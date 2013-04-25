@@ -19,11 +19,10 @@ in /SplitWGammaMC:
    TOuputTree : TInputTree
    TInputTree - automatucally generated class with the structure of the tree in the job_summer12_Wg.root
    TOutputTree - class which sets branches to the output tree, inherites all branch variables from TInputTree
-   SplitWGammaMC - loop over input tree entries, over iMC in each entry, decides whether the objects with given iMC goes to one of the output trees
-      if the mcPID[iMC] is 24 (W) and:
-      mcDecayType[iMC]==1 => Wgg
-      mcDecayType[iMC]==2:   W->enu
-      mcDecayType[iMC]==3:   W->munu
-      mcDecayType[iMC]==4:   W->taunu 
-      the same event can be saved to more than one output tree with different [iMC] objects
+   SplitWGammaMC - loop over input tree entries, over iMC in each entry and searches for iMC for which mcPID[iMC]==24
+      if the mcPID[iMC]==24 (W) and:
+        mcDecayType[iMC]==2:   W->enu
+        mcDecayType[iMC]==3:   W->munu
+        mcDecayType[iMC]==4:   W->taunu 
+      then the whole event is filled to W_enu, W_munu or W_taunu tree respectively 
 _________________________________________________________
