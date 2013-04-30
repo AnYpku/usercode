@@ -1,123 +1,303 @@
-#include "TConfiguration.h" //this class
-#include <iostream> //standard C++ class
+#include "TConfiguration.h" 
+  //this class
+#include "TInputSample.h" 
+  //this package
+#include <iostream> 
+  //standard C++ class
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1F.h>
 
-TConfiguration::TConfiguration(int channel, int sample)
+TConfiguration::TConfiguration()
 {
-  channel_=channel;
-  sample_=sample;
 }
 
 TConfiguration::~TConfiguration()
 {
 }
 
-void TConfiguration::SetChannelAndSample(int channel, int sample)
+TInputSample TConfiguration::GetInputSample(int channel, int sample, int iBkg)
 {
-  channel_=channel;
-  sample_=sample;
-}
+  TInputSample empty;
 
-void TConfiguration::SetInputFileNames()
-{
-  if (nDataMuFiles_>nInputFilesMax_ || nDataEleFiles_>nInputFilesMax_
-     || nSigMCMuFiles_>nInputFilesMax_ || nSigMCEleFiles_>nInputFilesMax_
-     || nBkgMCMuFiles_>nInputFilesMax_ || nBkgMCEleFiles_>nInputFilesMax_)
+  /////////////////////////////////////////
+  //input DATA MUON 
+  if (channel==MUON && sample==DATA)
     {
-      std::cout<<"Error in TConfiguration: One of these values nDataMuFiles_, nDataEleFiles_, nSigMCMuFiles_, nSigMCEleFiles_,  nBkgMCMuFiles_, nBkgMCEleFiles_ is greater than nInputFilesMax_; Please, go to TConfiguration.h and increase nInputFilesMax_; NO input values will be set up now!"<<std::endl;
-      nInputFiles=0;
-      return;
+      const int nFiles = 8;
+      TString dir = "/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/";
+      TString fileNames[nFiles]=
+        {  dir+"V05-03-07-04_maybe/job_1muon_2012a_Jul13rereco_skim.root",
+           dir+"V05-03-07-06/job_muon_2012b_Jul13rereco_skim.root",
+           dir+"V05-03-07-04_maybe/job_1muon_2012a_Aug6rereco_skim.root",
+           dir+"V05-03-07-06/job_muon_2012c_Aug24rereco_skim.root",
+           dir+"V05-03-07-06/job_muon_2012c_Dec11rereco_skim.root",
+           dir+"V05-03-07-06/job_muon_2012c_PRv2_skim.root",
+           dir+"V05-03-07-06/job_muon_2012c_PRv21_skim.root",
+           dir+"V05-03-07-04_maybe/job_1muon_2012d_PRv1_skim.root"
+        };
+      float lumiData[nFiles] = {-1.0, -1.0, 0.082, 0.495, 0.134, -1.0, -1.0, -1.0};
+      float lumiMC[nFiles] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
+      float csMC[nFiles] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
+      bool skim[nFiles] = {1,1,1,1,1,1,1,1};
+      int color = 1; //kBlack
+      float lumiDataTotal = 19593.0;
+      TInputSample dataMu (nFiles, "data", "data, muons", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+      return dataMu;
     }
-  if (channel_==MUON)
+
+  /////////////////////////////////////////
+  //input DATA ELECTRON 
+  else if (channel==ELECTRON && sample==DATA)
     {
-      if (sample_==DATA)
-        {
-          nInputFiles=nDataMuFiles_;
-          for (int i=0; i<nInputFiles; i++)
-            inputFileNames[i]=inputDataMuFileNames_[i];
-        }
-      else if (sample_==SIGMC)
-        {
-          nInputFiles=nSigMCMuFiles_;
-          for (int i=0; i<nInputFiles; i++)
-            inputFileNames[i]=inputSigMCMuFileNames_[i];
-        }
-      else if (sample_==BKGMC)
-        {
-          nInputFiles=nBkgMCMuFiles_;
-          for (int i=0; i<nInputFiles; i++)
-            inputFileNames[i]=inputBkgMCMuFileNames_[i];
-        }
-      else
-        {
-          nInputFiles=0;
-          std::cout<<"Error in TConfiguration::SetInputFileNames(): sample must be DATA, SIGMC or BKGMC. Please, make a change in the appropriate place"<<std::endl;
-        }
-    }//closing brace for if (channel_==MUON)
-  else if (channel_==ELECTRON)
+      //const int nFiles = 0;
+      //int color = 1; //kBlack
+      TInputSample dataEle;
+      return dataEle;
+    }
+
+  /////////////////////////////////////////
+  //input SIGMC MUON 
+  else if (channel==MUON && sample==SIGMC)
     {
-      if (sample_==DATA)
-        {
-          nInputFiles=nDataEleFiles_;
-          for (int i=0; i<nInputFiles; i++)
-            inputFileNames[i]=inputDataEleFileNames_[i];
-        }
-      else if (sample_==SIGMC)
-        {
-          nInputFiles=nSigMCEleFiles_;
-          for (int i=0; i<nInputFiles; i++)
-            inputFileNames[i]=inputSigMCEleFileNames_[i];
-        }
-      else if (sample_==BKGMC)
-        {
-          nInputFiles=nBkgMCEleFiles_;
-          for (int i=0; i<nInputFiles; i++)
-            inputFileNames[i]=inputBkgMCEleFileNames_[i];
-        }
-      else
-        {
-          nInputFiles=0;
-          std::cout<<"Error in TConfiguration::SetInputFileNames(): sample must be DATA, SIGMC or BKGMC. Please, make a change in the appropriate place"<<std::endl;
-        }
-    }//closing brace for else if (channel_==ELECTRON)
-  else
+      const int nFiles = 1;
+      TString fileNames[nFiles]= {"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Wg_munu.root"};
+      float lumiData[nFiles] = {-1.0};
+      float lumiMC[nFiles] = {-1.0};
+      float csMC[nFiles] = {461.6*927660/4802358};
+      bool skim[nFiles] = {0};
+      int color = 634; //kRed+2
+      float lumiDataTotal = -1.0;
+      TInputSample sigmcMu (nFiles, "Wg_to_munu", "W#gamma{#rightarrow}#mu#nu#gamma", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+      return sigmcMu;
+    }
+
+  /////////////////////////////////////////
+  //input SIGMC ELECTRON
+  else if (channel==ELECTRON && sample==SIGMC)
     {
-      nInputFiles=0;
-      std::cout<<"Error in TConfiguration::SetInputFileNames(): channel must be MUON or ELECTRON. Please, make a change in the appropriate place"<<std::endl;
-    }//closing brace for else
+      const int nFiles = 1;
+      TString fileNames[nFiles]= {"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Wg_enu.root"};
+      float lumiData[nFiles] = {-1.0};
+      float lumiMC[nFiles] = {-1.0};
+      float csMC[nFiles] = {461.6*927363/4802358};
+      bool skim[nFiles] = {0};
+      int color = 921; //kGray+1
+      float lumiDataTotal = -1.0;
+      TInputSample sigmcEle (nFiles, "Wg_to_enu", "W#gamma{#rightarrow}e#nu#gamma", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+      return sigmcEle;
+    }
+
+  /////////////////////////////////////////
+  //input BKGMC, the same for both channels
+  else if (sample==BKGMC)
+    {
+
+      if (iBkg==0)
+        {
+          TString sourceName="Wjets_to_lnu";
+          const int nFiles = 2;
+          TString fileNames[nFiles]= {"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WJetsToLNu1_skim.root","/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WJetsToLNu2_skim.root"};
+          float lumiData[nFiles] = {-1.0,-1.0};
+          float lumiMC[nFiles] = {-1.0,-1.0};
+          float csMC[nFiles] = {30400./2,30400./2};
+          bool skim[nFiles] = {1,1};
+          int color = 435; //kCyan+3
+          float lumiDataTotal = -1.0;
+          TInputSample bkgmc (nFiles, sourceName, "W+jets{#rightarrow}l#nu+jets", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+          return bkgmc;          
+        }
+
+      else if (iBkg==1)
+        {
+          TString sourceName="DYjets_to_ll";
+          const int nFiles = 1;
+          TString fileNames[nFiles]= {"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_DYJetsToLL.root"};
+          float lumiData[nFiles] = {-1.0};
+          float lumiMC[nFiles] = {-1.0};
+          float csMC[nFiles] = {11050.};
+          bool skim[nFiles] = {1};
+          int color = 419; //kGreen+3
+          float lumiDataTotal = -1.0;
+          TInputSample bkgmc (nFiles, sourceName, "DY+jets{#rightarrow}l#bar{l}", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+          return bkgmc;          
+        }
+
+      else if (iBkg==2)
+        {
+          TString sourceName="dibosons";
+          const int nFiles = 10;
+          TString dir="/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/";
+          TString fileNames[nFiles]= 
+            {dir+"job_summer12_WWg.root",
+             dir+"job_summer12_WW_2l2nu.root",
+             dir+"job_summer12_WZ_3lnu.root",
+             dir+"job_summer12_WZ_2l2q.root",
+             dir+"job_summer12_ZZ_4e.root",
+             dir+"job_summer12_ZZ_4mu.root",
+             dir+"job_summer12_ZZ_4tau.root",
+             dir+"job_summer12_ZZ_2e2mu.root",
+             dir+"job_summer12_ZZ_2e2tau.root",
+             dir+"job_summer12_ZZ_2mu2tau.root",
+            };
+          float lumiData[nFiles] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
+          float lumiMC[nFiles] = {-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0};
+          float csMC[nFiles] = {0.528,4.7,0.8674,1.755,0.07691,0.07691,0.07691,0.1767,0.1767,0.1767};
+          bool skim[nFiles] = {0,0,0,0,0,0,0,0,0,0};
+          int color = 799; //kOrange-1
+          float lumiDataTotal = -1.0;
+          TInputSample bkgmc (nFiles, sourceName, "WW, WZ, ZZ", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+          return bkgmc;          
+        }
+
+
+      else if (iBkg==3)
+        {
+          TString sourceName="Wg_to_taunu";
+          const int nFiles = 1;
+          TString fileNames[nFiles]= 
+            { "/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Wg_taunu.root" };
+          float lumiData[nFiles] = {-1.0};
+          float lumiMC[nFiles] = {-1.0};
+          float csMC[nFiles] = {461.6*927456/4802358};
+          bool skim[nFiles] = {0};
+          int color = 882; //kViolet+2
+          float lumiDataTotal = -1.0;
+          TInputSample bkgmc (nFiles, sourceName, "W#gamma{#rightarrow}#tau#nu#gamma", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+          return bkgmc;          
+        }
+
+      else if (iBkg==4)
+        {
+          TString sourceName="Zg_to_ll";
+          const int nFiles = 1;
+          TString fileNames[nFiles]= 
+            { "/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Zg.root" };
+          float lumiData[nFiles] = {-1.0};
+          float lumiMC[nFiles] = {-1.0};
+          float csMC[nFiles] = {132.6};
+          bool skim[nFiles] = {0};
+          int color = 402; //kYellow+2
+          float lumiDataTotal = -1.0;
+          TInputSample bkgmc (nFiles, sourceName, "Z#gamma{#rightarrow}l#bar{l}", color, lumiDataTotal, fileNames, lumiData, lumiMC, csMC, skim);
+          return bkgmc;          
+        }
+      //the last iBkg must be nBkgSources_-1
+
+    } //end of else if (sample==BKGMC)
+
+  return empty;
 }
 
-void TConfiguration::SetSelectedFileName()
+
+TString TConfiguration::GetSelectedFileName(int channel, int sample, int iBkg, bool isDebugMode)
 {
+  if ( !CheckSample(sample) || !CheckChannel(channel) ) return "";
+
+  TString fileName=selectedEventsDir_;
   
-  selectedFileName=selectedEventsDir_+selectedEventsNameBase_;
-
-  if (channel_==MUON)
-    selectedFileName+="_MUON";
-  else if (channel_==ELECTRON)
-    selectedFileName+="_ELECTRON";
-  else
+  if (channel==MUON && sample==DATA) 
+    fileName+=selectedEventsNameDataMu_;
+  else if (channel==ELECTRON && sample==DATA)  
+    fileName+=selectedEventsNameDataEle_;
+  else if (channel==MUON && sample==SIGMC) 
+    fileName+=selectedEventsNameSignalMCMu_;
+  else if (channel==ELECTRON && sample==SIGMC) 
+    fileName+=selectedEventsNameSignalMCMu_;
+  else if (sample==BKGMC)
     {
-      std::cout<<"Error in TConfiguration::SetSelectedFileName(): channel must be MUON or ELECTRON. Please, make a change in the appropriate place"<<std::endl;
-      selectedFileName="";
-      return;
+      TInputSample input = GetInputSample (channel, sample, iBkg);
+      fileName+=selectedEventsNameBkgMC_;
+      if (iBkg>=0 && iBkg<nBkgSources_)
+        fileName+=input.sourceName_;
+      else
+        {
+           std::cout<<"ERROR detected in TConfiguration::GetSelectedFileName: no "<<iBkg<<" background source exists for muons"<<std::cout;
+           return "";
+        }
     }
 
-  if (sample_==DATA)
-    selectedFileName+="_DATA";
-  else if (sample_==SIGMC)
-    selectedFileName+="_SIGMC";
-  else if (sample_==BKGMC)
-    selectedFileName+="_BKGMC";
-  else
-    {
-      std::cout<<"Error in TConfiguration::SetSelectedFileName(): sample must be DATA, SIGMC or BKGMC. Please, make a change in the appropriate place"<<std::endl;
-      selectedFileName="";
-      return;
-     }
-  selectedFileName+=".root";
+  if (isDebugMode) fileName+=nameDebugMode_;
+  fileName+=".root";
+  return fileName;
 }
 
 TString TConfiguration::GetPhosphorConstantFileName()
 {
   return phosphorConstantsFile_;
+}
+
+int TConfiguration::GetNSources(int sample)
+{
+  if (sample==DATA || sample==SIGMC) return 1;
+  else if (sample==BKGMC) return nBkgSources_;
+  else std::cout<<"ERROR detected in TConfiguration::GetNSources: sample "<<sample<<" is not known"<<std::endl;
+  return 0;
+}
+
+float TConfiguration::GetLumiWeight(int channel, int sample, int iBkg, int iFile)
+{
+  if (sample==DATA) return 1.0;
+
+  if (!CheckSample(sample) || !CheckChannel(channel) || !CheckBkgNumber(sample,iBkg)) return -1.0;
+
+
+  TInputSample data = GetInputSample(channel, DATA);
+  float lumiData = data.lumiDataTotal_;
+  TInputSample mc = GetInputSample(channel, sample, iBkg);
+  if (iFile>=mc.nFiles_) 
+    {
+      std::cout<<"ERROR detected in TConfiguration::GetLumiWeight: iFile="<<iFile<<" is too big"<<std::endl;
+      return -1.0;
+    }
+
+  if (mc.lumiMC_[iFile]!=-1.0) return (lumiData / mc.lumiMC_[iFile]);
+  TFile f(mc.fileNames_[iFile]);
+  if (!f.IsOpen()) 
+    {
+      std::cout<<"ERROR detected in TConfiguration::GetLumiWeight: file "<<mc.fileNames_[iFile]<<" is not open"<<std::endl;
+      return -1.0;
+    }
+  f.cd("ggNtuplizer");
+
+  TTree* tr = (TTree*)gDirectory->Get("EventTree");
+  long nEvents = tr->GetEntries();
+
+  if (mc.isSkimmed_[iFile])
+    {
+
+      TH1F* hist = (TH1F*)gDirectory->Get("hskim");
+      nEvents = nEvents * hist->GetBinContent(1) / hist->GetBinContent(2);
+      hist = 0;
+
+    }
+
+  tr = 0;
+  return (lumiData / (nEvents/mc.csMC_[iFile]));
+
+}
+
+bool TConfiguration::CheckSample(int sample)
+{
+  if (sample==DATA || sample==SIGMC || sample==BKGMC) return 1;
+  std::cout<<"ERROR detected in TConfiguration::CheckSample: sample = "<<sample<<" is unknown"<<std::endl;
+  return 0;
+}
+
+bool TConfiguration::CheckChannel(int channel)
+{
+  if (channel==MUON || channel==ELECTRON) return 1;
+  std::cout<<"ERROR detected in TConfiguration::CheckChannel: channel = "<<channel<<" is unknown"<<std::endl;
+  return 0;
+}
+
+bool TConfiguration::CheckBkgNumber(int sample, int iBkg)
+{
+  if (!CheckSample(sample)) return 0;
+  if (sample==BKGMC && iBkg>=nBkgSources_) 
+    {
+      std::cout<<"ERROR detected in TConfiguration::CheckBkgNumber: (iBkg="<<iBkg<<") > (nBkgSources_="<<nBkgSources_<<"). nBkgSources_ can be increased in TConfiguration.h "<<std::endl;
+      return 0;
+    }
+  return 1;
 }

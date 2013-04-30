@@ -1,63 +1,51 @@
 #ifndef TConfiguration_h
 #define TConfiguration_h
 
-#include "TString.h" //ROOT class
+#include "TInputSample.h" 
+  //this package
+#include "TString.h" 
+#include "TColor.h" 
+  //ROOT class
 
 class TConfiguration
 {
   public:
-    TConfiguration(int channel, int sample);
+    TConfiguration();
     virtual ~TConfiguration();
-    void SetChannelAndSample(int channel, int sample);
-    void SetInputFileNames();
-    void SetSelectedFileName();
+    TInputSample GetInputSample( int channel, int sample, int iBkg=0);
+    TString GetSelectedFileName(int channel, int sample, int iBkg=0, bool isDebugMode=0);
     TString GetPhosphorConstantFileName();
+    int GetNSources(int sample);
+    float GetLumiWeight(int channel, int sample, int iBkg=0, int iFile=0);
 
-    enum {MUON, ELECTRON};
-    enum {DATA, SIGMC, BKGMC};
+    bool CheckChannel(int channel);
+    bool CheckSample(int sample);
+    bool CheckBkgNumber(int sample, int iBkg);
 
-    int nInputFiles;
-    static const int nInputFilesMax_=30;
-      //increase this number if for one of the cases 
-      //you have more than 30 input files
-    TString inputFileNames[nInputFilesMax_];
-    TString selectedFileName;
+    enum {MUON, ELECTRON};//channel
+    enum {DATA, SIGMC, BKGMC};//sample
 
-  private:
-    int channel_;
-      //select channel - MUON or ELECTRON
-    int sample_;
-      //select on what you would like to run the analysis:
-      //DATA, SIGMC or BKGMC
+    static const int nBkgSources_ = 5;
 };
 
-static const int nDataMuFiles_ = 8;
-static const TString inputDataMuFileNames_[nDataMuFiles_]=
-{
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-04_maybe/job_1muon_2012a_Jul13rereco_skim.root",//Jul 13
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012b_Jul13rereco_skim.root",//Jul 13
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-04_maybe/job_1muon_2012a_Aug6rereco_skim.root",//Aug 6
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_Aug24rereco_skim.root",//Aug 24
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_Dec11rereco_skim.root",//Dec 11
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_PRv2_skim.root",//PR
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_PRv21_skim.root",//PR
-"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-04_maybe/job_1muon_2012d_PRv1_skim.root"//PR
-};
-static const int nDataEleFiles_ = 0;
-static const TString inputDataEleFileNames_[nDataEleFiles_];
-static const int nSigMCMuFiles_ = 1;
-static const TString inputSigMCMuFileNames_[nSigMCMuFiles_]=
-{"/home/hep/eavdeeva2/WGammaAnalysis/job_summer12_Wg.root"};
-static const int nSigMCEleFiles_ = 0;
-static const TString inputSigMCEleFileNames_[nSigMCEleFiles_];
-static const int nBkgMCMuFiles_ = 0;
-static const TString inputBkgMCMuFileNames_[nBkgMCMuFiles_];
-static const int nBkgMCEleFiles_ = 0;
-static const TString inputBkgMCEleFileNames_[nBkgMCEleFiles_];
+/////////////////////////////////////////
+//photon Pt binning
+static const int nPhoPtBins_ = 9;
+static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
 
+/////////////////////////////////////////
+//selected files, directory and file names
+//(these files will be output of the script Selection)
 static const TString selectedEventsDir_="../WGammaOutput/";
-static const TString selectedEventsNameBase_="selected";
+static const TString selectedEventsNameDataMu_="selected_MUON_DATA";//.root
+static const TString selectedEventsNameDataEle_="selected_ELECTRON_DATA";//.root
+static const TString selectedEventsNameSignalMCMu_="selected_MUON_SIGMC";//.root
+static const TString selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.root
+static const TString selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
+static const TString nameDebugMode_ = "_debugMode";
 
+/////////////////////////////////////////
+// phosphor corrections file
 static const TString phosphorConstantsFile_ = "../CertifiedConstants/PHOSPHOR_NUMBERS_EXPFIT_ERRORS.txt";
 
 #endif //#ifndef TConfiguration_h
