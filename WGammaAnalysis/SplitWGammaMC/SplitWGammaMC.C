@@ -58,12 +58,17 @@ void SplitWGammaMC::LoopOverInputTree()
       if (entry < 0) break;
 
       fChain->GetEntry(entry);
+      bool hasW=0;
       for (int iMC=0; iMC<nMC; iMC++)
         {
-          if (mcPID[iMC]==24)
-            for (int id=1; id<numberOfTrees; id++)
-              if (mcDecayType[iMC]==id) outputTree_[id]->Fill();
+          if (mcPID[iMC]==24 || mcPID[iMC]==-24)
+            {
+              for (int id=2; id<numberOfTrees; id++)
+                if (mcDecayType[iMC]==id) outputTree_[id]->Fill();
+              hasW=1;
+            }
         }
+      if (!hasW) outputTree_[1]->Fill();
     
     }//loop over entries ends
 
