@@ -1,8 +1,8 @@
 #ifndef TConfiguration_h
 #define TConfiguration_h
 
-#include "TInputSample.h" 
-  //this package
+#include <string>
+ 
 #include "TString.h" 
 #include "TColor.h" 
   //ROOT class
@@ -12,20 +12,17 @@ class TConfiguration
   public:
     TConfiguration();
     virtual ~TConfiguration();
-    TInputSample GetInputSample( int channel, int sample, int iBkg=0);
-    TString GetSelectedFileName(int channel, int sample, int iBkg=0, bool isDebugMode=0);
-    TString GetPhosphorConstantFileName();
-    int GetNSources(int sample);
-    float GetLumiWeight(int channel, int sample, int iBkg=0, int iFile=0);
+    string GetPhosphorConstantFileName();
 
-    bool CheckChannel(int channel);
-    bool CheckSample(int sample);
-    bool CheckBkgNumber(int sample, int iBkg);
+    string GetSelectedEventsDir();
+    string GetSelectedNameDataMu();
+    string GetSelectedNameDataEle();
+    string GetSelectedNameSignalMCMu();
+    string GetSelectedNameSignalMCEle();
+    string GetSelectedNameBkgMC();
+    string GetNameDebugMode();
+    string GetNameReleasedCuts();
 
-    enum {MUON, ELECTRON};//channel
-    enum {DATA, SIGMC, BKGMC};//sample
-
-    static const int nBkgSources_ = 5;
 };
 
 /////////////////////////////////////////
@@ -36,16 +33,17 @@ static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,
 /////////////////////////////////////////
 //selected files, directory and file names
 //(these files will be output of the script Selection)
-static const TString selectedEventsDir_="../WGammaOutput/";
-static const TString selectedEventsNameDataMu_="selected_MUON_DATA";//.root
-static const TString selectedEventsNameDataEle_="selected_ELECTRON_DATA";//.root
-static const TString selectedEventsNameSignalMCMu_="selected_MUON_SIGMC";//.root
-static const TString selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.root
-static const TString selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
-static const TString nameDebugMode_ = "_debugMode";
+static const string selectedEventsDir_="../WGammaOutput/";
+static const string selectedEventsNameDataMu_="selected_MUON_DATA";//.root
+static const string selectedEventsNameDataEle_="selected_ELECTRON_DATA";//.root
+static const string selectedEventsNameSignalMCMu_="selected_MUON_SIGMC";//.root
+static const string selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.root
+static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
+static const string nameDebugMode_ = "_debugMode";
+static const string nameReleasedCuts_ = "_releasedCuts";
 
 /////////////////////////////////////////
 // phosphor corrections file
-static const TString phosphorConstantsFile_ = "../CertifiedConstants/PHOSPHOR_NUMBERS_EXPFIT_ERRORS.txt";
+static const string phosphorConstantsFile_ = "../CertifiedConstants/PHOSPHOR_NUMBERS_EXPFIT_ERRORS.txt";
 
 #endif //#ifndef TConfiguration_h

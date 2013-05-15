@@ -1,0 +1,124 @@
+###################################################################
+###  SYNTAX RULES OF THE CONFIGURATION FILE:
+########
+###  1) if first symbol in the line is '#' - this is a comment
+###  2) if first symbol in the line is '$' - here information about new sample starts
+###       the first word is sample type (DATA, SIGMC, BKGMC)
+###       for DATA and SIGMC, the second word is name of channel (MUON, ELECTRON, BOTH_CHANNELS)
+###       no channel specified here for BKGMC
+###       next, for SIGMC and BKGMC only: name of sample (e.g. Wg_to_munu)
+###       next, for SIGMC and BKGMC only: label of the sample for legend (e.g.  W#gamma#rightarrow#mu#nu#gamma)
+###       next, number - color from TColor.h table (ROOT)
+###       next, for DATA only: may or may not be word "lumiTotal" with lumiTotal value after that
+###       next, for SIGMC and BKGMC only: may or may not be work "csTotal" with csTotal value after that
+###         (csTotal is used for luminocity reweight for MC samples for which original file was splitted)
+###  3) if first symbol in the line is '-' - this is a file for given sample
+###       for BKGMC only: name of channel for which this bkg needs to be processed (MUON, ELECTRON, BOTH_CHANNELS)
+###       next, name of the file
+###       next, for DATA only: may or may not be luminocity value
+###         (might be used for purposes of fast processing only one data file rather then full data)
+###       next, for SIGMC and BKGMC only: cross section value for 8 TeV from the twiki table
+###       next, for SIGMC and BKGMC only: may or may not be branching ration or filter efficiency or whatever other factor
+###  4) empty lines or lines started with any other symbol are just ignored for now
+########
+###  reading from the config.txt is implemented in 
+###  TAllInputSamples::ReadConfig(int channel, char* configFile)
+###################################################################
+         
+
+###################################################################
+$   DATA     MUON    1    lumiTotal 19593.0        
+# 1 is kBlack, 19593.0 - luminocity
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-04_maybe/job_1muon_2012a_Jul13rereco_skim.root
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012b_Jul13rereco_skim.root
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-04_maybe/job_1muon_2012a_Aug6rereco_skim.root 0.082 
+#0.082 - luminocity of this file
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_Aug24rereco_skim.root 0.495 
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_Dec11rereco_skim.root 0.134 
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_PRv2_skim.root
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-06/job_muon_2012c_PRv21_skim.root
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/ikrav/WGamma/MuoGamDR03Skim/V05-03-07-04_maybe/job_1muon_2012d_PRv1_skim.root
+
+@
+
+###################################################################
+$   DATA     ELECTRON    1
+# no files yet
+
+@
+
+###################################################################
+$   SIGMC    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634     #634=kRed+2
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Wg_munu.root   461.6  0.3262  
+# cross section and branching 
+
+@
+
+###################################################################
+$   SIGMC    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    921     
+#921=kGray+1
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Wg_enu.root   461.6  0.3320  
+# cross section and branching 
+
+###################################################################
+$ BKGMC      Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  csTotal 30400  
+#433=kCyan+1
+
+- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WJetsToLNu1_skim.root
+
+- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WJetsToLNu2_skim.root
+
+@
+
+###################################################################
+$ BKGMC      DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
+#418=kGreen+2
+
+- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_DYJetsToLL.root   11050
+
+###################################################################
+$ BKGMC      Zg     Z#gamma#rightarrowl#bar{l}      401    
+#401=kYellow+1
+
+- BOTH_CHANNELS  /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Zg.root   132.6 
+
+###################################################################
+#$ BKGMC      dibosons      WW,WZ,ZZ       799    #799=kOrange-1
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WWg.root    0.528
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WW_2l2nu.root   4.7
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WZ_3lnu.root   0.8674
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_WZ_2l2q.root   1.755
+#
+#- ELECTRON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_4e.root    0.07691
+#
+#- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_4mu.root      0.07691
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_4tau.root   0.07691
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_2e2mu.root   0.1767
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_2e2tau.root   0.1767
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_2mu2tau.root   0.1767
+
+###################################################################
+#$ BKGMC      Wg_to_taunu     W#gamma#rightarrow#tau#nu#gamma        882    
+#882=kViolet+2
+#
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_Wg_taunu.root    461.6    0.3472  
+
+
