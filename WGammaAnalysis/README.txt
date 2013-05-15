@@ -2,15 +2,31 @@
 ## WGammaAnalysis ##
 ####################
 
+to run WGamma Monte Carlo sample splitter (e, mu, tau channels)
+  $ cd SplitWGammaMC
+  $ root -l runSplitWGammaMC.C
+
 to run Selection:
-  cd Selection
-  root -l runSelection.C
+  $ cd Selection
+  $ root -l runSelection.C
 
 output root files availiable in the WGammaOutput
+
 _________________________________________________________
 
-runSelection.C calls WGammaSelection::LoopOverFiles() 
+in /SplitWGammaMC:
+
+   independent script, splits Wg to Wg_munug, Wg_enug and Wg_taunug
+   $ root -l runSplitWGammaMC.C
+   more detailed README aviliable in the /SplitWGammaMC
+_________________________________________________________
+
+
 in /Selection:
+
+   runSelection.C calls WGammaSelection::LoopOverFiles()
+   run it with line
+   $ root -l runSelection.C
    WGammaSelection: TEventTree, TSelectedEventsTree
    TEventTree - class of the input tree
    TSelectedEventsTree - class of the output tree
@@ -29,13 +45,4 @@ in /Selection:
        the class was taken from 
        http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
 __________________________________________________________
-
-the next steps to be done:
-- fix "failing filling brach for memory-resident tree" error
-- split TConfiguration to two files: 
-    machine dependent (locations of MC and data input files)
-    and machine independent (everything else)
-- implement Selection for MC
-    add MC-specific variables to the TEventTree and TSelectedEventsTree
-    add MC-specific corrections
       
