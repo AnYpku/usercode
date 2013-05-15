@@ -4,6 +4,7 @@
 class TPhotonCuts
 {
   public:
+    TPhotonCuts();
     TPhotonCuts(    int phoEleVeto_ipho,
                     float phoEt_ipho,
                     float phoEta_ipho,
@@ -18,6 +19,8 @@ class TPhotonCuts
     virtual ~TPhotonCuts();
 
     bool Passed();
+    bool PhoKinematics(float phoPt, float phoEta);
+    bool PhoKinematics();
     bool SimpleCutBasedPhotonID2012(); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
       //for reference
@@ -30,6 +33,8 @@ class TPhotonCuts
     float EffAreaPhotons();
     //the following function calculated corrected particle flow isolation
     float PFIsoCorr(float PFIso, float rho, float EA);
+    bool IsBarrel(float phoEta);
+    bool IsEndcap(float phoEta);
     bool IsBarrel();
     bool IsEndcap();
 
@@ -57,7 +62,7 @@ class TPhotonCuts
     float phoPFPhoIsoEndcapCut_[3];
 
     const static float phoPtCut_ = 15.0;
-    const static int WP_=2; 
+    const static int WP_=1; 
       //WP - working point
       //nWP - total number of working points
       //0 - loose  (90% for barrel, 85% for endcap) 

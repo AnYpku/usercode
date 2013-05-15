@@ -3,6 +3,10 @@
 #include <iostream> //general C++ class
 #include "TMath.h" //ROOT class
 
+TMuonCuts::TMuonCuts()
+{
+}
+
 TMuonCuts::TMuonCuts(  int imu,
                float muPt_imu,
                float* muPt,
@@ -14,7 +18,9 @@ TMuonCuts::TMuonCuts(  int imu,
                int muNumberOfValidTrkLayers_imu,
                int muNumberOfValidMuonHits_imu,
                int muStations_imu,
+               int HLT_HLTIndex_18,
                int HLT_HLTIndex_19,
+               int muTrg_imu_0,
                int muTrg_imu_1,
                float muChi2NDF_imu,
                float muD0_imu,
@@ -33,6 +39,8 @@ TMuonCuts::TMuonCuts(  int imu,
   muNumberOfValidTrkLayers_imu_=muNumberOfValidTrkLayers_imu;
   muNumberOfValidMuonHits_imu_=muNumberOfValidMuonHits_imu;
   muStations_imu_=muStations_imu;
+  HLT_HLTIndex_18_=HLT_HLTIndex_18;
+  muTrg_imu_0_=muTrg_imu_0;
   HLT_HLTIndex_19_=HLT_HLTIndex_19;
   muTrg_imu_1_=muTrg_imu_1;
   muChi2NDF_imu_=muChi2NDF_imu;
@@ -65,7 +73,7 @@ bool TMuonCuts::MoreMuonsVeto()
 }
 
 bool TMuonCuts::Passed() { 
-  if (!MuKinematics()) return false; 
+  if (!MuKinematics(muPt_imu_, muEta_imu_)) return false; 
   if (!MuTriggerMatch()) return false;
   if (!MuId()) return false; 
   if (!MuIsolation()) return false;
@@ -74,15 +82,17 @@ bool TMuonCuts::Passed() {
 
 bool TMuonCuts::MuTriggerMatch()
 {
-  if (!HLT_HLTIndex_19_) return false;//HLT_IsoMu24_v
-  if (!muTrg_imu_1_) return false;//muonTriggerMatchHLTIsoMu24
-  return true;
+  if (HLT_HLTIndex_19_ && muTrg_imu_1_) return true;
+    //HLT_IsoMu24_v, muonTriggerMatchHLTIsoMu24
+  if (HLT_HLTIndex_18_ && muTrg_imu_0_) return true;
+    //HLT_IsoMu24_eta2p1_, muonTriggerMatchHLTIsoMu24eta2p1
+  return false;
 }
 
-bool TMuonCuts::MuKinematics() 
+bool TMuonCuts::MuKinematics(float muPt, float muEta) 
 {
-  if (muPt_imu_<=muPtCut_) return false; 
-  if (fabs(muEta_imu_)>=muEtaCut_) return false ;
+  if (muPt<=muPtCut_) return false; 
+  if (fabs(muEta)>=muEtaCut_) return false ;
   return true ; 
 }
 

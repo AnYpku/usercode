@@ -3,6 +3,10 @@
 #include "math.h"
   //standard C++ class
 
+TPhotonCuts::TPhotonCuts()
+{
+}
+
 TPhotonCuts::TPhotonCuts(    int phoEleVeto_ipho,
                     float phoEt_ipho,
                     float phoEta_ipho,
@@ -43,9 +47,21 @@ TPhotonCuts::~TPhotonCuts()
 
 bool TPhotonCuts::Passed()
 {
-  if (phoSCEt_ipho_<phoPtCut_) return false;
+  if (!PhoKinematics()) return false;
   if (!SimpleCutBasedPhotonID2012()) return false;
   return true;
+}
+
+bool TPhotonCuts::PhoKinematics(float phoPt, float phoEta)
+{
+  if (phoPt<phoPtCut_) return false;
+  if (!IsBarrel(phoEta) && !IsEndcap(phoEta)) return false;
+  return true;
+}
+
+bool TPhotonCuts::PhoKinematics()
+{
+  return PhoKinematics(phoSCEt_ipho_, phoSCEta_ipho_);
 }
 
 bool TPhotonCuts::SimpleCutBasedPhotonID2012()
@@ -118,14 +134,24 @@ float TPhotonCuts::PFIsoCorr(float PFIso, float rho, float EA)
   return 0.0;
 }
 
+bool TPhotonCuts::IsBarrel(float phoEta)
+{
+  if (fabs(phoEta)<1.442) return true;
+  return false;
+}
+
+bool TPhotonCuts::IsEndcap(float phoEta)
+{
+  if (fabs(phoEta)>1.566 && fabs(phoSCEta_ipho_)<2.5) return true;
+  return false;
+}
+
 bool TPhotonCuts::IsBarrel()
 {
-  if (fabs(phoSCEta_ipho_)<1.442) return true;
-  return false;
+    return IsBarrel(phoSCEta_ipho_);
 }
 
 bool TPhotonCuts::IsEndcap()
 {
-  if (fabs(phoSCEta_ipho_)>1.566 && fabs(phoSCEta_ipho_)<2.5) return true;
-  return false;
+    return IsEndcap(phoSCEta_ipho_);
 }

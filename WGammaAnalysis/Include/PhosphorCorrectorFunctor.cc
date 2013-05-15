@@ -10,6 +10,8 @@
 zgamma::PhosphorCorrectionFunctor::PhosphorCorrectionFunctor(){
 
 };//default constructor
+
+/*
 zgamma::PhosphorCorrectionFunctor::PhosphorCorrectionFunctor(const char* filename){
 
   rand = new TRandom3(0);
@@ -23,10 +25,10 @@ zgamma::PhosphorCorrectionFunctor::PhosphorCorrectionFunctor(const char* filenam
     }
   }
 };
+*/
 
 
-
-zgamma::PhosphorCorrectionFunctor::PhosphorCorrectionFunctor(const char* filename, bool R9Cat){
+zgamma::PhosphorCorrectionFunctor::PhosphorCorrectionFunctor(const char* filename){
   
   rand = new TRandom3(0);
   this->MapCat();
@@ -34,7 +36,7 @@ zgamma::PhosphorCorrectionFunctor::PhosphorCorrectionFunctor(const char* filenam
   if( !SetMapFileName(filename) ){
     std::cout << "[INFO]--> Problems openning the file" << std::endl;
   }else{
-    if( !CreateMap( true ) ){
+    if( !CreateMap( ) ){
       std::cout << "[INFO]--> Some Problem Filling the MAP Was Found, please check your MAP FILE" << std::endl;
     }
   }
@@ -69,15 +71,16 @@ double zgamma::PhosphorCorrectionFunctor::FabSmear(double E, double eta, double 
 };
 
 bool zgamma::PhosphorCorrectionFunctor::SetMapFileName(const char* filename){
-this->filename = filename;
+this->filename_ = filename;
 
  return true;
 };
 
+/*
 bool zgamma::PhosphorCorrectionFunctor::CreateMap(){
   int year, dataType, detType, corrType, ptBin;
   double corrNumber;
-  MapFile.open(filename);
+  MapFile.open(filename_);
   std::string line;
   std::string KeyMap;
   if(  MapFile.is_open() ){
@@ -106,13 +109,13 @@ bool zgamma::PhosphorCorrectionFunctor::CreateMap(){
   }
 
 };
+*/
 
 
-
-bool zgamma::PhosphorCorrectionFunctor::CreateMap(bool R9Cat){
+bool zgamma::PhosphorCorrectionFunctor::CreateMap(){
   int year, dataType, detType, r9Cat,corrType, ptBin;
   double corrNumber, Err;
-  MapFile.open(filename);
+  MapFile.open(filename_);
   std::string line;
   std::string KeyMap;
   if(  MapFile.is_open() ){
@@ -207,8 +210,8 @@ double zgamma::PhosphorCorrectionFunctor::GetScaleCorr(int year, double pt, doub
 
 double zgamma::PhosphorCorrectionFunctor::GetCorrEnergyMC(int year, double pt, double etaReco, double Egen){
   
-  int dataType = Data;
-  int corrType = Scale;
+  //int dataType = Data;
+  //int corrType = Scale;
   int ptBin = -1;
   int detType = -1;
   
@@ -242,7 +245,7 @@ double zgamma::PhosphorCorrectionFunctor::GetCorrEnergyMC(int year, double pt, d
   std::map<std::string, double>::iterator it_Rdata = CorrMap.find(KeyMap_Rdata);
 
   if( it_Smc == CorrMap.end() ){
-    std::cout << "[INFO]-->Scale MC NOT found on the MAP, correction not applied" << "Pt = "  << pt << " eta = " << etaReco << std::endl;
+    //std::cout << "[INFO]-->Scale MC NOT found on the MAP, correction not applied" << "Pt = "  << pt << " eta = " << etaReco << std::endl;
     return ETtoE( pt, etaReco);
     
   }else if( it_Rmc == CorrMap.end() ){
@@ -272,8 +275,8 @@ double zgamma::PhosphorCorrectionFunctor::GetCorrEnergyMC(int year, double pt, d
 
 double zgamma::PhosphorCorrectionFunctor::GetCorrEnergyMC(float R9, int year, double pt, double etaReco, double Egen){
   
-  int dataType = Data;
-  int corrType = Scale;
+  //int dataType = Data;
+  //int corrType = Scale;
   int ptBin = -1;
   int detType = -1;
   int r9Cat = -1;
@@ -316,7 +319,7 @@ double zgamma::PhosphorCorrectionFunctor::GetCorrEnergyMC(float R9, int year, do
   std::map<std::string, double>::iterator it_Rdata = CorrMap.find(KeyMap_Rdata);
   
   if( it_Smc == CorrMap.end() ){
-    std::cout << "[INFO]-->Scale MC NOT found on the MAP, correction not applied" << "Pt = "  << pt << " eta = " << etaReco << std::endl;
+    //std::cout << "[INFO]-->Scale MC NOT found on the MAP, correction not applied" << "Pt = "  << pt << " eta = " << etaReco << std::endl;
     return ETtoE( pt, etaReco);
     
   }else if( it_Rmc == CorrMap.end() ){
@@ -656,7 +659,7 @@ pair <int,double> zgamma::PhosphorCorrectionFunctor::ResEnError(float R9, int ye
 
 double zgamma::PhosphorCorrectionFunctor::ScaleEnError(float R9, int year, double pt, double etaReco, double Egen){
   
-  int cat = GetCategory(R9, year, pt, etaReco);
+  //int cat = GetCategory(R9, year, pt, etaReco);
   float ScaleError = 0.01;//1%
   int* c_in;
   
@@ -684,7 +687,7 @@ double zgamma::PhosphorCorrectionFunctor::ScaleEnError(float R9, int year, doubl
 
 double zgamma::PhosphorCorrectionFunctor::ResEnError(float R9, int year, double pt, double etaReco, double Egen){
 
-  int cat = GetCategory(R9, year, pt, etaReco);
+  //int cat = GetCategory(R9, year, pt, etaReco);
   float SigR_over_R = 0.02;//2%
   int* c_in;
   

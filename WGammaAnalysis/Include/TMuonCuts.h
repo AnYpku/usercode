@@ -6,6 +6,7 @@
 class TMuonCuts
   {
      public:
+       TMuonCuts ();
        TMuonCuts ( int imu,
                float muPt_imu,
                float* muPt,
@@ -17,7 +18,9 @@ class TMuonCuts
                int muNumberOfValidTrkLayers_imu_,
                int muNumberOfValidMuonHits_imu_,
                int muStations_imu,
+               int HLT_HLTIndex_18,
                int HLT_HLTIndex_19,
+               int muTrg_imu_0,
                int muTrg_imu_1,
                float muChi2NDF_imu_,
                float muD0_imu,
@@ -34,7 +37,7 @@ class TMuonCuts
          //if muon passed the whole selection requirement 
          //(except veto on having another muon)
        bool MuTriggerMatch();
-       bool MuKinematics();
+       bool MuKinematics(float muPt, float muEta);
        bool MuIsolation();
         //mu Isolation as recommended here:
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation
@@ -50,6 +53,8 @@ class TMuonCuts
        int muNumberOfValidTrkLayers_imu_;
        int muNumberOfValidMuonHits_imu_;
        int muStations_imu_;
+       int HLT_HLTIndex_18_;
+       int muTrg_imu_0_;
        int HLT_HLTIndex_19_;
        int muTrg_imu_1_;
        float muChi2NDF_imu_;
