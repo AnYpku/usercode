@@ -8,25 +8,21 @@
 class TSelectedEventsTree
 {
   public:
-    TSelectedEventsTree(TString selectedTreeFileName=0);
+    TSelectedEventsTree();
     virtual ~TSelectedEventsTree();
 
-    void SetOutputTreeFile();
+    void SetOutputTree(TTree* tree);
     void Fill();
-    void SaveTreeToFile();
     void SetValues(float leEta, float lePhi, float lePt,
                    float phoEta, float phoPhi, float phoEt,
                    float lePhoDeltaR,
                    float WMt,
                    float pfMET, float pfMETPhi,
                    int run,
-                   int inputFileN);
-
-  protected:
-    TString selectedTreeFileName_;    
+                   int inputFileN,
+                   float weight); 
 
   private:
-    TFile outFile_;
     TTree *outTree_;
     float leEta_;
     float lePhi_;
@@ -40,6 +36,7 @@ class TSelectedEventsTree
     float pfMETPhi_;
     int run_;
     int inputFileN_;
+    float weight_;
 };
 
 #endif //#ifndef TSelectedEventsTree_h

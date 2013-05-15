@@ -4,26 +4,19 @@
 #include "TString.h" //ROOT class
 #include <iostream> //standard C++ class
 
-TSelectedEventsTree::TSelectedEventsTree(TString selectedTreeFileName)
+TSelectedEventsTree::TSelectedEventsTree()
 {
-  if (selectedTreeFileName==0)
-    {
-      outTree_=0;
-      std::cout<<"TSelectedEventsTree: no outputFile specified"<<std::endl;
-    }
-  else
-    TSelectedEventsTree::SetOutputTreeFile();
+
 }
 
 TSelectedEventsTree::~TSelectedEventsTree()
 {
-  if (outTree_) delete (outTree_);
-  outTree_=0;
+
 }
 
-void TSelectedEventsTree::SetOutputTreeFile()
+void TSelectedEventsTree::SetOutputTree(TTree* tree)
 {
-  outTree_ = new TTree("selectedEvents","selected Events");
+  outTree_=tree;
   outTree_->Branch("leptonEta",&leEta_,"leptonEta/F");
   outTree_->Branch("leptonPhi",&lePhi_,"leptonPhi/F");
   outTree_->Branch("leptonPt",&lePt_,"leptonPt/F");
@@ -36,18 +29,12 @@ void TSelectedEventsTree::SetOutputTreeFile()
   outTree_->Branch("pfMET",&pfMET_,"pfMET/F");
   outTree_->Branch("run",&run_,"run/I");
   outTree_->Branch("inputFileNumber",&inputFileN_,"inputFileNumber/I");
+  outTree_->Branch("weight",&weight_,"weight/F");
 }
 
 void TSelectedEventsTree::Fill()
 {
   outTree_->Fill();
-}
-
-void TSelectedEventsTree::SaveTreeToFile()
-{
-  outFile_.Open(selectedTreeFileName_,"recreate");
-  outTree_->Write();
-  outFile_.Close();
 }
 
 void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, 
@@ -56,7 +43,8 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
                  float WMt,
                  float pfMET, float pfMETPhi,
                  int run,
-                 int inputFileN)
+                 int inputFileN,
+                 float weight)
 {
   leEta_=leEta;
   lePhi_=lePhi;
@@ -70,4 +58,5 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
   pfMETPhi_=pfMETPhi;
   run_=run;
   inputFileN_=inputFileN;
+  weight_=weight;
 }

@@ -5,28 +5,31 @@
 #ifndef TEventTree_h
 #define TEventTree_h
 
-#include <TROOT.h> //root class
-#include <TChain.h> //root class
-#include <TFile.h> //root class
+#include <TROOT.h>
+#include <TChain.h>
+#include <TFile.h>
+  //ROOT classes
 
 class TEventTree {
 public:
    const static Int_t kMaxnHLT = 456;
-   const static Int_t kMaxnVtx = 59;
-   const static Int_t kMaxnVtxBS = 59;
+   const static Int_t kMaxnVtx = 70;
+   const static Int_t kMaxnVtxBS = 70;
    const static Int_t kMaxnPFPho = 48;
    const static Int_t kMaxnPFEle = 6;
    const static Int_t kMaxnEle = 10;
-   const static Int_t kMaxnPho = 11;
+   const static Int_t kMaxnPho = 16;
    const static Int_t kMaxnMu = 33;
-   const static Int_t kMaxnJet = 86;
+   const static Int_t kMaxnJet = 92;
    const static Int_t kMaxnLowPtJet = 69;
    const static Int_t kMaxnConv = 0;//500
      //since they are not used in the analysis,
      //I don't want to creat these big arrays of Float_t
      //for converted photons
+   const static Int_t kMaxnMC = 9;
+   const static Int_t kMaxnPUInfo = 3;
 
-protected:
+public:
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
@@ -44,6 +47,34 @@ protected:
    Int_t           IsVtxGood;
    Int_t           nVtxBS;
    Float_t         vtxbs[kMaxnVtxBS][3];   //[nVtxBS]
+//MC specific variables start here:
+   Float_t         pdf[7];
+   Float_t         pthat;
+   Float_t         processID;
+   Int_t           nMC;
+   Int_t           mcPID[kMaxnMC];   //[nMC]
+   Float_t         mcVtx[kMaxnMC][3];   //[nMC]
+   Float_t         mcPt[kMaxnMC];   //[nMC]
+   Float_t         mcMass[kMaxnMC];   //[nMC]
+   Float_t         mcEta[kMaxnMC];   //[nMC]
+   Float_t         mcPhi[kMaxnMC];   //[nMC]
+   Float_t         mcE[kMaxnMC];   //[nMC]
+   Float_t         mcEt[kMaxnMC];   //[nMC]
+   Int_t           mcGMomPID[kMaxnMC];   //[nMC]
+   Int_t           mcMomPID[kMaxnMC];   //[nMC]
+   Float_t         mcMomPt[kMaxnMC];   //[nMC]
+   Float_t         mcMomMass[kMaxnMC];   //[nMC]
+   Float_t         mcMomEta[kMaxnMC];   //[nMC]
+   Float_t         mcMomPhi[kMaxnMC];   //[nMC]
+   Int_t           mcIndex[kMaxnMC];   //[nMC]
+   Int_t           mcDecayType[kMaxnMC];   //[nMC]
+   Float_t         genMET;
+   Float_t         genMETPhi;
+   Int_t           nPUInfo;
+   Int_t           nPU[kMaxnPUInfo];   //[nPUInfo]
+   Int_t           puBX[kMaxnPUInfo];   //[nPUInfo]
+   Float_t         puTrue[kMaxnPUInfo];   //[nPUInfo]
+//MC specific variables ends here
    Float_t         MET;
    Float_t         METPhi;
    Float_t         METsumEt;
@@ -113,6 +144,12 @@ protected:
    Float_t         eleSeedTime[kMaxnEle];   //[nEle]
    Int_t           eleRecoFlag[kMaxnEle];   //[nEle]
    Int_t           elePos[kMaxnEle];   //[nEle]
+//MC specific variables start here:
+   Int_t           eleGenIndex[kMaxnEle];   //[nEle]
+   Int_t           eleGenGMomPID[kMaxnEle];   //[nEle]
+   Int_t           eleGenMomPID[kMaxnEle];   //[nEle]
+   Float_t         eleGenMomPt[kMaxnEle];   //[nEle]
+//MC specific variables end here
    Float_t         eleIsoTrkDR03[kMaxnEle];   //[nEle]
    Float_t         eleIsoEcalDR03[kMaxnEle];   //[nEle]
    Float_t         eleIsoHcalDR03[kMaxnEle];   //[nEle]
@@ -203,6 +240,12 @@ protected:
    Int_t           phoSeedDetId2[kMaxnPho];   //[nPho]
    Int_t           phoRecoFlag[kMaxnPho];   //[nPho]
    Int_t           phoPos[kMaxnPho];   //[nPho]
+//MC specific variables start here
+   Int_t           phoGenIndex[kMaxnPho];   //[nPho]
+   Int_t           phoGenGMomPID[kMaxnPho];   //[nPho]
+   Int_t           phoGenMomPID[kMaxnPho];   //[nPho]
+   Float_t         phoGenMomPt[kMaxnPho];   //[nPho]
+//MC specific variables end here
    Float_t         phoSCE[kMaxnPho];   //[nPho]
    Float_t         phoSCRawE[kMaxnPho];   //[nPho]
    Float_t         phoESEn[kMaxnPho];   //[nPho]
@@ -260,6 +303,9 @@ protected:
    Float_t         muPz[kMaxnMu];   //[nMu]
    Float_t         muVtx[kMaxnMu][3];   //[nMu]
    Float_t         muVtxGlb[kMaxnMu][3];   //[nMu]
+//MC specific variable starts
+   Int_t           muGenIndex[kMaxnMu];   //[nMu]
+//MC specific variable ends
    Float_t         mucktPt[kMaxnMu];   //[nMu]
    Float_t         mucktPtErr[kMaxnMu];   //[nMu]
    Float_t         mucktEta[kMaxnMu];   //[nMu]
@@ -373,6 +419,19 @@ protected:
    Int_t           jetWPLevels[kMaxnJet][4];   //[nJet]
    Float_t         jetMVAsExt[kMaxnJet][4][100];   //[nJet]
    Int_t           jetWPLevelsExt[kMaxnJet][4][100];   //[nJet]
+//MC specific variables begin
+   Int_t           jetPartonID[kMaxnJet];   //[nJet]
+   Int_t           jetGenJetIndex[kMaxnJet];   //[nJet]
+   Float_t         jetGenJetEn[kMaxnJet];   //[nJet]
+   Float_t         jetGenJetPt[kMaxnJet];   //[nJet]
+   Float_t         jetGenJetEta[kMaxnJet];   //[nJet]
+   Float_t         jetGenJetPhi[kMaxnJet];   //[nJet]
+   Int_t           jetGenPartonID[kMaxnJet];   //[nJet]
+   Float_t         jetGenEn[kMaxnJet];   //[nJet]
+   Float_t         jetGenPt[kMaxnJet];   //[nJet]
+   Float_t         jetGenEta[kMaxnJet];   //[nJet]
+   Float_t         jetGenPhi[kMaxnJet];   //[nJet]
+//MC specific variables end
    Int_t           nLowPtJet;
    Float_t         jetLowPtEn[kMaxnLowPtJet];   //[nLowPtJet]
    Float_t         jetLowPtPt[kMaxnLowPtJet];   //[nLowPtJet]
@@ -383,6 +442,18 @@ protected:
    Float_t         jetLowPtRawPt[kMaxnLowPtJet];   //[nLowPtJet]
    Float_t         jetLowPtRawEn[kMaxnLowPtJet];   //[nLowPtJet]
    Float_t         jetLowPtArea[kMaxnLowPtJet];   //[nLowPtJet]
+//MC specific variables begin
+   Int_t           jetLowPtPartonID[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenJetEn[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenJetPt[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenJetEta[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenJetPhi[kMaxnLowPtJet];   //[nLowPtJet]
+   Int_t           jetLowPtGenPartonID[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenEn[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenPt[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenEta[kMaxnLowPtJet];   //[nLowPtJet]
+   Float_t         jetLowPtGenPhi[kMaxnLowPtJet];   //[nLowPtJet]
+//MC specific variables end
    Int_t           nConv;
    Float_t         convP4[kMaxnConv][4];   //[nConv]
    Float_t         convVtx[kMaxnConv][3];   //[nConv]
@@ -434,6 +505,32 @@ protected:
    TBranch        *b_IsVtxGood;   //!
    TBranch        *b_nVtxBS;   //!
    TBranch        *b_vtxbs;   //!
+   TBranch        *b_pdf;   //!
+   TBranch        *b_pthat;   //!
+   TBranch        *b_processID;   //!
+   TBranch        *b_nMC;   //!
+   TBranch        *b_mcPID;   //!
+   TBranch        *b_mcVtx;   //!
+   TBranch        *b_mcPt;   //!
+   TBranch        *b_mcMass;   //!
+   TBranch        *b_mcEta;   //!
+   TBranch        *b_mcPhi;   //!
+   TBranch        *b_mcE;   //!
+   TBranch        *b_mcEt;   //!
+   TBranch        *b_mcGMomPID;   //!
+   TBranch        *b_mcMomPID;   //!
+   TBranch        *b_mcMomPt;   //!
+   TBranch        *b_mcMomMass;   //!
+   TBranch        *b_mcMomEta;   //!
+   TBranch        *b_mcMomPhi;   //!
+   TBranch        *b_mcIndex;   //!
+   TBranch        *b_mcDecayType;   //!
+   TBranch        *b_genMET;   //!
+   TBranch        *b_genMETPhi;   //!
+   TBranch        *b_nPUInfo;   //!
+   TBranch        *b_nPU;   //!
+   TBranch        *b_puBX;   //!
+   TBranch        *b_puTrue;   //!
    TBranch        *b_MET;   //!
    TBranch        *b_METPhi;   //!
    TBranch        *b_METsumEt;   //!
@@ -503,6 +600,10 @@ protected:
    TBranch        *b_eleSeedTime;   //!
    TBranch        *b_eleRecoFlag;   //!
    TBranch        *b_elePos;   //!
+   TBranch        *b_eleGenIndex;   //!
+   TBranch        *b_eleGenGMomPID;   //!
+   TBranch        *b_eleGenMomPID;   //!
+   TBranch        *b_eleGenMomPt;   //!
    TBranch        *b_eleIsoTrkDR03;   //!
    TBranch        *b_eleIsoEcalDR03;   //!
    TBranch        *b_eleIsoHcalDR03;   //!
@@ -593,6 +694,10 @@ protected:
    TBranch        *b_phoSeedDetId2;   //!
    TBranch        *b_phoRecoFlag;   //!
    TBranch        *b_phoPos;   //!
+   TBranch        *b_phoGenIndex;   //!
+   TBranch        *b_phoGenGMomPID;   //!
+   TBranch        *b_phoGenMomPID;   //!
+   TBranch        *b_phoGenMomPt;   //!
    TBranch        *b_phoSCE;   //!
    TBranch        *b_phoSCRawE;   //!
    TBranch        *b_phoESEn;   //!
@@ -650,6 +755,7 @@ protected:
    TBranch        *b_muPz;   //!
    TBranch        *b_muVtx;   //!
    TBranch        *b_muVtxGlb;   //!
+   TBranch        *b_muGenIndex;   //!
    TBranch        *b_mucktPt;   //!
    TBranch        *b_mucktPtErr;   //!
    TBranch        *b_mucktEta;   //!
@@ -763,6 +869,17 @@ protected:
    TBranch        *b_jetWPLevels;   //!
    TBranch        *b_jetMVAsExt;   //!
    TBranch        *b_jetWPLevelsExt;   //!
+   TBranch        *b_jetPartonID;   //!
+   TBranch        *b_jetGenJetIndex;   //!
+   TBranch        *b_jetGenJetEn;   //!
+   TBranch        *b_jetGenJetPt;   //!
+   TBranch        *b_jetGenJetEta;   //!
+   TBranch        *b_jetGenJetPhi;   //!
+   TBranch        *b_jetGenPartonID;   //!
+   TBranch        *b_jetGenEn;   //!
+   TBranch        *b_jetGenPt;   //!
+   TBranch        *b_jetGenEta;   //!
+   TBranch        *b_jetGenPhi;   //!
    TBranch        *b_nLowPtJet;   //!
    TBranch        *b_jetLowPtEn;   //!
    TBranch        *b_jetLowPtPt;   //!
@@ -773,6 +890,16 @@ protected:
    TBranch        *b_jetLowPtRawPt;   //!
    TBranch        *b_jetLowPtRawEn;   //!
    TBranch        *b_jetLowPtArea;   //!
+   TBranch        *b_jetLowPtPartonID;   //!
+   TBranch        *b_jetLowPtGenJetEn;   //!
+   TBranch        *b_jetLowPtGenJetPt;   //!
+   TBranch        *b_jetLowPtGenJetEta;   //!
+   TBranch        *b_jetLowPtGenJetPhi;   //!
+   TBranch        *b_jetLowPtGenPartonID;   //!
+   TBranch        *b_jetLowPtGenEn;   //!
+   TBranch        *b_jetLowPtGenPt;   //!
+   TBranch        *b_jetLowPtGenEta;   //!
+   TBranch        *b_jetLowPtGenPhi;   //!
    TBranch        *b_nConv;   //!
    TBranch        *b_convP4;   //!
    TBranch        *b_convVtx;   //!
@@ -814,7 +941,9 @@ public:
    TEventTree(TTree *tree=0);
    virtual ~TEventTree();
    void GetEntryNeededBranchesOnly(Long64_t entry);
+   void GetEntryMCSpecific(Long64_t entry);
    virtual void     Init(TTree *tree);
+   void SetMCSpecificAddresses();
 };
 
 #endif //#ifndef TEventTree_h

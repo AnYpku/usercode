@@ -8,12 +8,14 @@ TEventTree::TEventTree(TTree *tree)
 TEventTree::~TEventTree()
 {
    if (!fChain) return;
-   delete fChain->GetCurrentFile();
+   //delete fChain->GetCurrentFile();
 }
 
 void TEventTree::GetEntryNeededBranchesOnly(Long64_t entry)
 {
    b_run->GetEntry(entry);
+   b_event->GetEntry(entry);
+   b_isData->GetEntry(entry);
    b_nHLT->GetEntry(entry);
    b_HLT->GetEntry(entry);
    b_HLTIndex->GetEntry(entry);
@@ -55,6 +57,39 @@ void TEventTree::GetEntryNeededBranchesOnly(Long64_t entry)
    b_muNumberOfValidMuonHits->GetEntry(entry);
    b_muStations->GetEntry(entry);
    b_rho2012->GetEntry(entry);
+   b_nJet->GetEntry(entry);
+   b_jetRawPt->GetEntry(entry);
+   b_jetRawEn->GetEntry(entry);
+   b_jetPt->GetEntry(entry);
+   b_jetEta->GetEntry(entry);
+   b_jetPhi->GetEntry(entry);
+   b_nLowPtJet->GetEntry(entry);
+   b_jetLowPtRawPt->GetEntry(entry);
+   b_jetLowPtRawEn->GetEntry(entry);
+   b_jetLowPtPt->GetEntry(entry);
+   b_jetLowPtEta->GetEntry(entry);
+   b_jetLowPtPhi->GetEntry(entry);
+}
+
+void TEventTree::GetEntryMCSpecific(Long64_t entry)
+{
+   b_nMC->GetEntry(entry); 
+   b_mcPID->GetEntry(entry); 
+   b_mcE->GetEntry(entry);
+   b_mcEt->GetEntry(entry);
+   b_mcPt->GetEntry(entry);
+   b_mcEta->GetEntry(entry);
+   b_mcIndex->GetEntry(entry);
+   b_muGenIndex->GetEntry(entry);
+   b_phoGenIndex->GetEntry(entry);
+
+//   b_jetGenJetPt->GetEntry(entry);
+//   b_jetGenJetEta->GetEntry(entry);
+//   b_jetGenJetPhi->GetEntry(entry);
+//   b_jetLowPtGenJetPt->GetEntry(entry);
+//   b_jetLowPtGenJetEta->GetEntry(entry);
+//   b_jetLowPtGenJetPhi->GetEntry(entry);
+
 }
 
 void TEventTree::Init(TTree *tree)
@@ -449,4 +484,23 @@ void TEventTree::Init(TTree *tree)
    fChain->SetBranchAddress("convTk2D0", convTk2D0, &b_convTk2D0);
    fChain->SetBranchAddress("convTk2Pout", convTk2Pout, &b_convTk2Pout);
    fChain->SetBranchAddress("convTk2Pin", convTk2Pin, &b_convTk2Pin);
+}
+
+void TEventTree::SetMCSpecificAddresses()
+{
+   fChain->SetBranchAddress("nMC", &nMC, &b_nMC);
+   fChain->SetBranchAddress("mcPID", mcPID, &b_mcPID);
+   fChain->SetBranchAddress("mcE", mcE, &b_mcE);
+   fChain->SetBranchAddress("mcEt", mcEt, &b_mcEt);
+   fChain->SetBranchAddress("mcPt", mcPt, &b_mcPt);
+   fChain->SetBranchAddress("mcEta", mcEta, &b_mcEta);
+   fChain->SetBranchAddress("mcIndex", mcIndex, &b_mcIndex);
+   fChain->SetBranchAddress("muGenIndex", muGenIndex, &b_muGenIndex);
+   fChain->SetBranchAddress("phoGenIndex", phoGenIndex, &b_phoGenIndex);
+   fChain->SetBranchAddress("jetGenJetPt", jetGenJetPt, &b_jetGenJetPt);
+   fChain->SetBranchAddress("jetGenJetEta", jetGenJetEta, &b_jetGenJetEta);
+   fChain->SetBranchAddress("jetGenJetPhi", jetGenJetPhi, &b_jetGenJetPhi);
+   fChain->SetBranchAddress("jetLowPtGenJetPt", jetLowPtGenJetPt, &b_jetLowPtGenJetPt);
+   fChain->SetBranchAddress("jetLowPtGenJetEta", jetLowPtGenJetEta, &b_jetLowPtGenJetEta);
+   fChain->SetBranchAddress("jetLowPtGenJetPhi", jetLowPtGenJetPhi, &b_jetLowPtGenJetPhi);
 }
