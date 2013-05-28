@@ -52,6 +52,12 @@ bool TPhotonCuts::Passed()
   return true;
 }
 
+bool TPhotonCuts::PassedExceptKinematics()
+{
+  if (!SimpleCutBasedPhotonID2012()) return false;
+  return true;
+}
+
 bool TPhotonCuts::PhoKinematics(float phoPt, float phoEta)
 {
   if (phoPt<phoPtCut_) return false;

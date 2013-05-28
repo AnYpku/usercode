@@ -19,6 +19,7 @@ class TPhotonCuts
     virtual ~TPhotonCuts();
 
     bool Passed();
+    bool PassedExceptKinematics();
     bool PhoKinematics(float phoPt, float phoEta);
     bool PhoKinematics();
     bool SimpleCutBasedPhotonID2012(); 

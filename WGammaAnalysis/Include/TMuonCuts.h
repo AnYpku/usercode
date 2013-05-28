@@ -36,6 +36,7 @@ class TMuonCuts
        bool Passed();
          //if muon passed the whole selection requirement 
          //(except veto on having another muon)
+       bool PassedExceptKinematics();
        bool MuTriggerMatch();
        bool MuKinematics(float muPt, float muEta);
        bool MuIsolation();

@@ -72,11 +72,17 @@ bool TMuonCuts::MoreMuonsVeto()
   return true;
 }
 
-bool TMuonCuts::Passed() { 
-  if (!MuKinematics(muPt_imu_, muEta_imu_)) return false; 
+bool TMuonCuts::PassedExceptKinematics() { 
   if (!MuTriggerMatch()) return false;
   if (!MuId()) return false; 
   if (!MuIsolation()) return false;
+  return true;
+}
+
+
+bool TMuonCuts::Passed() { 
+  if (!MuKinematics(muPt_imu_, muEta_imu_)) return false; 
+  if (!PassedExceptKinematics()) return false;
   return true;
 }
 
