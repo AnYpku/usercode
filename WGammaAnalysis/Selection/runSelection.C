@@ -3,7 +3,7 @@
   gROOT->ProcessLine(".L ../Configuration/TInputSample.C+");
   gROOT->ProcessLine(".L ../Configuration/TAllInputSamples.C+");
 
-  gROOT->ProcessLine(".L TEventTree.C+");
+  gROOT->ProcessLine(".L ../Include/TEventTree.C+");
   gROOT->ProcessLine(".L ../Include/TMuonCuts.C+");
   gROOT->ProcessLine(".L ../Include/TElectronCuts.C+");
   gROOT->ProcessLine(".L ../Include/TPhotonCuts.C+");
