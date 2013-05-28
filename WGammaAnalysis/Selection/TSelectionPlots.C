@@ -40,6 +40,11 @@ void TSelectionPlots::GetTrees(int channel, string confFile)
       if (!hasHist_.back())
         {
           std::cout<<"file "<<file_.back()->GetName()<<" can't be opened"<<std::endl;
+          tree_.push_back(0);
+          colors_.push_back(0);
+          isData_.push_back(0);
+          isSigMC_.push_back(0);
+          sourceLabel_.push_back("");
           continue;
         }
 
@@ -57,6 +62,8 @@ void TSelectionPlots::GetTrees(int channel, string confFile)
        isSigMC_.push_back(0);
 
      sourceLabel_.push_back(INPUT.allInputs_[i].sourceLatexLabel_);
+
+
     }
 }
 
@@ -66,10 +73,13 @@ void TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits)
   legend_ = new TLegend(0.5,0.7,0.95,0.95);
   for (int i=0; i<nSources_; i++)
     {
-      if (!hasHist_[i]) continue;
 
-      TString histName="hist";
+      TString histName="hist"+plotVar;
       histName+=i;
+      if (!hasHist_[i]){
+        hist_.push_back(new TH1F(histName, plotVar.c_str(), nBins, binLimits));
+        continue;
+      }
       file_[i]->cd();
       hist_.push_back(new TH1F(histName, plotVar.c_str(), nBins, binLimits));
       tree_[i]->Draw(plotVar+TString(">>") + histName,"weight");
@@ -131,10 +141,10 @@ void TSelectionPlots::DrawSpectrumDataVsMC()
    return;
   }
 
-  float maxData;
-  float maxMC;
-  float maxDataMC;
-  for (int i=0; i<hasHist_.size(); i++)
+  float maxData=0;
+  float maxMC=0;
+  float maxDataMC=0;
+  for (int i=hasHist_.size()-1; i>=0; i--)
     {
       if (hasHist_[i] && !isData_[i]) mcHists->Add(hist_[i]);
       if (hasHist_[i] && isData_[i]) {   
@@ -200,28 +210,38 @@ void TSelectionPlots::DrawSpectrumDataVsMC()
 */
 }
 
-void TSelectionPlots::DrawSpectrumSigVsBkg()
+void TSelectionPlots::DrawSpectrumSigVsBkg(TString nameCanvas,TString nameForSave)
 {
 
-  TCanvas* c = new TCanvas("c1","c1");
-  THStack* bkgHists = new THStack("bkgHists","bkgHists");
-  bool hasSigMC=0;
-  
+  TCanvas* c = new TCanvas(nameCanvas,nameCanvas);
+  TString histName="hist_"+nameCanvas;
+  THStack* bkgHists = new THStack(histName,histName);
+  int sigMC=-1;
+ 
   for (int i=0; i<hasHist_.size(); i++)
     {
       if (hasHist_[i] && !isSigMC_[i] && !isData_[i]) {
-        hist_[i]->SetFillStyle(3144);
         bkgHists->Add(hist_[i]);
       }
       if (hasHist_[i] &&  isSigMC_[i] && !isData_[i]) {   
-        hasSigMC = 1;   
-        hist_[i]->Draw();
+        hist_[i]->SetFillStyle(3144);
+        sigMC = i;   
+        //hist_[i]->Draw();
       }
     }
 
-  if (hasSigMC) bkgHists->Draw("same");
-  else bkgHists->Draw();
+  bkgHists->Draw();
+  if (sigMC!=-1) 
+    hist_[sigMC]->Draw("same");
+
+//  if (hasSigMC) bkgHists->Draw("same");
+//  else bkgHists->Draw();
 
   legend_->Draw("same");
-  c->SaveAs("drawSpectrumSigVsBkg.png");
+  c->SaveAs(nameForSave);
+
 }
+
+
+
+

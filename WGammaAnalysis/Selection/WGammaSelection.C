@@ -14,19 +14,70 @@
 #include "TMath.h" 
   // ROOT class
 #include <iostream> 
+#include <string>
+#include <sstream>  
   //standard C++ class
 
-WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile, bool isDebugMode)
+WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile, bool isReleasedCutsMode, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
+  isReleasedCutsMode_=isReleasedCutsMode;
   isDebugMode_=isDebugMode;
-  sampleMode_=sampleMode;
   TConfiguration config;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
     //field of this class, WGammaSelection
+
+  sampleMode_=sampleMode;
+  if (sampleMode_==NOTSPECIFIED){
+    std::cout<<"ERROR in WGammaSelection::WGammaSelection: sampleMode_ is NONSPECIFIED"<<std::endl;
+    return;
+  }
+  else if (sampleMode_>NOTSPECIFIED){
+    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong sampleMode_ "<<std::endl;
+    return;    
+  }
+  for (int i=0; i<INPUT_->nSources_; i++)
+    {
+      doAnalizeSample_.push_back(1);      
+    } 
+}
+
+WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isReleasedCutsMode, bool isDebugMode)
+{
+
+  INPUT_ = new TAllInputSamples(channel, configFile);
+
+  channel_=channel;
+  isReleasedCutsMode_=isReleasedCutsMode;
+  isDebugMode_=isDebugMode;
+  TConfiguration config;
+  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
+    //field of this class, WGammaSelection
+
+  sampleMode_=NOTSPECIFIED;
+  stringstream ss(analyzedSampleNames);
+  vector <string> names;
+  string name;
+  while (ss >> name) 
+    names.push_back(name);
+  int nNames = names.size();
+
+  std::cout<<"1 - will do, 0 - will not do"<<std::endl;
+  for (int i=0; i<INPUT_->nSources_; i++)
+    {
+      doAnalizeSample_.push_back(0);  
+      for (int j=0; j<nNames; j++)
+        {
+          if (names[j]==INPUT_->allInputs_[i].sourceName_)
+            doAnalizeSample_.back()=1; 
+        }
+      std::cout<<INPUT_->allInputs_[i].sourceName_<<": "<<doAnalizeSample_[i]<<std::endl;
+    }  
+  if (doAnalizeSample_.size()!=INPUT_->nSources_)
+    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong doAnalizeSample_.size()"<<std::endl;
 }
 
 WGammaSelection::~WGammaSelection()
@@ -40,22 +91,24 @@ void WGammaSelection::LoopOverInputFiles()
 {
   TConfiguration config;
   int nSources = INPUT_->nSources_; 
-  if (isDebugMode_ && nSources>3)
-    nSources = 3;
+  //if (isDebugMode_ && nSources>3)
+  //  nSources = 3;
 
   for (int iSource=0; iSource<nSources; iSource++)
     {
-       sample_ = INPUT_->allInputs_[iSource].sample_;
+       if (!doAnalizeSample_[iSource])
+         continue;
 
+       sample_ = INPUT_->allInputs_[iSource].sample_;
        if (sample_==TInputSample::DATA)
-           if (sampleMode_==DATA || sampleMode_==NOBKG || sampleMode_==ALL);
-           else continue;
+           if (sampleMode_==SIGMC || sampleMode_==NOBKG || sampleMode_==MC)
+             continue;
        if (sample_==TInputSample::SIGMC)
-           if (sampleMode_==SIGMC || sampleMode_==MC || sampleMode_==NOBKG || sampleMode_==ALL);
-           else continue;
+           if (sampleMode_==DATA || sampleMode_==BKGMC)
+             continue;
        if (sample_==TInputSample::BKGMC)
-           if (sampleMode_==BKGMC || sampleMode_==MC || sampleMode_==ALL);
-           else continue;
+           if (sampleMode_==DATA || sampleMode_==SIGMC || sampleMode_==NOBKG)
+           continue;
 
        if (!isDebugMode_)
          selectedTreeFileName_=INPUT_->allInputs_[iSource].fileSelected_;
@@ -63,11 +116,11 @@ void WGammaSelection::LoopOverInputFiles()
          selectedTreeFileName_=INPUT_->allInputs_[iSource].fileSelectedDebug_;
        TTree* tree;
        int inputFileNMax = INPUT_->allInputs_[iSource].nFiles_;
-       if (isDebugMode_) 
-         {
-           if (INPUT_->allInputs_[iSource].nFiles_<1) inputFileNMax=INPUT_->allInputs_[iSource].nFiles_;
-           else inputFileNMax=1;
-         }
+       //if (isDebugMode_) 
+       //  {
+       //    if (INPUT_->allInputs_[iSource].nFiles_<1) inputFileNMax=INPUT_->allInputs_[iSource].nFiles_;
+       //    else inputFileNMax=1;
+       //  }
        TFile fileOut(selectedTreeFileName_,"recreate");
        TTree* outTree = new TTree("selectedEvents","selected Events");
        SetOutputTree(outTree); 
@@ -75,6 +128,12 @@ void WGammaSelection::LoopOverInputFiles()
        for (inputFileN_=0; inputFileN_< inputFileNMax; inputFileN_++)
          {
            lumiWeight_=INPUT_->allInputs_[iSource].lumiWeights_[inputFileN_];
+           if (!isData && isDebugMode_){
+             if (INPUT_->allInputs_[iSource].isSharedCS_)
+               debugModeWeight_=1.0/INPUT_->allInputs_[iSource].csTotal_;
+              else
+               debugModeWeight_=1.0/INPUT_->allInputs_[iSource].cs_[inputFileN_];
+           }
 
            TFile f((INPUT_->allInputs_[iSource].fileNames_[inputFileN_]).c_str());
            if (f.IsOpen()) 
@@ -89,7 +148,7 @@ void WGammaSelection::LoopOverInputFiles()
            if (tree) 
              {
                 Init(tree);
-                if (sample_!=TInputSample::DATA) SetMCSpecificAddresses();
+                //if (sample_!=TInputSample::DATA) SetMCSpecificAddresses();
              }   
            else
              {
@@ -123,8 +182,8 @@ void WGammaSelection::LoopOverTreeEvents()
    Long64_t nentries = fChain->GetEntries();
    if (isDebugMode_) 
      {
-       if (fChain->GetEntries()<100000) nentries=fChain->GetEntries();
-       else nentries=100000;
+       if (fChain->GetEntries()<debugModeNEntries_) nentries=fChain->GetEntries();
+       else nentries=debugModeNEntries_;
      }
    int nPassed=0;
 
@@ -143,37 +202,17 @@ void WGammaSelection::LoopOverTreeEvents()
    for (int ile=0; ile<nLeptonMax; ile++)
      goodLeptonPhotonPairs[ile]=new bool[kMaxnPho];
 
-   if ((channel_=TInputSample::MUON) 
-       && (fChain->GetMaximum("nMu")>kMaxnMu))
-     //kMaxnMu - field of TEventTree
-     {
-       PrintErrorMessageMaxNumberOf(MUON_);
-          //methof of this class (WGammaSelection)
-       return;
-     }
-   if (channel_==TInputSample::ELECTRON 
-       && fChain->GetMaximum("nEle")>kMaxnEle)
-     {
-       PrintErrorMessageMaxNumberOf(ELECTRON_);
-          //methof of this class (WGammaSelection)
-       return;
-     }
-   if (fChain->GetMaximum("nPho")>kMaxnPho)
-     {
-       PrintErrorMessageMaxNumberOf(PHOTON_);
-          //methof of this class (WGammaSelection)
-       return;
-     }
+   CheckMaxNumbersInTree();
 
-       nTotal_=0;
-       nBeforeLeptonLoop_=0;
-       nLeptons_=0;
-       nLeptonsPassed_=0; 
-       nMoreVetoPassed_=0;
-       nWMtPassed_=0;
-       nPhotons_=0;
-       nPhotonsPassed_=0;
-       nPhoLepPassed_=0;
+   nTotal_=0;
+   nBeforeLeptonLoop_=0;
+   nLeptons_=0;
+   nLeptonsPassed_=0; 
+   nMoreVetoPassed_=0;
+   nWMtPassed_=0;
+   nPhotons_=0;
+   nPhotonsPassed_=0;
+   nPhoLepPassed_=0;
   
    for (Long64_t entry=0; entry<nentries; entry++) 
    //loop over events in the tree
@@ -242,7 +281,9 @@ void WGammaSelection::LoopOverTreeEvents()
   delete[] goodLeptonPhotonPairs;
 
   std::cout<<"Summary:"<<std::endl;
-  std::cout<<"nEntries="<<nentries<<", nPassed="<<nPassed<<", eff="<<(double)nPassed/nentries<<std::endl;
+  std::cout<<"nEntries="<<nentries<<", nPassed="<<nPassed<<", eff="<<(double)nPassed/nentries<<", nWeightes="<<nPassed*debugModeWeight_;
+  if (debugModeWeight_!=0) std::cout<<" or  "<<nPassed/debugModeWeight_;
+  std::cout<<std::endl;
   std::cout<<"nTotal_="<<nTotal_<<std::endl;
   std::cout<<"nBeforeLeptonLoop_="<<nBeforeLeptonLoop_<<" (IsVtxGood!=-1, nPho >= 0, nLe_ >=0, metFilters[6]==1)"<<std::endl;
   std::cout<<"nLeptons_="<<nLeptons_<<std::endl;
@@ -326,7 +367,7 @@ bool WGammaSelection::Cut(bool** goodLeptonPhotonPairs)
                muPFIsoR04_PU[ile]);
                //variables which are input for TMuonCuts constructor
                //are fields of TEventTree
-             if (muon.Passed()) 
+             if ( (!isReleasedCutsMode_ && muon.Passed()) || (isReleasedCutsMode_ && muon.PassedExceptKinematics()) ) 
                {
 
                  nLeptonsPassed_++;
@@ -336,11 +377,11 @@ bool WGammaSelection::Cut(bool** goodLeptonPhotonPairs)
                  nMoreVetoPassed_++;
 
                  WMt_[ile] = sqrt(2*muPt[ile]*pfMET*(1-cos(muPhi[ile]-pfMETPhi)));
-                 if (WMt_[ile]>WMtCut_)
+                 if ( (WMt_[ile]>WMtCut_ && !isReleasedCutsMode_) || (isReleasedCutsMode_))
                    {
                      nWMtPassed_++;
                      thisLeptonPassed=1;
-                   }        
+                   }    
                } 
           }
         else if (channel_==TInputSample::ELECTRON)
@@ -352,7 +393,7 @@ bool WGammaSelection::Cut(bool** goodLeptonPhotonPairs)
               {
                 if (!electron.MoreElectronsVeto()) return 0;  
                 WMt_[ile] = sqrt(2*elePt[ile]*pfMET*(1-cos(elePhi[ile]-pfMETPhi)));
-                if (WMt_[ile]>WMtCut_) thisLeptonPassed=1;        
+                if ((WMt_[ile]>WMtCut_ && !isReleasedCutsMode_) || (isReleasedCutsMode_)) thisLeptonPassed=1;        
               } 
           }
 
@@ -384,13 +425,14 @@ bool WGammaSelection::Cut(bool** goodLeptonPhotonPairs)
         else
           {
             int phoMCIndex = -1;
-            for (int iMC=0; iMC<nMC; iMC++)
+            for (int iMC=0; iMC<nMC; iMC++){
               if (mcPID[iMC]==22) phoMCIndex = iMC;
-            if (phoMCIndex == -1) return 0;
-            phoEt[ipho] = photonCorrector_->GetCorrEtMC(phoR9[ipho], 2012, phoEt[ipho], phoEta[ipho], mcE[phoMCIndex]);
+            }
+            if (phoMCIndex > -1) 
+              phoEt[ipho] = photonCorrector_->GetCorrEtMC(phoR9[ipho], 2012, phoEt[ipho], phoEta[ipho], mcE[phoMCIndex]);
           }
 
-  
+                
         TPhotonCuts photon(phoEleVeto[ipho],
                     phoEt[ipho],phoEta[ipho],
                     phoSCEt[ipho],phoSCEta[ipho],
@@ -400,7 +442,8 @@ bool WGammaSelection::Cut(bool** goodLeptonPhotonPairs)
                     rho2012);
           //variables which are input for TPhotonCuts constructor
           //are fields of TEventTree
-	if (photon.Passed()) 
+
+	if ( (!isReleasedCutsMode_ && photon.Passed()) || (isReleasedCutsMode_ && photon.PassedExceptKinematics()) ) 
           {
      
             nPhotonsPassed_++;
@@ -447,8 +490,52 @@ bool WGammaSelection::LeptonPhotonMatch(int ile, int ipho)
        dphi=dphi-2*TMath::Pi()) ;
   float dR=sqrt((leEta-phoSCEta[ipho])*(leEta-phoSCEta[ipho])+dphi*dphi);
   lePhoDeltaR_[ile][ipho]=dR;
-  if (dR <= lePhoDeltaRCut_) return false;
+  if (!isReleasedCutsMode_ && dR <= lePhoDeltaRCut_) return false;
   return true ; 
+}
+
+bool WGammaSelection::CheckMaxNumbersInTree()
+{
+   if ((channel_=TInputSample::MUON) 
+       && (fChain->GetMaximum("nMu")>kMaxnMu))
+     //kMaxnMu - field of TEventTree
+     {
+       PrintErrorMessageMaxNumberOf(MUON_);
+          //methof of this class (WGammaSelection)
+       return 0;
+     }
+   if (channel_==TInputSample::ELECTRON 
+       && fChain->GetMaximum("nEle")>kMaxnEle)
+     {
+       PrintErrorMessageMaxNumberOf(ELECTRON_);
+          //methof of this class (WGammaSelection)
+       return 0;
+     }
+   if (fChain->GetMaximum("nPho")>kMaxnPho)
+     {
+       PrintErrorMessageMaxNumberOf(PHOTON_);
+          //methof of this class (WGammaSelection)
+       return 0;
+     }
+   if (fChain->GetMaximum("nJet")>kMaxnJet)
+     {
+       PrintErrorMessageMaxNumberOf(JET_);
+          //methof of this class (WGammaSelection)
+       return 0;
+     }
+   if (fChain->GetMaximum("nLowPtJet")>kMaxnLowPtJet)
+     {
+       PrintErrorMessageMaxNumberOf(LOWPTJET_);
+          //methof of this class (WGammaSelection)
+       return 0;
+     }
+   if (!isData && fChain->GetMaximum("nMC")>kMaxnMC)
+     {
+       PrintErrorMessageMaxNumberOf(MC_);
+          //methof of this class (WGammaSelection)
+       return 0;
+     }
+   return 1;
 }
 
 void WGammaSelection::PrintErrorMessageMaxNumberOf(int particle)
@@ -461,6 +548,12 @@ void WGammaSelection::PrintErrorMessageMaxNumberOf(int particle)
          std::cout<<"maximum number of electrons in the file nEle="<<fChain->GetMaximum("nEle")<<", when kMaxnEle="<<kMaxnEle<<" only"<<std::endl;
        else if (particle==PHOTON_)
          std::cout<<"maximum number of photons in the file nPho="<<fChain->GetMaximum("nPho")<<", when kMaxnPho="<<kMaxnPho<<" only"<<std::endl;
+       else if (particle==JET_)
+         std::cout<<"maximum number of jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnJet="<<kMaxnJet<<" only"<<std::endl;
+      else if (particle==LOWPTJET_)
+         std::cout<<"maximum number of low Pt jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnLowPtJet="<<kMaxnLowPtJet<<" only"<<std::endl;
+      else if (particle==MC_)
+         std::cout<<"maximum number of mc particles in the file nMC="<<fChain->GetMaximum("nMC")<<", when kMaxnMC="<<kMaxnMC<<" only"<<std::endl;
        std::cout<<"please, go to TEventTree.h to increase this number up to proper value"<<std::endl;
        std::cout<<std::endl;
 }

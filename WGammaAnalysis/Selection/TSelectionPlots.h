@@ -18,7 +18,7 @@ public:
   void SetHistograms(string plotVar, int nBins, float* binLimits);
   void ScaleHistogramsToData();
   void DrawSpectrumDataVsMC();
-  void DrawSpectrumSigVsBkg();
+  void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);
 
 private:
   vector <TFile*> file_;

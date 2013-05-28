@@ -20,13 +20,13 @@ public:
    const static Int_t kMaxnEle = 10;
    const static Int_t kMaxnPho = 16;
    const static Int_t kMaxnMu = 33;
-   const static Int_t kMaxnJet = 92;
+   const static Int_t kMaxnJet = 97;
    const static Int_t kMaxnLowPtJet = 69;
    const static Int_t kMaxnConv = 0;//500
      //since they are not used in the analysis,
      //I don't want to creat these big arrays of Float_t
      //for converted photons
-   const static Int_t kMaxnMC = 9;
+   const static Int_t kMaxnMC = 13;
    const static Int_t kMaxnPUInfo = 3;
 
 public:
@@ -943,7 +943,7 @@ public:
    void GetEntryNeededBranchesOnly(Long64_t entry);
    void GetEntryMCSpecific(Long64_t entry);
    virtual void     Init(TTree *tree);
-   void SetMCSpecificAddresses();
+//   void SetMCSpecificAddresses();
 };
 
 #endif //#ifndef TEventTree_h
