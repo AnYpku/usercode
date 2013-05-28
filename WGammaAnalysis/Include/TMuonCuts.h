@@ -1,7 +1,7 @@
 #ifndef TMuonCuts_h
 #define TMuonCuts_h
 
-#include "../Selection/TEventTree.h" //class of this package
+#include "TEventTree.h" //class of this package
 
 class TMuonCuts
   {
