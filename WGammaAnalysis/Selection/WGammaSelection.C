@@ -4,6 +4,7 @@
 #include "../Include/TMuonCuts.h" 
 #include "../Include/TElectronCuts.h" 
 #include "../Include/TPhotonCuts.h" 
+#include "../Include/TFullCuts.h" 
 #include "../Configuration/TConfiguration.h" 
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
@@ -76,7 +77,7 @@ WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string
         }
       std::cout<<INPUT_->allInputs_[i].sourceName_<<": "<<doAnalizeSample_[i]<<std::endl;
     }  
-  if (doAnalizeSample_.size()!=INPUT_->nSources_)
+  if ((int)doAnalizeSample_.size()!=INPUT_->nSources_)
     std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong doAnalizeSample_.size()"<<std::endl;
 }
 
@@ -198,6 +199,13 @@ void WGammaSelection::LoopOverTreeEvents()
        std::cout<<"Error detected in WGammaSelection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
        return;
      }
+
+   float* WMt = new float[nLeptonMax];
+
+   float** lePhoDeltaR = new float*[nLeptonMax];
+   for (int ile=0; ile<nLeptonMax; ile++)
+     lePhoDeltaR[ile]=new float[kMaxnPho];
+   
    bool** goodLeptonPhotonPairs = new bool*[nLeptonMax];
    for (int ile=0; ile<nLeptonMax; ile++)
      goodLeptonPhotonPairs[ile]=new bool[kMaxnPho];
@@ -233,7 +241,15 @@ void WGammaSelection::LoopOverTreeEvents()
              return;
           }
 
-        if (Cut(goodLeptonPhotonPairs) == 1)
+       // if (TFullCuts::Cut(goodLeptonPhotonPairs, treeLeaf,   
+       //         channel_,  isReleasedCutsMode_, 
+       //         WMt_, lePhoDeltaR_, photonCorrector_) == 1)
+       //       //method of this class (WGammaSelection)
+
+       TFullCuts fullCuts;
+       if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
+                channel_,  isReleasedCutsMode_,
+                WMt, lePhoDeltaR, photonCorrector_) == 1)
               //method of this class (WGammaSelection)
 
           for (int ile=0; ile<nLe_; ile++)
@@ -248,8 +264,8 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.muPt[ile], 
                               treeLeaf.phoEta[ipho], 
                               treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
-                              lePhoDeltaR_[ile][ipho],
-                              WMt_[ile],
+                              lePhoDeltaR[ile][ipho],
+                              WMt[ile],
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
                               treeLeaf.run,
                               inputFileN_,
@@ -259,8 +275,8 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.elePt[ile], 
                               treeLeaf.phoEta[ipho], 
                               treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
-                              lePhoDeltaR_[ile][ipho],
-                              WMt_[ile],
+                              lePhoDeltaR[ile][ipho],
+                              WMt[ile],
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
                               treeLeaf.run,
                               inputFileN_,
@@ -280,218 +296,29 @@ void WGammaSelection::LoopOverTreeEvents()
     delete goodLeptonPhotonPairs[ile];
   delete[] goodLeptonPhotonPairs;
 
+  for (int ile=0; ile<nLeptonMax; ile++)
+    delete lePhoDeltaR[ile];
+  delete[] lePhoDeltaR;
+ 
+  delete WMt;
+
   std::cout<<"Summary:"<<std::endl;
   std::cout<<"nEntries="<<nentries<<", nPassed="<<nPassed<<", eff="<<(double)nPassed/nentries<<", nWeightes="<<nPassed*debugModeWeight_;
   if (debugModeWeight_!=0) std::cout<<" or  "<<nPassed/debugModeWeight_;
   std::cout<<std::endl;
-  std::cout<<"nTotal_="<<nTotal_<<std::endl;
-  std::cout<<"nBeforeLeptonLoop_="<<nBeforeLeptonLoop_<<" (IsVtxGood!=-1, nPho >= 0, nLe_ >=0, metFilters[6]==1)"<<std::endl;
-  std::cout<<"nLeptons_="<<nLeptons_<<std::endl;
-  if (nLeptons_!=0)       
-    std::cout<<"nLeptonsPassed_="<<nLeptonsPassed_<<", eff="<<1.0*nLeptonsPassed_/nLeptons_<<std::endl; 
-  std::cout<<"nMoreVetoPassed_="<<nMoreVetoPassed_<<std::endl;
-  std::cout<<"nWMtPassed_="<<nWMtPassed_<<std::endl;
-  std::cout<<"nPhotons_="<<nPhotons_<<std::endl;
-  if (nPhotons_!=0) 
-    std::cout<<"nPhotonsPassed_="<<nPhotonsPassed_<<", eff="<<1.0*nPhotonsPassed_/nPhotons_<<std::endl;
-  std::cout<<"nPhoLepPassed_="<<nPhoLepPassed_<<std::endl; 
-  std::cout<<std::endl;
+//  std::cout<<"nTotal_="<<nTotal_<<std::endl;
+//  std::cout<<"nBeforeLeptonLoop_="<<nBeforeLeptonLoop_<<" (IsVtxGood!=-1, nPho >= 0, nLe_ >=0, metFilters[6]==1)"<<std::endl;
+//  std::cout<<"nLeptons_="<<nLeptons_<<std::endl;
+//  if (nLeptons_!=0)       
+//    std::cout<<"nLeptonsPassed_="<<nLeptonsPassed_<<", eff="<<1.0*nLeptonsPassed_/nLeptons_<<std::endl; 
+//  std::cout<<"nMoreVetoPassed_="<<nMoreVetoPassed_<<std::endl;
+//  std::cout<<"nWMtPassed_="<<nWMtPassed_<<std::endl;
+//  std::cout<<"nPhotons_="<<nPhotons_<<std::endl;
+//  if (nPhotons_!=0) 
+//    std::cout<<"nPhotonsPassed_="<<nPhotonsPassed_<<", eff="<<1.0*nPhotonsPassed_/nPhotons_<<std::endl;
+//  std::cout<<"nPhoLepPassed_="<<nPhoLepPassed_<<std::endl; 
+//  std::cout<<std::endl;
 
-}
-
-bool WGammaSelection::Cut(bool** goodLeptonPhotonPairs)
-{
-  // This function is called from LoopOverEvents.
-  // returns  1 if entry is accepted.
-  // returns 0 otherwise.
-
-   nTotal_++;
-
-   if ((treeLeaf.IsVtxGood)==-1) return 0;
-   if (treeLeaf.nPho < 1) return 0; 
-   if (nLe_ < 1) return 0;
-      //these variables are fields of TEventTree
-   if (!treeLeaf.metFilters[6]) return 0;
-      //metFilters - is field of TEventTree
-      //[6] - ecalLaserCorrFilter
-      //necessary to remove spikes in the photon distributions 
-      //for Jul13 rereco
-
-
-   if (!treeLeaf.isData) {
-     //MET smearing
-     TMetTools met(treeLeaf.event, treeLeaf.pfMET, treeLeaf.pfMETPhi,
-              treeLeaf.nLowPtJet, treeLeaf.jetLowPtRawPt, treeLeaf.jetLowPtRawEn,
-              treeLeaf.jetLowPtPt, treeLeaf.jetLowPtEta, treeLeaf.jetLowPtPhi,
-              treeLeaf.jetLowPtGenJetPt, treeLeaf.jetLowPtGenJetEta, treeLeaf.jetLowPtGenJetPhi,
-              treeLeaf.nJet, treeLeaf.jetRawPt, treeLeaf.jetRawEn, treeLeaf.jetPt, treeLeaf.jetEta, treeLeaf.jetPhi,
-              treeLeaf.jetGenJetPt, treeLeaf.jetGenJetEta, treeLeaf.jetGenJetPhi);
-     met.METSmearCorrection();
-     treeLeaf.pfMET = met.GetRecoPfMET();
-     treeLeaf.pfMETPhi = met.GetRecoPfMETPhi();
-  
-   }
-
-   bool goodLeptonPhotonPairsExist=0;
-   for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
-     for (int ile=0; ile<nLe_; ile++) 
-       goodLeptonPhotonPairs[ile][ipho]=0;   
-
-   bool goodLepton[nLe_];
-   bool goodLeptonExists=0;
-   bool thisLeptonPassed;
-
-   nBeforeLeptonLoop_++;
-
-   for (int ile=0; ile<nLe_; ile++) 
-   //start of lepton loop
-     { 
-
-        nLeptons_++; 
-
-        thisLeptonPassed=0;        
-        if (channel_==TInputSample::MUON)
-          {
-            TMuonCuts muon(ile,treeLeaf.muPt[ile],treeLeaf.muPt,treeLeaf.muEta[ile],treeLeaf.muEta,
-               treeLeaf.nMu,treeLeaf.muNumberOfValidPixelHits[ile],
-               treeLeaf.muNumberOfValidTrkHits[ile],treeLeaf.muNumberOfValidTrkLayers[ile],
-               treeLeaf.muNumberOfValidMuonHits[ile],
-               treeLeaf.muStations[ile],  
-               treeLeaf.HLT[treeLeaf.HLTIndex[18]],treeLeaf.HLT[treeLeaf.HLTIndex[19]],
-               treeLeaf.muTrg[ile][0],treeLeaf.muTrg[ile][1],
-               treeLeaf.muChi2NDF[ile],
-               treeLeaf.muD0[ile],treeLeaf.muDz[ile],
-               treeLeaf.muPFIsoR04_CH[ile],
-               treeLeaf.muPFIsoR04_NH[ile],
-               treeLeaf.muPFIsoR04_Pho[ile],
-               treeLeaf.muPFIsoR04_PU[ile]);
-               //variables which are input for TMuonCuts constructor
-               //are fields of TEventTree
-             if ( (!isReleasedCutsMode_ && muon.Passed()) || (isReleasedCutsMode_ && muon.PassedExceptKinematics()) ) 
-               {
-
-                 nLeptonsPassed_++;
-
-                 if (!muon.MoreMuonsVeto()) return 0; 
-
-                 nMoreVetoPassed_++;
-
-                 WMt_[ile] = sqrt(2*treeLeaf.muPt[ile]*treeLeaf.pfMET*(1-cos(treeLeaf.muPhi[ile]-treeLeaf.pfMETPhi)));
-                 if ( (WMt_[ile]>WMtCut_ && !isReleasedCutsMode_) || (isReleasedCutsMode_))
-                   {
-                     nWMtPassed_++;
-                     thisLeptonPassed=1;
-                   }    
-               } 
-          }
-        else if (channel_==TInputSample::ELECTRON)
-          {
-            //TElectronCuts functions are empty now;
-            //they are included here for the future
-            TElectronCuts electron(treeLeaf.elePt[ile]);
-            if (electron.Passed()) 
-              {
-                if (!electron.MoreElectronsVeto()) return 0;  
-                WMt_[ile] = sqrt(2*treeLeaf.elePt[ile]*treeLeaf.pfMET*(1-cos(treeLeaf.elePhi[ile]-treeLeaf.pfMETPhi)));
-                if ((WMt_[ile]>WMtCut_ && !isReleasedCutsMode_) || (isReleasedCutsMode_)) thisLeptonPassed=1;        
-              } 
-          }
-
-        if (thisLeptonPassed)
-          {
-            if (goodLeptonExists) return 0;  
-              //to remove events with more than one leptons in the event
-            goodLeptonExists=1;
-            goodLepton[ile]=1; 
-          } 
-        else goodLepton[ile]=0; 
-      } //end of lepton loop 
-
-   if (!goodLeptonExists) return 0;
-     //skip loop over photons if no good leptons found
-
-   bool goodPhoton[treeLeaf.nPho];
-   bool goodPhotonExists=0;
-   for (int ipho=0; ipho<treeLeaf.nPho; ipho++) 
-   //start of photon loop
-     {       
-       
-        nPhotons_++;
-
-        if (sample_==TInputSample::DATA) 
-           treeLeaf.phoEt[ipho] = photonCorrector_->GetCorrEtData(treeLeaf.phoR9[ipho], 2012, treeLeaf.phoEt[ipho], treeLeaf.phoEta[ipho]);
-          //Phosphor correction needs to be applied for the photon Et only, 
-          //not for SC Et
-        else
-          {
-            int phoMCIndex = -1;
-            for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
-              if (treeLeaf.mcPID[iMC]==22) phoMCIndex = iMC;
-            }
-            if (phoMCIndex > -1) 
-              treeLeaf.phoEt[ipho] = photonCorrector_->GetCorrEtMC(treeLeaf.phoR9[ipho], 2012, treeLeaf.phoEt[ipho], treeLeaf.phoEta[ipho], treeLeaf.mcE[phoMCIndex]);
-          }
-
-                
-        TPhotonCuts photon(treeLeaf.phoEleVeto[ipho],
-                    treeLeaf.phoEt[ipho],treeLeaf.phoEta[ipho],
-                    treeLeaf.phoSCEt[ipho],treeLeaf.phoSCEta[ipho],
-                    treeLeaf.phoHoverE12[ipho],
-                    treeLeaf.phoSigmaIEtaIEta[ipho],
-                    treeLeaf.phoPFChIso[ipho],treeLeaf.phoPFNeuIso[ipho],treeLeaf.phoPFPhoIso[ipho],
-                    treeLeaf.rho2012);
-          //variables which are input for TPhotonCuts constructor
-          //are fields of TEventTree
-
-	if ( (!isReleasedCutsMode_ && photon.Passed()) || (isReleasedCutsMode_ && photon.PassedExceptKinematics()) ) 
-          {
-     
-            nPhotonsPassed_++;
-
-            goodPhotonExists=1;
-            goodPhoton[ipho]=1;
-          }
-        else goodPhoton[ipho]=0;
-      } //end of photon loop   
-
-   if (!goodPhotonExists) return 0;
-     //skip checking lepton-photon matching if no good photons found
-
-    //check matching between muon and photon
-    for (int ile=0; ile<nLe_; ile++) 
-      {
-        for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
-          {
-            if (goodPhoton[ipho] && goodLepton[ile] && LeptonPhotonMatch(ile,ipho))
-              {
-
-                nPhoLepPassed_++;
-
-                goodLeptonPhotonPairs[ile][ipho]=1;
-                goodLeptonPhotonPairsExist=1;  
-              }                
-           }    
-       }     
-
-   return goodLeptonPhotonPairsExist;
-}
-
-bool WGammaSelection::LeptonPhotonMatch(int ile, int ipho) 
-{ 
-  float lePhi=0;
-  float leEta=0;
-  if (channel_==TInputSample::MUON)
-    {lePhi=treeLeaf.muPhi[ile]; leEta=treeLeaf.muEta[ile];}
-  else if (channel_==TInputSample::ELECTRON)
-    {lePhi=treeLeaf.elePhi[ile]; leEta=treeLeaf.eleEta[ile];}
-  float dphi;
-  for (dphi=fabs(lePhi-treeLeaf.phoSCPhi[ipho]);
-       fabs(dphi)>=2*TMath::Pi(); 
-       dphi=dphi-2*TMath::Pi()) ;
-  float dR=sqrt((leEta-treeLeaf.phoSCEta[ipho])*(leEta-treeLeaf.phoSCEta[ipho])+dphi*dphi);
-  lePhoDeltaR_[ile][ipho]=dR;
-  if (!isReleasedCutsMode_ && dR <= lePhoDeltaRCut_) return false;
-  return true ; 
 }
 
 bool WGammaSelection::CheckMaxNumbersInTree()

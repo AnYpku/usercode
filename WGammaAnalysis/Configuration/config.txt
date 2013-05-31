@@ -86,9 +86,9 @@ $ BKGMC      DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418
 $ BKGMC      ttbarjet    t#bar{t}jets   43  
 #43
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_1l.root   53.2
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_1l.root   53.2
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_2l.root   13.43
+#- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_2l.root   13.43
 
 ###################################################################
 $ BKGMC      Zg     Z#gamma#rightarrowl#bar{l}      401    
