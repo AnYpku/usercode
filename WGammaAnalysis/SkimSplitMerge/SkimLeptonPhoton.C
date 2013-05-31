@@ -90,12 +90,12 @@ void SkimLeptonPhoton::LoopOverInputTree()
       if (entry < 0) break;
 
       TREE_.fChain->GetEntry(entry);
-      if (TREE_.nPho>0 && TREE_.nMu>0 && (channel_==MUON || channel_==BOTH))
+      if (TREE_.treeLeaf.nPho>0 && TREE_.treeLeaf.nMu>0 && (channel_==MUON || channel_==BOTH))
         {
           nMuPassed++; 
           outputTreeMu_->Fill();
         }
-      if (TREE_.nPho>0 && TREE_.nEle>0 && (channel_==ELECTRON || channel_==BOTH))
+      if (TREE_.treeLeaf.nPho>0 && TREE_.treeLeaf.nEle>0 && (channel_==ELECTRON || channel_==BOTH))
         {
           nElePassed++;
           outputTreeEle_->Fill();

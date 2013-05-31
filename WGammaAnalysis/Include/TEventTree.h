@@ -33,6 +33,7 @@ public:
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
+   struct InputTreeLeaves {
    // Declaration of leaf types
    Int_t           run;
    Long64_t        event;
@@ -490,6 +491,10 @@ public:
    Float_t         convTk2D0[kMaxnConv];   //[nConv]
    Float_t         convTk2Pout[kMaxnConv];   //[nConv]
    Float_t         convTk2Pin[kMaxnConv];   //[nConv]
+    
+   };
+
+   InputTreeLeaves treeLeaf;
 
    // List of branches
    TBranch        *b_run;   //!
