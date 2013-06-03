@@ -72,7 +72,7 @@ class TMuonCuts
        
  
 
-       const static float muPtCut_=35.;
+       const static float muPtCut_=26.;
        const static float extraMuPtCut_=10.;
        const static float muEtaCut_=2.1;
        const static float extraMuEtaCut_=2.4;
