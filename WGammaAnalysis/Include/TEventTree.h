@@ -26,7 +26,7 @@ public:
      //since they are not used in the analysis,
      //I don't want to creat these big arrays of Float_t
      //for converted photons
-   const static Int_t kMaxnMC = 13;
+   const static Int_t kMaxnMC = 16;
    const static Int_t kMaxnPUInfo = 3;
 
 public:
