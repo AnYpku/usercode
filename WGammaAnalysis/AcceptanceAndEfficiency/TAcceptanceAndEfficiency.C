@@ -13,6 +13,7 @@
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
   //currently in this package
 #include "TMath.h" 
+#include "TH1F.h" 
   // ROOT class
 #include <iostream> 
 #include <string>
@@ -52,6 +53,11 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
        TTree* tree;
        int inputFileNMax = INPUT_->allInputs_[iSource].nFiles_;
 
+       nEvents_=0;
+       nSkimPassed_=0;
+       nAccPassed_=0;
+       nEffPassed_=0;
+
        for (int inputFileN=0; inputFileN< inputFileNMax; inputFileN++)
          {
 
@@ -65,6 +71,7 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
              } 
            f.cd("ggNtuplizer");
            tree = (TTree*)gDirectory->Get("EventTree");
+
            if (tree) 
              {
                 Init(tree);
@@ -75,7 +82,23 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
                 std::cout<<"ERROR detected in TAcceptanceAndEfficiency::LoopOverInputFiles: tree in the file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<" does not exist"<<std::endl;
                 return;
              }  
- 
+
+           bool isSkimmed = gDirectory->GetListOfKeys()->Contains("hskim");
+
+           if (!isSkimmed){
+             nEvents_+=tree->GetEntries();
+             nSkimPassed_+=tree->GetEntries();
+           }
+           else if (isSkimmed){
+              TH1F* hist = (TH1F*)gDirectory->Get("hskim");
+              nEvents_ += tree->GetEntries() * hist->GetBinContent(1) / hist->GetBinContent(2);
+              nSkimPassed_+=tree->GetEntries();
+              hist = 0;
+           }
+
+           
+
+
       
            LoopOverTreeEvents();
              //method of this class (TAcceptanceAndEfficiency)
@@ -83,6 +106,15 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
              //field of TEventTree
 
          }//loop over inputFileN_ ends
+
+     std::cout<<"Summary:"<<std::endl;
+     std::cout<<"nEvents="<<nEvents_<<std::endl;
+     if (nEvents_==0) continue;
+     std::cout<<"nSkimPassed="<<nSkimPassed_<<", effSkim="<<(double)nSkimPassed_/nEvents_<<std::endl;
+     if (nSkimPassed_==0) continue;
+     std::cout<<"nAccPassed="<<nAccPassed_<<", effSkim*acc="<<(double)nAccPassed_/nEvents_<<std::endl;
+     if (nAccPassed_==0) continue;
+     std::cout<<"nEffPassed="<<nEffPassed_<<", effSkim*acc*eff="<<(double)nEffPassed_/nEvents_<<std::endl;
 
       std::cout<<"the output will be saved to "<<std::endl<<std::endl;
 
@@ -99,8 +131,6 @@ void TAcceptanceAndEfficiency::LoopOverTreeEvents()
        if (fChain->GetEntries()<debugModeNEntries_) nentries=fChain->GetEntries();
        else nentries=debugModeNEntries_;
      }
-   int nAccPassed=0;
-   int nEffPassed=0;
 
    //goodLeptonPhotonPairs(two-dimentional array of bool-s)
    //memory allocation for some variables: 
@@ -153,26 +183,36 @@ void TAcceptanceAndEfficiency::LoopOverTreeEvents()
         
         // apply acceptance cuts
         bool accPassed=0;
-        for (int ile=0; ile<nLe_; ile++)
-          for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
-            if (photonEmpty.PhoKinematics(treeLeaf.phoSCEt[treeLeaf.phoGenIndex[ipho]],
-                                          treeLeaf.phoSCEta[treeLeaf.phoGenIndex[ipho]])){
 
-              if (channel_==TInputSample::MUON && 
-                  muonEmpty.MuKinematics(treeLeaf.muPt[treeLeaf.muGenIndex[ile]], 
-                                         treeLeaf.muEta[treeLeaf.muGenIndex[ile]])) 
+        for (int ile=0; ile<nLe_; ile++)
+          for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
+            int iphoMC=-999;
+            int ileMC=-999;
+            for (int imc=0; imc<treeLeaf.nMC; imc++){
+              if (treeLeaf.mcIndex[imc]==treeLeaf.phoGenIndex[ipho]) 
+                iphoMC=imc;
+              if (channel_==TInputSample::MUON && treeLeaf.mcIndex[imc]==treeLeaf.muGenIndex[ile])   
+                ileMC=imc;
+            }
+            if (iphoMC>=0 && photonEmpty.PhoKinematics(treeLeaf.mcEt[iphoMC],
+                                                       treeLeaf.mcEta[iphoMC])){
+
+              if (ileMC>=0 && channel_==TInputSample::MUON && 
+                  muonEmpty.MuKinematics(treeLeaf.mcPt[ileMC], 
+                                         treeLeaf.mcEta[ileMC])) 
                 {
                   accPassed=1;
                   accLeptonPhotonPassed[ile][ipho]=1;
-                  nAccPassed++;
+                  nAccPassed_++;
                 }
               else if (channel_==TInputSample::ELECTRON) 
                 {
                   accPassed=1;
                   accLeptonPhotonPassed[ile][ipho]=1;
-                  nAccPassed++;
+                  nAccPassed_++;
                 }
             } //if photonEmpty.PhoKinematics()
+          }//end of loop over ipho
         if (!accPassed) continue;
 
         //apply efficiency cuts
@@ -184,7 +224,7 @@ void TAcceptanceAndEfficiency::LoopOverTreeEvents()
           for (int ile=0; ile<nLe_; ile++)
             for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
                 if (effLeptonPhotonPassed[ile][ipho] && accLeptonPhotonPassed[ile][ipho])
-                    nEffPassed+=1;
+                    nEffPassed_+=1;
         else continue;
 
      } //end of loop over events in the tree
@@ -204,12 +244,6 @@ void TAcceptanceAndEfficiency::LoopOverTreeEvents()
  
   delete WMt;
 
-  std::cout<<"Summary:"<<std::endl;
-  std::cout<<"nEntries="<<nentries<<std::endl;
-  if (nentries==0) return;
-  std::cout<<"nAccPassed="<<nAccPassed<<", acc="<<(double)nAccPassed/nentries<<std::endl;
-  if (nAccPassed==0) return;
-  std::cout<<"nEffPassed="<<nEffPassed<<", eff="<<(double)nEffPassed/nAccPassed<<std::endl;
 //  std::cout<<"nTotal_="<<nTotal_<<std::endl;
 //  std::cout<<"nBeforeLeptonLoop_="<<nBeforeLeptonLoop_<<" (IsVtxGood!=-1, nPho >= 0, nLe_ >=0, metFilters[6]==1)"<<std::endl;
 //  std::cout<<"nLeptons_="<<nLeptons_<<std::endl;
@@ -224,69 +258,3 @@ void TAcceptanceAndEfficiency::LoopOverTreeEvents()
 //  std::cout<<std::endl;
 
 }
-
-/*
-bool WGammaSelection::CheckMaxNumbersInTree()
-{
-   if ((channel_=TInputSample::MUON) 
-       && (fChain->GetMaximum("nMu")>kMaxnMu))
-     //kMaxnMu - field of TEventTree
-     {
-       PrintErrorMessageMaxNumberOf(MUON_);
-          //methof of this class (WGammaSelection)
-       return 0;
-     }
-   if (channel_==TInputSample::ELECTRON 
-       && fChain->GetMaximum("nEle")>kMaxnEle)
-     {
-       PrintErrorMessageMaxNumberOf(ELECTRON_);
-          //methof of this class (WGammaSelection)
-       return 0;
-     }
-   if (fChain->GetMaximum("nPho")>kMaxnPho)
-     {
-       PrintErrorMessageMaxNumberOf(PHOTON_);
-          //methof of this class (WGammaSelection)
-       return 0;
-     }
-   if (fChain->GetMaximum("nJet")>kMaxnJet)
-     {
-       PrintErrorMessageMaxNumberOf(JET_);
-          //methof of this class (WGammaSelection)
-       return 0;
-     }
-   if (fChain->GetMaximum("nLowPtJet")>kMaxnLowPtJet)
-     {
-       PrintErrorMessageMaxNumberOf(LOWPTJET_);
-          //methof of this class (WGammaSelection)
-       return 0;
-     }
-   if (!treeLeaf.isData && fChain->GetMaximum("nMC")>kMaxnMC)
-     {
-       PrintErrorMessageMaxNumberOf(MC_);
-          //methof of this class (WGammaSelection)
-       return 0;
-     }
-   return 1;
-}
-
-void WGammaSelection::PrintErrorMessageMaxNumberOf(int particle)
-{
-       std::cout<<std::endl;
-       std::cout<<"Error detected in WGammaSelection::PrintErrorMessageMaxNumberOf:"<<std::endl;
-       if (particle==MUON_)
-         std::cout<<"maximum number of muons in the file nMu="<<fChain->GetMaximum("nMu")<<", when kMaxnMu="<<kMaxnMu<<" only"<<std::endl;
-       else if (particle==ELECTRON_)
-         std::cout<<"maximum number of electrons in the file nEle="<<fChain->GetMaximum("nEle")<<", when kMaxnEle="<<kMaxnEle<<" only"<<std::endl;
-       else if (particle==PHOTON_)
-         std::cout<<"maximum number of photons in the file nPho="<<fChain->GetMaximum("nPho")<<", when kMaxnPho="<<kMaxnPho<<" only"<<std::endl;
-       else if (particle==JET_)
-         std::cout<<"maximum number of jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnJet="<<kMaxnJet<<" only"<<std::endl;
-      else if (particle==LOWPTJET_)
-         std::cout<<"maximum number of low Pt jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnLowPtJet="<<kMaxnLowPtJet<<" only"<<std::endl;
-      else if (particle==MC_)
-         std::cout<<"maximum number of mc particles in the file nMC="<<fChain->GetMaximum("nMC")<<", when kMaxnMC="<<kMaxnMC<<" only"<<std::endl;
-       std::cout<<"please, go to TEventTree.h to increase this number up to proper value"<<std::endl;
-       std::cout<<std::endl;
-}
-*/
