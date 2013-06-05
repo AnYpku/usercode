@@ -10,8 +10,10 @@
 #include <TTree.h>
 #include <TCanvas.h>
 #include <THStack.h>
+#include <TCut.h>
   //root classes
 #include <iostream>
+#include <sstream>
 #include <string>
   //standard C++
 
@@ -23,16 +25,35 @@ TSelectionPlots::~TSelectionPlots()
 {
 }
 
-void TSelectionPlots::GetTrees(int channel, string confFile)
+void TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
 {
+
+  stringstream ss(strSources);
+  vector <string> names;
+  string name;
+  while (ss >> name) 
+    names.push_back(name);
+  int nNames = names.size();
 
   TAllInputSamples INPUT(channel, confFile);
 
-  nSources_ = INPUT.nSources_;
-  for (int i=0; i<nSources_; i++)
+  nSources_ = 0;
+  for (int i=0; i<INPUT.nSources_; i++)
     {
 
       TString fileName = (TString)(INPUT.allInputs_[i].fileSelected_).c_str();
+      bool doThisSource=0;
+
+      for (int j=0; j<nNames; j++)
+        {
+          if (names[j]==INPUT.allInputs_[i].sourceName_)
+            doThisSource=1; 
+        }
+      if (strSources=="ALL")
+        doThisSource=1;
+
+      if (!doThisSource) continue;
+      nSources_++;
       
       file_.push_back(new TFile(fileName,"READ"));
       hasHist_.push_back(file_.back()->IsOpen());
@@ -67,7 +88,7 @@ void TSelectionPlots::GetTrees(int channel, string confFile)
     }
 }
 
-void TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits)
+void TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits, TString cut)
 {
 
   legend_ = new TLegend(0.5,0.7,0.95,0.95);
@@ -82,7 +103,7 @@ void TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits)
       }
       file_[i]->cd();
       hist_.push_back(new TH1F(histName, plotVar.c_str(), nBins, binLimits));
-      tree_[i]->Draw(plotVar+TString(">>") + histName,"weight");
+      tree_[i]->Draw(plotVar+TString(">>") + histName,"("+cut+")*weight");
       hist_.back()->Print();
       hist_.back()->SetLineColor(colors_[i]);
       hist_.back()->SetFillColor(colors_[i]);
@@ -218,7 +239,7 @@ void TSelectionPlots::DrawSpectrumSigVsBkg(TString nameCanvas,TString nameForSav
   THStack* bkgHists = new THStack(histName,histName);
   int sigMC=-1;
  
-  for (int i=0; i<hasHist_.size(); i++)
+  for (unsigned int i=0; i<hasHist_.size(); i++)
     {
       if (hasHist_[i] && !isSigMC_[i] && !isData_[i]) {
         bkgHists->Add(hist_[i]);

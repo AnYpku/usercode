@@ -14,8 +14,8 @@ class TSelectionPlots {
 public:
   TSelectionPlots();
   virtual ~TSelectionPlots();
-  void GetTrees(int channel, string confFile);
-  void SetHistograms(string plotVar, int nBins, float* binLimits);
+  void GetTrees(int channel, string confFile, string strSources="ALL");
+  void SetHistograms(string plotVar, int nBins, float* binLimits, TString cut="1");
   void ScaleHistogramsToData();
   void DrawSpectrumDataVsMC();
   void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);

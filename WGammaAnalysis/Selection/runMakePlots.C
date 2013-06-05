@@ -7,8 +7,17 @@
   gStyle->SetCanvasColor(0);
     //makePresentationPlots();
 
+  string confFile = "../Configuration/config.txt";
+  string plotVar="WMt";
+  int nBins=16;
+  float binLimits[nBins+1]={0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160};
+  TSelectionPlots plotter;
+  plotter.GetTrees(TInputSample::MUON, confFile, "DATA Wg_to_munu Wjets_to_lnu DYjets_to_ll Zg Wg_to_taunu multibosons topNotJets");
+  plotter.SetHistograms(plotVar,nBins,binLimits,"lePhoDeltaR>0.7");
+  plotter.DrawSpectrumDataVsMC();
 
 
+/*
   string confFile = "../Configuration/config.txt";
    int nBins=50;
    float binLimits[nBins+1];
@@ -47,5 +56,5 @@
      nameCanvas+=varStr;
      plotter.DrawSpectrumSigVsBkg(nameCanvas,nameForSave);    
    }
-
+*/
 }
