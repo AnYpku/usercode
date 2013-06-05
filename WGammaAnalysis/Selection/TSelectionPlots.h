@@ -14,11 +14,12 @@ class TSelectionPlots {
 public:
   TSelectionPlots();
   virtual ~TSelectionPlots();
-  void GetTrees(int channel, string confFile, string strSources="ALL");
-  void SetHistograms(string plotVar, int nBins, float* binLimits, TString cut="1");
+  bool GetTrees(int channel, string confFile, string strSources="ALL");
+  bool SetHistograms(string plotVar, int nBins, float* binLimits, TString cut="1");
   void ScaleHistogramsToData();
-  void DrawSpectrumDataVsMC();
+  void DrawSpectrumDataVsMC(TString nameCanvas, TString nameForSave);
   void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);
+  bool CheckSizesOfAllVectors();
 
 private:
   vector <TFile*> file_;
@@ -29,7 +30,7 @@ private:
   vector <bool> isData_;
   vector <bool> isSigMC_;
   vector <int> colors_;
-  int nSources_;
+  unsigned int nSources_;
   TLegend* legend_;
   TConfiguration config_;
 };

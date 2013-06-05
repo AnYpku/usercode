@@ -25,7 +25,7 @@ TSelectionPlots::~TSelectionPlots()
 {
 }
 
-void TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
+bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
 {
 
   stringstream ss(strSources);
@@ -83,16 +83,16 @@ void TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
        isSigMC_.push_back(0);
 
      sourceLabel_.push_back(INPUT.allInputs_[i].sourceLatexLabel_);
-
-
     }
+
+  return 1;
 }
 
-void TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits, TString cut)
+bool TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits, TString cut)
 {
 
-  legend_ = new TLegend(0.5,0.7,0.95,0.95);
-  for (int i=0; i<nSources_; i++)
+  legend_ = new TLegend(0.7,0.7,0.95,0.95);
+  for (unsigned int i=0; i<nSources_; i++)
     {
 
       TString histName="hist"+plotVar;
@@ -119,6 +119,11 @@ void TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits,
     legend_->SetLineColor(1);
     legend_->SetLineWidth(2);
     legend_->SetFillColor(0);
+  if (!CheckSizesOfAllVectors()) {
+    std::cout<<"wrong vector sizes in TSelectionPlots::SetHistorgams"<<std::endl;
+    return 0;
+  }
+  return 1;
 }
 
 void TSelectionPlots::ScaleHistogramsToData()
@@ -149,10 +154,10 @@ void TSelectionPlots::ScaleHistogramsToData()
 }
 
 
-void TSelectionPlots::DrawSpectrumDataVsMC()
+void TSelectionPlots::DrawSpectrumDataVsMC(TString nameCanvas,TString nameForSave)
 {
 
-  TCanvas* c = new TCanvas("c","c");
+  TCanvas* c = new TCanvas(nameCanvas,nameCanvas);
   THStack* mcHists = new THStack("mcHists","mcHists");
   int dataIndex = -1;
   
@@ -179,7 +184,7 @@ void TSelectionPlots::DrawSpectrumDataVsMC()
 
 
   if (dataIndex!=-1) {
-    hist_[dataIndex]->GetYaxis()->SetRange(0,maxDataMC);
+    hist_[dataIndex]->GetYaxis()->SetRangeUser(0,1.1*maxDataMC);
     hist_[dataIndex]->Draw();
     mcHists->Draw("same");
     hist_[dataIndex]->Draw("EP same");
@@ -187,7 +192,7 @@ void TSelectionPlots::DrawSpectrumDataVsMC()
   else mcHists->Draw();
 
   legend_->Draw("same");
-  c->SaveAs("drawSpectrumDataVsMC.png");
+  c->SaveAs(nameForSave);
 
 /*
 
@@ -263,6 +268,18 @@ void TSelectionPlots::DrawSpectrumSigVsBkg(TString nameCanvas,TString nameForSav
 
 }
 
+bool TSelectionPlots::CheckSizesOfAllVectors()
+{
+  if (file_.size()!=nSources_ || tree_.size()!=nSources_ || hist_.size()!=nSources_ || 
+      sourceLabel_.size()!=nSources_ || hasHist_.size()!=nSources_ || isData_.size()!=nSources_ ||
+      isSigMC_.size()!=nSources_ || colors_.size()!=nSources_)
+    {
+      std::cout<<"ERROR detected in TSelectionPlots::CheckSizesOfAllVectors: sizes of some vectors are not equal to nSources_="<<nSources_<<std::endl;
+      std::cout<<"file_.size()="<<file_.size()<<", tree_.size()="<<tree_.size()<<", hist_.size()="<<hist_.size()<<", sourceLabel_.size()="<<sourceLabel_.size()<<", hasHist_.size()="<<hasHist_.size()<<", isData_.size()="<<isData_.size()<<", isSigMC_.size()="<<isSigMC_.size()<<", colors_.size()="<<colors_.size()<<std::endl;
+      return 0;
+    }
+  return 1;
+}
 
 
 
