@@ -2,47 +2,72 @@
 ## WGammaAnalysis ##
 ####################
 
-to run WGamma Monte Carlo sample splitter (e, mu, tau channels)
-  $ cd SplitWGammaMC
-  $ root -l runSplitWGammaMC.C
+1) AcceptanceAndEfficiency
+2) CertifiedConstants
+3) Configuration
+4) Include
+5) QuickChecks
+6) Selection
+7) SkimSplitMerge
+8) SplitWGammaMC
+9) WGammaOutput
+10)remove_dot_so_d_tilda_files.sh
 
-to run Selection:
-  $ cd Selection
-  $ root -l runSelection.C
+##############################
+1) AcceptanceAndEfficiency
 
-output root files availiable in the WGammaOutput
+calculates Acceptance times Efficiency
 
-_________________________________________________________
+##############################
+2) CertifiedConstants
 
-in /SplitWGammaMC:
+lists constants officially provided by CMS
+containes 
+- list of JSON files (which are not used anywhere in the package so far)
+- file with photon energy correction constants
+pathes to files must be listed in the /Configuration
+shouldn't be hardcoded anywhere else
 
-   independent script, splits Wg to Wg_munug, Wg_enug and Wg_taunug
-   $ root -l runSplitWGammaMC.C
-   more detailed README aviliable in the /SplitWGammaMC
-_________________________________________________________
+##############################
+3) Configuration
 
+##############################
+4) Include
 
-in /Selection:
+##############################
+5) QuickChecks
 
-   runSelection.C calls WGammaSelection::LoopOverFiles()
-   run it with line
-   $ root -l runSelection.C
-   WGammaSelection: TEventTree, TSelectedEventsTree
-   TEventTree - class of the input tree
-   TSelectedEventsTree - class of the output tree
-   WGammaSelection - loops over input files, over each event in the input trees,
-                     over leptons and photons, decides whether the event 
-                     passed the selection cuts or not 
-                     and if yes - stores the information to the 
-                     output tree
+##############################
+6) Selection
 
-   WGammaSelection also depends on:
-     Configuration/TConfiguration.h - names of the files, some constants
-     Include/TMuonCuts.h - muon cuts
-     Include/TElectronCuts.h - electron cuts which were not implemented yet
-     Include/TPhotonCuts.h - photon cuts
-     Include/PhosphorCorrectorFunctor.hh - photon energy and Et correction;
-       the class was taken from 
-       http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
-__________________________________________________________
-      
+does selection and makes selection plots
+
+##############################
+7) SkimSplitMerge
+
+does skimming and splitting of WGamma to munu, enu, taunu channels
+potentially can easily do merging
+
+##############################
+8) SplitWGammaMC
+
+empty directory; I was trying to rename this directory to SkimSplitMerge
+So, I created directory SkimSplitMerge
+but was not able to remove directory SplitWGammaMC from the CVS
+now it still stays in the CVS but remains empty
+
+##############################
+9) WGammaOutput
+
+the output root files and plots should be stored here
+more precise pathes should be listed in /Configuration
+
+##############################
+10)remove_dot_so_d_tilda_files.sh
+
+this file simply goes into directories and removes files
+*.so *.d *~
+now the names of the directories where to go are just hardcoded
+into the file
+Improvement may be achieved here if to do loop over directory names
+in the current directory
