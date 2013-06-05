@@ -126,17 +126,17 @@ $ BKGMC      multibosons      WW,WZ,ZZ,#gamma#gamma,#{gamma}+jets       799
 
 - MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2mu2tau_MuPhoSkim.root   0.1767
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_gjet_15to30.root   200061.7
+- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_15to30_MuPhoSkim.root   200061.7
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_gjet_30to50.root   19931.62
+- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_30to50_MuPhoSkim.root   19931.62
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_gjet_50to80.root   3322.309
+- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_50to80_MuPhoSkim.root   3322.309
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_gjet_80to120.root  558.2
+- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_80to120_MuPhoSkim.root  558.2
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_gjet_120to170.root 108.0
+- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_120to170_MuPhoSkim.root 108.0
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_diphotonsjets.root   75.39
+- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_diphotonsjets_MuPhoSkim.root   75.39
 
 ###################################################################
 $ BKGMC      topNotJets     t,#bar{t},#bar{t}t#gamma,#bar{t}tW,#bar{t}tZ        9    
