@@ -19,7 +19,7 @@ SplitWGammaMC::SplitWGammaMC(TString* nameWGammaSample, TString nameDir, TString
       fileOut_[i]->mkdir(nameDir_);
       fileOut_[i]->cd(nameDir_);
       outputTree_[i] = new TTree(nameTree_,nameTree_);
-      InitOutputTree(outputTree_[i]);
+      TREE_.InitOutputTree(outputTree_[i]);
         //method of TOutputTree
 
     }
@@ -27,7 +27,7 @@ SplitWGammaMC::SplitWGammaMC(TString* nameWGammaSample, TString nameDir, TString
 
 SplitWGammaMC::~SplitWGammaMC()
 {
-  fChain = 0;
+  TREE_.fChain = 0;
   for (int i=1; i<numberOfTrees; i++)
     {
       //delete outputTree_[i];
@@ -42,29 +42,29 @@ void SplitWGammaMC::LoopOverInputTree()
   TFile f(nameWGammaSample_[0],"READ");
   f.cd(nameDir_);
   TTree* tree =(TTree*)gDirectory->Get(nameTree_);
-  Init(tree);
+  TREE_.Init(tree);
     //method of TInputTree
   TH1F* hEvents = (TH1F*)gDirectory->Get("hEvents");
   TH1F* hPU = (TH1F*)gDirectory->Get("hPU");
   TH1F* hPUTrue = (TH1F*)gDirectory->Get("hPUTrue");
 
-  if (fChain == 0) return;
+  if (TREE_.fChain == 0) return;
         //field of TInputTree
 
-  Long64_t nentries = fChain->GetEntries();
+  Long64_t nentries = TREE_.fChain->GetEntries();
   //nentries = 10;
   for (Long64_t entry=0; entry<nentries; entry++) 
     {
       if (entry < 0) break;
 
-      fChain->GetEntry(entry);
+      TREE_.fChain->GetEntry(entry);
       bool hasW=0;
-      for (int iMC=0; iMC<nMC; iMC++)
+      for (int iMC=0; iMC<TREE_.treeLeaf.nMC; iMC++)
         {
-          if (mcPID[iMC]==24 || mcPID[iMC]==-24)
+          if (TREE_.treeLeaf.mcPID[iMC]==24 || TREE_.treeLeaf.mcPID[iMC]==-24)
             {
               for (int id=2; id<numberOfTrees; id++)
-                if (mcDecayType[iMC]==id) outputTree_[id]->Fill();
+                if (TREE_.treeLeaf.mcDecayType[iMC]==id) outputTree_[id]->Fill();
               hasW=1;
             }
         }

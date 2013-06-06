@@ -1,11 +1,11 @@
 #ifndef SplitWGammaMC_h
 #define SplitWGammaMC_h
 
-#include "TOutputTree.h"
+#include "TInputOutputTree.h"
 #include <TString.h>
 #include <TFile.h>
 
-class SplitWGammaMC: public TOutputTree{
+class SplitWGammaMC{
 public :
    SplitWGammaMC(TString* nameWGammaSample, TString nameDir, TString nameTree);
    virtual ~SplitWGammaMC();
@@ -15,9 +15,12 @@ public :
      //tree [0] is input tree;
      //trees [1]-[4] are output trees
 private :
+   TInputOutputTree TREE_;
    TFile    *fileOut_[numberOfTrees]; //output Files
    TTree    *outputTree_[numberOfTrees]; //output Trees
    TString nameWGammaSample_[numberOfTrees]; //names of input [0] and output [1]-[numberOfTrees] files
+   TString nameDir_;
+   TString nameTree_;
 };
 
 #endif

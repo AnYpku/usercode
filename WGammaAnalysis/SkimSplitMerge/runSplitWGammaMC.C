@@ -1,6 +1,6 @@
 {
-  gROOT->ProcessLine(".L TInputTree.C+");
-  gROOT->ProcessLine(".L TOutputTree.C+");
+  gROOT->ProcessLine(".L ../Include/TEventTree.C+");
+  gROOT->ProcessLine(".L TInputOutputTree.C+");
   gROOT->ProcessLine(".L SplitWGammaMC.C+");
 
   //mcDecayType when the mcPID is 24 (W)
