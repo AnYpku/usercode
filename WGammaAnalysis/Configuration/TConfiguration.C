@@ -1,6 +1,7 @@
 #include "TConfiguration.h" 
   //this class
 #include <iostream> 
+#include <vector> 
   //standard C++ class
 #include <TFile.h>
 #include <TTree.h>
@@ -58,4 +59,17 @@ string TConfiguration::GetNameDebugMode()
 string TConfiguration::GetNameReleasedCuts()
 {
   return nameReleasedCuts_;
+}
+
+int TConfiguration::GetNPhoPtBins()
+{
+  return nPhoPtBins_;
+}
+
+vector <float> TConfiguration::GetPhoPtBinsLimits()
+{
+  vector <float> lims;
+  for (int i=0; i<nPhoPtBins_+1; i++)
+    lims.push_back(phoPtBinsLimits_[i]);
+  return lims;   
 }

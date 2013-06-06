@@ -22,6 +22,8 @@ class TConfiguration
     string GetSelectedNameBkgMC();
     string GetNameDebugMode();
     string GetNameReleasedCuts();
+    int GetNPhoPtBins();
+    vector <float> GetPhoPtBinsLimits();
 
 };
 
