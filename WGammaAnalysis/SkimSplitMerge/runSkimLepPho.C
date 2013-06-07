@@ -1,7 +1,5 @@
 {
-  gROOT->ProcessLine(".L ../Include/TEventTree.C+");
-  gROOT->ProcessLine(".L TInputOutputTree.C+");
-  gROOT->ProcessLine(".L SkimLeptonPhoton.C+");
+  gROOT->ProcessLine(".x ../Include/rootlogon.C");
 
   TBenchmark time;
   time.Start("time");

@@ -1,19 +1,5 @@
 {
-  gROOT->ProcessLine(".L ../Configuration/TConfiguration.C+");
-  gROOT->ProcessLine(".L ../Configuration/TInputSample.C+");
-  gROOT->ProcessLine(".L ../Configuration/TAllInputSamples.C+");
-
-  gROOT->ProcessLine(".L ../Include/TEventTree.C+");
-  gROOT->ProcessLine(".L ../Include/TMuonCuts.C+");
-  gROOT->ProcessLine(".L ../Include/TElectronCuts.C+");
-  gROOT->ProcessLine(".L ../Include/TPhotonCuts.C+");
-  gROOT->ProcessLine(".L ../Include/TMetTools.C+");
-  gROOT->ProcessLine(".L ../Include/TFullCuts.C+");
-  gROOT->ProcessLine(".L ../Include/PhosphorCorrectorFunctor.cc+");
-
-  gROOT->ProcessLine(".L TAcceptanceAndEfficiency.C+");
-
-
+  gROOT->ProcessLine(".x ../Include/rootlogon.C");
 
   gSystem->SetAclicMode(TSystem::kOpt);
     //to run code in optimized mode; 
@@ -23,7 +9,7 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  TAcceptanceAndEfficiency accAndEff( TInputSample::MUON, "../Configuration/config.txt", 0, 0);
+  TAcceptanceAndEfficiency accAndEff( TInputSample::MUON, "../Configuration/config.txt", 0, 1);
   accAndEff.LoopOverInputFiles();
 
 
