@@ -9,6 +9,7 @@
   gROOT->ProcessLine(".L ../Include/TElectronCuts.C+");
   gROOT->ProcessLine(".L ../Include/TMuonCuts.C+");
   gROOT->ProcessLine(".L ../Include/TMetTools.C+");
+  gROOT->ProcessLine(".L ../Include/TPuReweight.C+");
   gROOT->ProcessLine(".L ../Include/TFullCuts.C+");
 
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/TAcceptanceAndEfficiency.C+");
