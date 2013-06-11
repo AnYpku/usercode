@@ -32,6 +32,11 @@ class TAcceptanceAndEfficiency: public TEventTree
        bool isReleasedCutsMode_;
        int nLe_;
 
+       float nEvents_;
+       float nSkimPassed_;
+       float nAccPassed_;
+       float nEffPassed_;
+
 
        const static int debugModeNEntries_=100000;
 
