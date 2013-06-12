@@ -1,0 +1,5 @@
+cd /home/hep/eavdeeva2/releases/CMSSW_5_0_1/src/FWCore/PythonUtilities/scripts
+
+cmsenv
+
+mergeJSON.py /home/hep/eavdeeva2/WGamma/UserCode/eavdeeva/WGammaAnalysis/CertifiedConstants/JSONfiles/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_v2.txt /home/hep/eavdeeva2/WGamma/UserCode/eavdeeva/WGammaAnalysis/CertifiedConstants/JSONfiles/Cert_190782-190949_8TeV_06Aug2012ReReco_Collisions12_JSON.txt /home/hep/eavdeeva2/WGamma/UserCode/eavdeeva/WGammaAnalysis/CertifiedConstants/JSONfiles/Cert_198022-198523_8TeV_24Aug2012ReReco_Collisions12_JSON.txt /home/hep/eavdeeva2/WGamma/UserCode/eavdeeva/WGammaAnalysis/CertifiedConstants/JSONfiles/Cert_201191-201191_8TeV_11Dec2012ReReco-recover_Collisions12_JSON.txt /home/hep/eavdeeva2/WGamma/UserCode/eavdeeva/WGammaAnalysis/CertifiedConstants/JSONfiles/Extract_198941-208686_8Tev_PromptReco.txt --output /home/hep/eavdeeva2/WGamma/UserCode/eavdeeva/WGammaAnalysis/CertifiedConstants/JSONfiles/Total_8TeV_2012_JSON.txt
