@@ -6,10 +6,12 @@
 #include "../Include/TMuonCuts.h" 
 #include "../Include/TElectronCuts.h" 
 #include "../Include/TPhotonCuts.h" 
+#include "../Include/TPuReweight.h" 
 #include "../Configuration/TAllInputSamples.h"
   //this package
 #include "../Include/PhosphorCorrectorFunctor.hh"
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
+  //currently in this package
 #include "TTree.h" 
 #include "TMath.h" 
   //ROOT package
@@ -19,8 +21,8 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
      //TEventTree - class for input tree
      //TSelectedEventsTree - class for output tree and output root file
      public:
-       WGammaSelection (int channel, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isDebugMode=0);
-       WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isDebugMode=0);
+       WGammaSelection (int channel, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isPuReweight=1, bool isDebugMode=0);
+       WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isPuReweight=1, bool isDebugMode=0);
        virtual ~WGammaSelection();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
@@ -39,6 +41,7 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
 
        bool isDebugMode_;
        bool isReleasedCutsMode_;
+       bool isPuReweight_;
        int sampleMode_;
        vector <bool> doAnalizeSample_;
 
@@ -70,6 +73,7 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
        const static int debugModeNEntries_=100000;
 
        zgamma::PhosphorCorrectionFunctor* photonCorrector_;
+       TPuReweight* puWeight_;
        TString selectedTreeFileName_;
   };
 

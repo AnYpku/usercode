@@ -5,6 +5,7 @@
 #include "../Include/TElectronCuts.h" 
 #include "../Include/TPhotonCuts.h" 
 #include "../Include/TFullCuts.h" 
+#include "../Include/TPuReweight.h" 
 #include "../Configuration/TConfiguration.h" 
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
@@ -19,13 +20,14 @@
 #include <sstream>  
   //standard C++ class
 
-WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile, bool isReleasedCutsMode, bool isDebugMode)
+WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile, bool isReleasedCutsMode, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
   isReleasedCutsMode_=isReleasedCutsMode;
+  isPuReweight_=isPuReweight;
   isDebugMode_=isDebugMode;
   TConfiguration config;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
@@ -46,13 +48,14 @@ WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile,
     } 
 }
 
-WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isReleasedCutsMode, bool isDebugMode)
+WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isReleasedCutsMode, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
   isReleasedCutsMode_=isReleasedCutsMode;
+  isPuReweight_=isPuReweight;
   isDebugMode_=isDebugMode;
   TConfiguration config;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
@@ -157,11 +160,14 @@ void WGammaSelection::LoopOverInputFiles()
                 return;
              }  
  
-      
+           puWeight_=new TPuReweight(config.GetPileupDataFileName(),INPUT_->allInputs_[iSource].fileNames_[inputFileN_]);
+           
            LoopOverTreeEvents();
              //method of this class (WGammaSelection)
            fChain=0;
              //field of TEventTree
+
+           delete puWeight_;
 
          }//loop over inputFileN_ ends
 
@@ -186,7 +192,9 @@ void WGammaSelection::LoopOverTreeEvents()
        if (fChain->GetEntries()<debugModeNEntries_) nentries=fChain->GetEntries();
        else nentries=debugModeNEntries_;
      }
-   int nPassed=0;
+
+   float nTotal=0;
+   float nPassed=0;
 
    //goodLeptonPhotonPairs(two-dimentional array of bool-s)
    //memory allocation for some variables: 
@@ -246,6 +254,11 @@ void WGammaSelection::LoopOverTreeEvents()
        //         WMt_, lePhoDeltaR_, photonCorrector_) == 1)
        //       //method of this class (WGammaSelection)
 
+       totalWeight_ = lumiWeight_;
+       if (!treeLeaf.isData && isPuReweight_)
+         totalWeight_*=puWeight_->GetPuWeightMc(treeLeaf.nPUInfo);
+       nTotal+=totalWeight_;
+
        TFullCuts fullCuts;
        if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
                 channel_,  isReleasedCutsMode_,
@@ -257,8 +270,7 @@ void WGammaSelection::LoopOverTreeEvents()
               {
                 if (goodLeptonPhotonPairs[ile][ipho])
                   {
-                    totalWeight_ = lumiWeight_;
-                    nPassed+=1;
+                    nPassed+=totalWeight_;
                     if (channel_==TInputSample::MUON) 
                        SetValues(treeLeaf.muEta[ile],treeLeaf.muPhi[ile],
                               treeLeaf.muPt[ile], 
@@ -303,9 +315,7 @@ void WGammaSelection::LoopOverTreeEvents()
   delete WMt;
 
   std::cout<<"Summary:"<<std::endl;
-  std::cout<<"nEntries="<<nentries<<", nPassed="<<nPassed<<", eff="<<(double)nPassed/nentries<<", nWeightes="<<nPassed*debugModeWeight_;
-  if (debugModeWeight_!=0) std::cout<<" or  "<<nPassed/debugModeWeight_;
-  std::cout<<std::endl;
+  std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<std::endl;
 //  std::cout<<"nTotal_="<<nTotal_<<std::endl;
 //  std::cout<<"nBeforeLeptonLoop_="<<nBeforeLeptonLoop_<<" (IsVtxGood!=-1, nPho >= 0, nLe_ >=0, metFilters[6]==1)"<<std::endl;
 //  std::cout<<"nLeptons_="<<nLeptons_<<std::endl;

@@ -22,6 +22,7 @@ class TConfiguration
     string GetSelectedNameBkgMC();
     string GetNameDebugMode();
     string GetNameReleasedCuts();
+    string GetPileupDataFileName();
     int GetNPhoPtBins();
     vector <float> GetPhoPtBinsLimits();
 
@@ -43,6 +44,7 @@ static const string selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.
 static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
 static const string nameDebugMode_ = "_debugMode";
 static const string nameReleasedCuts_ = "_releasedCuts";
+static const string pileupDataFileName_ = "../CertifiedConstants/Pileup/pileup_Extract_198941-208686_8Tev_PromptReco.root";
 
 /////////////////////////////////////////
 // phosphor corrections file

@@ -61,6 +61,11 @@ string TConfiguration::GetNameReleasedCuts()
   return nameReleasedCuts_;
 }
 
+string TConfiguration::GetPileupDataFileName()
+{
+  return pileupDataFileName_;
+}
+
 int TConfiguration::GetNPhoPtBins()
 {
   return nPhoPtBins_;

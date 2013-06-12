@@ -3,19 +3,20 @@
 
 #include "TFile.h"
 #include "TH1D.h"
+#include "TH1F.h"
 
 class TPuReweight
 {
   public:
     TPuReweight();
-    TPuReweight(string fileName, string histName, string fileNameMc, string histNameMc);
+    TPuReweight(string fileName, string fileNameMc);
     virtual ~TPuReweight();
     float GetPuWeightMc(int nPu);
   private:
     TFile *fPuData_;
     TH1D *hPuData_;
     TFile *fPuMc_;
-    TH1D *hPuMc_;
+    TH1F *hPuMc_;
 
 };
 #endif
