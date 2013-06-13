@@ -82,7 +82,7 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
    b_mcIndex->GetEntry(entry);
    b_muGenIndex->GetEntry(entry);
    b_phoGenIndex->GetEntry(entry);
-   b_nPUInfo->GetEntry(entry);
+//   b_puTrue->GetEntry(entry);
 
 //   b_jetGenJetPt->GetEntry(entry);
 //   b_jetGenJetEta->GetEntry(entry);

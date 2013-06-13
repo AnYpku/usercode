@@ -44,7 +44,7 @@ static const string selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.
 static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
 static const string nameDebugMode_ = "_debugMode";
 static const string nameReleasedCuts_ = "_releasedCuts";
-static const string pileupDataFileName_ = "../CertifiedConstants/Pileup/pileup_Extract_198941-208686_8Tev_PromptReco.root";
+static const string pileupDataFileName_ = "../CertifiedConstants/Pileup/pileup_Total_8TeV_2012_JSON.root";
 
 /////////////////////////////////////////
 // phosphor corrections file

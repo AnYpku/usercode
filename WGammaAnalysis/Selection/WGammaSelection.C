@@ -249,14 +249,9 @@ void WGammaSelection::LoopOverTreeEvents()
              return;
           }
 
-       // if (TFullCuts::Cut(goodLeptonPhotonPairs, treeLeaf,   
-       //         channel_,  isReleasedCutsMode_, 
-       //         WMt_, lePhoDeltaR_, photonCorrector_) == 1)
-       //       //method of this class (WGammaSelection)
-
        totalWeight_ = lumiWeight_;
        if (!treeLeaf.isData && isPuReweight_)
-         totalWeight_*=puWeight_->GetPuWeightMc(treeLeaf.nPUInfo);
+         totalWeight_*=puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]);
        nTotal+=totalWeight_;
 
        TFullCuts fullCuts;
