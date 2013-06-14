@@ -12,7 +12,7 @@
   gROOT->ProcessLine(".L ../Include/TPuReweight.C+");
   gROOT->ProcessLine(".L ../Include/TFullCuts.C+");
 
-  gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/TAcceptanceAndEfficiency.C+");
+  gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
   gROOT->ProcessLine(".L ../Selection/TSelectedEventsTree.C+");
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");

@@ -1,5 +1,5 @@
-#ifndef TAcceptanceAndEfficiency_h
-#define TAcceptanceAndEfficiency_h
+#ifndef CalcAccAndEff_h
+#define CalcAccAndEff_h
 
 #include "../Configuration/TAllInputSamples.h"
 #include "../Include/TEventTree.h"
@@ -10,12 +10,12 @@
 #include "TMath.h" 
   //ROOT package
 
-class TAcceptanceAndEfficiency: public TEventTree
+class CalcAccAndEff: public TEventTree
   {
      public:
-       TAcceptanceAndEfficiency (int channel, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isDebugMode=0);
+       CalcAccAndEff (int channel, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isDebugMode=0);
 
-       virtual ~TAcceptanceAndEfficiency();
+       virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
 //       bool    CheckMaxNumbersInTree();

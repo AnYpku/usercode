@@ -1,4 +1,4 @@
-#include "TAcceptanceAndEfficiency.h" 
+#include "CalcAccAndEff.h" 
   //this class
 #include "../Include/TMetTools.h" 
 #include "../Include/TMuonCuts.h" 
@@ -20,7 +20,7 @@
 #include <sstream>  
   //standard C++ class
 
-TAcceptanceAndEfficiency::TAcceptanceAndEfficiency(int channel, string configFile, bool isReleasedCutsMode, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCutsMode, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
@@ -33,14 +33,14 @@ TAcceptanceAndEfficiency::TAcceptanceAndEfficiency(int channel, string configFil
     //field of this class
 }
 
-TAcceptanceAndEfficiency::~TAcceptanceAndEfficiency()
+CalcAccAndEff::~CalcAccAndEff()
 {
    fChain = 0;
      //field of TEventTree 
    delete photonCorrector_;
 }
 
-void TAcceptanceAndEfficiency::LoopOverInputFiles()
+void CalcAccAndEff::LoopOverInputFiles()
 {
   TConfiguration config;
   int nSources = INPUT_->nSources_;
@@ -66,7 +66,7 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
              std::cout<<std::endl<<"processing file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<std::endl;
            else
              {
-                std::cout<<"ERROR detected in TAcceptanceAndEfficiency::LoopOverInputFiles: file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<" was not found"<<std::endl;
+                std::cout<<"ERROR detected in CalcAccAndEff::LoopOverInputFiles: file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<" was not found"<<std::endl;
                 return;
              } 
            f.cd("ggNtuplizer");
@@ -79,7 +79,7 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
              }   
            else
              {
-                std::cout<<"ERROR detected in TAcceptanceAndEfficiency::LoopOverInputFiles: tree in the file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<" does not exist"<<std::endl;
+                std::cout<<"ERROR detected in CalcAccAndEff::LoopOverInputFiles: tree in the file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<" does not exist"<<std::endl;
                 return;
              }  
 
@@ -101,7 +101,7 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
 
       
            LoopOverTreeEvents();
-             //method of this class (TAcceptanceAndEfficiency)
+             //method of this class (CalcAccAndEff)
            fChain=0;
              //field of TEventTree
 
@@ -122,7 +122,7 @@ void TAcceptanceAndEfficiency::LoopOverInputFiles()
 }
 
 
-void TAcceptanceAndEfficiency::LoopOverTreeEvents()
+void CalcAccAndEff::LoopOverTreeEvents()
 {
    if (fChain == 0) return;
    Long64_t nentries = fChain->GetEntries();
@@ -177,7 +177,7 @@ void TAcceptanceAndEfficiency::LoopOverTreeEvents()
         else if (channel_==TInputSample::ELECTRON) nLe_=treeLeaf.nEle;
         else
           {
-             std::cout<<"Error detected in  TAcceptanceAndEfficiency::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
+             std::cout<<"Error detected in  CalcAccAndEff::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
              return;
           }
         
