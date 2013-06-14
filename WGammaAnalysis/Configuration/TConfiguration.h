@@ -42,9 +42,11 @@ static const string selectedEventsNameDataEle_="selected_ELECTRON_DATA";//.root
 static const string selectedEventsNameSignalMCMu_="selected_MUON_SIGMC";//.root
 static const string selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.root
 static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
+
+
 static const string nameDebugMode_ = "_debugMode";
 static const string nameReleasedCuts_ = "_releasedCuts";
-static const string pileupDataFileName_ = "../CertifiedConstants/Pileup/pileup_Total_8TeV_2012_JSON.root";
+static const string pileupDataFileName_ = "../CertifiedConstants/Pileup/TruePU_69300_2012Full.root";
 
 /////////////////////////////////////////
 // phosphor corrections file
