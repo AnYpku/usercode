@@ -1,8 +1,10 @@
 #ifndef CalcAccAndEff_h
 #define CalcAccAndEff_h
 
+#include "../Configuration/TConfiguration.h"
 #include "../Configuration/TAllInputSamples.h"
 #include "../Include/TEventTree.h"
+#include "../Include/TPuReweight.h"
   //this package
 #include "../Include/PhosphorCorrectorFunctor.hh"
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
@@ -13,7 +15,7 @@
 class CalcAccAndEff: public TEventTree
   {
      public:
-       CalcAccAndEff (int channel, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isDebugMode=0);
+       CalcAccAndEff (int channel, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isPuReweight=1, bool isDebugMode=0);
 
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
@@ -30,17 +32,31 @@ class CalcAccAndEff: public TEventTree
 
        bool isDebugMode_;
        bool isReleasedCutsMode_;
+       bool isPuReweight_;
+
+       float lumiWeight_;
+       float debugModeWeight_;
+       float totalWeight_;
+
        int nLe_;
 
        float nEvents_;
-       float nSkimPassed_;
        float nAccPassed_;
+       float nEventsInAcc_;
        float nEffPassed_;
 
+       vector <float> vecPhoPtLimits_;
+       vector <float> vecnEvents_;
+       vector <float> vecnAccPassed_;
+       vector <float> vecnEventsInAcc_;
+       vector <float> vecnEffPassed_;
 
-       const static int debugModeNEntries_=100000;
+
+       const static int debugModeNEntries_=100;
 
        zgamma::PhosphorCorrectionFunctor* photonCorrector_;
+       TPuReweight* puWeight_;
+       TConfiguration config_;
   };
 
 #endif 

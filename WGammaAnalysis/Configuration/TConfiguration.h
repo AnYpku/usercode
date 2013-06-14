@@ -25,6 +25,7 @@ class TConfiguration
     string GetPileupDataFileName();
     int GetNPhoPtBins();
     vector <float> GetPhoPtBinsLimits();
+    int FindPhoPtBinByPhoPt(float pt);
 
 };
 

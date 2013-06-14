@@ -78,3 +78,11 @@ vector <float> TConfiguration::GetPhoPtBinsLimits()
     lims.push_back(phoPtBinsLimits_[i]);
   return lims;   
 }
+
+int TConfiguration::FindPhoPtBinByPhoPt(float pt)
+{
+  for (int i=0; i<nPhoPtBins_+1; i++)
+    if (pt>=phoPtBinsLimits_[i] && pt<phoPtBinsLimits_[i+1])
+      return i;
+  return -1; 
+}

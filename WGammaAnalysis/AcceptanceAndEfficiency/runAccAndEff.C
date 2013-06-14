@@ -9,7 +9,7 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  TAcceptanceAndEfficiency accAndEff( TInputSample::MUON, "../Configuration/config.txt", 0, 1);
+  CalcAccAndEff accAndEff( TInputSample::MUON, "../Configuration/config.txt", 0, 1, 1);
   accAndEff.LoopOverInputFiles();
 
 

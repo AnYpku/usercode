@@ -5,6 +5,7 @@
 #include "../Include/TElectronCuts.h" 
 #include "../Include/TPhotonCuts.h" 
 #include "../Include/TFullCuts.h" 
+#include "../Include/TPuReweight.h" 
 #include "../Configuration/TConfiguration.h" 
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
@@ -20,7 +21,7 @@
 #include <sstream>  
   //standard C++ class
 
-CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCutsMode, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCutsMode, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
@@ -28,9 +29,22 @@ CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCuts
   channel_=channel;
   isReleasedCutsMode_=isReleasedCutsMode;
   isDebugMode_=isDebugMode;
-  TConfiguration config;
-  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
+  isPuReweight_=isPuReweight;
+  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config_.GetPhosphorConstantFileName()).c_str());
     //field of this class
+
+  nEvents_=0;
+  nAccPassed_=0;
+  nEventsInAcc_=0;
+  nEffPassed_=0;
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    vecnEvents_.push_back(0);
+    vecnAccPassed_.push_back(0);
+    vecnEventsInAcc_.push_back(0);
+    vecnEffPassed_.push_back(0);
+  }
+
+  vecPhoPtLimits_ = config_.GetPhoPtBinsLimits();
 }
 
 CalcAccAndEff::~CalcAccAndEff()
@@ -42,7 +56,6 @@ CalcAccAndEff::~CalcAccAndEff()
 
 void CalcAccAndEff::LoopOverInputFiles()
 {
-  TConfiguration config;
   int nSources = INPUT_->nSources_;
   for (int iSource=0; iSource<nSources; iSource++)
     {
@@ -53,14 +66,9 @@ void CalcAccAndEff::LoopOverInputFiles()
        TTree* tree;
        int inputFileNMax = INPUT_->allInputs_[iSource].nFiles_;
 
-       nEvents_=0;
-       nSkimPassed_=0;
-       nAccPassed_=0;
-       nEffPassed_=0;
-
        for (int inputFileN=0; inputFileN< inputFileNMax; inputFileN++)
          {
-
+           lumiWeight_=INPUT_->allInputs_[iSource].lumiWeights_[inputFileN];
            TFile f((INPUT_->allInputs_[iSource].fileNames_[inputFileN]).c_str());
            if (f.IsOpen()) 
              std::cout<<std::endl<<"processing file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<std::endl;
@@ -85,38 +93,57 @@ void CalcAccAndEff::LoopOverInputFiles()
 
            bool isSkimmed = gDirectory->GetListOfKeys()->Contains("hskim");
 
-           if (!isSkimmed){
-             nEvents_+=tree->GetEntries();
-             nSkimPassed_+=tree->GetEntries();
+           if (isSkimmed){
+              std::cout<<"ERROR detected in CalcAccAndEff::LoopOverInputFiles: file"<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<" is skimmed; skimmed signal MC file can't be used for acceptance and efficiency calculation; please, use the full signal MC file"<<std::endl;
+              return;
            }
-           else if (isSkimmed){
-              TH1F* hist = (TH1F*)gDirectory->Get("hskim");
-              nEvents_ += tree->GetEntries() * hist->GetBinContent(1) / hist->GetBinContent(2);
-              nSkimPassed_+=tree->GetEntries();
-              hist = 0;
-           }
+
+//           if (!isSkimmed){
+//             nEvents_+=tree->GetEntries();
+//             nSkimPassed_+=tree->GetEntries();
+//           }
+//           else if (isSkimmed){
+//              TH1F* hist = (TH1F*)gDirectory->Get("hskim");
+//              nEvents_ += tree->GetEntries() * hist->GetBinContent(1) / hist->GetBinContent(2);
+//              nSkimPassed_+=tree->GetEntries();
+//              hist = 0;
+//           }
 
            
 
 
-      
+           puWeight_=new TPuReweight(config_.GetPileupDataFileName(),INPUT_->allInputs_[iSource].fileNames_[inputFileN]);
+
            LoopOverTreeEvents();
              //method of this class (CalcAccAndEff)
            fChain=0;
              //field of TEventTree
 
+           delete puWeight_;
+
          }//loop over inputFileN_ ends
 
      std::cout<<"Summary:"<<std::endl;
-     std::cout<<"nEvents="<<nEvents_<<std::endl;
+     std::cout<<"nEvents="<<nEvents_;
      if (nEvents_==0) continue;
-     std::cout<<"nSkimPassed="<<nSkimPassed_<<", effSkim="<<(double)nSkimPassed_/nEvents_<<std::endl;
-     if (nSkimPassed_==0) continue;
-     std::cout<<"nAccPassed="<<nAccPassed_<<", effSkim*acc="<<(double)nAccPassed_/nEvents_<<std::endl;
-     if (nAccPassed_==0) continue;
-     std::cout<<"nEffPassed="<<nEffPassed_<<", effSkim*acc*eff="<<(double)nEffPassed_/nEvents_<<std::endl;
+     std::cout<<"nAccPassed="<<nAccPassed_<<", acc="<<(double)nAccPassed_/nEvents_<<std::endl;
+     std::cout<<"nEventsInAcc="<<nEventsInAcc_;
+     if (nEventsInAcc_==0) continue;
+     std::cout<<"nEffPassed="<<nEffPassed_<<", eff="<<(double)nEffPassed_/nEventsInAcc_<<std::endl;
 
-      std::cout<<"the output will be saved to "<<std::endl<<std::endl;
+     std::cout<<std::endl;
+     for (int i=0; i<config_.GetNPhoPtBins(); i++){
+       std::cout<<std::endl;
+       std::cout<<"pho Pt: "<<vecPhoPtLimits_[i]<<" - "<<vecPhoPtLimits_[i+1]<<std::endl;
+       std::cout<<" -- nEvents="<<vecnEvents_[i];
+       if (vecnEvents_[i]==0) continue;
+       std::cout<<", nAccPassed="<<vecnAccPassed_[i]<<", acc="<<(double)vecnAccPassed_[i]/vecnEvents_[i]<<std::endl;
+       std::cout<<" -- nEventsInAcc="<<vecnEventsInAcc_[i];
+       if (vecnEventsInAcc_[i]==0) continue;
+       std::cout<<", nEffPassed="<<vecnEffPassed_[i]<<", eff="<<(double)vecnEffPassed_[i]/vecnEventsInAcc_[i]<<std::endl;
+     }//end of for (int i=0; i<config_.GetNPhoPtBins(); i++)
+
+     std::cout<<"the output will be saved to "<<std::endl<<std::endl;
 
     } //loop over iSource ends
 }
@@ -173,6 +200,11 @@ void CalcAccAndEff::LoopOverTreeEvents()
         if (!treeLeaf.isData) GetEntryMCSpecific(entry);
           //method of TEventTree class
 
+        float weightPU;
+        if (isPuReweight_)
+          weightPU = puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]);
+        else weightPU=1;
+
         if (channel_==TInputSample::MUON) nLe_=treeLeaf.nMu;
         else if (channel_==TInputSample::ELECTRON) nLe_=treeLeaf.nEle;
         else
@@ -183,6 +215,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
         
         // apply acceptance cuts
         bool accPassed=0;
+        int bin=-1;
 
         for (int ile=0; ile<nLe_; ile++)
           for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
@@ -194,23 +227,32 @@ void CalcAccAndEff::LoopOverTreeEvents()
               if (channel_==TInputSample::MUON && treeLeaf.mcIndex[imc]==treeLeaf.muGenIndex[ile])   
                 ileMC=imc;
             }
+            nEvents_+=lumiWeight_;
+            bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt[iphoMC]);
+            if (bin<vecnEvents_.size() && bin!=-1)
+              vecnEvents_[bin]+=lumiWeight_;
+            else if (bin==-1);
+            else {
+              std::cout<<"ERROR detected in CalcAccAndEff::LoopOverTreeEvents(): pho pt bin found = "<<bin<<", but size of vector = "<<vecnEvents_.size()<<std::endl;
+              return;
+            }
             if (iphoMC>=0 && photonEmpty.PhoKinematics(treeLeaf.mcEt[iphoMC],
                                                        treeLeaf.mcEta[iphoMC])){
 
-              if (ileMC>=0 && channel_==TInputSample::MUON && 
-                  muonEmpty.MuKinematics(treeLeaf.mcPt[ileMC], 
-                                         treeLeaf.mcEta[ileMC])) 
+              if ((ileMC>=0 && channel_==TInputSample::MUON && 
+                   muonEmpty.MuKinematics(treeLeaf.mcPt[ileMC], 
+                                         treeLeaf.mcEta[ileMC])) ||
+                   (ileMC>=0 && channel_==TInputSample::ELECTRON)) 
                 {
                   accPassed=1;
                   accLeptonPhotonPassed[ile][ipho]=1;
-                  nAccPassed_++;
-                }
-              else if (channel_==TInputSample::ELECTRON) 
-                {
-                  accPassed=1;
-                  accLeptonPhotonPassed[ile][ipho]=1;
-                  nAccPassed_++;
-                }
+                  nAccPassed_+=lumiWeight_;
+                  nEventsInAcc_+=lumiWeight_*weightPU;
+                  bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt[iphoMC]);
+                  if (bin<vecnAccPassed_.size() && bin!=-1)
+                    vecnAccPassed_[bin]+=lumiWeight_;
+                  }
+//                  bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt[ipho]);
             } //if photonEmpty.PhoKinematics()
           }//end of loop over ipho
         if (!accPassed) continue;
@@ -224,7 +266,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
           for (int ile=0; ile<nLe_; ile++)
             for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
                 if (effLeptonPhotonPassed[ile][ipho] && accLeptonPhotonPassed[ile][ipho])
-                    nEffPassed_+=1;
+                    nEffPassed_+=lumiWeight_*weightPU;
         else continue;
 
      } //end of loop over events in the tree
