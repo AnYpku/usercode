@@ -9,18 +9,22 @@
     //makePresentationPlots();
 
   //PlotSigVsBkg();
-  //PlotDataVsMC();
-
-
+  //PlotDataVsMC("lePhoDeltaR>0.7");
   string confFile = "../Configuration/config.txt";
-  string plotVar="pfMETPhi";
-  int nBins=12;
-  float binLimits[nBins+1]={-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3};
+  TSelectionPlots plotter;
+  plotter.GetTrees(TInputSample::MUON, confFile);
+  plotter.PrintWeightedNumberOfEvents("lePhoDeltaR>0.7");
+
+/*
+  string confFile = "../Configuration/config.txt";
+  string plotVar="WMt";
+  int nBins=20;
+  float binLimits[nBins+1]={0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
   TSelectionPlots plotter;
   plotter.GetTrees(TInputSample::MUON, confFile, "DATA Wg_to_munu Wjets_to_lnu DYjets_to_ll Zg Wg_to_taunu multibosons topNotJets");
   plotter.SetHistograms(plotVar,nBins,binLimits,"lePhoDeltaR>0.7");
-  plotter.DrawSpectrumDataVsMC("cpfMETPhi","pfMETPhi_dR07_cut.png");
-
+  plotter.DrawSpectrumDataVsMC("cWMt","WMt.png");
+*/
 /*
   string confFile = "../Configuration/config.txt";
   string plotVar="lePhoDeltaR";

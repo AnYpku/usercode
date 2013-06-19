@@ -281,5 +281,54 @@ bool TSelectionPlots::CheckSizesOfAllVectors()
   return 1;
 }
 
+void TSelectionPlots::PrintWeightedNumberOfEvents(TString cut)
+{
 
+  float nMCEvents=0;
+  float nMCEventsErr=0;
+  for (int i=0; i<nSources_; i++){
+    std::cout<<sourceLabel_[i]<<" ";
+//    std::cout<<tree_[i]->GetEntries()<<" ";
+//    std::cout<<tree_[i]->GetEntries(cut)<<" ";
+
+    TH1F* h = new TH1F("h", "WMt", 100, tree_[i]->GetMinimum("WMt"), tree_[i]->GetMaximum("WMt"));
+    tree_[i]->Draw("WMt>>h","1","goff");
+
+    TH1F* hCut = new TH1F("hCut", "WMt", 100, tree_[i]->GetMinimum("WMt"), tree_[i]->GetMaximum("WMt"));
+    tree_[i]->Draw("WMt>>hCut",cut,"goff");
+
+    TH1F* hWeight = new TH1F("hWeight", "WMt", 100, tree_[i]->GetMinimum("WMt"), tree_[i]->GetMaximum("WMt"));
+    tree_[i]->Draw("WMt>>hWeight","weight","goff");
+
+    TH1F* hWeightCut = new TH1F("hWeightCut", "WMt", 100, tree_[i]->GetMinimum("WMt"), tree_[i]->GetMaximum("WMt"));
+    tree_[i]->Draw("WMt>>hWeightCut","("+cut+")*weight","goff");
+
+    TH1F* hWeightSquaredCut = new TH1F("hWeightSquaredCut", "WMt", 100, tree_[i]->GetMinimum("WMt"), tree_[i]->GetMaximum("WMt"));
+    tree_[i]->Draw("WMt>>hWeightSquaredCut","("+cut+")*weight*weight","goff");
+
+
+//    std::cout<<h->Integral()<<" ";
+//    std::cout<<hCut->Integral()<<" ";
+//    std::cout<<hWeight->Integral()<<" ";
+    if (!isData_[i]) nMCEvents+=hWeightCut->Integral();
+    std::cout<<hWeightCut->Integral()<<" +- ";
+//    std::cout<<hWeightSquaredCut->Integral()<<" ";
+    if (!isData_[i]) nMCEventsErr+=hWeightSquaredCut->Integral();
+    std::cout<<sqrt(hWeightSquaredCut->Integral())<<" ";
+
+    delete h;
+    delete hCut;
+    delete hWeight;
+    delete hWeightCut;
+    delete hWeightSquaredCut;
+   
+    std::cout<<std::endl;
+  }
+  nMCEventsErr=sqrt(nMCEventsErr);
+  std::cout<<"TOTAL MC: ";
+  std::cout<<nMCEvents<<" +- ";
+  std::cout<<nMCEventsErr;
+  std::cout<<std::endl;
+  
+}
 

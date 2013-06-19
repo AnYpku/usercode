@@ -20,6 +20,7 @@ public:
   void DrawSpectrumDataVsMC(TString nameCanvas, TString nameForSave);
   void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);
   bool CheckSizesOfAllVectors();
+  void PrintWeightedNumberOfEvents(TString cut);
 
 private:
   vector <TFile*> file_;
