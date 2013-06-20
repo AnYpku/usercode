@@ -4,6 +4,7 @@
   gROOT->ProcessLine(".L ../Configuration/TAllInputSamples.C+");
 
   gROOT->ProcessLine(".L ../Include/PhosphorCorrectorFunctor.cc+");
+  gROOT->ProcessLine(".L ../Include/TMathTools.C+");
   gROOT->ProcessLine(".L ../Include/TEventTree.C+");
   gROOT->ProcessLine(".L ../Include/TPhotonCuts.C+");
   gROOT->ProcessLine(".L ../Include/TElectronCuts.C+");
