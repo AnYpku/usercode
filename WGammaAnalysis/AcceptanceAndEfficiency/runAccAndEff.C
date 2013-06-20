@@ -10,6 +10,7 @@
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
   CalcAccAndEff accAndEff( TInputSample::MUON, "../Configuration/config.txt", 0, 1, 1);
+  //CalcAccAndEff accAndEff( TInputSample::MUON);
   accAndEff.LoopOverInputFiles();
 
 

@@ -44,15 +44,23 @@ class CalcAccAndEff: public TEventTree
        float nAccPassed_;
        float nEventsInAcc_;
        float nEffPassed_;
+       float nEventsErr_;
+       float nAccPassedErr_;
+       float nEventsInAccErr_;
+       float nEffPassedErr_;
 
        vector <float> vecPhoPtLimits_;
        vector <float> vecnEvents_;
        vector <float> vecnAccPassed_;
        vector <float> vecnEventsInAcc_;
        vector <float> vecnEffPassed_;
+       vector <float> vecnEventsErr_;
+       vector <float> vecnAccPassedErr_;
+       vector <float> vecnEventsInAccErr_;
+       vector <float> vecnEffPassedErr_;
 
 
-       const static int debugModeNEntries_=100;
+       const static int debugModeNEntries_=100000;
 
        zgamma::PhosphorCorrectionFunctor* photonCorrector_;
        TPuReweight* puWeight_;
