@@ -20,6 +20,7 @@ class CalcAccAndEff: public TEventTree
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
+       void    SaveOutput();
 //       bool    CheckMaxNumbersInTree();
 //       void    PrintErrorMessageMaxNumberOf(int particle);
 
@@ -49,7 +50,13 @@ class CalcAccAndEff: public TEventTree
        float nEventsInAccErr_;
        float nEffPassedErr_;
 
+       float acc_;
+       float eff_;
+       float accErr_;
+       float effErr_;
+
        vector <float> vecPhoPtLimits_;
+
        vector <float> vecnEvents_;
        vector <float> vecnAccPassed_;
        vector <float> vecnEventsInAcc_;
@@ -58,6 +65,11 @@ class CalcAccAndEff: public TEventTree
        vector <float> vecnAccPassedErr_;
        vector <float> vecnEventsInAccErr_;
        vector <float> vecnEffPassedErr_;
+
+       vector <float> vecacc_;
+       vector <float> veceff_;
+       vector <float> vecaccErr_;
+       vector <float> veceffErr_;
 
 
        const static int debugModeNEntries_=100000;

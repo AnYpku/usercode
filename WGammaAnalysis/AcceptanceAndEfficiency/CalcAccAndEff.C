@@ -1,5 +1,6 @@
 #include "CalcAccAndEff.h" 
   //this class
+#include "../Include/TMathTools.h"
 #include "../Include/TMetTools.h" 
 #include "../Include/TMuonCuts.h" 
 #include "../Include/TElectronCuts.h" 
@@ -15,6 +16,9 @@
   //currently in this package
 #include "TMath.h" 
 #include "TH1F.h" 
+#include "TVectorF.h" 
+#include "TCanvas.h"
+#include "TGraphErrors.h"
   // ROOT class
 #include <iostream> 
 #include <string>
@@ -41,6 +45,12 @@ CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCuts
   nAccPassedErr_=0;
   nEventsInAccErr_=0;
   nEffPassedErr_=0;
+
+  acc_=-1;
+  eff_=-1;
+  accErr_=-1;
+  effErr_=-1;
+
   for (int i=0; i<config_.GetNPhoPtBins(); i++){
     vecnEvents_.push_back(0);
     vecnAccPassed_.push_back(0);
@@ -50,6 +60,11 @@ CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCuts
     vecnAccPassedErr_.push_back(0);
     vecnEventsInAccErr_.push_back(0);
     vecnEffPassedErr_.push_back(0);
+
+    vecacc_.push_back(-1);
+    veceff_.push_back(-1);
+    vecaccErr_.push_back(-1);
+    veceffErr_.push_back(-1);
   }
 
   vecPhoPtLimits_ = config_.GetPhoPtBinsLimits();
@@ -142,13 +157,30 @@ void CalcAccAndEff::LoopOverInputFiles()
        vecnEffPassedErr_[i]=sqrt(vecnEffPassedErr_[i]);
      }
 
+     TMathTools mathTools;
+     if (nEvents_!=0){ 
+       acc_=nAccPassed_/nEvents_;
+       accErr_=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",nAccPassed_,nEvents_,nAccPassedErr_,nEventsErr_);
+     }
+     if (nEventsInAcc_!=0){ 
+       eff_=(double)nEffPassed_/nEventsInAcc_;
+       effErr_=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",nEffPassed_,nEventsInAcc_,nEffPassedErr_,nEventsInAccErr_);
+     }
+
+     for (int i=0; i<config_.GetNPhoPtBins(); i++){
+       vecacc_[i]=vecnAccPassed_[i]/vecnEvents_[i];
+       vecaccErr_[i]=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",vecnAccPassed_[i],vecnEvents_[i],vecnAccPassedErr_[i],vecnEventsErr_[i]);
+       veceff_[i]=vecnEffPassed_[i]/vecnEventsInAcc_[i];
+       veceffErr_[i]=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",vecnEffPassed_[i],vecnEventsInAcc_[i],vecnEffPassedErr_[i],vecnEventsInAccErr_[i]);
+     }
+
+     SaveOutput();
+
      std::cout<<"Summary:"<<std::endl;
      std::cout<<"nEvents="<<nEvents_<<"+-"<<nEventsErr_;
-     if (nEvents_==0) continue;
-     std::cout<<", nAccPassed="<<nAccPassed_<<"+-"<<nAccPassedErr_<<", acc="<<(double)nAccPassed_/nEvents_<<std::endl;
+     std::cout<<", nAccPassed="<<nAccPassed_<<"+-"<<nAccPassedErr_<<", acc="<<acc_<<"+-"<<accErr_<<std::endl;
      std::cout<<"nEventsInAcc="<<nEventsInAcc_<<"+-"<<nEventsInAccErr_;
-     if (nEventsInAcc_==0) continue;
-     std::cout<<", nEffPassed="<<nEffPassed_<<"+-"<<nEffPassedErr_<<", eff="<<(double)nEffPassed_/nEventsInAcc_<<std::endl;
+     std::cout<<", nEffPassed="<<nEffPassed_<<"+-"<<nEffPassedErr_<<", eff="<<eff_<<"+-"<<effErr_<<std::endl;
      std::cout<<std::endl;
 
      std::cout<<std::endl;
@@ -157,10 +189,10 @@ void CalcAccAndEff::LoopOverInputFiles()
        std::cout<<"pho Pt: "<<vecPhoPtLimits_[i]<<" - "<<vecPhoPtLimits_[i+1]<<std::endl;
        std::cout<<" -- nEvents="<<vecnEvents_[i]<<"+-"<<vecnEventsErr_[i];
        if (vecnEvents_[i]==0) continue;
-       std::cout<<", nAccPassed="<<vecnAccPassed_[i]<<"+-"<<vecnAccPassedErr_[i]<<", acc="<<(double)vecnAccPassed_[i]/vecnEvents_[i]<<std::endl;
+       std::cout<<", nAccPassed="<<vecnAccPassed_[i]<<"+-"<<vecnAccPassedErr_[i]<<", acc="<<vecacc_[i]<<"+-"<<vecaccErr_[i]<<std::endl;
        std::cout<<" -- nEventsInAcc="<<vecnEventsInAcc_[i]<<"+-"<<vecnEventsInAccErr_[i];
        if (vecnEventsInAcc_[i]==0) continue;
-       std::cout<<", nEffPassed="<<vecnEffPassed_[i]<<"+-"<<vecnEffPassedErr_[i]<<", eff="<<(double)vecnEffPassed_[i]/vecnEventsInAcc_[i]<<std::endl;
+       std::cout<<", nEffPassed="<<vecnEffPassed_[i]<<"+-"<<vecnEffPassedErr_[i]<<", eff="<<veceff_[i]<<"+-"<<veceffErr_[i]<<std::endl;
      }//end of for (int i=0; i<config_.GetNPhoPtBins(); i++)
 
      std::cout<<std::endl;
@@ -252,7 +284,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
             nEvents_+=lumiWeight_;
             nEventsErr_+=lumiWeight_*lumiWeight_;
             bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt[iphoMC]);
-            if (bin<vecnEvents_.size() && bin!=-1){
+            if (bin<(int)vecnEvents_.size() && bin!=-1){
               vecnEvents_[bin]+=lumiWeight_;
               vecnEventsErr_[bin]+=lumiWeight_*lumiWeight_;
             }
@@ -276,12 +308,12 @@ void CalcAccAndEff::LoopOverTreeEvents()
                   nEventsInAcc_+=lumiWeight_*weightPU;
                   nEventsInAccErr_+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
                   bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt[iphoMC]);
-                  if (bin<vecnAccPassed_.size() && bin!=-1){
+                  if (bin<(int)vecnAccPassed_.size() && bin!=-1){
                     vecnAccPassed_[bin]+=lumiWeight_;
                     vecnAccPassedErr_[bin]+=lumiWeight_*lumiWeight_;
                   }
                   bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt[ipho]);
-                  if (bin<vecnEventsInAcc_.size() && bin!=-1){
+                  if (bin<(int)vecnEventsInAcc_.size() && bin!=-1){
                     vecnEventsInAcc_[bin]+=lumiWeight_*weightPU;
                     vecnEventsInAccErr_[bin]+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
                   }
@@ -305,7 +337,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
                     nEffPassed_+=lumiWeight_*weightPU;
                     nEffPassedErr_+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
                     bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt[ipho]);
-                    if (bin<vecnEffPassed_.size() && bin!=-1){
+                    if (bin<(int)vecnEffPassed_.size() && bin!=-1){
                       vecnEffPassed_[bin]+=lumiWeight_*weightPU;
                       vecnEffPassedErr_[bin]+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
                     }
@@ -346,4 +378,61 @@ void CalcAccAndEff::LoopOverTreeEvents()
 //  std::cout<<"nPhoLepPassed_="<<nPhoLepPassed_<<std::endl; 
 //  std::cout<<std::endl;
 
+}
+
+void CalcAccAndEff::SaveOutput()
+{
+  TVectorF vacc(config_.GetNPhoPtBins());
+  TVectorF vaccErr(config_.GetNPhoPtBins());
+  TVectorF veff(config_.GetNPhoPtBins());
+  TVectorF veffErr(config_.GetNPhoPtBins());
+  TVectorF acc(1);
+  TVectorF accErr(1);
+  TVectorF eff(1);
+  TVectorF effErr(1);
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    vacc[i]=vecacc_[i];
+    vaccErr[i]=vecaccErr_[i];
+    veff[i]=veceff_[i];
+    veffErr[i]=veceffErr_[i];
+  }
+  acc[0]=acc_;
+  accErr[0]=accErr_;
+  eff[0]=eff_;
+  effErr[0]=effErr_;
+  TFile f("../WGammaOutput/AccEff_MUON.root","recreate");
+  vacc.Write("acc1D");
+  veff.Write("eff1D");
+  vaccErr.Write("accErr1D");
+  veffErr.Write("effErr1D");
+  acc.Write("accTotal");
+  eff.Write("effTotal");
+  accErr.Write("accErrTotal");
+  effErr.Write("effErrTotal");
+
+
+  //Draw
+  TVectorF phoBins(config_.GetNPhoPtBins());
+  TVectorF phoBinsErr(config_.GetNPhoPtBins());
+  TVectorF vacceff(config_.GetNPhoPtBins());
+  TVectorF vacceffErr(config_.GetNPhoPtBins());
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    phoBins[i]=0.5*(vecPhoPtLimits_[i+1]+vecPhoPtLimits_[i]);
+    phoBinsErr[i]=0.5*(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
+    vacceff[i]=vacc[i]*veff[i];
+    vacceffErr[i]=sqrt(vacc[i]*vacc[i]*veffErr[i]*veffErr[i]+veff[i]*veff[i]*vaccErr[i]*vaccErr[i]);
+  }
+  TCanvas cAccEff("cAccEff","cAccEff");
+  TGraphErrors grAcc(phoBins, vacc, phoBinsErr, vaccErr);
+  grAcc.SetLineColor(2);
+  TGraphErrors grEff(phoBins, veff, phoBinsErr, veffErr);
+  grEff.SetLineColor(4);
+  TGraphErrors grAccEff(phoBins, vacceff, phoBinsErr, vacceffErr);
+  grAccEff.SetLineColor(1);
+  grAcc.Draw("AP");
+  grEff.Draw("P");
+  grAccEff.Draw("P");
+  cAccEff.SetLogy();
+  cAccEff.SetLogx();
+  cAccEff.SaveAs("cAccEff.png");
 }
