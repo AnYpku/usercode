@@ -66,6 +66,56 @@ string TConfiguration::GetPileupDataFileName()
   return pileupDataFileName_;
 }
 
+string TConfiguration::GetAccEffDirName()
+{
+  return acceffDir_;
+}
+
+string TConfiguration::GetAccEffFileName()
+{
+  return acceffFile_;
+}
+
+string TConfiguration::GetAcc1DName()
+{
+  return acc1DName_;
+}
+
+string TConfiguration::GetEff1DName()
+{
+  return eff1DName_;
+}
+
+string TConfiguration::GetAccErr1DName()
+{
+  return accErr1DName_;
+}
+
+string TConfiguration::GetEffErr1DName()
+{
+  return effErr1DName_;
+}
+
+string TConfiguration::GetAccTotalName()
+{
+  return accTotalName_;
+}
+
+string TConfiguration::GetEffTotalName()
+{
+  return effTotalName_;
+}
+
+string TConfiguration::GetAccErrTotalName()
+{
+  return accErrTotalName_;
+}
+
+string TConfiguration::GetEffErrTotalName()
+{
+  return effErrTotalName_;
+}
+
 int TConfiguration::GetNPhoPtBins()
 {
   return nPhoPtBins_;

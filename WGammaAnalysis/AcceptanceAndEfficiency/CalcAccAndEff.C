@@ -400,15 +400,17 @@ void CalcAccAndEff::SaveOutput()
   accErr[0]=accErr_;
   eff[0]=eff_;
   effErr[0]=effErr_;
-  TFile f("../WGammaOutput/AccEff_MUON.root","recreate");
-  vacc.Write("acc1D");
-  veff.Write("eff1D");
-  vaccErr.Write("accErr1D");
-  veffErr.Write("effErr1D");
-  acc.Write("accTotal");
-  eff.Write("effTotal");
-  accErr.Write("accErrTotal");
-  effErr.Write("effErrTotal");
+  TString fName=(config_.GetAccEffDirName()).c_str();
+  fName+=(config_.GetAccEffFileName()).c_str();
+  TFile f(fName,"recreate");
+  vacc.Write((config_.GetAcc1DName()).c_str());
+  veff.Write((config_.GetEff1DName()).c_str());
+  vaccErr.Write((config_.GetAccErr1DName()).c_str());
+  veffErr.Write((config_.GetEffErr1DName()).c_str());
+  acc.Write((config_.GetAccTotalName()).c_str());
+  eff.Write((config_.GetEffTotalName()).c_str());
+  accErr.Write((config_.GetAccErrTotalName()).c_str());
+  effErr.Write((config_.GetEffErrTotalName()).c_str());
 
 
   //Draw
@@ -425,14 +427,19 @@ void CalcAccAndEff::SaveOutput()
   TCanvas cAccEff("cAccEff","cAccEff");
   TGraphErrors grAcc(phoBins, vacc, phoBinsErr, vaccErr);
   grAcc.SetLineColor(2);
+  grAcc.SetLineWidth(2);
+  grAcc.GetYaxis()->SetRangeUser(0.0,1.0);
+  grAcc.GetXaxis()->SetMoreLogLabels(1);
   TGraphErrors grEff(phoBins, veff, phoBinsErr, veffErr);
   grEff.SetLineColor(4);
+  grEff.SetLineWidth(2);
   TGraphErrors grAccEff(phoBins, vacceff, phoBinsErr, vacceffErr);
   grAccEff.SetLineColor(1);
+  grAccEff.SetLineWidth(2);
   grAcc.Draw("AP");
   grEff.Draw("P");
   grAccEff.Draw("P");
-  cAccEff.SetLogy();
+  //cAccEff.SetLogy();
   cAccEff.SetLogx();
   cAccEff.SaveAs("cAccEff.png");
 }

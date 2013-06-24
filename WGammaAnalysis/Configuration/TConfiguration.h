@@ -20,6 +20,18 @@ class TConfiguration
     string GetSelectedNameSignalMCMu();
     string GetSelectedNameSignalMCEle();
     string GetSelectedNameBkgMC();
+
+    string GetAccEffDirName();
+    string GetAccEffFileName();
+    string GetAcc1DName();
+    string GetEff1DName();
+    string GetAccErr1DName();
+    string GetEffErr1DName();
+    string GetAccTotalName();
+    string GetEffTotalName();
+    string GetAccErrTotalName();
+    string GetEffErrTotalName();
+
     string GetNameDebugMode();
     string GetNameReleasedCuts();
     string GetPileupDataFileName();
@@ -44,7 +56,21 @@ static const string selectedEventsNameSignalMCMu_="selected_MUON_SIGMC";//.root
 static const string selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.root
 static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
 
+//////////////////////////////////////////
+//acceptance and efficiency
+//
+static const string acceffDir_="../WGammaOutput/";
+static const string acceffFile_="AccEff_MUON.root";
+static const string acc1DName_="acc1D"; 
+static const string eff1DName_="eff1D"; 
+static const string accErr1DName_="accErr1D"; 
+static const string effErr1DName_="effErr1D";
+static const string accTotalName_="accTotal"; 
+static const string effTotalName_="effTotal"; 
+static const string accErrTotalName_="accErrTotal"; 
+static const string effErrTotalName_="effErrTotal";
 
+//////////////////////////////////////////
 static const string nameDebugMode_ = "_debugMode";
 static const string nameReleasedCuts_ = "_releasedCuts";
 static const string pileupDataFileName_ = "../CertifiedConstants/Pileup/TruePU_69300_2012Full.root";
