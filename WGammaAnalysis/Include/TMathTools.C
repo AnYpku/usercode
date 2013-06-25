@@ -45,3 +45,19 @@ float TMathTools::ErrOfTwoIndependent(string type, float x1, float x2, float er1
   std::cout<<"unknown expression type "<<type<<"; value -1 will be returned"<<std::endl;
   return -1;
 }
+
+float TMathTools::ErrOfThreeIndependent(string type, float x1, float x2, float x3, float er1, float er2, float er3)
+{
+  if (type=="x1/(x2*x3)"){
+    if (x2*x3==0){
+      std::cout<<"ERROR detected in TMathTools::ErrOfThreeIndependent: x2*x3=0; value -1 will be returned"<<std::endl;
+      return -1;
+    }
+    float er = x2*x2*x3*x3*er1*er1 + x3*x3*x1*x1*er2*er2 + x1*x1*x2*x2*er3*er3;
+    er = sqrt(er);
+    er = er/(x2*x2*x3*x3);
+    return er;
+  }
+  std::cout<<"unknown expression type "<<type<<"; value -1 will be returned"<<std::endl;
+  return -1;
+}
