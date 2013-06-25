@@ -5,6 +5,7 @@
 #include "../Configuration/TAllInputSamples.h"
   //this package
 #include <vector>
+#include <string>
   //C++
 
 class CalcCrossSection
@@ -13,6 +14,7 @@ class CalcCrossSection
        CalcCrossSection (int channel, string configfile="../Configuration/config.txt");
 
        virtual ~CalcCrossSection();
+       void    Calc(string cut);
        void    GetSignalYields(string cut);
        void    ApplyAccAndEff();
        void    DivideOverLumi();
@@ -21,10 +23,13 @@ class CalcCrossSection
 
      private:
 
+       int channel_;
        TAllInputSamples* INPUT_;
        TConfiguration config_;
-       vector <float> signalYields_;
-       vector <float> signalYieldsErr_;
+       float signalYieldTotal_;
+       float signalYieldErrTotal_;
+       vector <float> signalYields1D_;
+       vector <float> signalYieldsErr1D_;
        float lumi_;
 
        vector <float> vecPhoPtLimits_;

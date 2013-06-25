@@ -9,9 +9,8 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  //CalcAccAndEff accAndEff( TInputSample::MUON, "../Configuration/config.txt", 0, 1, 1);
-  CalcAccAndEff accAndEff( TInputSample::MUON);
-  accAndEff.LoopOverInputFiles();
+  CalcCrossSection ccs( TInputSample::MUON, "../Configuration/config.txt");
+  ccs.GetSignalYields("lePhoDeltaR>0.7");
 
 
   time.Stop("time");
