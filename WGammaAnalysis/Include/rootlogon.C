@@ -15,6 +15,8 @@
 
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
+  gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
+
   gROOT->ProcessLine(".L ../Selection/TSelectedEventsTree.C+");
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/WGammaSelection.C+");
