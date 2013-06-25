@@ -3,6 +3,7 @@
 #include "../Configuration/TConfiguration.h" 
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
+#include "../Include/TMathTools.h"
   //this package
   //currently in this package
 #include <string>
@@ -11,6 +12,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
+#include "TVectorF.h"
   //ROOT class
 
 CalcCrossSection::CalcCrossSection(int channel, string configFile)
@@ -57,6 +59,8 @@ void CalcCrossSection::GetSignalYields(string cut)
     {
        int sample = INPUT_->allInputs_[iSource].sample_;
        if (sample==TInputSample::SIGMC) continue;
+       if (sample==TInputSample::DATA)
+         lumi_=INPUT_->allInputs_[iSource].lumiTotal_;
        TString fileName = (TString)(INPUT_->allInputs_[iSource].fileSelected_).c_str();
        TFile f(fileName);
        TTree* tr = (TTree *)f.Get("selectedEvents");
@@ -103,17 +107,57 @@ void CalcCrossSection::GetSignalYields(string cut)
 
 void CalcCrossSection::ApplyAccAndEff()
 {
+  TString fName=(config_.GetAccEffDirName()).c_str();
+  fName+=(config_.GetAccEffFileName()).c_str();
+  TFile f(fName,"read");
+  TVectorF* vacc = (TVectorF*)f.Get((config_.GetAcc1DName()).c_str());
+  TVectorF* veff = (TVectorF*)f.Get((config_.GetEff1DName()).c_str());
+  TVectorF* vaccErr = (TVectorF*)f.Get((config_.GetAccErr1DName()).c_str());
+  TVectorF* veffErr = (TVectorF*)f.Get((config_.GetEffErr1DName()).c_str());
+  TVectorF* acc = (TVectorF*)f.Get((config_.GetAccTotalName()).c_str());
+  TVectorF* eff = (TVectorF*)f.Get((config_.GetEffTotalName()).c_str());
+  TVectorF* accErr = (TVectorF*)f.Get((config_.GetAccErrTotalName()).c_str());
+  TVectorF* effErr = (TVectorF*)f.Get((config_.GetEffErrTotalName()).c_str());
+
+  TMathTools math;
+  signalYieldErrTotal_=math.ErrOfThreeIndependent("x1/(x2*x3)",signalYieldTotal_,acc->operator()(0),eff->operator()(0),signalYieldErrTotal_,accErr->operator()(0),effErr->operator()(0));
+  signalYieldTotal_=signalYieldTotal_/((acc->operator()(0))*(eff->operator()(0)));
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    signalYieldsErr1D_[i]=math.ErrOfThreeIndependent("x1/(x2*x3)",signalYields1D_[i],vacc->operator()(i),veff->operator()(i),signalYieldsErr1D_[i],vaccErr->operator()(i),veffErr->operator()(i));
+    signalYields1D_[i]=signalYields1D_[i]/((vacc->operator()(i))*(veff->operator()(i)));
+  }
+  std::cout<<"Acc and eff corrected yields:"<<std::endl;
+  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
+  for (int i=0; i<config_.GetNPhoPtBins(); i++)
+    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
 
 }
 
 void CalcCrossSection::DivideOverLumi()
 {
-
+  signalYieldTotal_=signalYieldTotal_/lumi_;
+  signalYieldErrTotal_=signalYieldErrTotal_/lumi_;
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    signalYields1D_[i]=signalYields1D_[i]/lumi_;
+    signalYieldsErr1D_[i]=signalYieldsErr1D_[i]/lumi_;
+  }
+  std::cout<<"yields over lumi:"<<std::endl;
+  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
+  for (int i=0; i<config_.GetNPhoPtBins(); i++)
+    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
 }
 
 void CalcCrossSection::DivideOverBinWidth()
 {
-
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    signalYields1D_[i]=signalYields1D_[i]/(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
+    signalYieldsErr1D_[i]=signalYieldsErr1D_[i]/(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
+  }
+  std::cout<<"Cross section, pb:"<<std::endl;
+  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
+  std::cout<<"Differential, pb/GeV:"<<std::endl;
+  for (int i=0; i<config_.GetNPhoPtBins(); i++)
+    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
 }
 
 void CalcCrossSection::SaveOutput()

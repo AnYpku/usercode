@@ -10,7 +10,7 @@
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
   CalcCrossSection ccs( TInputSample::MUON, "../Configuration/config.txt");
-  ccs.GetSignalYields("lePhoDeltaR>0.7");
+  ccs.Calc("lePhoDeltaR>0.7");
 
 
   time.Stop("time");
