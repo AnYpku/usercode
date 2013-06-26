@@ -65,6 +65,9 @@ void CalcCrossSection::GetSignalYields(string cut)
          lumi_=INPUT_->allInputs_[iSource].lumiTotal_;
        TString fileName = (TString)(INPUT_->allInputs_[iSource].fileSelected_).c_str();
        TFile f(fileName);
+       if (!f.IsOpen()) continue;
+       bool hasTree = f.GetListOfKeys()->Contains("selectedEvents");
+       if (!hasTree) continue;
        TTree* tr = (TTree *)f.Get("selectedEvents");
 
        TH1F *hist = new TH1F("hist","hist",10,tr->GetMinimum("phoEt"),tr->GetMaximum("phoEt"));
