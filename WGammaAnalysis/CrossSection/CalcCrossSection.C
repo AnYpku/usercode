@@ -13,6 +13,8 @@
 #include "TTree.h"
 #include "TH1F.h"
 #include "TVectorF.h"
+#include "TGraphErrors.h"
+#include "TCanvas.h"
   //ROOT class
 
 CalcCrossSection::CalcCrossSection(int channel, string configFile)
@@ -42,7 +44,7 @@ void CalcCrossSection::Calc(string cut)
   ApplyAccAndEff();
   DivideOverLumi();
   DivideOverBinWidth();
-  SaveOutput();
+  PlotAndSaveOutput();
 }
 
 void CalcCrossSection::GetSignalYields(string cut)
@@ -160,7 +162,32 @@ void CalcCrossSection::DivideOverBinWidth()
     std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
 }
 
-void CalcCrossSection::SaveOutput()
+void CalcCrossSection::PlotAndSaveOutput()
 {
+  TVectorF csTotal(1);
+  TVectorF csErrTotal(1);
+  TVectorF cs1D(config_.GetNPhoPtBins());
+  TVectorF csErr1D(config_.GetNPhoPtBins());
+
+  csTotal[0]=signalYieldTotal_;
+  csErrTotal[0]=signalYieldErrTotal_;
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    cs1D[i]=signalYields1D_[i];
+    csErr1D[i]=signalYieldsErr1D_[i];
+  }
+  
+  TVectorF phoBins(config_.GetNPhoPtBins());
+  TVectorF phoBinsErr(config_.GetNPhoPtBins());
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    phoBins[i]=0.5*(vecPhoPtLimits_[i+1]+vecPhoPtLimits_[i]);
+    phoBinsErr[i]=0.5*(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
+  }
+
+  TCanvas c("cCS","cCS");
+  TGraphErrors grCS(phoBins,cs1D,phoBinsErr,csErr1D);
+  c.SetLogx();
+  c.SetLogy();
+  grCS.Draw("AP");
+  c.SaveAs("cCS.png");
 
 }

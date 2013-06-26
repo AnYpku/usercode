@@ -19,7 +19,7 @@ class CalcCrossSection
        void    ApplyAccAndEff();
        void    DivideOverLumi();
        void    DivideOverBinWidth();
-       void    SaveOutput();
+       void    PlotAndSaveOutput();
 
      private:
 
