@@ -24,7 +24,7 @@ public:
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
 
 private:
-  const static float WMtCut_ = 70.;//70.;
+  const static float WMtCut_ = 0.;//70.;
   const static float lePhoDeltaRCut_ = 0.7;//0.7;
 };
 
