@@ -15,6 +15,7 @@
 #include "TVectorF.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
+#include "TAxis.h"
   //ROOT class
 
 CalcCrossSection::CalcCrossSection(int channel, string configFile)
@@ -188,9 +189,16 @@ void CalcCrossSection::PlotAndSaveOutput()
 
   TCanvas c("cCS","cCS");
   TGraphErrors grCS(phoBins,cs1D,phoBinsErr,csErr1D);
+  TAxis* xAx=grCS.GetXaxis();
+  xAx->SetTitle("Pt_{#gamma}, GeV/c");
+  grCS.GetXaxis()->SetMoreLogLabels(kTRUE);
+  TAxis* yAx=grCS.GetYaxis();
+  yAx->SetTitle("d#sigma/dPt_{#gamma}, pb x c/GeV");
   c.SetLogx();
   c.SetLogy();
+  grCS.SetLineWidth(2);
   grCS.Draw("AP");
   c.SaveAs("cCS.png");
+  c.SaveAs("cCS.root");
 
 }
