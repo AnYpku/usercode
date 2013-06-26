@@ -38,6 +38,8 @@ class TConfiguration
     int GetNPhoPtBins();
     vector <float> GetPhoPtBinsLimits();
     int FindPhoPtBinByPhoPt(float pt);
+    float GetPhoPtMin();
+    float GetLePhoDeltaRMin();
 
 };
 
@@ -45,6 +47,11 @@ class TConfiguration
 //photon Pt binning
 static const int nPhoPtBins_ = 9;
 static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
+static const float phoPtMin_=15.;
+  //minimum value for total CS
+static const float lePhoDeltaRMin_=0.7;
+  //minimum value for total and differential cross section; 
+  //cut value may be bigger or equal to this value
 
 /////////////////////////////////////////
 //selected files, directory and file names

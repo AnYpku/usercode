@@ -136,3 +136,13 @@ int TConfiguration::FindPhoPtBinByPhoPt(float pt)
       return i;
   return -1; 
 }
+
+float TConfiguration::GetPhoPtMin()
+{
+  return phoPtMin_;
+}
+
+float TConfiguration::GetLePhoDeltaRMin()
+{
+  return lePhoDeltaRMin_;
+}
