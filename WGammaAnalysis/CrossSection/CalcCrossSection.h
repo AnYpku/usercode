@@ -14,8 +14,8 @@ class CalcCrossSection
        CalcCrossSection (int channel, string configfile="../Configuration/config.txt");
 
        virtual ~CalcCrossSection();
-       void    Calc(string cut);
-       void    GetSignalYields(string cut);
+       void    Calc();
+       void    GetSignalYields();
        void    ApplyAccAndEff();
        void    DivideOverLumi();
        void    DivideOverBinWidth();

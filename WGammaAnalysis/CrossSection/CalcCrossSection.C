@@ -39,16 +39,16 @@ CalcCrossSection::~CalcCrossSection()
 
 }
 
-void CalcCrossSection::Calc(string cut)
+void CalcCrossSection::Calc()
 {
-  GetSignalYields(cut);
+  GetSignalYields();
   ApplyAccAndEff();
   DivideOverLumi();
   DivideOverBinWidth();
   PlotAndSaveOutput();
 }
 
-void CalcCrossSection::GetSignalYields(string cut)
+void CalcCrossSection::GetSignalYields()
 {
   for (int i=0; i<config_.GetNPhoPtBins(); i++){
     signalYields1D_.push_back(0.0);
@@ -71,10 +71,13 @@ void CalcCrossSection::GetSignalYields(string cut)
        if (!hasTree) continue;
        TTree* tr = (TTree *)f.Get("selectedEvents");
 
-       TH1F *hist = new TH1F("hist","hist",10,tr->GetMinimum("phoEt"),tr->GetMaximum("phoEt"));
-       tr->Draw("phoEt>>hist","("+TString(cut.c_str())+")*weight","goff");
-       TH1F *histErr = new TH1F("histErr","histErr",10,tr->GetMinimum("phoEt"),tr->GetMaximum("phoEt"));
-       tr->Draw("phoEt>>histErr","("+TString(cut.c_str())+")*weight*weight","goff");
+       TString dRCut="lePhoDeltaR>";
+       dRCut+=config_.GetLePhoDeltaRMin();
+
+       TH1F *hist = new TH1F("hist","hist",10,config_.GetPhoPtMin(),tr->GetMaximum("phoEt"));
+       tr->Draw("phoEt>>hist","("+dRCut+")*weight","goff");
+       TH1F *histErr = new TH1F("histErr","histErr",10,config_.GetPhoPtMin(),tr->GetMaximum("phoEt"));
+       tr->Draw("phoEt>>histErr","("+dRCut+")*weight*weight","goff");
 
        if (sample==TInputSample::DATA) 
          signalYieldTotal_+=hist->Integral();
@@ -87,9 +90,9 @@ void CalcCrossSection::GetSignalYields(string cut)
 
        for (int i=0; i<config_.GetNPhoPtBins(); i++){
          TH1F *hist1D = new TH1F("hist1D","hist1D",10,vecPhoPtLimits_[i],vecPhoPtLimits_[i+1]);
-         tr->Draw("phoEt>>hist1D","("+TString(cut.c_str())+")*weight","goff");
+         tr->Draw("phoEt>>hist1D","("+dRCut+")*weight","goff");
          TH1F *hist1DErr = new TH1F("hist1DErr","hist1DErr",10,vecPhoPtLimits_[i],vecPhoPtLimits_[i+1]);
-         tr->Draw("phoEt>>hist1DErr","("+TString(cut.c_str())+")*weight*weight","goff");
+         tr->Draw("phoEt>>hist1DErr","("+dRCut+")*weight*weight","goff");
 
          if (sample==TInputSample::DATA) 
            signalYields1D_[i]+=hist1D->Integral();
