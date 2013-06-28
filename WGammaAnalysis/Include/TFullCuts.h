@@ -20,7 +20,8 @@ public:
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
                     int channel, bool isReleasedCutsMode,
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector);
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector,
+                    bool isWjets=0);
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
 
 private:

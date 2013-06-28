@@ -28,7 +28,8 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
                     int channel, bool isReleasedCutsMode,
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector)
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector,
+                    bool isWjets)
 {
 
   // This function is called from LoopOverEvents.
@@ -158,7 +159,6 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
      {       
        
 //        nPhotons_++;
-
         if (inpTreeLeaf.isData) 
            inpTreeLeaf.phoEt[ipho] = photonCorrector->GetCorrEtData(inpTreeLeaf.phoR9[ipho], 2012, inpTreeLeaf.phoEt[ipho], inpTreeLeaf.phoEta[ipho]);
           //Phosphor correction needs to be applied for the photon Et only, 
@@ -185,7 +185,11 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
           //variables which are input for TPhotonCuts constructor
           //are fields of TEventTree
 
-	if (photon.Passed()) 
+        bool isExtraFsrIsr = isWjets && fabs(inpTreeLeaf.phoGenMomPID[ipho]) <= 22;
+         //reject FSR/ISR photons from W+jets background
+         //because this events are already in Wg sample
+
+	if (photon.Passed() && !isExtraFsrIsr) 
           {
      
 //            nPhotonsPassed_++;

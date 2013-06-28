@@ -161,6 +161,13 @@ void WGammaSelection::LoopOverInputFiles()
              }  
  
            puWeight_=new TPuReweight(config.GetPileupDataFileName(),INPUT_->allInputs_[iSource].fileNames_[inputFileN_]);
+
+           if (INPUT_->allInputs_[iSource].sourceName_=="Wjets_to_lnu")
+             isWjets_=1;
+           else 
+             isWjets_=0;
+           
+           std::cout<<"isWjets_ = "<<isWjets_<<std::endl;
            
            LoopOverTreeEvents();
              //method of this class (WGammaSelection)
@@ -257,7 +264,7 @@ void WGammaSelection::LoopOverTreeEvents()
        TFullCuts fullCuts;
        if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
                 channel_,  isReleasedCutsMode_,
-                WMt, lePhoDeltaR, photonCorrector_) == 1)
+                WMt, lePhoDeltaR, photonCorrector_,isWjets_) == 1)
               //method of this class (WGammaSelection)
 
           for (int ile=0; ile<nLe_; ile++)

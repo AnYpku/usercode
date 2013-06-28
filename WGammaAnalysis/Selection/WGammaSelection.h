@@ -38,6 +38,7 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
        enum {MUON_, ELECTRON_, PHOTON_, JET_, LOWPTJET_, MC_};
        int channel_;
        int sample_;
+       bool isWjets_;
 
        bool isDebugMode_;
        bool isReleasedCutsMode_;
