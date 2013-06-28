@@ -20,7 +20,7 @@ class CalcAccAndEff: public TEventTree
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
-       void    SaveOutput();
+       void    PlotAndSaveOutput();
 //       bool    CheckMaxNumbersInTree();
 //       void    PrintErrorMessageMaxNumberOf(int particle);
 
