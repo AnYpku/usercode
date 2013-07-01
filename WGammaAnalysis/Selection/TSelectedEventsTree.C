@@ -30,6 +30,8 @@ void TSelectedEventsTree::SetOutputTree(TTree* tree)
   outTree_->Branch("run",&run_,"run/I");
   outTree_->Branch("inputFileNumber",&inputFileN_,"inputFileNumber/I");
   outTree_->Branch("weight",&weight_,"weight/F");
+  outTree_->Branch("PUweight",&PUweight_,"PUweight/F");
+  outTree_->Branch("PU",&PU_,"PU/F");
 }
 
 void TSelectedEventsTree::Fill()
@@ -44,7 +46,7 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
                  float pfMET, float pfMETPhi,
                  int run,
                  int inputFileN,
-                 float weight)
+                 float weight, float PUweight, float PU)
 {
   leEta_=leEta;
   lePhi_=lePhi;
@@ -59,4 +61,6 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
   run_=run;
   inputFileN_=inputFileN;
   weight_=weight;
+  PUweight_=PUweight;
+  PU_=PU;
 }

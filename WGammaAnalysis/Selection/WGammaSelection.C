@@ -283,7 +283,7 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
                               treeLeaf.run,
                               inputFileN_,
-                              totalWeight_);
+                              totalWeight_,puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]),treeLeaf.puTrue[1]);
                     else if (channel_==TInputSample::ELECTRON) 
                        SetValues(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile],
                               treeLeaf.elePt[ile], 
@@ -294,7 +294,7 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
                               treeLeaf.run,
                               inputFileN_,
-                              totalWeight_);
+                              totalWeight_,puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]),treeLeaf.puTrue[1]);
                        //method of TSelectedEventsTree
                        //variables are fields of TEventTree
                      Fill();

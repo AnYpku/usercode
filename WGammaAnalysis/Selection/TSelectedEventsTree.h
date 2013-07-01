@@ -20,7 +20,7 @@ class TSelectedEventsTree
                    float pfMET, float pfMETPhi,
                    int run,
                    int inputFileN,
-                   float weight); 
+                   float weight, float PUweight, float PU); 
 
   private:
     TTree *outTree_;
@@ -37,6 +37,8 @@ class TSelectedEventsTree
     int run_;
     int inputFileN_;
     float weight_;
+    float PUweight_;
+    float PU_;
 };
 
 #endif //#ifndef TSelectedEventsTree_h
