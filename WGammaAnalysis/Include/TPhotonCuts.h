@@ -18,17 +18,19 @@ class TPhotonCuts
                     float rho2012);
     virtual ~TPhotonCuts();
 
-    bool Passed();
-    bool PassedExceptKinematics();
+    bool Passed(bool doSigmaIEtaIEtaCut=1);
+    bool PassedExceptKinematics(bool doSigmaIEtaIEtaCut=1);
     bool PhoKinematics(float phoPt, float phoEta);
     bool PhoKinematics();
-    bool SimpleCutBasedPhotonID2012(); 
+    bool SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut=1); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
       //for reference
 
     //the following three functions determine effective areas depending on |eta|
     //the values are taken from
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
+    bool CutSigmaIEtaIEta();
+
     float EffAreaCharged();
     float EffAreaNeutral();
     float EffAreaPhotons();

@@ -66,6 +66,17 @@ string TConfiguration::GetPileupDataFileName()
   return pileupDataFileName_;
 }
 
+string TConfiguration::GetSignalTemplateNameMu()
+{
+  return signalTemplateNameMu_;
+}
+
+string TConfiguration::GetSignalTemplateNameEle()
+{
+  return signalTemplateNameEle_;
+}
+
+
 string TConfiguration::GetAccEffDirName()
 {
   return acceffDir_;

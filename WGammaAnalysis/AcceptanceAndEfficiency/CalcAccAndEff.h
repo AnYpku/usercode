@@ -15,7 +15,7 @@
 class CalcAccAndEff: public TEventTree
   {
      public:
-       CalcAccAndEff (int channel, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isPuReweight=1, bool isDebugMode=0);
+       CalcAccAndEff (int channel, string configfile="../Configuration/config.txt", bool isPuReweight=1, bool isDebugMode=0);
 
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
@@ -32,7 +32,6 @@ class CalcAccAndEff: public TEventTree
        int channel_;
 
        bool isDebugMode_;
-       bool isReleasedCutsMode_;
        bool isPuReweight_;
 
        float lumiWeight_;

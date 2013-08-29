@@ -21,9 +21,8 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
      //TEventTree - class for input tree
      //TSelectedEventsTree - class for output tree and output root file
      public:
-       enum {EVENTSELECTION_, SIGNALTEMPLATE_, BKGTEMPLATE_};
-       WGammaSelection (int channel, int mode = EVENTSELECTION_, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isPuReweight=1, bool isDebugMode=0);
-       WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isPuReweight=1, bool isDebugMode=0);
+       WGammaSelection (int channel, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isPuReweight=1, bool isDebugMode=0);
+       WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isReseasedCutsMode=0, bool isPuReweight=1, bool isDebugMode=0);
        virtual ~WGammaSelection();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
@@ -37,16 +36,12 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
        TAllInputSamples* INPUT_;
 
        enum {MUON_, ELECTRON_, PHOTON_, JET_, LOWPTJET_, MC_};
-
-       int selectionPurpose_;
-       bool doSigmaIEtaIEtaCut_;
-
-       int channel_;//ELECTRON, MUON
-       int sample_; //DATA, SIGMC, BKGMC
-       int mode_; //EVENTSELECTION_, SIGNALTEMPLATE_, BKGTEMPLATE_
+       int channel_;
+       int sample_;
        bool isWjets_;
 
        bool isDebugMode_;
+       bool isReleasedCutsMode_;
        bool isPuReweight_;
        int sampleMode_;
        vector <bool> doAnalizeSample_;

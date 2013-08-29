@@ -21,15 +21,14 @@ TFullCuts::~TFullCuts()
 
 //bool TFullCuts::Cut(bool** goodLeptonPhotonPairs, 
 //                    TEventTree::InputTreeLeaves &inpTreeLeaf,   
-//                    int channel, bool isReleasedCutsMode,
+//                    int channel, 
 //                    float* WMt, float** lePhoDeltaR,
 //                    zgamma::PhosphorCorrectionFunctor* photonCorrector)
 bool TFullCuts::Cut(bool** goodLeptonPhotonPairs, 
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
-                    int channel, bool isReleasedCutsMode,
+                    int channel, 
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector,
-                    bool isWjets)
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut)
 {
 
   // This function is called from LoopOverEvents.
@@ -119,7 +118,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 //                 nMoreVetoPassed_++;
 
                  WMt[ile] = sqrt(2*inpTreeLeaf.muPt[ile]*inpTreeLeaf.pfMET*(1-cos(inpTreeLeaf.muPhi[ile]-inpTreeLeaf.pfMETPhi)));
-                 if ( (WMt[ile]>WMtCut_ && !isReleasedCutsMode) || (isReleasedCutsMode))
+                 if ( WMt[ile]>WMtCut_ )
                    {
 //                     nWMtPassed_++;
                      thisLeptonPassed=1;
@@ -135,7 +134,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
               {
                 if (!electron.MoreElectronsVeto()) return 0;  
                 WMt[ile] = sqrt(2*inpTreeLeaf.elePt[ile]*inpTreeLeaf.pfMET*(1-cos(inpTreeLeaf.elePhi[ile]-inpTreeLeaf.pfMETPhi)));
-                if ((WMt[ile]>WMtCut_ && !isReleasedCutsMode) || (isReleasedCutsMode)) thisLeptonPassed=1;        
+                if (WMt[ile]>WMtCut_) thisLeptonPassed=1;        
               } 
           }
 
@@ -153,7 +152,40 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
      //skip loop over photons if no good leptons found
 
    bool goodPhoton[inpTreeLeaf.nPho];
+   if (!PhotonsOnlyCuts(goodPhoton,inpTreeLeaf,photonCorrector, doSigmaIEtaIEtaCut)) return 0;
+     //skip checking lepton-photon matching if no good photons found
+
+    //check matching between muon and photon
+    for (int ile=0; ile<nLe; ile++) 
+      {
+        for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++)
+          {
+
+            if (channel==TInputSample::MUON)
+              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.muPhi[ile],inpTreeLeaf.muEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
+            else if (channel==TInputSample::ELECTRON)
+              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.elePhi[ile],inpTreeLeaf.eleEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
+
+            if (goodPhoton[ipho] && goodLepton[ile] && 
+                (lePhoDeltaR[ile][ipho]>lePhoDeltaRCut_))
+              {
+
+//                nPhoLepPassed_++;
+
+                goodLeptonPhotonPairs[ile][ipho]=1;
+                goodLeptonPhotonPairsExist=1;  
+              }                
+           }    
+       }     
+
+   return goodLeptonPhotonPairsExist;
+}
+
+bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
+               TEventTree::InputTreeLeaves &inpTreeLeaf,   
+               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut){
    bool goodPhotonExists=0;
+
    for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++) 
    //start of photon loop
      {       
@@ -185,11 +217,8 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
           //variables which are input for TPhotonCuts constructor
           //are fields of TEventTree
 
-        bool isExtraFsrIsr = isWjets && fabs(inpTreeLeaf.phoGenMomPID[ipho]) <= 22;
-         //reject FSR/ISR photons from W+jets background
-         //because this events are already in Wg sample
 
-	if (photon.Passed() && !isExtraFsrIsr) 
+	if (photon.Passed(doSigmaIEtaIEtaCut)) 
           {
      
 //            nPhotonsPassed_++;
@@ -199,36 +228,8 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
           }
         else goodPhoton[ipho]=0;
       } //end of photon loop   
-
-   if (!goodPhotonExists) return 0;
-     //skip checking lepton-photon matching if no good photons found
-
-    //check matching between muon and photon
-    for (int ile=0; ile<nLe; ile++) 
-      {
-        for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++)
-          {
-
-            if (channel==TInputSample::MUON)
-              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.muPhi[ile],inpTreeLeaf.muEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
-            else if (channel==TInputSample::ELECTRON)
-              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.elePhi[ile],inpTreeLeaf.eleEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
-
-            if (goodPhoton[ipho] && goodLepton[ile] && 
-                (lePhoDeltaR[ile][ipho]>lePhoDeltaRCut_ || isReleasedCutsMode))
-              {
-
-//                nPhoLepPassed_++;
-
-                goodLeptonPhotonPairs[ile][ipho]=1;
-                goodLeptonPhotonPairsExist=1;  
-              }                
-           }    
-       }     
-
-   return goodLeptonPhotonPairsExist;
+  return goodPhotonExists;
 }
-
 
 float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 
 { 

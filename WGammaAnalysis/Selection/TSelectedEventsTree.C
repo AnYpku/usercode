@@ -23,6 +23,7 @@ void TSelectedEventsTree::SetOutputTree(TTree* tree)
   outTree_->Branch("phoEta",&phoEta_,"phoEta/F");
   outTree_->Branch("phoPhi",&phoPhi_,"phoPhi/F");
   outTree_->Branch("phoEt",&phoEt_,"phoEt/F");
+  outTree_->Branch("phoSigmaIEtaIEta",&phoSigmaIEtaIEta_,"phoSigmaIEtaIEta/F");
   outTree_->Branch("lePhoDeltaR",&lePhoDeltaR_,"lePhoDeltaR/F");
   outTree_->Branch("WMt",&WMt_,"WMt/F");
   outTree_->Branch("pfMETPhi",&pfMETPhi_,"pfMETPhi/F");
@@ -41,6 +42,7 @@ void TSelectedEventsTree::Fill()
 
 void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, 
                  float phoEta, float phoPhi, float phoEt,
+                 float phoSigmaIEtaIEta,
                  float lePhoDeltaR,
                  float WMt,
                  float pfMET, float pfMETPhi,
@@ -54,6 +56,7 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
   phoEta_=phoEta;
   phoPhi_=phoPhi;
   phoEt_=phoEt;
+  phoSigmaIEtaIEta_=phoSigmaIEtaIEta;
   lePhoDeltaR_=lePhoDeltaR;
   WMt_=WMt;
   pfMET_=pfMET;

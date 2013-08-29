@@ -15,6 +15,7 @@ class TSelectedEventsTree
     void Fill();
     void SetValues(float leEta, float lePhi, float lePt,
                    float phoEta, float phoPhi, float phoEt,
+                   float phoSigmaIEtaIEta,
                    float lePhoDeltaR,
                    float WMt,
                    float pfMET, float pfMETPhi,
@@ -30,6 +31,7 @@ class TSelectedEventsTree
     float phoEta_;
     float phoPhi_;
     float phoEt_;
+    float phoSigmaIEtaIEta_;
     float lePhoDeltaR_;
     float WMt_;
     float pfMET_;

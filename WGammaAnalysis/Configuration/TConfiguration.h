@@ -21,6 +21,9 @@ class TConfiguration
     string GetSelectedNameSignalMCEle();
     string GetSelectedNameBkgMC();
 
+    string GetSignalTemplateNameMu();
+    string GetSignalTemplateNameEle();
+
     string GetAccEffDirName();
     string GetAccEffFileName();
     string GetAcc1DName();
@@ -62,6 +65,12 @@ static const string selectedEventsNameDataEle_="selected_ELECTRON_DATA";//.root
 static const string selectedEventsNameSignalMCMu_="selected_MUON_SIGMC";//.root
 static const string selectedEventsNameSignalMCEle_="selected_ELECTRON_SIGMC";//.root
 static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceName_].root
+
+//////////////////////////////////////////
+//data driven background estimation
+//
+static const string signalTemplateNameMu_="../WGammaOutput/signalTemplate_MUON.root";
+static const string signalTemplateNameEle_="../WGammaOutput/signalTemplate_ELECTRON.root";
 
 //////////////////////////////////////////
 //acceptance and efficiency

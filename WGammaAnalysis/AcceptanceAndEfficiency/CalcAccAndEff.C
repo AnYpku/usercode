@@ -27,13 +27,12 @@
 #include <sstream>  
   //standard C++ class
 
-CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isReleasedCutsMode, bool isPuReweight, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
-  isReleasedCutsMode_=isReleasedCutsMode;
   isDebugMode_=isDebugMode;
   isPuReweight_=isPuReweight;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config_.GetPhosphorConstantFileName()).c_str());
@@ -335,8 +334,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
         //apply efficiency cuts
         ////////////////////////
         bool effPassed = fullCuts.Cut(effLeptonPhotonPassed, treeLeaf,   
-                channel_,  isReleasedCutsMode_,
-                WMt, lePhoDeltaR, photonCorrector_);
+                channel_,  WMt, lePhoDeltaR, photonCorrector_);
         for (int ile=0; ile<nLe_; ile++)
           for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
 

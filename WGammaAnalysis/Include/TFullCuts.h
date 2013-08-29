@@ -13,15 +13,17 @@ public:
   virtual ~TFullCuts();
 //  bool Cut(bool** goodLeptonPhotonPairs, 
 //                    TEventTree::InputTreeLeaves &inpTreeLeaf,   
-//                    int channel, bool isReleasedCutsMode,
+//                    int channel, 
 //                    float* WMt, float** lePhoDeltaR,
 //                    zgamma::PhosphorCorrectionFunctor* photonCorrector);
   bool Cut(bool** goodLeptonPhotonPairs, 
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
-                    int channel, bool isReleasedCutsMode,
+                    int channel, 
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector,
-                    bool isWjets=0);
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1);
+  bool PhotonsOnlyCuts(bool* goodPhoton,
+               TEventTree::InputTreeLeaves &inpTreeLeaf,   
+               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1);
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
 
 private:

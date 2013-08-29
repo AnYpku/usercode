@@ -1,4 +1,4 @@
-#include "WGammaSelection.h" 
+#include "TSignalComponentShape.h" 
   //this class
 #include "../Include/TMetTools.h" 
 #include "../Include/TMuonCuts.h" 
@@ -20,57 +20,46 @@
 #include <sstream>  
   //standard C++ class
 
-WGammaSelection::WGammaSelection(int channel, int mode, int sampleMode, string configFile, bool isPuReweight, bool isDebugMode)
+TSignalComponentShape::TSignalComponentShape(int channel, int sampleMode, string configFile, bool isReleasedCutsMode, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
+  isReleasedCutsMode_=isReleasedCutsMode;
   isPuReweight_=isPuReweight;
   isDebugMode_=isDebugMode;
   TConfiguration config;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
-    //field of this class, WGammaSelection
+    //field of this class, TSignalComponentShape
 
   sampleMode_=sampleMode;
   if (sampleMode_==NOTSPECIFIED){
-    std::cout<<"ERROR in WGammaSelection::WGammaSelection: sampleMode_ is NONSPECIFIED"<<std::endl;
+    std::cout<<"ERROR in TSignalComponentShape::TSignalComponentShape: sampleMode_ is NONSPECIFIED"<<std::endl;
     return;
   }
   else if (sampleMode_>NOTSPECIFIED){
-    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong sampleMode_ "<<std::endl;
+    std::cout<<"ERROR in TSignalComponentShape::TSignalComponentShape: wrong sampleMode_ "<<std::endl;
     return;    
   }
   for (int i=0; i<INPUT_->nSources_; i++)
     {
       doAnalizeSample_.push_back(1);      
     } 
-
-  mode_=mode;
-  if (mode_==EVENTSELECTION_){
-    doSigmaIEtaIEtaCut_=1;    
-  }
-  if (mode_==SIGNALTEMPLATE_){
-    sampleMode_= TInputSample::SIGMC;
-    doSigmaIEtaIEtaCut_=0;
-  }
-  if (mode_==BKGTEMPLATE_){
-    doSigmaIEtaIEtaCut_=0;
-  }
-
 }
 
-WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isPuReweight, bool isDebugMode)
+TSignalComponentShape::TSignalComponentShape(int channel, string analyzedSampleNames, string configFile, bool isReleasedCutsMode, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
+  isReleasedCutsMode_=isReleasedCutsMode;
   isPuReweight_=isPuReweight;
   isDebugMode_=isDebugMode;
   TConfiguration config;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
-    //field of this class, WGammaSelection
+    //field of this class, TSignalComponentShape
 
   sampleMode_=NOTSPECIFIED;
   stringstream ss(analyzedSampleNames);
@@ -92,19 +81,17 @@ WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string
       std::cout<<INPUT_->allInputs_[i].sourceName_<<": "<<doAnalizeSample_[i]<<std::endl;
     }  
   if ((int)doAnalizeSample_.size()!=INPUT_->nSources_)
-    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong doAnalizeSample_.size()"<<std::endl;
-
-  doSigmaIEtaIEtaCut_=1;
+    std::cout<<"ERROR in TSignalComponentShape::TSignalComponentShape: wrong doAnalizeSample_.size()"<<std::endl;
 }
 
-WGammaSelection::~WGammaSelection()
+TSignalComponentShape::~TSignalComponentShape()
 {
    fChain = 0;
      //field of TEventTree 
    delete photonCorrector_;
 }
 
-void WGammaSelection::LoopOverInputFiles()
+void TSignalComponentShape::LoopOverInputFiles()
 {
   TConfiguration config;
   int nSources = INPUT_->nSources_; 
@@ -138,12 +125,7 @@ void WGammaSelection::LoopOverInputFiles()
        //    if (INPUT_->allInputs_[iSource].nFiles_<1) inputFileNMax=INPUT_->allInputs_[iSource].nFiles_;
        //    else inputFileNMax=1;
        //  }
-
-       TString fileOutName;
-       if (mode_==EVENTSELECTION_) fileOutName = selectedTreeFileName_;
-       else if (mode_==SIGNALTEMPLATE_ && channel_==TInputSample::MUON) fileOutName = config.GetSignalTemplateNameMu();
-       else if (mode_==SIGNALTEMPLATE_ && channel_==TInputSample::ELECTRON) fileOutName = config.GetSignalTemplateNameEle();
-       TFile fileOut(fileOutName,"recreate");
+       TFile fileOut(selectedTreeFileName_,"recreate");
        TTree* outTree = new TTree("selectedEvents","selected Events");
        SetOutputTree(outTree); 
 
@@ -162,7 +144,7 @@ void WGammaSelection::LoopOverInputFiles()
              std::cout<<std::endl<<"processing file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<std::endl;
            else
              {
-                std::cout<<"ERROR detected in WGammaSelection::LoopOverInputFiles: file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<" was not found"<<std::endl;
+                std::cout<<"ERROR detected in TSignalComponentShape::LoopOverInputFiles: file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<" was not found"<<std::endl;
                 return;
              } 
            f.cd("ggNtuplizer");
@@ -174,7 +156,7 @@ void WGammaSelection::LoopOverInputFiles()
              }   
            else
              {
-                std::cout<<"ERROR detected in WGammaSelection::LoopOverInputFiles: tree in the file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<" does not exist"<<std::endl;
+                std::cout<<"ERROR detected in TSignalComponentShape::LoopOverInputFiles: tree in the file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<" does not exist"<<std::endl;
                 return;
              }  
  
@@ -188,7 +170,7 @@ void WGammaSelection::LoopOverInputFiles()
            std::cout<<"isWjets_ = "<<isWjets_<<std::endl;
            
            LoopOverTreeEvents();
-             //method of this class (WGammaSelection)
+             //method of this class (TSignalComponentShape)
            fChain=0;
              //field of TEventTree
 
@@ -208,7 +190,7 @@ void WGammaSelection::LoopOverInputFiles()
 }
 
 
-void WGammaSelection::LoopOverTreeEvents()
+void TSignalComponentShape::LoopOverTreeEvents()
 {
    if (fChain == 0) return;
    Long64_t nentries = fChain->GetEntries();
@@ -229,7 +211,7 @@ void WGammaSelection::LoopOverTreeEvents()
      //kMaxnMu - field of TEventTree
    else
      {
-       std::cout<<"Error detected in WGammaSelection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
+       std::cout<<"Error detected in TSignalComponentShape::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
        return;
      }
 
@@ -270,7 +252,7 @@ void WGammaSelection::LoopOverTreeEvents()
         else if (channel_==TInputSample::ELECTRON) nLe_=treeLeaf.nEle;
         else
           {
-             std::cout<<"Error detected in  WGammaSelection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
+             std::cout<<"Error detected in  TSignalComponentShape::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
              return;
           }
 
@@ -281,9 +263,9 @@ void WGammaSelection::LoopOverTreeEvents()
 
        TFullCuts fullCuts;
        if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
-                channel_,
-                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_) == 1)
-              //method of this class (WGammaSelection)
+                channel_,  isReleasedCutsMode_,
+                WMt, lePhoDeltaR, photonCorrector_,isWjets_) == 1)
+              //method of this class (TSignalComponentShape)
 
           for (int ile=0; ile<nLe_; ile++)
             for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
@@ -296,7 +278,6 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.muPt[ile], 
                               treeLeaf.phoEta[ipho], 
                               treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
-                              treeLeaf.phoSigmaIEtaIEta[ipho],
                               lePhoDeltaR[ile][ipho],
                               WMt[ile],
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
@@ -308,7 +289,6 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.elePt[ile], 
                               treeLeaf.phoEta[ipho], 
                               treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
-                              treeLeaf.phoSigmaIEtaIEta[ipho],
                               lePhoDeltaR[ile][ipho],
                               WMt[ile],
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
@@ -353,54 +333,54 @@ void WGammaSelection::LoopOverTreeEvents()
 
 }
 
-bool WGammaSelection::CheckMaxNumbersInTree()
+bool TSignalComponentShape::CheckMaxNumbersInTree()
 {
    if ((channel_=TInputSample::MUON) 
        && (fChain->GetMaximum("nMu")>kMaxnMu))
      //kMaxnMu - field of TEventTree
      {
        PrintErrorMessageMaxNumberOf(MUON_);
-          //methof of this class (WGammaSelection)
+          //methof of this class (TSignalComponentShape)
        return 0;
      }
    if (channel_==TInputSample::ELECTRON 
        && fChain->GetMaximum("nEle")>kMaxnEle)
      {
        PrintErrorMessageMaxNumberOf(ELECTRON_);
-          //methof of this class (WGammaSelection)
+          //methof of this class (TSignalComponentShape)
        return 0;
      }
    if (fChain->GetMaximum("nPho")>kMaxnPho)
      {
        PrintErrorMessageMaxNumberOf(PHOTON_);
-          //methof of this class (WGammaSelection)
+          //methof of this class (TSignalComponentShape)
        return 0;
      }
    if (fChain->GetMaximum("nJet")>kMaxnJet)
      {
        PrintErrorMessageMaxNumberOf(JET_);
-          //methof of this class (WGammaSelection)
+          //methof of this class (TSignalComponentShape)
        return 0;
      }
    if (fChain->GetMaximum("nLowPtJet")>kMaxnLowPtJet)
      {
        PrintErrorMessageMaxNumberOf(LOWPTJET_);
-          //methof of this class (WGammaSelection)
+          //methof of this class (TSignalComponentShape)
        return 0;
      }
    if (!treeLeaf.isData && fChain->GetMaximum("nMC")>kMaxnMC)
      {
        PrintErrorMessageMaxNumberOf(MC_);
-          //methof of this class (WGammaSelection)
+          //methof of this class (TSignalComponentShape)
        return 0;
      }
    return 1;
 }
 
-void WGammaSelection::PrintErrorMessageMaxNumberOf(int particle)
+void TSignalComponentShape::PrintErrorMessageMaxNumberOf(int particle)
 {
        std::cout<<std::endl;
-       std::cout<<"Error detected in WGammaSelection::PrintErrorMessageMaxNumberOf:"<<std::endl;
+       std::cout<<"Error detected in TSignalComponentShape::PrintErrorMessageMaxNumberOf:"<<std::endl;
        if (particle==MUON_)
          std::cout<<"maximum number of muons in the file nMu="<<fChain->GetMaximum("nMu")<<", when kMaxnMu="<<kMaxnMu<<" only"<<std::endl;
        else if (particle==ELECTRON_)
