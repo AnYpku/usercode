@@ -35,6 +35,9 @@ class TConfiguration
     string GetAccErrTotalName();
     string GetEffErrTotalName();
 
+    string GetPhotonScaleFactorsFileNamePt15to20GeV();
+    string GetPhotonScaleFactorsFileNamePt20toInfGeV();
+
     string GetNameDebugMode();
     string GetNameReleasedCuts();
     string GetPileupDataFileName();
@@ -85,6 +88,12 @@ static const string accTotalName_="accTotal";
 static const string effTotalName_="effTotal"; 
 static const string accErrTotalName_="accErrTotal"; 
 static const string effErrTotalName_="effErrTotal";
+
+//////////////////////////////////////////
+//scale factors
+//
+static const string photonScaleFactorsFileNamePt15to20GeV_="../CertifiedConstants/PhotonScaleFactors/ScaleFactors_Pt15to20GeV_2012.root";
+static const string photonScaleFactorsFileNamePt20toInfGeV_="../CertifiedConstants/PhotonScaleFactors/ScaleFactors_Pt20toInfGeV_2012.root";
 
 //////////////////////////////////////////
 static const string nameDebugMode_ = "_debugMode";

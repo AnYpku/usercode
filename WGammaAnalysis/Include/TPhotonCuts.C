@@ -2,6 +2,12 @@
   //this class
 #include "math.h"
   //standard C++ class
+#include "../Configuration/TConfiguration.h"
+  //this package
+#include "TFile.h"
+#include "TH1D.h"
+#include "TString.h"
+ //ROOT
 
 TPhotonCuts::TPhotonCuts()
 {

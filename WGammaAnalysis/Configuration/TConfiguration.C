@@ -127,6 +127,16 @@ string TConfiguration::GetEffErrTotalName()
   return effErrTotalName_;
 }
 
+string TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
+{
+  return photonScaleFactorsFileNamePt15to20GeV_;
+}
+
+string TConfiguration::GetPhotonScaleFactorsFileNamePt20toInfGeV()
+{
+  return photonScaleFactorsFileNamePt20toInfGeV_;
+}
+
 int TConfiguration::GetNPhoPtBins()
 {
   return nPhoPtBins_;

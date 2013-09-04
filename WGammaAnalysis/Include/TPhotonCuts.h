@@ -42,6 +42,8 @@ class TPhotonCuts
     bool IsEndcap();
 
     const static int nWP_=3;
+    enum {WP_LOOSE, WP_MEDIUM, WP_TIGHT};
+
 
   private:
     int phoEleVeto_ipho_; //conversion safe lectron veto
@@ -65,7 +67,7 @@ class TPhotonCuts
     float phoPFPhoIsoEndcapCut_[3];
 
     const static float phoPtCut_ = 15.0;
-    const static int WP_=1; 
+    const static int WP_=WP_MEDIUM; 
       //WP - working point
       //nWP - total number of working points
       //0 - loose  (90% for barrel, 85% for endcap) 

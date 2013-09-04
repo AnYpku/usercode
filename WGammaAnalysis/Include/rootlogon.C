@@ -7,7 +7,7 @@
   gROOT->ProcessLine(".L ../Include/TMathTools.C+");
   gROOT->ProcessLine(".L ../Include/TEventTree.C+");
   gROOT->ProcessLine(".L ../Include/TPhotonCuts.C+");
-
+  gROOT->ProcessLine(".L ../Include/TPhotonScaleFactor.C+");
   gROOT->ProcessLine(".L ../Include/TElectronCuts.C+");
   gROOT->ProcessLine(".L ../Include/TMuonCuts.C+");
   gROOT->ProcessLine(".L ../Include/TMetTools.C+");

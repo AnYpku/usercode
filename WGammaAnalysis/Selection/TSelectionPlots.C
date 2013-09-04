@@ -286,7 +286,7 @@ void TSelectionPlots::PrintWeightedNumberOfEvents(TString cut)
 
   float nMCEvents=0;
   float nMCEventsErr=0;
-  for (int i=0; i<nSources_; i++){
+  for (unsigned int i=0; i<nSources_; i++){
     std::cout<<sourceLabel_[i]<<" ";
 //    std::cout<<tree_[i]->GetEntries()<<" ";
 //    std::cout<<tree_[i]->GetEntries(cut)<<" ";
