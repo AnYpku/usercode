@@ -2,6 +2,7 @@
   //this class
 #include "math.h"
 #include "string.h"
+#include <iostream>
   //standard C++ class
 #include "../Configuration/TConfiguration.h"
 #include "TPhotonCuts.h"
@@ -66,6 +67,26 @@ float TPhotonScaleFactor::GetScaleFactor()
 float TPhotonScaleFactor::GetScaleFactorErr()
 {
   return scaleFactorErr_;
+}
+
+float TPhotonScaleFactor::GetScaleFactorExceptElectronVeto()
+{
+  return scaleFactorExceptElectronVeto_;
+}
+
+float TPhotonScaleFactor::GetScaleFactorExceptElectronVetoErr()
+{
+  return scaleFactorExceptElectronVetoErr_;
+}
+
+float TPhotonScaleFactor::GetScaleFactorElectronVeto()
+{
+  return scaleFactorElectronVeto_;
+}
+
+float TPhotonScaleFactor::GetScaleFactorElectronVetoErr()
+{
+  return scaleFactorElectronVetoErr_;
 }
 
 void TPhotonScaleFactor::SetScaleFactorExceptElectronVeto(float pt, float eta, int WP)
@@ -142,11 +163,11 @@ void TPhotonScaleFactor::SetScaleFactorExceptElectronVetoPt20toInf(float pt, flo
 
 void TPhotonScaleFactor::SetScaleFactorExceptElectronVetoKnownHist(TH1D *h, float pt)
 {
-   if (pt>=h->GetMaximum()){
-     scaleFactorExceptElectronVeto_=h->GetBinContent(h->GetMaximumBin());
-     scaleFactorExceptElectronVetoErr_=h->GetBinError(h->GetMaximumBin());
+   if (pt>=(h->GetBinCenter(h->GetNbinsX())+h->GetBinWidth(h->GetNbinsX()))){
+     scaleFactorExceptElectronVeto_=h->GetBinContent(h->GetNbinsX());
+     scaleFactorExceptElectronVetoErr_=h->GetBinError(h->GetNbinsX());
    }
-   else if (pt<=h->GetMinimum()){
+   else if (pt<=h->GetBinLowEdge(1)){
      scaleFactorExceptElectronVeto_=1.0;
      scaleFactorExceptElectronVetoErr_=0.0;
    }
@@ -169,7 +190,7 @@ void TPhotonScaleFactor::SetScaleFactorElectronVeto(float pt, float eta, int WP)
 
 void TPhotonScaleFactor::SetScaleFactorElectronVetoBarrel(float pt, int WP)
 {
-    if      (pt>15 && pt<20)
+    if      (pt>15 && pt<20){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9910;
         scaleFactorElectronVetoErr_= 0.0040;
@@ -182,7 +203,8 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoBarrel(float pt, int WP)
         scaleFactorElectronVeto_= 0.9939;
         scaleFactorElectronVetoErr_= 0.0043;
       }
-    else if (pt>20 && pt<30)
+    }
+    else if (pt>20 && pt<30){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9996;
         scaleFactorElectronVetoErr_= 0.0059;
@@ -195,7 +217,8 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoBarrel(float pt, int WP)
         scaleFactorElectronVeto_= 1.0032;
         scaleFactorElectronVetoErr_= 0.0066;
       }
-    else if (pt>30 && pt<40)
+    }
+    else if (pt>30 && pt<40){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 1.0081;
         scaleFactorElectronVetoErr_= 0.0154;
@@ -208,7 +231,8 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoBarrel(float pt, int WP)
         scaleFactorElectronVeto_= 0.9919;
         scaleFactorElectronVetoErr_= 0.0057;
       }
-    else if (pt>15)
+    }
+    else if (pt>15){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9957;
         scaleFactorElectronVetoErr_= 0.0037;
@@ -221,11 +245,12 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoBarrel(float pt, int WP)
         scaleFactorElectronVeto_= 0.9969;
         scaleFactorElectronVetoErr_= 0.0035;
       }
+   }
 }
 
 void TPhotonScaleFactor::SetScaleFactorElectronVetoEndcap(float pt, int WP)
 {
-    if      (pt>15 && pt<20)
+    if      (pt>15 && pt<20){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9970;
         scaleFactorElectronVetoErr_= 0.0148;
@@ -238,7 +263,8 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoEndcap(float pt, int WP)
         scaleFactorElectronVeto_= 1.0046;
         scaleFactorElectronVetoErr_= 0.0178;
       }
-    else if (pt>20 && pt<30)
+    }
+    else if (pt>20 && pt<30){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9911;
         scaleFactorElectronVetoErr_= 0.0169;
@@ -251,7 +277,8 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoEndcap(float pt, int WP)
         scaleFactorElectronVeto_= 0.9917;
         scaleFactorElectronVetoErr_= 0.0200;
       }
-    else if (pt>30 && pt<40)
+    }
+    else if (pt>30 && pt<40){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9796;
         scaleFactorElectronVetoErr_= 0.0117;
@@ -264,7 +291,8 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoEndcap(float pt, int WP)
         scaleFactorElectronVeto_= 0.9837;
         scaleFactorElectronVetoErr_= 0.0114;
       }
-    else if (pt>15)
+    }
+    else if (pt>15){
       if      (WP==emptyPhoton_.WP_LOOSE){
         scaleFactorElectronVeto_= 0.9919;
         scaleFactorElectronVetoErr_= 0.0094;
@@ -277,6 +305,7 @@ void TPhotonScaleFactor::SetScaleFactorElectronVetoEndcap(float pt, int WP)
         scaleFactorElectronVeto_= 0.9957;
         scaleFactorElectronVetoErr_= 0.0113;
       }
+    }
 }
 
 TString TPhotonScaleFactor::GetPhotonScaleFactorHistName(float pt, float eta, int WP)

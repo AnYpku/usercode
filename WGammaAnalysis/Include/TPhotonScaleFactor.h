@@ -31,6 +31,10 @@ class TPhotonScaleFactor
 
     float GetScaleFactor();
     float GetScaleFactorErr(); 
+    float GetScaleFactorExceptElectronVeto();
+    float GetScaleFactorExceptElectronVetoErr();
+    float GetScaleFactorElectronVeto();
+    float GetScaleFactorElectronVetoErr();  
 
 
   private:
