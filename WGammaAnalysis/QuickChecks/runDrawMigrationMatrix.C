@@ -12,6 +12,7 @@
   TTree* tr = (TTree*)gDirectory->Get("EventTree");
 
   gStyle->SetPalette(1);
+  gStyle->SetPaintTextFormat("0.2f");
   DrawMigrationMatrix(tr);
 
   time.Stop("time");

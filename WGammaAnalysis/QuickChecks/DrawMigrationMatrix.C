@@ -23,8 +23,8 @@ void DrawMigrationMatrix(TTree* tr)
   }
   TH2F* histMigr = new TH2F("hist","migration matrix", config.GetNPhoPtBins(),binLimits,config.GetNPhoPtBins(),binLimits);
 
-  //for (long entry=0; entry<100000; entry++)
-  for (long entry=0; entry<nentries; entry++)
+  for (long entry=0; entry<100000; entry++)
+  //for (long entry=0; entry<nentries; entry++)
  
     {
       evTr.GetEntryNeededBranchesOnly(entry);
@@ -82,7 +82,8 @@ void DrawMigrationMatrix(TTree* tr)
   histMigr->SetStats(0);
   histMigr->GetXaxis()->SetMoreLogLabels(1);
   histMigr->GetYaxis()->SetMoreLogLabels(1);
-  histMigr->Draw("COLZ");
+  histMigr->SetMarkerSize(1);
+  histMigr->Draw("COLZ TEXT");
   c.SetLogx();
   c.SetLogy();
   c.SaveAs("matrMigr.png");
