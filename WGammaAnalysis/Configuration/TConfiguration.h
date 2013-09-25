@@ -23,6 +23,11 @@ class TConfiguration
 
     string GetSignalTemplateNameMu();
     string GetSignalTemplateNameEle();
+    string GetBkgTemplateRawNameMu();
+    string GetBkgTemplateRawNameEle();
+    string GetTemplatePicNameBase();
+//    string GetBkgTemplateNameMu();
+//    string GetBkgTemplateNameEle();
 
     string GetAccEffDirName();
     string GetAccEffFileName();
@@ -72,8 +77,13 @@ static const string selectedEventsNameBkgMC_="selected_BKGMC_";//[input.sourceNa
 //////////////////////////////////////////
 //data driven background estimation
 //
-static const string signalTemplateNameMu_="../WGammaOutput/signalTemplate_MUON.root";
-static const string signalTemplateNameEle_="../WGammaOutput/signalTemplate_ELECTRON.root";
+static const string signalTemplateNameMu_="../WGammaOutput/templateSignal_MUON.root";
+static const string signalTemplateNameEle_="../WGammaOutput/templateSignal_ELECTRON.root";
+static const string bkgTemplateRawNameMu_="../WGammaOutput/templateRawBkg_MUON.root";
+static const string bkgTemplateRawNameEle_="../WGammaOutput/templateRawBkg_ELECTRON.root";
+static const string templatePicNameBase_="../WGammaOutput/templateFits/templateFit_";
+//static const string bkgTemplateNameMu_="../WGammaOutput/bkgTemplate_MUON.root";
+//static const string bkgTemplateNameEle_="../WGammaOutput/bkgTemplate_ELECTRON.root";
 
 //////////////////////////////////////////
 //acceptance and efficiency

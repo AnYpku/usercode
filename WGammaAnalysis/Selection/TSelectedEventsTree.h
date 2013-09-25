@@ -16,9 +16,12 @@ class TSelectedEventsTree
     void SetValues(float leEta, float lePhi, float lePt,
                    float phoEta, float phoPhi, float phoEt,
                    float phoSigmaIEtaIEta,
+                   float phoPFChIsoCorr,
+                   float phoSCRChIsoCorr,
                    float lePhoDeltaR,
                    float WMt,
                    float pfMET, float pfMETPhi,
+                   float rho2012,
                    int run,
                    int inputFileN,
                    float weight, float PUweight, float PU); 
@@ -32,10 +35,13 @@ class TSelectedEventsTree
     float phoPhi_;
     float phoEt_;
     float phoSigmaIEtaIEta_;
+    float phoPFChIsoCorr_;
+    float phoSCRChIsoCorr_;
     float lePhoDeltaR_;
     float WMt_;
     float pfMET_;
     float pfMETPhi_;
+    float rho2012_;
     int run_;
     int inputFileN_;
     float weight_;

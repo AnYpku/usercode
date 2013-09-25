@@ -1,6 +1,9 @@
 #ifndef TPhotonCuts_h
 #define TPhotonCuts_h
 
+#include "TCut.h"
+ //ROOT
+
 class TPhotonCuts
 {
   public:
@@ -18,19 +21,24 @@ class TPhotonCuts
                     float rho2012);
     virtual ~TPhotonCuts();
 
-    bool Passed(bool doSigmaIEtaIEtaCut=1);
-    bool PassedExceptKinematics(bool doSigmaIEtaIEtaCut=1);
+    bool Passed(bool doSigmaIEtaIEtaCut=1, bool doPhoChIsocut=1);
+    bool PassedExceptKinematics(bool doSigmaIEtaIEtaCut=1, bool doPhoChIsocut=1);
     bool PhoKinematics(float phoPt, float phoEta);
     bool PhoKinematics();
-    bool SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut=1); 
+    bool SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut=1, bool doPhoChIsoCut=1); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
       //for reference
 
     //the following three functions determine effective areas depending on |eta|
     //the values are taken from
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
+    bool CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta);
     bool CutSigmaIEtaIEta();
+    bool CutPhoChIso(float phoChIso, float rho2012, float eta, int WP);
+    TCut CutPhoChIso(TString phoChIso, TString eta, int WP);
+    bool CutPhoChIso();
 
+    float EffAreaCharged(float eta);
     float EffAreaCharged();
     float EffAreaNeutral();
     float EffAreaPhotons();
@@ -38,8 +46,12 @@ class TPhotonCuts
     float PFIsoCorr(float PFIso, float rho, float EA);
     bool IsBarrel(float phoEta);
     bool IsEndcap(float phoEta);
+    TCut IsBarrel(TString phoEtaStr);
+    TCut IsEndcap(TString phoEtaStr);
     bool IsBarrel();
     bool IsEndcap();
+
+    float GetPhoPFChIsoCorr(float phoChIso, float rho2012, float eta);
 
     const static int nWP_=3;
     enum {WP_LOOSE, WP_MEDIUM, WP_TIGHT};

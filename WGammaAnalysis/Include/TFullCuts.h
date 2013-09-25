@@ -20,10 +20,10 @@ public:
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
                     int channel, 
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1);
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1, bool doPhoChIsoCut=1);
   bool PhotonsOnlyCuts(bool* goodPhoton,
                TEventTree::InputTreeLeaves &inpTreeLeaf,   
-               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1);
+               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1, bool doPhoChIsoCut=1);
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
 
 private:

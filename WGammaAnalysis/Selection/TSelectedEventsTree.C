@@ -24,10 +24,13 @@ void TSelectedEventsTree::SetOutputTree(TTree* tree)
   outTree_->Branch("phoPhi",&phoPhi_,"phoPhi/F");
   outTree_->Branch("phoEt",&phoEt_,"phoEt/F");
   outTree_->Branch("phoSigmaIEtaIEta",&phoSigmaIEtaIEta_,"phoSigmaIEtaIEta/F");
+  outTree_->Branch("phoPFChIsoCorr",&phoPFChIsoCorr_,"phoPFChIsoCorr/F");
+  outTree_->Branch("phoSCRChIsoCorr",&phoSCRChIsoCorr_,"phoSCRChIsoCorr/F");
   outTree_->Branch("lePhoDeltaR",&lePhoDeltaR_,"lePhoDeltaR/F");
   outTree_->Branch("WMt",&WMt_,"WMt/F");
   outTree_->Branch("pfMETPhi",&pfMETPhi_,"pfMETPhi/F");
   outTree_->Branch("pfMET",&pfMET_,"pfMET/F");
+  outTree_->Branch("rho2012",&rho2012_,"rho2012/F");
   outTree_->Branch("run",&run_,"run/I");
   outTree_->Branch("inputFileNumber",&inputFileN_,"inputFileNumber/I");
   outTree_->Branch("weight",&weight_,"weight/F");
@@ -43,9 +46,12 @@ void TSelectedEventsTree::Fill()
 void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, 
                  float phoEta, float phoPhi, float phoEt,
                  float phoSigmaIEtaIEta,
+                 float phoPFChIsoCorr,
+                 float phoSCRChIsoCorr,
                  float lePhoDeltaR,
                  float WMt,
                  float pfMET, float pfMETPhi,
+                 float rho2012,
                  int run,
                  int inputFileN,
                  float weight, float PUweight, float PU)
@@ -57,10 +63,13 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
   phoPhi_=phoPhi;
   phoEt_=phoEt;
   phoSigmaIEtaIEta_=phoSigmaIEtaIEta;
+  phoPFChIsoCorr_=phoPFChIsoCorr;
+  phoSCRChIsoCorr_=phoSCRChIsoCorr;
   lePhoDeltaR_=lePhoDeltaR;
   WMt_=WMt;
   pfMET_=pfMET;
   pfMETPhi_=pfMETPhi;
+  rho2012_=rho2012;
   run_=run;
   inputFileN_=inputFileN;
   weight_=weight;

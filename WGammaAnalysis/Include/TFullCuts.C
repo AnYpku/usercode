@@ -28,7 +28,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
                     int channel, 
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut)
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut, bool doPhoChIsoCut)
 {
 
   // This function is called from LoopOverEvents.
@@ -152,7 +152,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
      //skip loop over photons if no good leptons found
 
    bool goodPhoton[inpTreeLeaf.nPho];
-   if (!PhotonsOnlyCuts(goodPhoton,inpTreeLeaf,photonCorrector, doSigmaIEtaIEtaCut)) return 0;
+   if (!PhotonsOnlyCuts(goodPhoton,inpTreeLeaf,photonCorrector, doSigmaIEtaIEtaCut,doPhoChIsoCut)) return 0;
      //skip checking lepton-photon matching if no good photons found
 
     //check matching between muon and photon
@@ -183,7 +183,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 
 bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
                TEventTree::InputTreeLeaves &inpTreeLeaf,   
-               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut){
+               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut,  bool doPhoChIsoCut){
    bool goodPhotonExists=0;
 
    for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++) 
@@ -218,7 +218,7 @@ bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
           //are fields of TEventTree
 
 
-	if (photon.Passed(doSigmaIEtaIEtaCut)) 
+	if (photon.Passed(doSigmaIEtaIEtaCut,doPhoChIsoCut)) 
           {
      
 //            nPhotonsPassed_++;

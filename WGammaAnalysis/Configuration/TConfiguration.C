@@ -76,6 +76,30 @@ string TConfiguration::GetSignalTemplateNameEle()
   return signalTemplateNameEle_;
 }
 
+//string TConfiguration::GetBkgTemplateNameMu()
+//{
+//  return bkgTemplateNameMu_;
+//}
+
+//string TConfiguration::GetBkgTemplateNameEle()
+//{
+//  return bkgTemplateNameEle_;
+//}
+
+string TConfiguration::GetBkgTemplateRawNameMu()
+{
+  return bkgTemplateRawNameMu_;
+}
+
+string TConfiguration::GetBkgTemplateRawNameEle()
+{
+  return bkgTemplateRawNameEle_;
+}
+
+string TConfiguration::GetTemplatePicNameBase()
+{
+  return templatePicNameBase_;
+}
 
 string TConfiguration::GetAccEffDirName()
 {

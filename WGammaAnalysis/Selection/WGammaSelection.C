@@ -48,14 +48,18 @@ WGammaSelection::WGammaSelection(int channel, int mode, int sampleMode, string c
 
   mode_=mode;
   if (mode_==EVENTSELECTION_){
-    doSigmaIEtaIEtaCut_=1;    
+    doSigmaIEtaIEtaCut_=1;
+    doPhoChIsoCut_=1;    
   }
   if (mode_==SIGNALTEMPLATE_){
     sampleMode_= TInputSample::SIGMC;
     doSigmaIEtaIEtaCut_=0;
+    doPhoChIsoCut_=0;
   }
   if (mode_==BKGTEMPLATE_){
+    sampleMode_= TInputSample::DATA;
     doSigmaIEtaIEtaCut_=0;
+    doPhoChIsoCut_=0;
   }
 
 }
@@ -143,6 +147,8 @@ void WGammaSelection::LoopOverInputFiles()
        if (mode_==EVENTSELECTION_) fileOutName = selectedTreeFileName_;
        else if (mode_==SIGNALTEMPLATE_ && channel_==TInputSample::MUON) fileOutName = config.GetSignalTemplateNameMu();
        else if (mode_==SIGNALTEMPLATE_ && channel_==TInputSample::ELECTRON) fileOutName = config.GetSignalTemplateNameEle();
+       else if (mode_==BKGTEMPLATE_ && channel_==TInputSample::MUON) fileOutName = config.GetBkgTemplateRawNameMu();
+       else if (mode_==BKGTEMPLATE_ && channel_==TInputSample::ELECTRON) fileOutName = config.GetBkgTemplateRawNameEle();
        TFile fileOut(fileOutName,"recreate");
        TTree* outTree = new TTree("selectedEvents","selected Events");
        SetOutputTree(outTree); 
@@ -254,7 +260,9 @@ void WGammaSelection::LoopOverTreeEvents()
    nPhotons_=0;
    nPhotonsPassed_=0;
    nPhoLepPassed_=0;
-  
+
+
+   TPhotonCuts emptyPhoton;
    for (Long64_t entry=0; entry<nentries; entry++) 
    //loop over events in the tree
      {
@@ -282,7 +290,7 @@ void WGammaSelection::LoopOverTreeEvents()
        TFullCuts fullCuts;
        if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
                 channel_,
-                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_) == 1)
+                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_, doPhoChIsoCut_) == 1)
               //method of this class (WGammaSelection)
 
           for (int ile=0; ile<nLe_; ile++)
@@ -297,9 +305,12 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.phoEta[ipho], 
                               treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
                               treeLeaf.phoSigmaIEtaIEta[ipho],
+                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
+                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
                               lePhoDeltaR[ile][ipho],
                               WMt[ile],
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
+                              treeLeaf.rho2012,
                               treeLeaf.run,
                               inputFileN_,
                               totalWeight_,puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]),treeLeaf.puTrue[1]);
@@ -309,9 +320,12 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.phoEta[ipho], 
                               treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
                               treeLeaf.phoSigmaIEtaIEta[ipho],
+                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
+                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
                               lePhoDeltaR[ile][ipho],
                               WMt[ile],
                               treeLeaf.pfMET, treeLeaf.pfMETPhi,
+                              treeLeaf.rho2012,
                               treeLeaf.run,
                               inputFileN_,
                               totalWeight_,puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]),treeLeaf.puTrue[1]);
@@ -324,6 +338,7 @@ void WGammaSelection::LoopOverTreeEvents()
         else continue;
 
      } //end of loop over events in the tree
+
   //memory release:
 
   for (int ile=0; ile<nLeptonMax; ile++)

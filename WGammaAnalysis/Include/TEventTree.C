@@ -36,6 +36,9 @@ void TEventTree::GetEntryNeededBranchesOnly(Long64_t entry)
    b_phoPFChIso->GetEntry(entry);
    b_phoPFPhoIso->GetEntry(entry);
    b_phoPFNeuIso->GetEntry(entry);
+   //b_phoSCRChIso->GetEntry(entry);
+   //b_phoSCRPhoIso->GetEntry(entry);
+   //b_phoSCRNeuIso->GetEntry(entry);
    b_phoSCEt->GetEntry(entry);
    b_phoSCEta->GetEntry(entry);
    b_phoSCPhi->GetEntry(entry);

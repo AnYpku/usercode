@@ -40,6 +40,7 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
 
        int selectionPurpose_;
        bool doSigmaIEtaIEtaCut_;
+       bool doPhoChIsoCut_;
 
        int channel_;//ELECTRON, MUON
        int sample_; //DATA, SIGMC, BKGMC

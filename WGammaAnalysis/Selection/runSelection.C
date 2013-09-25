@@ -12,14 +12,11 @@
 //WGammaSelection(int channel, int mode, int sampleMode, string configFile, bool isPuReweight, bool isDebugMode)
 //WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isPuReweight, bool isDebugMode)
 
-  WGammaSelection selection( TInputSample::MUON, WGammaSelection::SIGNALTEMPLATE_);
+   //WGammaSelection selection( TInputSample::MUON, "DYjets_to_ll", "../Configuration/config.txt");
+  //selection.LoopOverInputFiles();
+
+  WGammaSelection selection( TInputSample::MUON, WGammaSelection::EVENTSELECTION_, WGammaSelection::DATA, "../Configuration/config.txt",1,1);
   selection.LoopOverInputFiles();
-
-  //WGammaSelection selection( TInputSample::MUON, "DYjets_to_ll", "../Configuration/config.txt");
-  //selection.LoopOverInputFiles();
-
-  //WGammaSelection selection( TInputSample::MUON, WGammaSelection::ALL);
-  //selection.LoopOverInputFiles();
 
   //WGammaSelection selection( TInputSample::MUON, "Wg_to_munu Wjets_to_lnu DYjets_to_ll ttbarjet Zg Wg_to_taunu");
   //selection.LoopOverInputFiles();
