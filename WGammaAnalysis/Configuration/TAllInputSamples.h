@@ -14,7 +14,7 @@ class TAllInputSamples
 
     void ReadConfig(int channel, string configFile);
     bool ReadSampleGeneralInfo(int channel, string line);
-    void ReadFileSpecificInfo(int channel, string line);
+    void ReadFileSpecificInfo(string line);
 
     int ChannelNumber (string channelStr);
     int SampleNumber  (string sampleStr);

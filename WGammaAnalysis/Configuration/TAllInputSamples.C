@@ -41,7 +41,7 @@ void TAllInputSamples::ReadConfig(int channel, string configFile)
       if (line[0] == '$') 
         isSampleNeeded = ReadSampleGeneralInfo(channel, line);
       if (line[0] == '-' && isSampleNeeded) 
-        ReadFileSpecificInfo(channel, line);
+        ReadFileSpecificInfo(line);
     } //while (!ifs.eof())
 }
 
@@ -53,23 +53,23 @@ bool TAllInputSamples::ReadSampleGeneralInfo(int channel, string line)
    string sampleType;
    ss >> sampleType;
    string channelName;
-   if (sampleType=="BKGMC") {
-     allInputs_.push_back(TInputSample());
-     nSources_++;
-     allInputs_.back().sample_=TInputSample::BKGMC;
-     allInputs_.back().channelTotal_=TInputSample::BOTH;
-   } //if (sampleType=="BKGMC")
-   else if (sampleType=="DATA" || sampleType=="SIGMC") {
+//   if (sampleType=="BKGMC") {
+  //   allInputs_.push_back(TInputSample());
+    // nSources_++;
+//     allInputs_.back().sample_=TInputSample::BKGMC;
+ //    allInputs_.back().channel_=ChannelNumber(channelName);
+   //} //if (sampleType=="BKGMC")
+   //else if (sampleType=="DATA" || sampleType=="SIGMC") {
      ss >> channelName;
-     if (ChannelNumber(channelName)==channel || ChannelNumber(channelName)==TInputSample::BOTH){           
+     if (ChannelNumber(channelName)==channel){           
        allInputs_.push_back(TInputSample());
        nSources_++;
        allInputs_.back().sample_=SampleNumber(sampleType);
-       allInputs_.back().channelTotal_=ChannelNumber(channelName);
+       allInputs_.back().channel_=ChannelNumber(channelName);
      } //if (ChannelNumber(channelName)==channel)
      else return 0;        
-   }// else if (sampleType=="DATA" || sampleType=="SIGMC")
-   else return 0;
+   //}// else if (sampleType=="DATA" || sampleType=="SIGMC")
+   //else return 0;
 
    if (sampleType=="DATA"){
      allInputs_.back().sourceName_=sampleType;
@@ -90,24 +90,12 @@ bool TAllInputSamples::ReadSampleGeneralInfo(int channel, string line)
    return 1;
 }
 
-void TAllInputSamples::ReadFileSpecificInfo(int channel, string line)
+void TAllInputSamples::ReadFileSpecificInfo(string line)
 {
    stringstream ss(line);
    string chr;
    ss >> chr;
-   if (allInputs_.back().sample_==TInputSample::BKGMC){
-     string channelStr;
-     ss >> channelStr;
-     if (ChannelNumber(channelStr)==channel || ChannelNumber(channelStr)==TInputSample::BOTH)  {
-       allInputs_.back().channelEachFile_.push_back(ChannelNumber(channelStr));
-       allInputs_.back().nFiles_++;
-     }
-     else return;          
-   }
-   else {
-     allInputs_.back().channelEachFile_.push_back( allInputs_.back().channelTotal_ );
-     allInputs_.back().nFiles_++;
-   }
+   allInputs_.back().nFiles_++;
 
    string fileName;
    ss >> fileName;
@@ -137,11 +125,9 @@ void TAllInputSamples::ReadFileSpecificInfo(int channel, string line)
 int TAllInputSamples::ChannelNumber (string channelStr)
 {
   if (channelStr=="MUON")  
-    return TInputSample::MUON;
+    return TConfiguration::MUON;
   else if (channelStr=="ELECTRON") 
-    return TInputSample::ELECTRON;
-  else if (channelStr=="BOTH_CHANNELS" || channelStr=="BOTH") 
-    return TInputSample::BOTH;
+    return TConfiguration::ELECTRON;
   return -1;
 }
 

@@ -29,8 +29,8 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
 {
 
   stringstream ss(strSources);
-  vector <string> names;
-  string name;
+  vector <TString> names;
+  TString name;
   while (ss >> name) 
     names.push_back(name);
   int nNames = names.size();
@@ -41,7 +41,7 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
   for (int i=0; i<INPUT.nSources_; i++)
     {
 
-      TString fileName = (TString)(INPUT.allInputs_[i].fileSelected_).c_str();
+      TString fileName = (TString)(INPUT.allInputs_[i].fileSelected_) ;
       bool doThisSource=0;
 
       for (int j=0; j<nNames; j++)
@@ -88,7 +88,7 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
   return 1;
 }
 
-bool TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits, TString cut)
+bool TSelectionPlots::SetHistograms(TString plotVar, int nBins, float* binLimits, TString cut)
 {
 
   legend_ = new TLegend(0.7,0.7,0.95,0.95);
@@ -98,11 +98,11 @@ bool TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits,
       TString histName="hist"+plotVar;
       histName+=i;
       if (!hasHist_[i]){
-        hist_.push_back(new TH1F(histName, plotVar.c_str(), nBins, binLimits));
+        hist_.push_back(new TH1F(histName, plotVar , nBins, binLimits));
         continue;
       }
       file_[i]->cd();
-      hist_.push_back(new TH1F(histName, plotVar.c_str(), nBins, binLimits));
+      hist_.push_back(new TH1F(histName, plotVar , nBins, binLimits));
       tree_[i]->Draw(plotVar+TString(">>") + histName,"("+cut+")*weight");
       hist_.back()->Print();
       hist_.back()->SetLineColor(colors_[i]);
@@ -114,7 +114,7 @@ bool TSelectionPlots::SetHistograms(string plotVar, int nBins, float* binLimits,
        hist_.back()->SetOption("PE");
      }
 
-     legend_->AddEntry(hist_.back(), sourceLabel_[i].c_str());
+     legend_->AddEntry(hist_.back(), sourceLabel_[i] );
     }
     legend_->SetLineColor(1);
     legend_->SetLineWidth(2);

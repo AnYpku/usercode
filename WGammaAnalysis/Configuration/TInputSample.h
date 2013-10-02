@@ -2,6 +2,7 @@
 #define TInputSample_h
 
 #include <string>
+#include "TString.h"
 #include "TConfiguration.h"
 
 class TInputSample
@@ -15,25 +16,25 @@ class TInputSample
     void GetFileSelectedNames();
     void Print();
 
-    enum {MUON, ELECTRON, BOTH};
+    //enum {MUON, ELECTRON, BOTH};
+       //shifted to TConfiguration.h
     enum {DATA, SIGMC, BKGMC};
 
-    int channelTotal_;
+    int channel_;
     int sample_;
     int nFiles_;
-    string sourceName_;
-    string sourceLatexLabel_;
+    TString sourceName_;
+    TString sourceLatexLabel_;
     int color_;
     bool isSharedCS_;
     float lumiTotal_;
     float csTotal_;
-    string fileSelected_;
-    string fileSelectedDebug_;
+    TString fileSelected_;
+    TString fileSelectedDebug_;
 
-    vector<string> fileNames_;
+    vector<TString> fileNames_;
     vector<float> cs_;
     vector<float> factor_;
-    vector<int> channelEachFile_;
 
     vector<float> lumiEachFile_;
     vector <float> lumiWeights_;

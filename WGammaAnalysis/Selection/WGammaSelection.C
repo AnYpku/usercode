@@ -20,7 +20,7 @@
 #include <sstream>  
   //standard C++ class
 
-WGammaSelection::WGammaSelection(int channel, int mode, int sampleMode, string configFile, bool isPuReweight, bool isDebugMode)
+WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile, bool isPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
@@ -29,7 +29,7 @@ WGammaSelection::WGammaSelection(int channel, int mode, int sampleMode, string c
   isPuReweight_=isPuReweight;
   isDebugMode_=isDebugMode;
   TConfiguration config;
-  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
+  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor(config.GetPhosphorConstantFileName());
     //field of this class, WGammaSelection
 
   sampleMode_=sampleMode;
@@ -46,22 +46,6 @@ WGammaSelection::WGammaSelection(int channel, int mode, int sampleMode, string c
       doAnalizeSample_.push_back(1);      
     } 
 
-  mode_=mode;
-  if (mode_==EVENTSELECTION_){
-    doSigmaIEtaIEtaCut_=1;
-    doPhoChIsoCut_=1;    
-  }
-  if (mode_==SIGNALTEMPLATE_){
-    sampleMode_= TInputSample::SIGMC;
-    doSigmaIEtaIEtaCut_=0;
-    doPhoChIsoCut_=0;
-  }
-  if (mode_==BKGTEMPLATE_){
-    sampleMode_= TInputSample::DATA;
-    doSigmaIEtaIEtaCut_=0;
-    doPhoChIsoCut_=0;
-  }
-
 }
 
 WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isPuReweight, bool isDebugMode)
@@ -73,7 +57,7 @@ WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string
   isPuReweight_=isPuReweight;
   isDebugMode_=isDebugMode;
   TConfiguration config;
-  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config.GetPhosphorConstantFileName()).c_str());
+  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor(config.GetPhosphorConstantFileName());
     //field of this class, WGammaSelection
 
   sampleMode_=NOTSPECIFIED;
@@ -144,11 +128,7 @@ void WGammaSelection::LoopOverInputFiles()
        //  }
 
        TString fileOutName;
-       if (mode_==EVENTSELECTION_) fileOutName = selectedTreeFileName_;
-       else if (mode_==SIGNALTEMPLATE_ && channel_==TInputSample::MUON) fileOutName = config.GetSignalTemplateNameMu();
-       else if (mode_==SIGNALTEMPLATE_ && channel_==TInputSample::ELECTRON) fileOutName = config.GetSignalTemplateNameEle();
-       else if (mode_==BKGTEMPLATE_ && channel_==TInputSample::MUON) fileOutName = config.GetBkgTemplateRawNameMu();
-       else if (mode_==BKGTEMPLATE_ && channel_==TInputSample::ELECTRON) fileOutName = config.GetBkgTemplateRawNameEle();
+       fileOutName = selectedTreeFileName_;
        TFile fileOut(fileOutName,"recreate");
        TTree* outTree = new TTree("selectedEvents","selected Events");
        SetOutputTree(outTree); 
@@ -163,7 +143,7 @@ void WGammaSelection::LoopOverInputFiles()
                debugModeWeight_=1.0/INPUT_->allInputs_[iSource].cs_[inputFileN_];
            }
 
-           TFile f((INPUT_->allInputs_[iSource].fileNames_[inputFileN_]).c_str());
+           TFile f(INPUT_->allInputs_[iSource].fileNames_[inputFileN_]);
            if (f.IsOpen()) 
              std::cout<<std::endl<<"processing file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<std::endl;
            else
@@ -186,12 +166,6 @@ void WGammaSelection::LoopOverInputFiles()
  
            puWeight_=new TPuReweight(config.GetPileupDataFileName(),INPUT_->allInputs_[iSource].fileNames_[inputFileN_]);
 
-           if (INPUT_->allInputs_[iSource].sourceName_=="Wjets_to_lnu")
-             isWjets_=1;
-           else 
-             isWjets_=0;
-           
-           std::cout<<"isWjets_ = "<<isWjets_<<std::endl;
            
            LoopOverTreeEvents();
              //method of this class (WGammaSelection)
@@ -230,8 +204,8 @@ void WGammaSelection::LoopOverTreeEvents()
    //goodLeptonPhotonPairs(two-dimentional array of bool-s)
    //memory allocation for some variables: 
    int nLeptonMax;
-   if (channel_==TInputSample::MUON) nLeptonMax=kMaxnMu;
-   else if (channel_==TInputSample::ELECTRON) nLeptonMax=kMaxnEle;
+   if (channel_==TConfiguration::MUON) nLeptonMax=kMaxnMu;
+   else if (channel_==TConfiguration::ELECTRON) nLeptonMax=kMaxnEle;
      //kMaxnMu - field of TEventTree
    else
      {
@@ -267,15 +241,13 @@ void WGammaSelection::LoopOverTreeEvents()
    //loop over events in the tree
      {
 
-        //fChain->GetEntry(entry);
-
         GetEntryNeededBranchesOnly(entry);
 
         if (!treeLeaf.isData) GetEntryMCSpecific(entry);
           //method of TEventTree class
 
-        if (channel_==TInputSample::MUON) nLe_=treeLeaf.nMu;
-        else if (channel_==TInputSample::ELECTRON) nLe_=treeLeaf.nEle;
+        if (channel_==TConfiguration::MUON) nLe_=treeLeaf.nMu;
+        else if (channel_==TConfiguration::ELECTRON) nLe_=treeLeaf.nEle;
         else
           {
              std::cout<<"Error detected in  WGammaSelection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
@@ -299,7 +271,7 @@ void WGammaSelection::LoopOverTreeEvents()
                 if (goodLeptonPhotonPairs[ile][ipho])
                   {
                     nPassed+=totalWeight_;
-                    if (channel_==TInputSample::MUON) 
+                    if (channel_==TConfiguration::MUON) 
                        SetValues(treeLeaf.muEta[ile],treeLeaf.muPhi[ile],
                               treeLeaf.muPt[ile], 
                               treeLeaf.phoEta[ipho], 
@@ -314,7 +286,7 @@ void WGammaSelection::LoopOverTreeEvents()
                               treeLeaf.run,
                               inputFileN_,
                               totalWeight_,puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]),treeLeaf.puTrue[1]);
-                    else if (channel_==TInputSample::ELECTRON) 
+                    else if (channel_==TConfiguration::ELECTRON) 
                        SetValues(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile],
                               treeLeaf.elePt[ile], 
                               treeLeaf.phoEta[ipho], 
@@ -370,7 +342,7 @@ void WGammaSelection::LoopOverTreeEvents()
 
 bool WGammaSelection::CheckMaxNumbersInTree()
 {
-   if ((channel_=TInputSample::MUON) 
+   if ((channel_=TConfiguration::MUON) 
        && (fChain->GetMaximum("nMu")>kMaxnMu))
      //kMaxnMu - field of TEventTree
      {
@@ -378,7 +350,7 @@ bool WGammaSelection::CheckMaxNumbersInTree()
           //methof of this class (WGammaSelection)
        return 0;
      }
-   if (channel_==TInputSample::ELECTRON 
+   if (channel_==TConfiguration::ELECTRON 
        && fChain->GetMaximum("nEle")>kMaxnEle)
      {
        PrintErrorMessageMaxNumberOf(ELECTRON_);

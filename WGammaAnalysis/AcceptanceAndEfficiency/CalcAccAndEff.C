@@ -35,7 +35,7 @@ CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isPuReweight, 
   channel_=channel;
   isDebugMode_=isDebugMode;
   isPuReweight_=isPuReweight;
-  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config_.GetPhosphorConstantFileName()).c_str());
+  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config_.GetPhosphorConstantFileName()) );
     //field of this class
 
   nEvents_=0;
@@ -93,7 +93,7 @@ void CalcAccAndEff::LoopOverInputFiles()
        for (int inputFileN=0; inputFileN< inputFileNMax; inputFileN++)
          {
            lumiWeight_=INPUT_->allInputs_[iSource].lumiWeights_[inputFileN];
-           TFile f((INPUT_->allInputs_[iSource].fileNames_[inputFileN]).c_str());
+           TFile f((INPUT_->allInputs_[iSource].fileNames_[inputFileN]) );
            if (f.IsOpen()) 
              std::cout<<std::endl<<"processing file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN]<<std::endl;
            else
@@ -216,8 +216,8 @@ void CalcAccAndEff::LoopOverTreeEvents()
    //goodLeptonPhotonPairs(two-dimentional array of bool-s)
    //memory allocation for some variables: 
    int nLeptonMax;
-   if (channel_==TInputSample::MUON) nLeptonMax=kMaxnMu;
-   else if (channel_==TInputSample::ELECTRON) nLeptonMax=kMaxnEle;
+   if (channel_==TConfiguration::MUON) nLeptonMax=kMaxnMu;
+   else if (channel_==TConfiguration::ELECTRON) nLeptonMax=kMaxnEle;
      //kMaxnMu - field of TEventTree
    else
      {
@@ -261,8 +261,8 @@ void CalcAccAndEff::LoopOverTreeEvents()
           weightPU = puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]);
         else weightPU=1;
 
-        if (channel_==TInputSample::MUON) nLe_=treeLeaf.nMu;
-        else if (channel_==TInputSample::ELECTRON) nLe_=treeLeaf.nEle;
+        if (channel_==TConfiguration::MUON) nLe_=treeLeaf.nMu;
+        else if (channel_==TConfiguration::ELECTRON) nLe_=treeLeaf.nEle;
         else
           {
              std::cout<<"Error detected in  CalcAccAndEff::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
@@ -280,9 +280,9 @@ void CalcAccAndEff::LoopOverTreeEvents()
           genLeptons[iMC]=0;
           if (treeLeaf.mcPID[iMC]==22)
             genPhotons[iMC]=1;
-          if (channel_==TInputSample::MUON && ((treeLeaf.mcPID[iMC]==13) || (treeLeaf.mcPID[iMC]==-13)))
+          if (channel_==TConfiguration::MUON && ((treeLeaf.mcPID[iMC]==13) || (treeLeaf.mcPID[iMC]==-13)))
             genLeptons[iMC]=1;
-          if (channel_==TInputSample::ELECTRON && ((treeLeaf.mcPID[iMC]==11) || (treeLeaf.mcPID[iMC]==-11)))
+          if (channel_==TConfiguration::ELECTRON && ((treeLeaf.mcPID[iMC]==11) || (treeLeaf.mcPID[iMC]==-11)))
             genLeptons[iMC]=1;
  
         } // loop over iMC; search for gen level photons and leptons
@@ -310,9 +310,9 @@ void CalcAccAndEff::LoopOverTreeEvents()
             // count number of events within acceptance
 
             bool isPhoAcc = photonEmpty.PhoKinematics(treeLeaf.mcEt[iGenPho],treeLeaf.mcEta[iGenPho]) ;
-            bool isLepAcc = (channel_==TInputSample::MUON && 
+            bool isLepAcc = (channel_==TConfiguration::MUON && 
                    muonEmpty.MuKinematics(treeLeaf.mcPt[iGenLep],treeLeaf.mcEta[iGenLep])) ||
-                   (channel_==TInputSample::ELECTRON);
+                   (channel_==TConfiguration::ELECTRON);
             if (isPhoAcc && isLepAcc) {
               accPassed=1;
               accLeptonPhotonPassed[iGenLep][iGenPho]=1;
@@ -343,8 +343,8 @@ void CalcAccAndEff::LoopOverTreeEvents()
             for (int imc=0; imc<treeLeaf.nMC; imc++){
               if (treeLeaf.mcIndex[imc]==treeLeaf.phoGenIndex[ipho]) 
                 iGenPho=imc;
-              if ((channel_==TInputSample::MUON && treeLeaf.mcIndex[imc]==treeLeaf.muGenIndex[ile]) ||
-                  (channel_==TInputSample::ELECTRON))   
+              if ((channel_==TConfiguration::MUON && treeLeaf.mcIndex[imc]==treeLeaf.muGenIndex[ile]) ||
+                  (channel_==TConfiguration::ELECTRON))   
                 iGenLep=imc;
             }//end of loop over iMC
 
@@ -353,9 +353,9 @@ void CalcAccAndEff::LoopOverTreeEvents()
               //check if event is "within acceptance"
 
             float dR = 0;
-            if (channel_==TInputSample::MUON) 
+            if (channel_==TConfiguration::MUON) 
               dR = math.DeltaR(treeLeaf.muEta[ile],treeLeaf.muPhi[ile],treeLeaf.phoEta[ipho],treeLeaf.phoPhi[ipho]);
-            else if (channel_==TInputSample::ELECTRON)
+            else if (channel_==TConfiguration::ELECTRON)
               dR = math.DeltaR(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile],treeLeaf.phoEta[ipho],treeLeaf.phoPhi[ipho]);
             if (dR<=config_.GetLePhoDeltaRMin()) continue;
 
@@ -443,17 +443,16 @@ void CalcAccAndEff::PlotAndSaveOutput()
   accErr[0]=accErr_;
   eff[0]=eff_;
   effErr[0]=effErr_;
-  TString fName=(config_.GetAccEffDirName()).c_str();
-  fName+=(config_.GetAccEffFileName()).c_str();
+  TString fName=config_.GetAccEffFileName(channel_) ;
   TFile f(fName,"recreate");
-  vacc.Write((config_.GetAcc1DName()).c_str());
-  veff.Write((config_.GetEff1DName()).c_str());
-  vaccErr.Write((config_.GetAccErr1DName()).c_str());
-  veffErr.Write((config_.GetEffErr1DName()).c_str());
-  acc.Write((config_.GetAccTotalName()).c_str());
-  eff.Write((config_.GetEffTotalName()).c_str());
-  accErr.Write((config_.GetAccErrTotalName()).c_str());
-  effErr.Write((config_.GetEffErrTotalName()).c_str());
+  vacc.Write((config_.GetAcc1DName()) );
+  veff.Write((config_.GetEff1DName()) );
+  vaccErr.Write((config_.GetAccErr1DName()) );
+  veffErr.Write((config_.GetEffErr1DName()) );
+  acc.Write((config_.GetAccTotalName()) );
+  eff.Write((config_.GetEffTotalName()) );
+  accErr.Write((config_.GetAccErrTotalName()) );
+  effErr.Write((config_.GetEffErrTotalName()) );
 
 
   //Draw

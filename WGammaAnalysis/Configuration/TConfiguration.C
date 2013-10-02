@@ -3,6 +3,7 @@
 #include <iostream> 
 #include <vector> 
   //standard C++ class
+#include <TString.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>
@@ -15,150 +16,112 @@ TConfiguration::~TConfiguration()
 {
 }
 
-string TConfiguration::GetPhosphorConstantFileName()
+TString TConfiguration::GetOutputDirName(int channel)
 {
-  return phosphorConstantsFile_;
+  if (channel==MUON) return outputDirMu_;
+  else if (channel==ELECTRON) return outputDirEle_;
+  return "0";
+} 
+
+TString TConfiguration::GetSelectedNameData(int channel)
+{
+  return (GetOutputDirName(channel)+selectedEventsNameData_);
 }
 
-string TConfiguration::GetSelectedEventsDir()
+TString TConfiguration::GetSelectedNameSignalMC(int channel)
 {
-  return selectedEventsDir_;
+  return GetOutputDirName(channel)+selectedEventsNameSignalMC_;
 }
 
-string TConfiguration::GetSelectedNameDataMu()
+TString TConfiguration::GetSelectedNameBkgMC(int channel)
 {
-  return selectedEventsNameDataMu_;
+  return GetOutputDirName(channel)+selectedEventsNameBkgMC_;
 }
 
-string TConfiguration::GetSelectedNameDataEle()
-{
-  return selectedEventsNameDataEle_;
-}
-
-string TConfiguration::GetSelectedNameSignalMCMu()
-{
-  return selectedEventsNameSignalMCMu_;
-}
-
-string TConfiguration::GetSelectedNameSignalMCEle()
-{
-  return selectedEventsNameSignalMCEle_;
-}
-
-string TConfiguration::GetSelectedNameBkgMC()
-{
-  return selectedEventsNameBkgMC_;
-}
-
-string TConfiguration::GetNameDebugMode()
+TString TConfiguration::GetNameDebugMode()
 {
   return nameDebugMode_;
 }
 
-
-string TConfiguration::GetNameReleasedCuts()
+TString TConfiguration::GetYieldsFileName(int channel)
 {
-  return nameReleasedCuts_;
+  return GetOutputDirName(channel)+yieldsFileName_;
 }
 
-string TConfiguration::GetPileupDataFileName()
+
+TString TConfiguration::GetYieldsDataHistName()
 {
-  return pileupDataFileName_;
+  return yieldsDataHistName_;
 }
 
-string TConfiguration::GetSignalTemplateNameMu()
+TString TConfiguration::GetTemplatePicNameBase(int channel)
 {
-  return signalTemplateNameMu_;
+  return GetOutputDirName(channel)+templatePicNameBase_;
 }
 
-string TConfiguration::GetSignalTemplateNameEle()
+TString TConfiguration::GetAccEffFileName(int channel)
 {
-  return signalTemplateNameEle_;
+  return GetOutputDirName(channel)+acceffFile_;
 }
 
-//string TConfiguration::GetBkgTemplateNameMu()
-//{
-//  return bkgTemplateNameMu_;
-//}
-
-//string TConfiguration::GetBkgTemplateNameEle()
-//{
-//  return bkgTemplateNameEle_;
-//}
-
-string TConfiguration::GetBkgTemplateRawNameMu()
-{
-  return bkgTemplateRawNameMu_;
-}
-
-string TConfiguration::GetBkgTemplateRawNameEle()
-{
-  return bkgTemplateRawNameEle_;
-}
-
-string TConfiguration::GetTemplatePicNameBase()
-{
-  return templatePicNameBase_;
-}
-
-string TConfiguration::GetAccEffDirName()
-{
-  return acceffDir_;
-}
-
-string TConfiguration::GetAccEffFileName()
-{
-  return acceffFile_;
-}
-
-string TConfiguration::GetAcc1DName()
+TString TConfiguration::GetAcc1DName()
 {
   return acc1DName_;
 }
 
-string TConfiguration::GetEff1DName()
+TString TConfiguration::GetEff1DName()
 {
   return eff1DName_;
 }
 
-string TConfiguration::GetAccErr1DName()
+TString TConfiguration::GetAccErr1DName()
 {
   return accErr1DName_;
 }
 
-string TConfiguration::GetEffErr1DName()
+TString TConfiguration::GetEffErr1DName()
 {
   return effErr1DName_;
 }
 
-string TConfiguration::GetAccTotalName()
+TString TConfiguration::GetAccTotalName()
 {
   return accTotalName_;
 }
 
-string TConfiguration::GetEffTotalName()
+TString TConfiguration::GetEffTotalName()
 {
   return effTotalName_;
 }
 
-string TConfiguration::GetAccErrTotalName()
+TString TConfiguration::GetAccErrTotalName()
 {
   return accErrTotalName_;
 }
 
-string TConfiguration::GetEffErrTotalName()
+TString TConfiguration::GetEffErrTotalName()
 {
   return effErrTotalName_;
 }
 
-string TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
+TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
 {
-  return photonScaleFactorsFileNamePt15to20GeV_;
+  return certifiedConstantsDir_+photonScaleFactorsFileNamePt15to20GeV_;
 }
 
-string TConfiguration::GetPhotonScaleFactorsFileNamePt20toInfGeV()
+TString TConfiguration::GetPhotonScaleFactorsFileNamePt20toInfGeV()
 {
-  return photonScaleFactorsFileNamePt20toInfGeV_;
+  return certifiedConstantsDir_+photonScaleFactorsFileNamePt20toInfGeV_;
+}
+
+TString TConfiguration::GetPileupDataFileName()
+{
+  return certifiedConstantsDir_+pileupDataFileName_;
+}
+
+TString TConfiguration::GetPhosphorConstantFileName()
+{
+  return (certifiedConstantsDir_+phosphorConstantsFile_);
 }
 
 int TConfiguration::GetNPhoPtBins()

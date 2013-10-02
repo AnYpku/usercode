@@ -64,7 +64,7 @@ void CalcCrossSection::GetSignalYields()
        if (sample==TInputSample::SIGMC) continue;
        if (sample==TInputSample::DATA)
          lumi_=INPUT_->allInputs_[iSource].lumiTotal_;
-       TString fileName = (TString)(INPUT_->allInputs_[iSource].fileSelected_).c_str();
+       TString fileName = (TString)(INPUT_->allInputs_[iSource].fileSelected_) ;
        TFile f(fileName);
        if (!f.IsOpen()) continue;
        bool hasTree = f.GetListOfKeys()->Contains("selectedEvents");
@@ -116,17 +116,16 @@ void CalcCrossSection::GetSignalYields()
 
 void CalcCrossSection::ApplyAccAndEff()
 {
-  TString fName=(config_.GetAccEffDirName()).c_str();
-  fName+=(config_.GetAccEffFileName()).c_str();
+  TString fName=(config_.GetAccEffFileName(channel_)) ;
   TFile f(fName,"read");
-  TVectorF* vacc = (TVectorF*)f.Get((config_.GetAcc1DName()).c_str());
-  TVectorF* veff = (TVectorF*)f.Get((config_.GetEff1DName()).c_str());
-  TVectorF* vaccErr = (TVectorF*)f.Get((config_.GetAccErr1DName()).c_str());
-  TVectorF* veffErr = (TVectorF*)f.Get((config_.GetEffErr1DName()).c_str());
-  TVectorF* acc = (TVectorF*)f.Get((config_.GetAccTotalName()).c_str());
-  TVectorF* eff = (TVectorF*)f.Get((config_.GetEffTotalName()).c_str());
-  TVectorF* accErr = (TVectorF*)f.Get((config_.GetAccErrTotalName()).c_str());
-  TVectorF* effErr = (TVectorF*)f.Get((config_.GetEffErrTotalName()).c_str());
+  TVectorF* vacc = (TVectorF*)f.Get((config_.GetAcc1DName()) );
+  TVectorF* veff = (TVectorF*)f.Get((config_.GetEff1DName()) );
+  TVectorF* vaccErr = (TVectorF*)f.Get((config_.GetAccErr1DName()) );
+  TVectorF* veffErr = (TVectorF*)f.Get((config_.GetEffErr1DName()) );
+  TVectorF* acc = (TVectorF*)f.Get((config_.GetAccTotalName()) );
+  TVectorF* eff = (TVectorF*)f.Get((config_.GetEffTotalName()) );
+  TVectorF* accErr = (TVectorF*)f.Get((config_.GetAccErrTotalName()) );
+  TVectorF* effErr = (TVectorF*)f.Get((config_.GetEffErrTotalName()) );
 
   TMathTools math;
   signalYieldErrTotal_=math.ErrOfThreeIndependent("x1/(x2*x3)",signalYieldTotal_,acc->operator()(0),eff->operator()(0),signalYieldErrTotal_,accErr->operator()(0),effErr->operator()(0));

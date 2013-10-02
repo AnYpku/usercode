@@ -3,6 +3,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH1F.h"
+#include "TString.h"
   //root classes
 
 #include <iostream>
@@ -13,10 +14,10 @@
 TPuReweight::TPuReweight(){
 }
 
-TPuReweight::TPuReweight(string fileNameData, string fileNameMc){
+TPuReweight::TPuReweight(TString fileNameData, TString fileNameMc){
 
 
-  fPuData_ = new TFile(fileNameData.c_str());
+  fPuData_ = new TFile(fileNameData);
   bool hasPuHist = fPuData_->GetListOfKeys()->Contains("pileup");
   if (hasPuHist) hDataPU_=(TH1F*)fPuData_->Get("pileup");
   else {
@@ -25,7 +26,7 @@ TPuReweight::TPuReweight(string fileNameData, string fileNameMc){
   }
 
 
-  fPuMc_ = new TFile(fileNameMc.c_str());
+  fPuMc_ = new TFile(fileNameMc);
   fPuMc_->cd("ggNtuplizer");
   hMCPU_   = (TH1F*)hDataPU_->Clone();
   hMCPU_->Reset();
@@ -61,7 +62,7 @@ TPuReweight::~TPuReweight(){
 }
 
 float TPuReweight::GetPuWeightMc(float puTrue){
-  int nTruePU = puTrue;
+  float nTruePU = puTrue;
   float puSize = puWeightArray_.size();
   float iPU = nTruePU*puSize/100.0;
   return puWeightArray_.at((int)iPU);

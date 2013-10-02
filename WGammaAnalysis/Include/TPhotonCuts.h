@@ -21,11 +21,11 @@ class TPhotonCuts
                     float rho2012);
     virtual ~TPhotonCuts();
 
-    bool Passed(bool doSigmaIEtaIEtaCut=1, bool doPhoChIsocut=1);
-    bool PassedExceptKinematics(bool doSigmaIEtaIEtaCut=1, bool doPhoChIsocut=1);
+    bool Passed(bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
+    bool PassedExceptKinematics(bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
     bool PhoKinematics(float phoPt, float phoEta);
     bool PhoKinematics();
-    bool SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut=1, bool doPhoChIsoCut=1); 
+    bool SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
       //for reference
 
@@ -34,8 +34,9 @@ class TPhotonCuts
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
     bool CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta);
     bool CutSigmaIEtaIEta();
-    bool CutPhoChIso(float phoChIso, float rho2012, float eta, int WP);
-    TCut CutPhoChIso(TString phoChIso, TString eta, int WP);
+    TCut CutSigmaIEtaIEta(TString sigmaIEtaIEta, TString eta);
+    bool CutPhoChIso(float phoChIso, float rho2012, float eta);
+    TCut CutPhoChIso(TString phoChIso, TString eta);
     bool CutPhoChIso();
 
     float EffAreaCharged(float eta);

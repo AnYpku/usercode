@@ -13,7 +13,7 @@
 
 TInputSample::TInputSample()
 {
-  channelTotal_=-1;
+  channel_=-1;
   sample_=-1;
   nFiles_=0;
   sourceName_="";
@@ -29,7 +29,6 @@ TInputSample::TInputSample()
       lumiEachFile_[i] = -1;
       cs_[i] = -1;
       factor_[i] = 1;
-      channelEachFile_[i] = -1;
       lumiWeights_[i] = 1;
     }
 }
@@ -43,7 +42,7 @@ void TInputSample::Print()
   std::cout<<std::endl;
   std::cout<<"sourceName_="<<sourceName_<<std::endl;
   std::cout<<"sourceLatexLabel_="<<sourceLatexLabel_<<std::endl;
-  std::cout<<"channelTotal_="<<channelTotal_<<std::endl;
+  std::cout<<"channel_="<<channel_<<std::endl;
   std::cout<<"sample_="<<sample_<<std::endl;
   std::cout<<"color_="<<color_<<std::endl;
   std::cout<<"lumiTotal_="<<lumiTotal_<<std::endl;
@@ -53,11 +52,6 @@ void TInputSample::Print()
   std::cout<<"fileSelected_="<<fileSelected_<<std::endl;
   std::cout<<"fileSelectedDebug_="<<fileSelectedDebug_<<std::endl;
 
-
-  std::cout<<"channelEachFile_("<<channelEachFile_.size()<<")={";
-  for (int i=0; i<nFiles_-1; i++) std::cout<<channelEachFile_[i]<<", ";
-  std::cout<<channelEachFile_[nFiles_-1];
-  std::cout<<"}"<<std::endl;
 
   std::cout<<"lumiEachFile_("<<lumiEachFile_.size()<<")={";
   for (int i=0; i<nFiles_-1; i++) std::cout<<lumiEachFile_[i]<<", ";
@@ -91,19 +85,16 @@ void TInputSample::Print()
 void TInputSample::GetFileSelectedNames()
 {
   TConfiguration conf;
-  string name;
-  if (channelTotal_==MUON && sample_==DATA)
-    name = conf.GetSelectedEventsDir() + conf.GetSelectedNameDataMu();
-  else if (channelTotal_==ELECTRON && sample_==DATA)
-    name = conf.GetSelectedEventsDir() + conf.GetSelectedNameDataEle();
-  else if (channelTotal_==MUON && sample_==SIGMC)
-    name = conf.GetSelectedEventsDir() + conf.GetSelectedNameSignalMCMu();
-  else if (channelTotal_==ELECTRON && sample_==SIGMC)
-    name = conf.GetSelectedEventsDir() + conf.GetSelectedNameSignalMCEle();
-  else if (sample_==BKGMC)
-    name = conf.GetSelectedEventsDir() + conf.GetSelectedNameBkgMC()+sourceName_;
-  fileSelected_ = name + string(".root");
-  fileSelectedDebug_ = name + conf.GetNameDebugMode() + string(".root"); 
+  TString name;
+  if (sample_==DATA)
+    name = conf.GetSelectedNameData(channel_);
+  else if (channel_==conf.MUON && sample_==SIGMC)
+    name = conf.GetSelectedNameSignalMC(channel_);
+  else if (sample_==BKGMC){
+    name = conf.GetSelectedNameBkgMC(channel_)+sourceName_;
+  }
+  fileSelected_ = name + TString(".root");
+  fileSelectedDebug_ = name + conf.GetNameDebugMode() + TString(".root"); 
 }
 
 void TInputSample::CalcLuminocities()
@@ -114,7 +105,7 @@ void TInputSample::CalcLuminocities()
 
   for (int iFile=0; iFile<nFiles_; iFile++)
     {
-       TFile f(fileNames_[iFile].c_str());
+       TFile f(fileNames_[iFile]);
        if (!f.IsOpen()) {
            std::cout<<"ERROR detected in TInputSample::CalcLuminocities: file "<<fileNames_[iFile]<<" is not open"<<std::endl;
            return;

@@ -15,7 +15,7 @@ public:
   TSelectionPlots();
   virtual ~TSelectionPlots();
   bool GetTrees(int channel, string confFile, string strSources="ALL");
-  bool SetHistograms(string plotVar, int nBins, float* binLimits, TString cut="1");
+  bool SetHistograms(TString plotVar, int nBins, float* binLimits, TString cut="1");
   void ScaleHistogramsToData();
   void DrawSpectrumDataVsMC(TString nameCanvas, TString nameForSave);
   void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);
@@ -26,7 +26,7 @@ private:
   vector <TFile*> file_;
   vector <TTree*> tree_;
   vector <TH1F*> hist_;
-  vector <string> sourceLabel_;
+  vector <TString> sourceLabel_;
   vector <bool> hasHist_;
   vector <bool> isData_;
   vector <bool> isSigMC_;

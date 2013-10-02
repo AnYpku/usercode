@@ -16,8 +16,8 @@ TPhotonScaleFactor::TPhotonScaleFactor()
 {
 
   TConfiguration config;
-  fSFPt15to20_ = new TFile ((config.GetPhotonScaleFactorsFileNamePt15to20GeV()).c_str());
-  fSFPt20toInf_ = new TFile ((config.GetPhotonScaleFactorsFileNamePt20toInfGeV()).c_str());
+  fSFPt15to20_ = new TFile (config.GetPhotonScaleFactorsFileNamePt15to20GeV());
+  fSFPt20toInf_ = new TFile (config.GetPhotonScaleFactorsFileNamePt20toInfGeV());
 
   hSFPt15to20Loose_Barrel1_ = (TH1D*)fSFPt15to20_->Get("Loose_Barrel1");
   hSFPt15to20Loose_Endcap1_ = (TH1D*)fSFPt15to20_->Get("Loose_Endcap1");

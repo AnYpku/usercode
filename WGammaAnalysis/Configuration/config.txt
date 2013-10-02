@@ -4,8 +4,7 @@
 ###  1) if first symbol in the line is '#' - this is a comment
 ###  2) if first symbol in the line is '$' - here information about new sample starts
 ###       the first word is sample type (DATA, SIGMC, BKGMC)
-###       for DATA and SIGMC, the second word is name of channel (MUON, ELECTRON, BOTH_CHANNELS)
-###       no channel specified here for BKGMC
+###       the second word is name of channel (MUON, ELECTRON)
 ###       next, for SIGMC and BKGMC only: name of sample (e.g. Wg_to_munu)
 ###       next, for SIGMC and BKGMC only: label of the sample for legend (e.g.  W#gamma#rightarrow#mu#nu#gamma)
 ###       next, number - color from TColor.h table (ROOT)
@@ -13,7 +12,6 @@
 ###       next, for SIGMC and BKGMC only: may or may not be work "csTotal" with csTotal value after that
 ###         (csTotal is used for luminocity reweight for MC samples for which original file was splitted)
 ###  3) if first symbol in the line is '-' - this is a file for given sample
-###       for BKGMC only: name of channel for which this bkg needs to be processed (MUON, ELECTRON, BOTH_CHANNELS)
 ###       next, name of the file
 ###       next, for DATA only: may or may not be luminocity value
 ###         (might be used for purposes of fast processing only one data file rather then full data)
@@ -68,87 +66,91 @@ $   SIGMC    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    921
 # cross section and branching 
 
 ###################################################################
-$ BKGMC      Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  csTotal 30400  
+$ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  csTotal 30400  
 #433=kCyan+1
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WJetsToLNu1_skim_MuPhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WJetsToLNu1_skim_MuPhoSkim.root
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WJetsToLNu2_skim_MuPhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WJetsToLNu2_skim_MuPhoSkim.root
 
 ###################################################################
-$ BKGMC      DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
+$ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
 #418=kGreen+2
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_DYJetsToLL_MuPhoSkim.root   2950
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_DYJetsToLL_MuPhoSkim.root   2950
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_DYJetsToLL_10to50_MuPhoSkim.root   11050
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_DYJetsToLL_10to50_MuPhoSkim.root   11050
 
 ###################################################################
-$ BKGMC      Zg     Z#gamma#rightarrowl#bar{l}      401    
+$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      401    
 #401=kYellow+1
 
-- MUON  /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_Zg_MuPhoSkim.root   132.6
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_Zg_MuPhoSkim.root   132.6
 
 ###################################################################
-$ BKGMC      multibosons      W#gamma,WW,WZ,ZZ,#gamma#gamma,#gamma+jets       9    
+$ BKGMC  MUON    multibosons      W#gamma,WW,WZ,ZZ,#gamma#gamma,#gamma+jets       9    
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WWg_MuPhoSkim.root    0.528
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WWg_MuPhoSkim.root    0.528
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WW_2l2nu_MuPhoSkim.root   4.7
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WW_2l2nu_MuPhoSkim.root   4.7
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WZ_3lnu_MuPhoSkim.root   0.8674
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WZ_3lnu_MuPhoSkim.root   0.8674
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WZ_2l2q_MuPhoSkim.root   1.755
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_WZ_2l2q_MuPhoSkim.root   1.755
 
-- ELECTRON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_4e.root    0.07691
+#- ELECTRON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ZZ_4e.root    0.07691
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_4mu_MuPhoSkim.root      0.07691
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_4mu_MuPhoSkim.root      0.07691
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_4tau_MuPhoSkim.root   0.07691
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_4tau_MuPhoSkim.root   0.07691
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2e2mu_MuPhoSkim.root   0.1767
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2e2mu_MuPhoSkim.root   0.1767
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2e2tau_MuPhoSkim.root   0.1767
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2e2tau_MuPhoSkim.root   0.1767
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2mu2tau_MuPhoSkim.root   0.1767
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ZZ_2mu2tau_MuPhoSkim.root   0.1767
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_15to30_MuPhoSkim.root   200061.7
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_15to30_MuPhoSkim.root   200061.7
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_30to50_MuPhoSkim.root   19931.62
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_30to50_MuPhoSkim.root   19931.62
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_50to80_MuPhoSkim.root   3322.309
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_50to80_MuPhoSkim.root   3322.309
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_80to120_MuPhoSkim.root  558.2
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_80to120_MuPhoSkim.root  558.2
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_120to170_MuPhoSkim.root 108.0
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_gjet_120to170_MuPhoSkim.root 108.0
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_diphotonsjets_MuPhoSkim.root   75.39
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_diphotonsjets_MuPhoSkim.root   75.39
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_Wg_taunu_MuPhoSkim.root    461.6    0.3472 
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_Wg_taunu_MuPhoSkim.root    461.6    0.3472 
 
 ###################################################################
-$ BKGMC      top     t,#bar{t},t#bar{t}        799    
+$ BKGMC  MUON    top     t,#bar{t},t#bar{t}        799    
 #799=kOrange-1
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_tbar_s_MuPhoSkim.root     1.57
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_tbar_s_MuPhoSkim.root     1.57
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_tbar_t_MuPhoSkim.root     25.0     0.98
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_tbar_t_MuPhoSkim.root     25.0     0.98
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_tbar_tW_MuPhoSkim.root    10.7     0.996
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_tbar_tW_MuPhoSkim.root    10.7     0.996
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_t_s_MuPhoSkim.root  2.82
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_t_s_MuPhoSkim.root  2.82
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_t_t_MuPhoSkim.root  47.0   0.98
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_t_t_MuPhoSkim.root  47.0   0.98
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_t_tW_MuPhoSkim.root 10.7  0.996
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_t_tW_MuPhoSkim.root 10.7  0.996
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttg.root 1.444
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttg.root 1.444
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ttW_MuPhoSkim.root 0.2149
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ttW_MuPhoSkim.root 0.2149
 
-- MUON /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ttZ_MuPhoSkim.root 0.172
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/MuPhoSkimmed/job_summer12_ttZ_MuPhoSkim.root 0.172
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_1l.root   53.2
+###################################################################
+$ BKGMC   MUON   ttbarjets     t#bar{t}+jets        44    
 
-- BOTH_CHANNELS /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_2l.root   13.43
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_1l.root   53.2
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/job_summer12_ttjets_2l.root   13.43
+
 

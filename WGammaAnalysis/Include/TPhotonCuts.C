@@ -104,25 +104,25 @@ bool TPhotonCuts::SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut, bool doPho
   return true;
 }
 
-bool TPhotonCuts::CutPhoChIso(float phoChIso, float rho2012, float eta, int WP)
+bool TPhotonCuts::CutPhoChIso(float phoChIso, float rho2012, float eta)
 {
   float isoCorr = PFIsoCorr(phoChIso, rho2012, EffAreaCharged(eta));
   if (IsBarrel(eta))
-    if (isoCorr<=phoPFChIsoBarrelCut_[WP]) return true;
+    if (isoCorr<=phoPFChIsoBarrelCut_[WP_]) return true;
   else if (IsEndcap(eta))
-    if (isoCorr<=phoPFChIsoEndcapCut_[WP]) return true;
+    if (isoCorr<=phoPFChIsoEndcapCut_[WP_]) return true;
   return false;
 }
 
-TCut TPhotonCuts::CutPhoChIso(TString phoChIso, TString eta, int WP)
+TCut TPhotonCuts::CutPhoChIso(TString phoChIso, TString eta)
 {
   TCut cutB = IsBarrel(eta);
   TCut cutE = IsEndcap(eta);
   TString cutIsoBStr = phoChIso+" <= ";
-  cutIsoBStr+=phoPFChIsoBarrelCut_[WP];
+  cutIsoBStr+=phoPFChIsoBarrelCut_[WP_];
   TCut cutIsoB(cutIsoBStr); 
   TString cutIsoEStr = phoChIso+" <= ";
-  cutIsoEStr+=phoPFChIsoEndcapCut_[WP];
+  cutIsoEStr+=phoPFChIsoEndcapCut_[WP_];
   TCut cutIsoE(cutIsoEStr); 
   TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
   return cut;
@@ -130,7 +130,7 @@ TCut TPhotonCuts::CutPhoChIso(TString phoChIso, TString eta, int WP)
 
 bool TPhotonCuts::CutPhoChIso()
 {
-  return CutPhoChIso(phoPFChIso_ipho_, rho2012_,phoEta_ipho_,WP_);
+  return CutPhoChIso(phoPFChIso_ipho_, rho2012_,phoEta_ipho_);
 }
 
 bool TPhotonCuts::CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta)
@@ -140,6 +140,20 @@ bool TPhotonCuts::CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta)
   if ( IsBarrel(eta) && (sigmaIEtaIEta<=phoSigmaIEtaIEtaBarrelCut_[WP_]) ) 
     return true;
   return false;
+}
+
+TCut TPhotonCuts::CutSigmaIEtaIEta(TString sigmaIEtaIEta, TString eta)
+{
+  TString cutBStr=sigmaIEtaIEta;
+  cutBStr+="<=";
+  cutBStr+=phoSigmaIEtaIEtaBarrelCut_[WP_];
+  TCut cutB(cutBStr);
+  TString cutEStr=sigmaIEtaIEta;
+  cutEStr+="<=";
+  cutEStr+=phoSigmaIEtaIEtaEndcapCut_[WP_];
+  TCut cutE(cutEStr);
+  TCut cut = (cutB && IsBarrel(eta)) || (cutE && IsEndcap(eta));
+  return cut;
 }
 
 bool TPhotonCuts::CutSigmaIEtaIEta()

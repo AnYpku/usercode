@@ -1,23 +1,44 @@
-####################
-## WGammaAnalysis ##
-####################
-
-1) AcceptanceAndEfficiency
-2) CertifiedConstants
-3) Configuration
-4) Include
-5) QuickChecks
-6) Selection
-7) SkimSplitMerge
-8) SplitWGammaMC
-9) WGammaOutput
-10)remove_dot_so_d_tilda_files.sh
+#####################
+## WGammaAnalysis ###
+#####################
+#####################
 
 ##############################
-1) AcceptanceAndEfficiency
+## The sequence itself:
 
-has class TAcceptanceAndEfficiency
-which calculates Acceptance times Efficiency
+
+##############################
+1) SkimSplitMerge
+- it is necessary to run the splitter of the WGamma sample
+- it is good to run skimmers of all MC samples for which it works
+
+does skimming (has problems with some files: ttjets, WWg, qcd_170to300)
+does splitting of WGamma to munu, enu, taunu channels
+potentially can easily do merging if needed
+
+##############################
+2) Selection
+- performs event selection except phoSigmaIEtaIEta and phoChIso cuts
+- currently also no WMt cut applied
+- needs results of SkimSplitMerge (WGamma splitter)
+
+##############################
+3) DDBkgTemplateMethod
+- estimates background using data driven template method
+- needs results of Selection
+
+##############################
+4) PrepareYields
+- not performed at all
+- estimates weighted selected yields and subtracts background
+- must apply phoSigmaIEtaIEta and phoChIso cuts (TFullCuts::ExtraCut)
+- needs results of Selection and DDBkgTemplateMethod
+
+##############################
+5) AcceptanceAndEfficiency
+- calculates acceptance and efficiency
+- must apply phoSigmaIEtaIEta and phoChIso cuts (TFullCuts::ExtraCut)
+- needs results of SkimSplitMerge (WGamma splitter)
 
 to run it do
 $ root -l runAccAndEff.C
@@ -35,7 +56,24 @@ Improvement plans:
 2013 June 7
 
 ##############################
-2) CertifiedConstants
+6) Unfolding
+- not performed at all 
+- calculates unfolding
+- must apply  phoSigmaIEtaIEta and phoChIso cuts (TFullCuts::ExtraCut)
+- needs results of SkimSplitMerge (WGamma splitter)
+
+##############################
+7) CrossSection
+- calculates cross section
+- needs results of PrepareYields, AcceptanceAndEfficiency, Unfolding
+
+
+
+##############################
+## Auxilary:
+
+##############################
+a) CertifiedConstants
 
 lists constants officially provided by CMS
 containes 
@@ -48,7 +86,7 @@ shouldn't be hardcoded anywhere else
 2013 June 11
 
 ##############################
-3) Configuration
+b) Configuration
 
 has three classes TConfiguration, TInputSample, TAllInputSamples
 and text configuration file config.txt
@@ -66,7 +104,7 @@ $ root -l runTest.C
 2013 June 11
 
 ##############################
-4) Include
+c) Include
 
 -- rootlogon.C - load all classes in the package. Does not load root macros which are not classes (e.g. "aux" files). Is recommended to use for "run" files in the directories. ("run" files are those which call main functions). Now, if one runs some class - all other classes in the package have to be compilable.
 
@@ -83,19 +121,23 @@ $ root -l runTest.C
 2013 June 11
 
 ##############################
-5) QuickChecks
+d) QuickChecks
 
 ##############################
-6) Selection
+e) WGammaOutput
 
-does selection and makes selection plots
+the output root files and plots should be stored here
+More precise pathes should be listed in /Configuration
 
 ##############################
-7) SkimSplitMerge
+f)remove_dot_so_d_tilda_files.sh
 
-does skimming (has problems with some files: ttjets, WWg, qcd_170to300)
-does splitting of WGamma to munu, enu, taunu channels
-potentially can easily do merging
+this file simply goes into directories and removes files
+*.so *.d *~
+now the names of the directories where to go are just hardcoded
+into the file
+Improvement may be achieved here if to do loop over directory names
+in the current directory
 
 ##############################
 8) SplitWGammaMC
@@ -104,19 +146,3 @@ empty directory; I was trying to rename this directory to SkimSplitMerge
 So, I created directory SkimSplitMerge
 but was not able to remove directory SplitWGammaMC from the CVS
 now it still stays in the CVS but remains empty
-
-##############################
-9) WGammaOutput
-
-the output root files and plots should be stored here
-More precise pathes should be listed in /Configuration
-
-##############################
-10)remove_dot_so_d_tilda_files.sh
-
-this file simply goes into directories and removes files
-*.so *.d *~
-now the names of the directories where to go are just hardcoded
-into the file
-Improvement may be achieved here if to do loop over directory names
-in the current directory

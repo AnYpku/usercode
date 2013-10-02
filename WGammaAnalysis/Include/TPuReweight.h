@@ -5,6 +5,7 @@
 #include "TH1D.h"
 #include "TH1F.h"
 #include "TTree.h"
+#include "TString.h"
   //root classes
 #include <vector>
   //C++ classes
@@ -13,7 +14,7 @@ class TPuReweight
 {
   public:
     TPuReweight();
-    TPuReweight(string fileName, string fileNameMc);
+    TPuReweight(TString fileName, TString fileNameMc);
     virtual ~TPuReweight();
     float GetPuWeightMc(float puTrue);
   private:

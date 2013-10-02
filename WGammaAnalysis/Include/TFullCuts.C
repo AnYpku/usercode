@@ -38,8 +38,8 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 //   nTotal_++;
 
    int nLe=0;
-   if (channel==TInputSample::MUON) nLe=inpTreeLeaf.nMu;
-   else if (channel==TInputSample::ELECTRON) nLe=inpTreeLeaf.nEle;
+   if (channel==TConfiguration::MUON) nLe=inpTreeLeaf.nMu;
+   else if (channel==TConfiguration::ELECTRON) nLe=inpTreeLeaf.nEle;
 
    if ((inpTreeLeaf.IsVtxGood)==-1) return 0;
    if (inpTreeLeaf.nPho < 1) return 0; 
@@ -88,7 +88,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 //        nLeptons_++; 
 
         thisLeptonPassed=0;        
-        if (channel==TInputSample::MUON)
+        if (channel==TConfiguration::MUON)
           {
             TMuonCuts muon(ile,inpTreeLeaf.muPt[ile],
                inpTreeLeaf.muPt,inpTreeLeaf.muEta[ile],inpTreeLeaf.muEta,
@@ -125,7 +125,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
                    }    
                } 
           }
-        else if (channel==TInputSample::ELECTRON)
+        else if (channel==TConfiguration::ELECTRON)
           {
             //TElectronCuts functions are empty now;
             //they are included here for the future
@@ -161,9 +161,9 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
         for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++)
           {
 
-            if (channel==TInputSample::MUON)
+            if (channel==TConfiguration::MUON)
               lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.muPhi[ile],inpTreeLeaf.muEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
-            else if (channel==TInputSample::ELECTRON)
+            else if (channel==TConfiguration::ELECTRON)
               lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.elePhi[ile],inpTreeLeaf.eleEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
 
             if (goodPhoton[ipho] && goodLepton[ile] && 
@@ -240,4 +240,16 @@ float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2)
        dphi=dphi-2*TMath::Pi()) ;
   float dR=sqrt((eta1-eta2)*(eta1-eta2)+dphi*dphi);
   return dR;
+}
+
+float TFullCuts::GetWMtCut()
+{
+  return WMtCut_;
+}
+
+TCut TFullCuts::ExtraCut(TString sigmaIEtaIEta, TString phoChIso, TString eta)
+{
+  TPhotonCuts emptyPhoton;
+  TCut cut = emptyPhoton.CutPhoChIso(phoChIso,eta) && emptyPhoton.CutSigmaIEtaIEta(sigmaIEtaIEta,eta);
+  return cut;
 }

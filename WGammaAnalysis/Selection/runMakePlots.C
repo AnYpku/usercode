@@ -1,9 +1,6 @@
 {
     //gROOT->ProcessLine(".L makePresentationPlots.C+");
-  gROOT->ProcessLine(".L ../Configuration/TConfiguration.C+");
-  gROOT->ProcessLine(".L ../Configuration/TInputSample.C+");
-  gROOT->ProcessLine(".L ../Configuration/TAllInputSamples.C+");
-  gROOT->ProcessLine(".L TSelectionPlots.C+");
+  gROOT->ProcessLine(".x ../Include/rootlogon.C+");
   gROOT->ProcessLine(".L auxSelectionPlots.C+");
   gStyle->SetCanvasColor(0);
     //makePresentationPlots();

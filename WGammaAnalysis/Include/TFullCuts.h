@@ -11,20 +11,18 @@ class TFullCuts{
 public:
   TFullCuts();
   virtual ~TFullCuts();
-//  bool Cut(bool** goodLeptonPhotonPairs, 
-//                    TEventTree::InputTreeLeaves &inpTreeLeaf,   
-//                    int channel, 
-//                    float* WMt, float** lePhoDeltaR,
-//                    zgamma::PhosphorCorrectionFunctor* photonCorrector);
   bool Cut(bool** goodLeptonPhotonPairs, 
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
                     int channel, 
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1, bool doPhoChIsoCut=1);
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, 
+                    bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0);
   bool PhotonsOnlyCuts(bool* goodPhoton,
                TEventTree::InputTreeLeaves &inpTreeLeaf,   
-               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=1, bool doPhoChIsoCut=1);
+               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0);
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
+  float GetWMtCut();
+  TCut ExtraCut(TString sigmaIEtaIEta, TString phoChIso, TString eta);
 
 private:
   const static float WMtCut_ = 0.;//70.;
