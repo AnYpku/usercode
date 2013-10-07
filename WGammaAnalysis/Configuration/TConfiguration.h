@@ -20,9 +20,13 @@ class TConfiguration
     TString GetSelectedNameBkgMC(int channel);
 
     TString GetYieldsFileName(int channel);
-    TString GetYieldsDataHistName();
+    TString GetYieldsSelectedHistName(int sample, TString sourceName);
+    TString GetYieldsDDTemplateBkgHistName();
+    TString GetYieldsSignalName();
 
     TString GetTemplatePicNameBase(int channel);
+    TString GetYieldsDDTemplateBkgFileName(int channel);
+    TString GetFractionsDDTemplateBkgHistName();
 
     TString GetAccEffFileName(int channel);
     TString GetAcc1DName();
@@ -76,14 +80,17 @@ static const TString selectedEventsNameBkgMC_="selectedBKGMC_";//[input.sourceNa
 //yields
 //
 static const TString yieldsFileName_="yields.root";
-static const TString yieldsDataHistName_="yieldsData";
+static const TString yieldsSelectedHistName_="yieldsSelected";
+static const TString yieldsDDTemplateBkgHist_="yieldsDDBkg";
+static const TString yieldsSignal_="yieldsSignal";
+
 
 //////////////////////////////////////////
 //data driven background estimation
 //
 static const TString templatePicNameBase_="TemplateFits/templateFit_";
 static const TString yieldsDDTemplateBkgFile_="yieldsDDTemplateBkg.root";
-static const TString yieldsDDTemplateBkgHist_="yieldsBkg";
+static const TString fractionsDDTemplateBkgHist_="fractionsBkg";
 
 //////////////////////////////////////////
 //acceptance and efficiency

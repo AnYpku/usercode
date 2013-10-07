@@ -1,10 +1,8 @@
 {
 
-  gROOT->ProcessLine(".L TConfiguration.C+");
-  gROOT->ProcessLine(".L TInputSample.C+");
-  gROOT->ProcessLine(".L TAllInputSamples.C+");
+  gROOT->ProcessLine(".x ../Include/rootlogon.C");
   
-  TAllInputSamples INPUT(TInputSample::MUON,"config.txt");
+  TAllInputSamples INPUT(TConfiguration::MUON,"config.txt");
   INPUT.Print();
 
 }

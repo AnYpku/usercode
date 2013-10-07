@@ -15,7 +15,7 @@
    //WGammaSelection selection( TInputSample::MUON, "DYjets_to_ll", "../Configuration/config.txt");
   //selection.LoopOverInputFiles();
 
-  WGammaSelection selection( TInputSample::MUON, "ttbarjets");
+  WGammaSelection selection(TConfiguration::MUON, "ttbarjets", "../Configuration/config.txt",1,0);
   selection.LoopOverInputFiles();
 
   //WGammaSelection selection( TInputSample::MUON, "Wg_to_munu Wjets_to_lnu DYjets_to_ll ttbarjet Zg Wg_to_taunu");

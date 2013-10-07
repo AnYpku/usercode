@@ -53,6 +53,9 @@ class TPhotonCuts
     bool IsEndcap();
 
     float GetPhoPFChIsoCorr(float phoChIso, float rho2012, float eta);
+    float GetPhoSigmaIEtaIEtaCutB(int WP);
+    float GetPhoSigmaIEtaIEtaCutE(int WP);
+    int   GetWP();
 
     const static int nWP_=3;
     enum {WP_LOOSE, WP_MEDIUM, WP_TIGHT};

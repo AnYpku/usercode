@@ -49,14 +49,34 @@ TString TConfiguration::GetYieldsFileName(int channel)
 }
 
 
-TString TConfiguration::GetYieldsDataHistName()
+TString TConfiguration::GetYieldsSelectedHistName(int sample, TString sourceName)
 {
-  return yieldsDataHistName_;
+  return yieldsSelectedHistName_+sourceName;
+}
+
+TString TConfiguration::GetYieldsDDTemplateBkgHistName()
+{
+  return yieldsDDTemplateBkgHist_;
+}
+
+TString TConfiguration::GetYieldsSignalName()
+{
+  return yieldsSignal_;
 }
 
 TString TConfiguration::GetTemplatePicNameBase(int channel)
 {
   return GetOutputDirName(channel)+templatePicNameBase_;
+}
+
+TString TConfiguration::GetYieldsDDTemplateBkgFileName(int channel)
+{
+  return GetOutputDirName(channel)+yieldsDDTemplateBkgFile_;
+}
+
+TString TConfiguration::GetFractionsDDTemplateBkgHistName()
+{
+  return fractionsDDTemplateBkgHist_;
 }
 
 TString TConfiguration::GetAccEffFileName(int channel)

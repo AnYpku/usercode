@@ -237,6 +237,7 @@ void WGammaSelection::LoopOverTreeEvents()
 
 
    TPhotonCuts emptyPhoton;
+
    for (Long64_t entry=0; entry<nentries; entry++) 
    //loop over events in the tree
      {
