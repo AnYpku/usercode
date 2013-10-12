@@ -15,11 +15,15 @@
    //WGammaSelection selection( TInputSample::MUON, "DYjets_to_ll", "../Configuration/config.txt");
   //selection.LoopOverInputFiles();
 
-  WGammaSelection selection(TConfiguration::MUON, "ttbarjets", "../Configuration/config.txt",1,0);
-  selection.LoopOverInputFiles();
+ // WGammaSelection selection(TConfiguration::MUON,"DYjets_to_ll", "../Configuration/config.txt",1,1);
+ // selection.LoopOverInputFiles();
 
   //WGammaSelection selection( TInputSample::MUON, "Wg_to_munu Wjets_to_lnu DYjets_to_ll ttbarjet Zg Wg_to_taunu");
   //selection.LoopOverInputFiles();
+
+  gROOT->ProcessLine(".L ExtraSelection.C+");
+  ExtraSelection(TConfiguration::MUON);
+
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

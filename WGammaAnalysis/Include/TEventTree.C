@@ -84,6 +84,7 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
    b_mcEta->GetEntry(entry);
    b_mcPhi->GetEntry(entry);
    b_mcIndex->GetEntry(entry);
+   b_eleGenIndex->GetEntry(entry);
    b_muGenIndex->GetEntry(entry);
    b_phoGenIndex->GetEntry(entry);
    b_phoGenMomPID->GetEntry(entry);

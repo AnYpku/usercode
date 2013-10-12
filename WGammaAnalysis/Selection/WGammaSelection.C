@@ -272,11 +272,30 @@ void WGammaSelection::LoopOverTreeEvents()
                 if (goodLeptonPhotonPairs[ile][ipho])
                   {
                     nPassed+=totalWeight_;
+
+                    phoGenPID_=-1000;
+                    leGenPID_=-1000;
+                      //members of TSelectedEvents
+                    if (sample_==TInputSample::SIGMC ||
+                        sample_==TInputSample::BKGMC)
+                      {
+                        for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
+                          if(treeLeaf.mcIndex[iMC]==treeLeaf.phoGenIndex[ipho])
+                            phoGenPID_=treeLeaf.mcPID[iMC];
+                          if (channel_==TConfiguration::MUON && 
+                              treeLeaf.mcIndex[iMC]==treeLeaf.muGenIndex[ile])
+                            leGenPID_=treeLeaf.mcPID[iMC];
+                          if (channel_==TConfiguration::ELECTRON && 
+                              treeLeaf.mcIndex[iMC]==treeLeaf.eleGenIndex[ile])
+                            leGenPID_=treeLeaf.mcPID[iMC];
+                        }
+                      }
+
                     if (channel_==TConfiguration::MUON) 
                        SetValues(treeLeaf.muEta[ile],treeLeaf.muPhi[ile],
-                              treeLeaf.muPt[ile], 
+                              treeLeaf.muPt[ile], leGenPID_,
                               treeLeaf.phoEta[ipho], 
-                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
+                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],phoGenPID_,
                               treeLeaf.phoSigmaIEtaIEta[ipho],
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
@@ -288,10 +307,10 @@ void WGammaSelection::LoopOverTreeEvents()
                               inputFileN_,
                               totalWeight_,puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]),treeLeaf.puTrue[1]);
                     else if (channel_==TConfiguration::ELECTRON) 
-                       SetValues(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile],
-                              treeLeaf.elePt[ile], 
+                       SetValues(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile], 
+                              treeLeaf.elePt[ile], leGenPID_,
                               treeLeaf.phoEta[ipho], 
-                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],
+                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho], phoGenPID_,
                               treeLeaf.phoSigmaIEtaIEta[ipho],
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),

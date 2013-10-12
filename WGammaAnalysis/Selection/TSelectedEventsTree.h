@@ -14,7 +14,9 @@ class TSelectedEventsTree
     void SetOutputTree(TTree* tree);
     void Fill();
     void SetValues(float leEta, float lePhi, float lePt,
+                   int leGenPID,
                    float phoEta, float phoPhi, float phoEt,
+                   int phoGenPID,
                    float phoSigmaIEtaIEta,
                    float phoPFChIsoCorr,
                    float phoSCRChIsoCorr,
@@ -31,9 +33,11 @@ class TSelectedEventsTree
     float leEta_;
     float lePhi_;
     float lePt_;
+    int leGenPID_;
     float phoEta_;
     float phoPhi_;
     float phoEt_;
+    int phoGenPID_;
     float phoSigmaIEtaIEta_;
     float phoPFChIsoCorr_;
     float phoSCRChIsoCorr_;

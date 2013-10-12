@@ -20,9 +20,11 @@ void TSelectedEventsTree::SetOutputTree(TTree* tree)
   outTree_->Branch("leptonEta",&leEta_,"leptonEta/F");
   outTree_->Branch("leptonPhi",&lePhi_,"leptonPhi/F");
   outTree_->Branch("leptonPt",&lePt_,"leptonPt/F");
+  outTree_->Branch("leptonGenPID",&leGenPID_,"leptonGenPID/F");
   outTree_->Branch("phoEta",&phoEta_,"phoEta/F");
   outTree_->Branch("phoPhi",&phoPhi_,"phoPhi/F");
   outTree_->Branch("phoEt",&phoEt_,"phoEt/F");
+  outTree_->Branch("phoGenPID",&phoGenPID_,"phoGenPID/F");
   outTree_->Branch("phoSigmaIEtaIEta",&phoSigmaIEtaIEta_,"phoSigmaIEtaIEta/F");
   outTree_->Branch("phoPFChIsoCorr",&phoPFChIsoCorr_,"phoPFChIsoCorr/F");
   outTree_->Branch("phoSCRChIsoCorr",&phoSCRChIsoCorr_,"phoSCRChIsoCorr/F");
@@ -43,8 +45,8 @@ void TSelectedEventsTree::Fill()
   outTree_->Fill();
 }
 
-void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, 
-                 float phoEta, float phoPhi, float phoEt,
+void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, int leGenPID,
+                 float phoEta, float phoPhi, float phoEt, int phoGenPID,
                  float phoSigmaIEtaIEta,
                  float phoPFChIsoCorr,
                  float phoSCRChIsoCorr,
@@ -59,9 +61,11 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
   leEta_=leEta;
   lePhi_=lePhi;
   lePt_=lePt;
+  leGenPID_=leGenPID;
   phoEta_=phoEta;
   phoPhi_=phoPhi;
   phoEt_=phoEt;
+  phoGenPID_=phoGenPID;
   phoSigmaIEtaIEta_=phoSigmaIEtaIEta;
   phoPFChIsoCorr_=phoPFChIsoCorr;
   phoSCRChIsoCorr_=phoSCRChIsoCorr;

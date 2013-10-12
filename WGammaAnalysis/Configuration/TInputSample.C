@@ -87,11 +87,11 @@ void TInputSample::GetFileSelectedNames()
   TConfiguration conf;
   TString name;
   if (sample_==DATA)
-    name = conf.GetSelectedNameData(channel_);
+    name = conf.GetSelectedPreliminaryNameData(channel_);
   else if (channel_==conf.MUON && sample_==SIGMC)
-    name = conf.GetSelectedNameSignalMC(channel_);
+    name = conf.GetSelectedPreliminaryNameSignalMC(channel_);
   else if (sample_==BKGMC){
-    name = conf.GetSelectedNameBkgMC(channel_)+sourceName_;
+    name = conf.GetSelectedPreliminaryNameBkgMC(channel_)+sourceName_;
   }
   fileSelected_ = name + TString(".root");
   fileSelectedDebug_ = name + conf.GetNameDebugMode() + TString(".root"); 

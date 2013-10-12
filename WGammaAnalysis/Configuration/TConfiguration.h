@@ -15,9 +15,12 @@ class TConfiguration
 
     TString GetOutputDirName(int channel);
 
-    TString GetSelectedNameData(int channel);
-    TString GetSelectedNameSignalMC(int channel);
-    TString GetSelectedNameBkgMC(int channel);
+    TString GetSelectedPreliminaryNameData(int channel);
+    TString GetSelectedPreliminaryNameSignalMC(int channel);
+    TString GetSelectedPreliminaryNameBkgMC(int channel);
+    TString GetSelectedFullyNameData(int channel);
+    TString GetSelectedFullyNameSignalMC(int channel);
+    TString GetSelectedFullyNameBkgMC(int channel);
 
     TString GetYieldsFileName(int channel);
     TString GetYieldsSelectedHistName(int sample, TString sourceName);
@@ -72,9 +75,12 @@ static const TString outputDirEle_="../WGammaOutput/ELECTRON/";
 /////////////////////////////////////////
 //selected files, directory and file names
 //(these files will be output of the script Selection)
-static const TString selectedEventsNameData_="selectedDATA";//.root
-static const TString selectedEventsNameSignalMC_="selectedSIGMC";//.root
-static const TString selectedEventsNameBkgMC_="selectedBKGMC_";//[input.sourceName_].root
+static const TString selectedPreliminaryEventsNameData_="PreliminarySelected/selectedDATA";//.root
+static const TString selectedPreliminaryEventsNameSignalMC_="PreliminarySelected/selectedSIGMC";//.root
+static const TString selectedPreliminaryEventsNameBkgMC_="PreliminarySelected/selectedBKGMC_";//[input.sourceName_].root
+static const TString selectedFullyEventsNameData_="FullySelected/selectedDATA";//.root
+static const TString selectedFullyEventsNameSignalMC_="FullySelected/selectedSIGMC";//.root
+static const TString selectedFullyEventsNameBkgMC_="FullySelected/selectedBKGMC_";//[input.sourceName_].root
 
 //////////////////////////////////////////
 //yields

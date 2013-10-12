@@ -62,7 +62,7 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
        int nWMtPassed_;
        int nPhotons_;
        int nPhotonsPassed_;
-       int nPhoLepPassed_;      
+       int nPhoLepPassed_; 
 
        float lumiWeight_;
        float debugModeWeight_;

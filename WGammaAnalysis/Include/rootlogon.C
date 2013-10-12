@@ -30,4 +30,8 @@
   gROOT->ProcessLine(".L ../SkimSplitMerge/SkimLeptonPhoton.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SplitWGammaMC.C+");
 
+  gStyle->SetPalette(1);
+  gStyle->SetCanvasColor(kWhite); 
+  
+
 }
