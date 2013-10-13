@@ -23,34 +23,14 @@ TString TConfiguration::GetOutputDirName(int channel)
   return "0";
 } 
 
-TString TConfiguration::GetSelectedPreliminaryNameData(int channel)
+TString TConfiguration::GetSelectedPreliminaryName(int channel, TString sourceName)
 {
-  return (GetOutputDirName(channel)+selectedPreliminaryEventsNameData_);
+  return (GetOutputDirName(channel)+selectedPreliminaryEventsNameBase_+"_"+sourceName+".root");
 }
 
-TString TConfiguration::GetSelectedPreliminaryNameSignalMC(int channel)
+TString TConfiguration::GetSelectedFullyName(int channel, TString sourceName)
 {
-  return GetOutputDirName(channel)+selectedPreliminaryEventsNameSignalMC_;
-}
-
-TString TConfiguration::GetSelectedPreliminaryNameBkgMC(int channel)
-{
-  return GetOutputDirName(channel)+selectedPreliminaryEventsNameBkgMC_;
-}
-
-TString TConfiguration::GetSelectedFullyNameData(int channel)
-{
-  return (GetOutputDirName(channel)+selectedFullyEventsNameData_);
-}
-
-TString TConfiguration::GetSelectedFullyNameSignalMC(int channel)
-{
-  return GetOutputDirName(channel)+selectedFullyEventsNameSignalMC_;
-}
-
-TString TConfiguration::GetSelectedFullyNameBkgMC(int channel)
-{
-  return GetOutputDirName(channel)+selectedFullyEventsNameBkgMC_;
+  return (GetOutputDirName(channel)+selectedFullyEventsNameBase_+"_"+sourceName+".root");
 }
 
 TString TConfiguration::GetNameDebugMode()
@@ -64,7 +44,7 @@ TString TConfiguration::GetYieldsFileName(int channel)
 }
 
 
-TString TConfiguration::GetYieldsSelectedHistName(int sample, TString sourceName)
+TString TConfiguration::GetYieldsSelectedHistName(TString sourceName)
 {
   return yieldsSelectedHistName_+sourceName;
 }

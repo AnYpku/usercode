@@ -15,15 +15,11 @@ class TConfiguration
 
     TString GetOutputDirName(int channel);
 
-    TString GetSelectedPreliminaryNameData(int channel);
-    TString GetSelectedPreliminaryNameSignalMC(int channel);
-    TString GetSelectedPreliminaryNameBkgMC(int channel);
-    TString GetSelectedFullyNameData(int channel);
-    TString GetSelectedFullyNameSignalMC(int channel);
-    TString GetSelectedFullyNameBkgMC(int channel);
+    TString GetSelectedPreliminaryName(int channel, TString sourceName);
+    TString GetSelectedFullyName(int channel, TString sourceName);
 
     TString GetYieldsFileName(int channel);
-    TString GetYieldsSelectedHistName(int sample, TString sourceName);
+    TString GetYieldsSelectedHistName(TString sourceName);
     TString GetYieldsDDTemplateBkgHistName();
     TString GetYieldsSignalName();
 
@@ -71,16 +67,14 @@ static const float lePhoDeltaRMin_=0.7;
 //
 static const TString outputDirMu_="../WGammaOutput/MUON/";
 static const TString outputDirEle_="../WGammaOutput/ELECTRON/";
+//all other pathes are relative to one of these two
 
 /////////////////////////////////////////
 //selected files, directory and file names
 //(these files will be output of the script Selection)
-static const TString selectedPreliminaryEventsNameData_="PreliminarySelected/selectedDATA";//.root
-static const TString selectedPreliminaryEventsNameSignalMC_="PreliminarySelected/selectedSIGMC";//.root
-static const TString selectedPreliminaryEventsNameBkgMC_="PreliminarySelected/selectedBKGMC_";//[input.sourceName_].root
-static const TString selectedFullyEventsNameData_="FullySelected/selectedDATA";//.root
-static const TString selectedFullyEventsNameSignalMC_="FullySelected/selectedSIGMC";//.root
-static const TString selectedFullyEventsNameBkgMC_="FullySelected/selectedBKGMC_";//[input.sourceName_].root
+static const TString selectedPreliminaryEventsNameBase_="PreliminarySelected/selected";
+static const TString selectedFullyEventsNameBase_="FullySelected/selected";
+
 
 //////////////////////////////////////////
 //yields

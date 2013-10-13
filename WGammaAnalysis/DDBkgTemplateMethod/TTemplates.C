@@ -45,8 +45,8 @@ void TTemplates::ComputeBackground()
 
 void TTemplates::SetHists()
 {
-  fSig_ = new TFile(config_.GetSelectedPreliminaryNameSignalMC(channel_)+".root");
-  fBkg_ = new TFile(config_.GetSelectedPreliminaryNameData(channel_)+".root");
+  fSig_ = new TFile(config_.GetSelectedPreliminaryName(channel_,"Wg_to_munu"));
+  fBkg_ = new TFile(config_.GetSelectedPreliminaryName(channel_,"DATA"));
 
   TTree* treeSignalInitial = (TTree *)fSig_->Get("selectedEvents");
   TTree* treeBkgrawInitial = (TTree *)fBkg_->Get("selectedEvents");

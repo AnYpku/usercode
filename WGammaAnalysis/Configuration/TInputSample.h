@@ -13,7 +13,7 @@ class TInputSample
     
     //void GetInputSample(TString configFile, int channel, int sample, TString bkgName="");
     void CalcLuminocities();
-    void GetFileSelectedNames();
+ //   void GetFileSelectedNames();
     void Print();
 
     //enum {MUON, ELECTRON, BOTH};
@@ -29,8 +29,8 @@ class TInputSample
     bool isSharedCS_;
     float lumiTotal_;
     float csTotal_;
-    TString fileSelected_;
-    TString fileSelectedDebug_;
+//    TString fileSelected_;
+//    TString fileSelectedDebug_;
 
     vector<TString> fileNames_;
     vector<float> cs_;

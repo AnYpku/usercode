@@ -51,12 +51,8 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   TString fInName;
   TString yieldsHistName;
 
-  if (INPUT_->allInputs_[iSource].sample_==TInputSample::DATA)
-    fInName = config_.GetSelectedFullyNameData(channel_)+".root";
-  else if (INPUT_->allInputs_[iSource].sample_==TInputSample::SIGMC)
-    fInName = config_.GetSelectedFullyNameSignalMC(channel_)+".root";
-  else if (INPUT_->allInputs_[iSource].sample_==TInputSample::BKGMC)
-    fInName = config_.GetSelectedFullyNameBkgMC(channel_)+INPUT_->allInputs_[iSource].sourceName_+".root";
+
+  fInName = config_.GetSelectedFullyName(channel_,INPUT_->allInputs_[iSource].sourceName_);
 
   TFile fIn(fInName);
   TTree* tr = (TTree*)fIn.Get("selectedEvents");
@@ -65,7 +61,7 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   float ptBinsLimits[config_.GetNPhoPtBins()+1];
   for (int i=0; i<config_.GetNPhoPtBins()+1; i++)
     ptBinsLimits[i] = vecPtBins[i];
-  TString yieldsName = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_));
+  TString yieldsName = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sourceName_));
   TString yieldsBName = (yieldsName+"B");
   TString yieldsEName = (yieldsName+"E");
 

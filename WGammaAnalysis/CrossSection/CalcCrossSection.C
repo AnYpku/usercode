@@ -50,6 +50,7 @@ void CalcCrossSection::Calc()
 
 void CalcCrossSection::GetSignalYields()
 {
+/*
   for (int i=0; i<config_.GetNPhoPtBins(); i++){
     signalYields1D_.push_back(0.0);
     signalYieldsErr1D_.push_back(0.0);
@@ -112,6 +113,7 @@ void CalcCrossSection::GetSignalYields()
   std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
   for (int i=0; i<config_.GetNPhoPtBins(); i++)
     std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
+*/
 }
 
 void CalcCrossSection::ApplyAccAndEff()

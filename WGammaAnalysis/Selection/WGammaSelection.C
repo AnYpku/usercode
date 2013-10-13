@@ -114,11 +114,9 @@ void WGammaSelection::LoopOverInputFiles()
        if (sample_==TInputSample::BKGMC)
            if (sampleMode_==DATA || sampleMode_==SIGMC || sampleMode_==NOBKG)
            continue;
-
-       if (!isDebugMode_)
-         selectedTreeFileName_=INPUT_->allInputs_[iSource].fileSelected_;
-       else 
-         selectedTreeFileName_=INPUT_->allInputs_[iSource].fileSelectedDebug_;
+       selectedTreeFileName_=config.GetSelectedPreliminaryName(channel_,INPUT_->allInputs_[iSource].sourceName_);
+       if (isDebugMode_)
+         selectedTreeFileName_.ReplaceAll(".root",config.GetNameDebugMode()+".root");
        TTree* tree;
        int inputFileNMax = INPUT_->allInputs_[iSource].nFiles_;
        //if (isDebugMode_) 

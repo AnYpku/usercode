@@ -16,7 +16,7 @@ TAllInputSamples::TAllInputSamples(int channel, string configFile)
 {
    ReadConfig(channel,configFile);
    for (int i=0; i<nSources_; i++) {
-     allInputs_[i].GetFileSelectedNames();
+  //   allInputs_[i].GetFileSelectedNames();
      allInputs_[i].CalcLuminocities();
    }
    CalcLumiWeights();

@@ -49,8 +49,8 @@ void TInputSample::Print()
   std::cout<<"nFiles_="<<nFiles_<<std::endl;
   std::cout<<"isSharedCS_="<<isSharedCS_<<std::endl;
   std::cout<<"csTotal_="<<csTotal_<<std::endl;
-  std::cout<<"fileSelected_="<<fileSelected_<<std::endl;
-  std::cout<<"fileSelectedDebug_="<<fileSelectedDebug_<<std::endl;
+//  std::cout<<"fileSelected_="<<fileSelected_<<std::endl;
+//  std::cout<<"fileSelectedDebug_="<<fileSelectedDebug_<<std::endl;
 
 
   std::cout<<"lumiEachFile_("<<lumiEachFile_.size()<<")={";
@@ -82,20 +82,20 @@ void TInputSample::Print()
   
 }
 
-void TInputSample::GetFileSelectedNames()
-{
-  TConfiguration conf;
-  TString name;
-  if (sample_==DATA)
-    name = conf.GetSelectedPreliminaryNameData(channel_);
-  else if (channel_==conf.MUON && sample_==SIGMC)
-    name = conf.GetSelectedPreliminaryNameSignalMC(channel_);
-  else if (sample_==BKGMC){
-    name = conf.GetSelectedPreliminaryNameBkgMC(channel_)+sourceName_;
-  }
-  fileSelected_ = name + TString(".root");
-  fileSelectedDebug_ = name + conf.GetNameDebugMode() + TString(".root"); 
-}
+//void TInputSample::GetFileSelectedNames()
+//{/
+//  TConfiguration conf;
+//  TString name;
+//  if (sample_==DATA)
+//    name = conf.GetSelectedPreliminaryNameData(channel_);
+//  else if (channel_==conf.MUON && sample_==SIGMC)
+//    name = conf.GetSelectedPreliminaryNameSignalMC(channel_);
+//  else if (sample_==BKGMC){
+//    name = conf.GetSelectedPreliminaryNameBkgMC(channel_)+sourceName_;
+//  }
+//  fileSelected_ = name + TString(".root");
+//  fileSelectedDebug_ = name + conf.GetNameDebugMode() + TString(".root"); 
+//}
 
 void TInputSample::CalcLuminocities()
 {
