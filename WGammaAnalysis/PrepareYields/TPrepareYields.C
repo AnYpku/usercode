@@ -52,7 +52,7 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   TString yieldsHistName;
 
 
-  fInName = config_.GetSelectedFullyName(channel_,INPUT_->allInputs_[iSource].sourceName_);
+  fInName = config_.GetSelectedFullyName(channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_);
 
   TFile fIn(fInName);
   TTree* tr = (TTree*)fIn.Get("selectedEvents");
@@ -61,9 +61,11 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   float ptBinsLimits[config_.GetNPhoPtBins()+1];
   for (int i=0; i<config_.GetNPhoPtBins()+1; i++)
     ptBinsLimits[i] = vecPtBins[i];
-  TString yieldsName = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sourceName_));
-  TString yieldsBName = (yieldsName+"B");
-  TString yieldsEName = (yieldsName+"E");
+  TString yieldsName  = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sample_,config_.COMMON,INPUT_->allInputs_[iSource].sourceName_));
+  TString yieldsBName = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sample_,config_.BARREL,INPUT_->allInputs_[iSource].sourceName_));
+  TString yieldsEName = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sample_,config_.ENDCAP,INPUT_->allInputs_[iSource].sourceName_));
+
+  TString yieldsGenName = config_.GetYieldsSelectedSignalMCGenHistName();
 
   fOut_->cd();
 
@@ -82,6 +84,9 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
                 config_.GetNPhoPtBins(),ptBinsLimits);
     sigMCYieldsE_ = new TH1F(yieldsEName,yieldsEName,
                 config_.GetNPhoPtBins(),ptBinsLimits);
+    sigMCGenYields_ = new TH1F(yieldsGenName,yieldsGenName,
+                config_.GetNPhoPtBins(),ptBinsLimits);
+
   }
   else if (INPUT_->allInputs_[iSource].sample_==TInputSample::BKGMC){
     vecBkgMCYields_.push_back( new TH1F(yieldsName,yieldsName,
@@ -97,6 +102,9 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   //TCut cut = fullCuts.ExtraCut("phoSigmaIEtaIEta", "phoPFChIsoCorr", "phoEta");
   //TString cutStr = cut.GetTitle();
   tr->Draw(TString("phoEt>>")+yieldsName,"(1)*weight","goff");
+  if (INPUT_->allInputs_[iSource].sample_==TInputSample::SIGMC){
+      tr->Draw(TString("phoGenEt>>")+yieldsGenName,"(1)*weight","goff");
+  }
   
   TCut cutB = emptyPhoton.IsBarrel("phoEta");
   TString cutStrB = cutB.GetTitle();
@@ -109,22 +117,24 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
 
 void TPrepareYields::SetYieldsDDBkgTemplate()
 {
-  TFile fFractions(config_.GetYieldsDDTemplateBkgFileName(channel_));
-  TH1F* frB = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName()+"B");
-  TH1F* frE = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName()+"E");
+  TFile fFractions(config_.GetFractionsDDTemplateBkgFileName(channel_));
+  TH1F* frB = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName(config_.BARREL));
+  TH1F* frE = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName(config_.ENDCAP));
   vector <float> vecPtBins = config_.GetPhoPtBinsLimits();
   float ptBinsLimits[config_.GetNPhoPtBins()+1];
   for (int i=0; i<config_.GetNPhoPtBins()+1; i++)
     ptBinsLimits[i] = vecPtBins[i];
 
   fOut_->cd();
-  TString yieldsName = config_.GetYieldsDDTemplateBkgHistName();
+  TString yieldsName = config_.GetYieldsDDTemplateBkgHistName(config_.COMMON);
+  TString yieldsNameB= config_.GetYieldsDDTemplateBkgHistName(config_.BARREL);
+  TString yieldsNameE= config_.GetYieldsDDTemplateBkgHistName(config_.ENDCAP);
 
   bkgDDYields_ = new TH1F(yieldsName,yieldsName,
                 config_.GetNPhoPtBins(),ptBinsLimits);
-  bkgDDYieldsB_ = new TH1F(yieldsName+"B",yieldsName+"B",
+  bkgDDYieldsB_ = new TH1F(yieldsNameB,yieldsNameB,
                 config_.GetNPhoPtBins(),ptBinsLimits);
-  bkgDDYieldsE_ = new TH1F(yieldsName+"E",yieldsName+"E",
+  bkgDDYieldsE_ = new TH1F(yieldsNameE,yieldsNameE,
                 config_.GetNPhoPtBins(),ptBinsLimits);
 
   bkgDDYieldsB_->Multiply(dataYieldsB_,frB);
@@ -180,6 +190,9 @@ void TPrepareYields::StoreYields()
   sigMCYields_->Write();
   sigMCYieldsB_->Write();
   sigMCYieldsE_->Write();
+  sigMCGenYields_->Write();
+//  sigMCGenYieldsB_->Write();
+//  sigMCGenYieldsE_->Write();
   for (unsigned int i=0; i<vecBkgMCYields_.size(); i++){
     vecBkgMCYields_[i]->Write();
     vecBkgMCYieldsB_[i]->Write();

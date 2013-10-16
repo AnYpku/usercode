@@ -7,6 +7,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>
+#include <iostream>
 
 TConfiguration::TConfiguration()
 {
@@ -16,6 +17,23 @@ TConfiguration::~TConfiguration()
 {
 }
 
+void TConfiguration::Print()
+{
+
+  std::cout<<"GetOutputDirName s: "<<GetOutputDirName(MUON)<<", "<<GetOutputDirName(ELECTRON)<<std::endl;
+  std::cout<<"GetSampleName s: "<<GetSampleName(DATA)<<", "<<GetSampleName(SIGMC)<<", "<<GetSampleName(BKGMC)<<std::endl;
+  std::cout<<"GetEtaBinName s: "<<GetEtaBinName(BARREL)<<", "<<GetEtaBinName(ENDCAP)<<", "<<GetEtaBinName(COMMON)<<std::endl;
+  std::cout<<std::endl;
+  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedPreliminaryName(MUON,DATA,"[sourceName]")<<", "<<GetSelectedPreliminaryName(MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedPreliminaryName(MUON,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedFullyName s: "<<GetSelectedFullyName(MUON,DATA,"[sourceName]")<<", "<<GetSelectedFullyName(MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedFullyName(MUON,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<std::endl;
+  std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
+  std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedHistName(DATA,COMMON,"[sourceName]")<<", "<<GetYieldsSelectedHistName(DATA,BARREL,"[sourceName]")<<", "<<GetYieldsSelectedHistName(DATA,ENDCAP,"[sourceName]")<<", "<<GetYieldsSelectedHistName(SIGMC,BARREL,"[sourceName]")<<", "<<GetYieldsSelectedHistName(BKGMC,BARREL,"[sourceName]")<<std::endl;
+  std::cout<<std::endl;
+  std::cout<<"GetFractionsDDTemplateBkgFileName s"<<GetFractionsDDTemplateBkgFileName(MUON)<<std::endl;
+
+}
+
 TString TConfiguration::GetOutputDirName(int channel)
 {
   if (channel==MUON) return outputDirMu_;
@@ -23,14 +41,34 @@ TString TConfiguration::GetOutputDirName(int channel)
   return "0";
 } 
 
-TString TConfiguration::GetSelectedPreliminaryName(int channel, TString sourceName)
+TString TConfiguration::GetSampleName(int sample)
 {
-  return (GetOutputDirName(channel)+selectedPreliminaryEventsNameBase_+"_"+sourceName+".root");
+  if (sample==DATA) return "DATA";
+  else if (sample==SIGMC) return "SIGMC";
+  else if (sample==BKGMC) return "BKGMC";
+  return "UNKNOWN_SAMPLE";
 }
 
-TString TConfiguration::GetSelectedFullyName(int channel, TString sourceName)
+TString TConfiguration::GetEtaBinName(int etaBin)
 {
-  return (GetOutputDirName(channel)+selectedFullyEventsNameBase_+"_"+sourceName+".root");
+  if (etaBin==BARREL) return "B";
+  else if (etaBin==ENDCAP) return "E";
+  else if (etaBin==COMMON) return "";
+  return "UNKNOWN_ETABIN";
+}
+
+TString TConfiguration::GetSelectedPreliminaryName(int channel, int sample, TString sourceName)
+{
+  TString name = GetOutputDirName(channel)+selectedPreliminaryEventsNameBase_+GetSampleName(sample);
+  if (sample == BKGMC) return name+"_"+sourceName+".root";
+  return name+".root";
+}
+
+TString TConfiguration::GetSelectedFullyName(int channel, int sample, TString sourceName)
+{
+  TString name = GetOutputDirName(channel)+selectedFullyEventsNameBase_+GetSampleName(sample);
+  if (sample == BKGMC) return name+"_"+sourceName+".root";
+  return name+".root";
 }
 
 TString TConfiguration::GetNameDebugMode()
@@ -44,34 +82,41 @@ TString TConfiguration::GetYieldsFileName(int channel)
 }
 
 
-TString TConfiguration::GetYieldsSelectedHistName(TString sourceName)
+TString TConfiguration::GetYieldsSelectedHistName(int sample, int etaBin, TString sourceName)
 {
-  return yieldsSelectedHistName_+sourceName;
+  TString name = yieldsSelectedHistName_+GetSampleName(sample);
+  if (sample==BKGMC) return name+sourceName+GetEtaBinName(etaBin);
+  return name+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetYieldsDDTemplateBkgHistName()
+TString TConfiguration::GetYieldsSelectedSignalMCGenHistName()
 {
-  return yieldsDDTemplateBkgHist_;
+  return yieldsSelectedSignalMCGenHistName_;
 }
 
-TString TConfiguration::GetYieldsSignalName()
+TString TConfiguration::GetYieldsDDTemplateBkgHistName(int etaBin)
 {
-  return yieldsSignal_;
+  return yieldsDDTemplateBkgHist_+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetTemplatePicNameBase(int channel)
+TString TConfiguration::GetYieldsSignalName(int etaBin)
 {
-  return GetOutputDirName(channel)+templatePicNameBase_;
+  return yieldsSignal_+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetYieldsDDTemplateBkgFileName(int channel)
+TString TConfiguration::GetFractionsDDTemplateBkgFileName(int channel)
 {
-  return GetOutputDirName(channel)+yieldsDDTemplateBkgFile_;
+  return GetOutputDirName(channel)+fractionsDDTemplateBkgFile_;
 }
 
-TString TConfiguration::GetFractionsDDTemplateBkgHistName()
+TString TConfiguration::GetFractionsDDTemplateBkgHistName(int etaBin)
 {
-  return fractionsDDTemplateBkgHist_;
+  return fractionsDDTemplateBkgHist_+GetEtaBinName(etaBin);
+}
+
+TString TConfiguration::GetTemplatePicNameBase(int ptBin, int etaBin)
+{
+  return templatePicNameBase_+"_"+TString(ptBin)+"_"+GetEtaBinName(etaBin);
 }
 
 TString TConfiguration::GetAccEffFileName(int channel)

@@ -18,7 +18,7 @@ class TTemplates
     void FitOne(int ptBin, int etaBin);
     void PrintChi2();
     void SaveBkgYields();
-    enum {BARREL, ENDCAP};
+//    enum {BARREL, ENDCAP};
       //eta bin: 0 - barrel, 1 - endcap
 
   private:
@@ -36,8 +36,6 @@ class TTemplates
     TH1F** hEndcapBkg_;
     TH1F** hEndcapLeakage_;
     TFile* fOutForSave_;
-    TH1F* yieldsBkgB_;
-    TH1F* yieldsBkgE_;
     TH1F* fractionsBkgB_;
     TH1F* fractionsBkgE_;
     vector <float> chi2Barrel_;

@@ -15,15 +15,9 @@ void ExtraSelection(int channel)
   TTree* tr=0;
   TTree* tr1=0;
   for (int i=0; i<INPUT.nSources_; i++){
-    TFile fIn(INPUT.allInputs_[i].fileSelected_);
+    TFile fIn(config.GetSelectedPreliminaryName(channel,INPUT.allInputs_[i].sourceName_));
     tr = (TTree*)fIn.Get("selectedEvents");
-    TString fOutName;
-    if (INPUT.allInputs_[i].sample_==TInputSample::DATA)
-      fOutName=config.GetSelectedFullyNameData(channel)+".root";
-    if (INPUT.allInputs_[i].sample_==TInputSample::SIGMC)
-      fOutName=config.GetSelectedFullyNameSignalMC(channel)+".root";
-    if (INPUT.allInputs_[i].sample_==TInputSample::BKGMC)
-      fOutName=config.GetSelectedFullyNameBkgMC(channel)+INPUT.allInputs_[i].sourceName_+".root";
+    TString fOutName=config.GetSelectedFullyName(channel,INPUT.allInputs_[i].sourceName_);
     TFile fOut(fOutName,"recreate");
 
     tr1 = tr->CopyTree(fullCut.ExtraCut("phoSigmaIEtaIEta","phoPFChIsoCorr","phoEta"));

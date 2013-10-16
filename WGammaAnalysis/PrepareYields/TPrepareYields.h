@@ -40,6 +40,8 @@ class TPrepareYields
     TH1F* sigMCYieldsB_;
     TH1F* sigMCYieldsE_;
 
+    TH1F* sigMCGenYields_;
+
     vector <TH1F*> vecBkgMCYields_;
     vector <TH1F*> vecBkgMCYieldsB_;
     vector <TH1F*> vecBkgMCYieldsE_;

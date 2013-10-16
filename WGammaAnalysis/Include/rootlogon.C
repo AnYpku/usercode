@@ -21,7 +21,7 @@
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
-
+/*
   gROOT->ProcessLine(".L ../Selection/TSelectedEventsTree.C+");
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/WGammaSelection.C+");
@@ -33,5 +33,5 @@
   gStyle->SetPalette(1);
   gStyle->SetCanvasColor(kWhite); 
  
-
+*/
 }

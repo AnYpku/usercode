@@ -12,20 +12,28 @@ class TConfiguration
     virtual ~TConfiguration();
 
     enum {MUON, ELECTRON};
+    enum {DATA, SIGMC, BKGMC};
+    enum {BARREL, ENDCAP, COMMON};
+    enum {TOTAL, ONEDI, TWODI};
+
+    void Print();
 
     TString GetOutputDirName(int channel);
+    TString GetSampleName(int sample);
+    TString GetEtaBinName(int etaBin);
 
-    TString GetSelectedPreliminaryName(int channel, TString sourceName);
-    TString GetSelectedFullyName(int channel, TString sourceName);
+    TString GetSelectedPreliminaryName(int channel, int sample, TString sourceName="");
+    TString GetSelectedFullyName(int channel, int sample, TString sourceName="");
 
     TString GetYieldsFileName(int channel);
-    TString GetYieldsSelectedHistName(TString sourceName);
-    TString GetYieldsDDTemplateBkgHistName();
-    TString GetYieldsSignalName();
+    TString GetYieldsSelectedHistName(int sample, int etaBin, TString sourceName);
+    TString GetYieldsSelectedSignalMCGenHistName();
+    TString GetYieldsDDTemplateBkgHistName(int etaBin);
+    TString GetYieldsSignalName(int etaBin);
 
-    TString GetTemplatePicNameBase(int channel);
-    TString GetYieldsDDTemplateBkgFileName(int channel);
-    TString GetFractionsDDTemplateBkgHistName();
+    TString GetFractionsDDTemplateBkgFileName(int channel);
+    TString GetFractionsDDTemplateBkgHistName(int etaBin);
+    TString GetTemplatePicNameBase(int ptBin, int etaBin);
 
     TString GetAccEffFileName(int channel);
     TString GetAcc1DName();
@@ -79,18 +87,19 @@ static const TString selectedFullyEventsNameBase_="FullySelected/selected";
 //////////////////////////////////////////
 //yields
 //
-static const TString yieldsFileName_="yields.root";
+static const TString yieldsFileName_="YieldsAndBackground/yields.root";
 static const TString yieldsSelectedHistName_="yieldsSelected";
 static const TString yieldsDDTemplateBkgHist_="yieldsDDBkg";
 static const TString yieldsSignal_="yieldsSignal";
+static const TString yieldsSelectedSignalMCGenHistName_="yieldsSelectedSignalMCGen";
 
 
 //////////////////////////////////////////
 //data driven background estimation
 //
-static const TString templatePicNameBase_="TemplateFits/templateFit_";
-static const TString yieldsDDTemplateBkgFile_="yieldsDDTemplateBkg.root";
+static const TString fractionsDDTemplateBkgFile_="YieldsAndBackground/fractionsDDTemplateBkg.root";
 static const TString fractionsDDTemplateBkgHist_="fractionsBkg";
+static const TString templatePicNameBase_="templateFit_";
 
 //////////////////////////////////////////
 //acceptance and efficiency

@@ -24,7 +24,7 @@ using namespace RooFit ;
 TTemplates::TTemplates(int channel)
 {
   channel_=channel;
-  fOutForSave_ = new TFile(config_.GetYieldsDDTemplateBkgFileName(channel_),"recreate");
+  fOutForSave_ = new TFile(config_.GetFractionsDDTemplateBkgFileName(channel_),"recreate");
 }
 
 TTemplates::~TTemplates()
@@ -36,8 +36,8 @@ void TTemplates::ComputeBackground()
   SetHists();
   //PrintHists();
   for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    FitOne(i,BARREL);
-    FitOne(i,ENDCAP);
+    FitOne(i,config_.BARREL);
+    FitOne(i,config_.ENDCAP);
   }
   PrintChi2();
   SaveBkgYields();
@@ -45,8 +45,8 @@ void TTemplates::ComputeBackground()
 
 void TTemplates::SetHists()
 {
-  fSig_ = new TFile(config_.GetSelectedPreliminaryName(channel_,"Wg_to_munu"));
-  fBkg_ = new TFile(config_.GetSelectedPreliminaryName(channel_,"DATA"));
+  fSig_ = new TFile(config_.GetSelectedPreliminaryName(channel_,config_.SIGMC));
+  fBkg_ = new TFile(config_.GetSelectedPreliminaryName(channel_,config_.DATA));
 
   TTree* treeSignalInitial = (TTree *)fSig_->Get("selectedEvents");
   TTree* treeBkgrawInitial = (TTree *)fBkg_->Get("selectedEvents");
@@ -176,7 +176,7 @@ void TTemplates::FitOne(int ptBin, int etaBin)
   TH1F* hSig = 0;
   TH1F* hBkg = 0;
   TH1F* hData= 0;
-  if (etaBin==BARREL){
+  if (etaBin==config_.BARREL){
     varMin = sIEtaIEtaBarrelMin_;
     varMax = sIEtaIEtaBarrelMax_;
     nBins = nBinsBarrel_;
@@ -184,7 +184,7 @@ void TTemplates::FitOne(int ptBin, int etaBin)
     hBkg  = hBarrelBkg_[ptBin];
     hData = hBarrelData_[ptBin];
   }
-  if (etaBin==ENDCAP){
+  if (etaBin==config_.ENDCAP){
     varMin = sIEtaIEtaEndcapMin_;
     varMax = sIEtaIEtaEndcapMax_;
     nBins = nBinsEndcap_;
@@ -215,18 +215,18 @@ void TTemplates::FitOne(int ptBin, int etaBin)
 
   TPhotonCuts emptyPhoton;
   float sihihCut = 0;
-  if (etaBin==BARREL) sihihCut = emptyPhoton.GetPhoSigmaIEtaIEtaCutB(emptyPhoton.GetWP());
-  else if (etaBin==ENDCAP) sihihCut = emptyPhoton.GetPhoSigmaIEtaIEtaCutE(emptyPhoton.GetWP());
+  if (etaBin==config_.BARREL) sihihCut = emptyPhoton.GetPhoSigmaIEtaIEtaCutB(emptyPhoton.GetWP());
+  else if (etaBin==config_.ENDCAP) sihihCut = emptyPhoton.GetPhoSigmaIEtaIEtaCutE(emptyPhoton.GetWP());
   sihihVar.setRange("inSelection",0,sihihCut);
   RooAbsReal* integralSumPdf = sumPdf.createIntegral(sihihVar,NormSet(sihihVar),Range("inSelection"));
   RooAbsReal* integralBkgPdf = backgroundPdf.createIntegral(sihihVar,NormSet(sihihVar),Range("inSelection"));
 
-  if (etaBin==BARREL){
+  if (etaBin==config_.BARREL){
     chi2Barrel_.push_back(chi2.getVal()/nBinsBarrel_);
     if (integralSumPdf->getVal()==0) bkgFractionBarrel_.push_back(-1);
     else bkgFractionBarrel_.push_back(integralBkgPdf->getVal()/integralSumPdf->getVal());
   }
-  else if (etaBin==ENDCAP){
+  else if (etaBin==config_.ENDCAP){
     chi2Endcap_.push_back(chi2.getVal()/nBinsEndcap_); 
     if (integralSumPdf->getVal()==0) bkgFractionEndcap_.push_back(-1);
     else bkgFractionEndcap_.push_back(integralBkgPdf->getVal()/integralSumPdf->getVal());
@@ -242,12 +242,13 @@ void TTemplates::FitOne(int ptBin, int etaBin)
   sumPdf.paramOn(plotter);
 
   plotter->Draw();
-  TString plotName(config_.GetTemplatePicNameBase(channel_));
+  TString plotName(config_.GetTemplatePicNameBase(ptBin,etaBin));
   plotName+=ptBin;
   plotName+="_";
   plotName+=etaBin;
   plotName+=".png";
-  c1.SaveAs(plotName);
+  fOutForSave_->cd();
+  c1.Write();
   delete plotter;
 }
 
@@ -262,25 +263,17 @@ void TTemplates::PrintChi2()
 void TTemplates::SaveBkgYields()
 {
   fOutForSave_->cd();
-  TString bkgYieldsBName = (config_.GetYieldsDDTemplateBkgHistName()+"B");
-  TString bkgYieldsEName = (config_.GetYieldsDDTemplateBkgHistName()+"E");
-  TString bkgFractionsBName = (config_.GetFractionsDDTemplateBkgHistName()+"B");
-  TString bkgFractionsEName = (config_.GetFractionsDDTemplateBkgHistName()+"E");
+  TString bkgFractionsBName = (config_.GetFractionsDDTemplateBkgHistName(config_.BARREL));
+  TString bkgFractionsEName = (config_.GetFractionsDDTemplateBkgHistName(config_.ENDCAP));
   vector <float> vecPtBins = config_.GetPhoPtBinsLimits();
   float ptBinsLimits[config_.GetNPhoPtBins()+1];
   for (int i=0; i<config_.GetNPhoPtBins()+1; i++)
     ptBinsLimits[i] = vecPtBins[i];
-  yieldsBkgB_ = new TH1F(bkgYieldsBName,bkgYieldsBName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
-  yieldsBkgE_ = new TH1F(bkgYieldsEName,bkgYieldsEName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
   fractionsBkgB_ = new TH1F(bkgFractionsBName,bkgFractionsBName,
                 config_.GetNPhoPtBins(),ptBinsLimits);
   fractionsBkgE_ = new TH1F(bkgFractionsEName,bkgFractionsEName,
                 config_.GetNPhoPtBins(),ptBinsLimits);
   for (int i=1; i<config_.GetNPhoPtBins()+1; i++){
-    yieldsBkgB_->SetBinContent(i,bkgFractionBarrel_[i-1]*hBarrelData_[i-1]->GetSumOfWeights());
-    yieldsBkgE_->SetBinContent(i,bkgFractionEndcap_[i-1]*hEndcapData_[i-1]->GetSumOfWeights());
     fractionsBkgB_->SetBinContent(i,bkgFractionBarrel_[i-1]);
     fractionsBkgE_->SetBinContent(i,bkgFractionEndcap_[i-1]);
 
@@ -291,8 +284,6 @@ void TTemplates::SaveBkgYields()
 
   }
 
-  yieldsBkgB_->Write();
-  yieldsBkgE_->Write();
   fractionsBkgB_->Write();
   fractionsBkgE_->Write();
 

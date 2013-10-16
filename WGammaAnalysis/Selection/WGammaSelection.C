@@ -273,13 +273,16 @@ void WGammaSelection::LoopOverTreeEvents()
 
                     phoGenPID_=-1000;
                     leGenPID_=-1000;
+                    phoGenEt_=-1000;
                       //members of TSelectedEvents
                     if (sample_==TInputSample::SIGMC ||
                         sample_==TInputSample::BKGMC)
                       {
                         for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
-                          if(treeLeaf.mcIndex[iMC]==treeLeaf.phoGenIndex[ipho])
+                          if(treeLeaf.mcIndex[iMC]==treeLeaf.phoGenIndex[ipho]){
                             phoGenPID_=treeLeaf.mcPID[iMC];
+                            phoGenEt_=treeLeaf.mcEt[iMC];
+                          }
                           if (channel_==TConfiguration::MUON && 
                               treeLeaf.mcIndex[iMC]==treeLeaf.muGenIndex[ile])
                             leGenPID_=treeLeaf.mcPID[iMC];
@@ -293,7 +296,7 @@ void WGammaSelection::LoopOverTreeEvents()
                        SetValues(treeLeaf.muEta[ile],treeLeaf.muPhi[ile],
                               treeLeaf.muPt[ile], leGenPID_,
                               treeLeaf.phoEta[ipho], 
-                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],phoGenPID_,
+                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho],phoGenPID_,phoGenEt_,
                               treeLeaf.phoSigmaIEtaIEta[ipho],
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
@@ -308,7 +311,7 @@ void WGammaSelection::LoopOverTreeEvents()
                        SetValues(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile], 
                               treeLeaf.elePt[ile], leGenPID_,
                               treeLeaf.phoEta[ipho], 
-                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho], phoGenPID_,
+                              treeLeaf.phoPhi[ipho], treeLeaf.phoEt[ipho], phoGenPID_,phoGenEt_,
                               treeLeaf.phoSigmaIEtaIEta[ipho],
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
                               emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso[ipho],treeLeaf.rho2012,treeLeaf.phoEta[ipho]),
