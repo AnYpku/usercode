@@ -164,6 +164,21 @@ TString TConfiguration::GetEffErrTotalName()
   return effErrTotalName_;
 }
 
+TString TConfiguration::GetUnfoldingFileName(int channel)
+{
+  return GetOutputDirName(channel)+unfoldingFileName_;
+}
+
+TString TConfiguration::GetMatrUnfo1DName()
+{
+  return matrUnfo1DName_;
+}
+
+TString TConfiguration::GetMatrMigr1DName()
+{
+  return matrMigr1DName_;
+}
+
 TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
 {
   return certifiedConstantsDir_+photonScaleFactorsFileNamePt15to20GeV_;
@@ -213,4 +228,33 @@ float TConfiguration::GetPhoPtMin()
 float TConfiguration::GetLePhoDeltaRMin()
 {
   return lePhoDeltaRMin_;
+}
+
+int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed)
+{ 
+  if (isOverflowUsed) return GetNPhoPtBins()+2;
+  return GetNPhoPtBins()+1;
+}
+
+vector <float> TConfiguration::GetPhoPtUnfBinsLimits(bool isOverflowUsed)
+{
+  vector <float> analysLims;
+  vector <float> unfoldLims;
+  analysLims = GetPhoPtBinsLimits();
+  unfoldLims.push_back(0);
+  for (int i=0; i<nPhoPtBins_+1; i++)
+    unfoldLims.push_back(analysLims[i]);
+  if (isOverflowUsed) 
+    unfoldLims.push_back(phoPtOverflowBinLimit_);
+  return unfoldLims;
+}
+
+int TConfiguration::FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed)
+{
+  if (pt<phoPtBinsLimits_[0]) return 0;
+  for (int i=0; i<GetNPhoPtBins()+1; i++)
+    if (pt>=phoPtBinsLimits_[i] && pt<phoPtBinsLimits_[i+1])
+      return i+1;
+  if (isOverflowUsed && pt>=phoPtBinsLimits_[GetNPhoPtBins()]) return GetNPhoPtUnfBins(1)-1;
+  return -1; 
 }

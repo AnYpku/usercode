@@ -67,7 +67,7 @@ bool TPhotonCuts::PassedExceptKinematics(bool doSigmaIEtaIEtaCut, bool doPhoChIs
 
 bool TPhotonCuts::PhoKinematics(float phoPt, float phoEta)
 {
-  if (phoPt<phoPtCut_) return false;
+//  if (phoPt<phoPtCut_) return false;
   if (!IsBarrel(phoEta) && !IsEndcap(phoEta)) return false;
   return true;
 }

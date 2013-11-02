@@ -19,6 +19,7 @@ TPrepareYields::TPrepareYields(int channel)
 {
   channel_=channel;
   INPUT_=new TAllInputSamples(channel_,"../Configuration/config.txt");
+  isOverflowUsed_=1;
 
 }
 
@@ -48,6 +49,7 @@ void TPrepareYields::SetYields()
 
 void TPrepareYields::SetYieldsOneSource(int iSource)
 {
+
   TString fInName;
   TString yieldsHistName;
 
@@ -57,9 +59,9 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   TFile fIn(fInName);
   TTree* tr = (TTree*)fIn.Get("selectedEvents");
 
-  vector <float> vecPtBins = config_.GetPhoPtBinsLimits();
-  float ptBinsLimits[config_.GetNPhoPtBins()+1];
-  for (int i=0; i<config_.GetNPhoPtBins()+1; i++)
+  vector <float> vecPtBins = config_.GetPhoPtUnfBinsLimits(isOverflowUsed_);
+  float ptBinsLimits[config_.GetNPhoPtUnfBins(isOverflowUsed_)+1];
+  for (int i=0; i<config_.GetNPhoPtUnfBins(isOverflowUsed_)+1; i++)
     ptBinsLimits[i] = vecPtBins[i];
   TString yieldsName  = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sample_,config_.COMMON,INPUT_->allInputs_[iSource].sourceName_));
   TString yieldsBName = (config_.GetYieldsSelectedHistName(INPUT_->allInputs_[iSource].sample_,config_.BARREL,INPUT_->allInputs_[iSource].sourceName_));
@@ -71,30 +73,30 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
 
   if (INPUT_->allInputs_[iSource].sample_==TInputSample::DATA){
     dataYields_ = new TH1F(yieldsName,yieldsName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
     dataYieldsB_ = new TH1F(yieldsBName,yieldsBName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
     dataYieldsE_ = new TH1F(yieldsEName,yieldsEName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
   }
   else if (INPUT_->allInputs_[iSource].sample_==TInputSample::SIGMC){
     sigMCYields_ = new TH1F(yieldsName,yieldsName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
     sigMCYieldsB_ = new TH1F(yieldsBName,yieldsBName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
     sigMCYieldsE_ = new TH1F(yieldsEName,yieldsEName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
     sigMCGenYields_ = new TH1F(yieldsGenName,yieldsGenName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
 
   }
   else if (INPUT_->allInputs_[iSource].sample_==TInputSample::BKGMC){
     vecBkgMCYields_.push_back( new TH1F(yieldsName,yieldsName,
-                config_.GetNPhoPtBins(),ptBinsLimits));
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits));
     vecBkgMCYieldsB_.push_back( new TH1F(yieldsBName,yieldsBName,
-                config_.GetNPhoPtBins(),ptBinsLimits));
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits));
     vecBkgMCYieldsE_.push_back( new TH1F(yieldsEName,yieldsEName,
-                config_.GetNPhoPtBins(),ptBinsLimits));
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits));
   }
 
   //TFullCuts fullCuts;
@@ -121,8 +123,8 @@ void TPrepareYields::SetYieldsDDBkgTemplate()
   TH1F* frB = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName(config_.BARREL));
   TH1F* frE = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName(config_.ENDCAP));
   vector <float> vecPtBins = config_.GetPhoPtBinsLimits();
-  float ptBinsLimits[config_.GetNPhoPtBins()+1];
-  for (int i=0; i<config_.GetNPhoPtBins()+1; i++)
+  float ptBinsLimits[config_.GetNPhoPtUnfBins(isOverflowUsed_)+1];
+  for (int i=0; i<config_.GetNPhoPtUnfBins(isOverflowUsed_)+1; i++)
     ptBinsLimits[i] = vecPtBins[i];
 
   fOut_->cd();
@@ -131,11 +133,11 @@ void TPrepareYields::SetYieldsDDBkgTemplate()
   TString yieldsNameE= config_.GetYieldsDDTemplateBkgHistName(config_.ENDCAP);
 
   bkgDDYields_ = new TH1F(yieldsName,yieldsName,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
   bkgDDYieldsB_ = new TH1F(yieldsNameB,yieldsNameB,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
   bkgDDYieldsE_ = new TH1F(yieldsNameE,yieldsNameE,
-                config_.GetNPhoPtBins(),ptBinsLimits);
+                config_.GetNPhoPtUnfBins(isOverflowUsed_),ptBinsLimits);
 
   bkgDDYieldsB_->Multiply(dataYieldsB_,frB);
   bkgDDYieldsE_->Multiply(dataYieldsE_,frE);

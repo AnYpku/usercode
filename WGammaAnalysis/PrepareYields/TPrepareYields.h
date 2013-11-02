@@ -29,6 +29,7 @@ class TPrepareYields
     TConfiguration config_;
     int channel_;
     TAllInputSamples* INPUT_;
+    bool isOverflowUsed_;
 
     TFile* fOut_;
 

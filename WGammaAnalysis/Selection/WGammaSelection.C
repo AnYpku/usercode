@@ -114,7 +114,7 @@ void WGammaSelection::LoopOverInputFiles()
        if (sample_==TInputSample::BKGMC)
            if (sampleMode_==DATA || sampleMode_==SIGMC || sampleMode_==NOBKG)
            continue;
-       selectedTreeFileName_=config.GetSelectedPreliminaryName(channel_,INPUT_->allInputs_[iSource].sourceName_);
+       selectedTreeFileName_=config.GetSelectedPreliminaryName(channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_);
        if (isDebugMode_)
          selectedTreeFileName_.ReplaceAll(".root",config.GetNameDebugMode()+".root");
        TTree* tree;

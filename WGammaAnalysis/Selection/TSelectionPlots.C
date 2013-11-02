@@ -41,7 +41,7 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
   nSources_ = 0;
   for (int i=0; i<INPUT.nSources_; i++)
     {
-      TString fileName = (TString)(config.GetSelectedFullyName(channel, INPUT.allInputs_[i].sourceName_)) ;
+      TString fileName = (TString)(config.GetSelectedFullyName(channel, INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_)) ;
       bool doThisSource=0;
 
       for (int j=0; j<nNames; j++)
