@@ -108,11 +108,11 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
       tr->Draw(TString("phoGenEt>>")+yieldsGenName,"(1)*weight","goff");
   }
   
-  TCut cutB = emptyPhoton.IsBarrel("phoEta");
+  TCut cutB = emptyPhoton.RangeBarrel();
   TString cutStrB = cutB.GetTitle();
   tr->Draw(TString("phoEt>>")+yieldsBName,"("+cutStrB+")*weight","goff");
 
-  TCut cutE = emptyPhoton.IsEndcap("phoEta");
+  TCut cutE = emptyPhoton.RangeEndcap();
   TString cutStrE = cutE.GetTitle();
   tr->Draw(TString("phoEt>>")+yieldsEName,"("+cutStrE+")*weight","goff");
 }

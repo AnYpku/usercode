@@ -20,7 +20,7 @@ void ExtraSelection(int channel)
     TString fOutName=config.GetSelectedFullyName(channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
     TFile fOut(fOutName,"recreate");
 
-    tr1 = tr->CopyTree(fullCut.ExtraCut("phoSigmaIEtaIEta","phoPFChIsoCorr","phoEta"));
+    tr1 = tr->CopyTree(fullCut.RangeExtraCut());
     tr1->Write();
 
   }

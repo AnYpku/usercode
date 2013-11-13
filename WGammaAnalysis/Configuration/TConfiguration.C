@@ -134,14 +134,9 @@ TString TConfiguration::GetEff1DName()
   return eff1DName_;
 }
 
-TString TConfiguration::GetAccErr1DName()
+TString TConfiguration::GetAccEff1DName()
 {
-  return accErr1DName_;
-}
-
-TString TConfiguration::GetEffErr1DName()
-{
-  return effErr1DName_;
+  return acceff1DName_;
 }
 
 TString TConfiguration::GetAccTotalName()
@@ -154,14 +149,9 @@ TString TConfiguration::GetEffTotalName()
   return effTotalName_;
 }
 
-TString TConfiguration::GetAccErrTotalName()
+TString TConfiguration::GetAccEffTotalName()
 {
-  return accErrTotalName_;
-}
-
-TString TConfiguration::GetEffErrTotalName()
-{
-  return effErrTotalName_;
+  return acceffTotalName_;
 }
 
 TString TConfiguration::GetUnfoldingFileName(int channel)
@@ -177,6 +167,16 @@ TString TConfiguration::GetMatrUnfo1DName()
 TString TConfiguration::GetMatrMigr1DName()
 {
   return matrMigr1DName_;
+}
+
+TString TConfiguration::GetYieldsRec1DName()
+{
+  return yieldsRec1DName_;
+}
+
+TString TConfiguration::GetYieldsGen1DName()
+{
+  return yieldsGen1DName_;
 }
 
 TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
@@ -241,7 +241,7 @@ vector <float> TConfiguration::GetPhoPtUnfBinsLimits(bool isOverflowUsed)
   vector <float> analysLims;
   vector <float> unfoldLims;
   analysLims = GetPhoPtBinsLimits();
-  unfoldLims.push_back(0);
+  unfoldLims.push_back(0.0);
   for (int i=0; i<nPhoPtBins_+1; i++)
     unfoldLims.push_back(analysLims[i]);
   if (isOverflowUsed) 

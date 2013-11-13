@@ -239,11 +239,11 @@ void CalcAccAndEff::LoopOverTreeEvents()
    for (int imc=0; imc<kMaxnMC; imc++)
      accLeptonPhotonPassed[imc]=new bool[kMaxnMC];
 
-//   CheckMaxNumbersInTree();
+   //   CheckMaxNumbersInTree();
   
    TFullCuts fullCuts;
    TMuonCuts muonEmpty;
-//   TElectronCuts electronEmpty;
+   //   TElectronCuts electronEmpty;
    TPhotonCuts photonEmpty;
 
    TMathTools math;
@@ -425,83 +425,78 @@ void CalcAccAndEff::LoopOverTreeEvents()
 
 void CalcAccAndEff::PlotAndSaveOutput()
 {
-  TVectorF vacc(config_.GetNPhoPtBins());
-  TVectorF vaccErr(config_.GetNPhoPtBins());
-  TVectorF veff(config_.GetNPhoPtBins());
-  TVectorF veffErr(config_.GetNPhoPtBins());
-  TVectorF acc(1);
-  TVectorF accErr(1);
-  TVectorF eff(1);
-  TVectorF effErr(1);
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    vacc[i]=vecacc_[i];
-    vaccErr[i]=vecaccErr_[i];
-    veff[i]=veceff_[i];
-    veffErr[i]=veceffErr_[i];
+  int nBins = config_.GetNPhoPtBins();
+  float binLims[nBins+1];
+  for (int i=0; i<nBins+1; i++){
+    binLims[i]=vecPhoPtLimits_[i];
   }
-  acc[0]=acc_;
-  accErr[0]=accErr_;
-  eff[0]=eff_;
-  effErr[0]=effErr_;
+
+  TH1D* hAcc1D = new TH1D(config_.GetAcc1DName(),config_.GetAcc1DName(),nBins,binLims);
+  TH1D* hEff1D = new TH1D(config_.GetEff1DName(),config_.GetEff1DName(),nBins,binLims);
+  TH1D* hAccEff1D = new TH1D(config_.GetAccEff1DName(),config_.GetAccEff1DName(),nBins,binLims);
+  TH1D* hAccTot = new TH1D(config_.GetAccTotalName(),config_.GetAccTotalName(),1,15,1000);
+  TH1D* hEffTot = new TH1D(config_.GetEffTotalName(),config_.GetEffTotalName(),1,15,1000);
+  TH1D* hAccEffTot = new TH1D(config_.GetAccEffTotalName(),config_.GetAccEffTotalName(),1,15,1000);
+
+  for (int i=0; i<config_.GetNPhoPtBins(); i++){
+    hAcc1D->SetBinContent(i+1,vecacc_[i]);
+    hAcc1D->SetBinError(i+1,vecaccErr_[i]);
+    hEff1D->SetBinContent(i+1,veceff_[i]);
+    hEff1D->SetBinError(i+1,veceffErr_[i]);
+    hAccEff1D->SetBinContent(i+1,vecacc_[i]*veceff_[i]);
+    hAccEff1D->SetBinError(i+1,sqrt(vecacc_[i]*vecacc_[i]*veceffErr_[i]*veceffErr_[i]+vecaccErr_[i]*vecaccErr_[i]*veceff_[i]*veceff_[i]));
+  }
+  hAccTot->SetBinContent(1,acc_);
+  hAccTot->SetBinError(1,accErr_);
+  hEffTot->SetBinContent(1,eff_);
+  hEffTot->SetBinError(1,effErr_);
+  hAccEffTot->SetBinContent(1,acc_*eff_);
+  hAccEffTot->SetBinError(1,sqrt(acc_*acc_*effErr_*effErr_+eff_*eff_*accErr_*accErr_));
+
+  hAcc1D->SetLineWidth(2);
+  hEff1D->SetLineWidth(2);
+  hAccEff1D->SetLineWidth(2);
+  hAccTot->SetLineWidth(2);
+  hEffTot->SetLineWidth(2);
+  hAccEffTot->SetLineWidth(2);
+
+  hAcc1D->SetLineColor(2);
+  hEff1D->SetLineColor(4);
+  hAccEff1D->SetLineColor(1);
+  hAccTot->SetLineColor(2);
+  hEffTot->SetLineColor(4);
+  hAccEffTot->SetLineColor(1);
+
   TString fName=config_.GetAccEffFileName(channel_) ;
   TFile f(fName,"recreate");
-  vacc.Write((config_.GetAcc1DName()) );
-  veff.Write((config_.GetEff1DName()) );
-  vaccErr.Write((config_.GetAccErr1DName()) );
-  veffErr.Write((config_.GetEffErr1DName()) );
-  acc.Write((config_.GetAccTotalName()) );
-  eff.Write((config_.GetEffTotalName()) );
-  accErr.Write((config_.GetAccErrTotalName()) );
-  effErr.Write((config_.GetEffErrTotalName()) );
+  hAcc1D->Write((config_.GetAcc1DName()) );
+  hEff1D->Write((config_.GetEff1DName()) );
+  hAccTot->Write((config_.GetAccTotalName()) );
+  hEffTot->Write((config_.GetEffTotalName()) );
+
 
 
   //Draw
-  TVectorF phoBins(config_.GetNPhoPtBins());
-  TVectorF phoBinsErr(config_.GetNPhoPtBins());
-  TVectorF vacceff(config_.GetNPhoPtBins());
-  TVectorF vacceffErr(config_.GetNPhoPtBins());
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    phoBins[i]=0.5*(vecPhoPtLimits_[i+1]+vecPhoPtLimits_[i]);
-    phoBinsErr[i]=0.5*(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
-    vacceff[i]=vacc[i]*veff[i];
-    vacceffErr[i]=sqrt(vacc[i]*vacc[i]*veffErr[i]*veffErr[i]+veff[i]*veff[i]*vaccErr[i]*vaccErr[i]);
-  }
-  TCanvas cAccEff("cAccEff","cAccEff");
-  TVectorF xPattern(2);
-  TVectorF yPattern(2);
-  xPattern[0]=vecPhoPtLimits_[0];
-  xPattern[1]=vecPhoPtLimits_[config_.GetNPhoPtBins()];;
-  yPattern[0]=0.0;
-  yPattern[1]=1.0;
-  TGraph grPattern(xPattern,yPattern);
-  grPattern.SetTitle("Acceptance and Efficiency");
-  grPattern.GetXaxis()->SetMoreLogLabels(1);
+  TCanvas* cAccEff = new TCanvas("cAccEff","cAccEff");
+  
 
+  TLegend* leg = new TLegend(0.2,0.7,0.5,0.85);
+  leg->AddEntry(hAcc1D,"acceptance","L");
+  leg->AddEntry(hEff1D,"efficiency","L");
+  leg->AddEntry(hAccEff1D,"acc x eff","L");
 
-  TGraphErrors grAcc(phoBins, vacc, phoBinsErr, vaccErr);
-  grAcc.SetLineColor(2);
-  grAcc.SetLineWidth(2);
-  grAcc.GetYaxis()->SetRangeUser(0.0,1.0);
-  grAcc.GetXaxis()->SetMoreLogLabels(1);
-  TGraphErrors grEff(phoBins, veff, phoBinsErr, veffErr);
-  grEff.SetLineColor(4);
-  grEff.SetLineWidth(2);
-  TGraphErrors grAccEff(phoBins, vacceff, phoBinsErr, vacceffErr);
-  grAccEff.SetLineColor(1);
-  grAccEff.SetLineWidth(2);
-
-  TLegend leg(0.2,0.7,0.5,0.85);
-  leg.AddEntry(&grAcc,"acceptance","L");
-  leg.AddEntry(&grEff,"efficiency","L");
-  leg.AddEntry(&grAccEff,"acc x eff","L");
-
-  grPattern.Draw("AP");
-  grAcc.Draw("P");
-  grEff.Draw("P");
-  grAccEff.Draw("P");
-  leg.Draw("same");
+  hAcc1D->SetStats(0);
+  hAcc1D->GetYaxis()->SetRangeUser(0.0,1.0);
+  hAcc1D->SetTitle("acceptance and efficiency");
+  hAcc1D->Draw();
+  hEff1D->Draw("same");
+  hAccEff1D->Draw("same");
+  hAccTot->Draw("same");
+  hEffTot->Draw("same");
+  hAccEffTot->Draw("same");
+  leg->Draw("same");
   //cAccEff.SetLogy();
-  cAccEff.SetLogx();
-  cAccEff.SaveAs("cAccEff.png");
-  cAccEff.SaveAs("cAccEff.root");
+  cAccEff->SetLogx();
+  cAccEff->Write("cAccEff");
+
 }

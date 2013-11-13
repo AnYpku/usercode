@@ -114,14 +114,14 @@ bool TPhotonCuts::CutPhoChIso(float phoChIso, float rho2012, float eta)
   return false;
 }
 
-TCut TPhotonCuts::CutPhoChIso(TString phoChIso, TString eta)
+TCut TPhotonCuts::RangePhoChIso()
 {
-  TCut cutB = IsBarrel(eta);
-  TCut cutE = IsEndcap(eta);
-  TString cutIsoBStr = phoChIso+" <= ";
+  TCut cutB = RangeBarrel();
+  TCut cutE = RangeEndcap();
+  TString cutIsoBStr = "phoPFChIsoCorr <= ";
   cutIsoBStr+=phoPFChIsoBarrelCut_[WP_];
   TCut cutIsoB(cutIsoBStr); 
-  TString cutIsoEStr = phoChIso+" <= ";
+  TString cutIsoEStr = "phoPFChIsoCorr <= ";
   cutIsoEStr+=phoPFChIsoEndcapCut_[WP_];
   TCut cutIsoE(cutIsoEStr); 
   TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
@@ -142,17 +142,17 @@ bool TPhotonCuts::CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta)
   return false;
 }
 
-TCut TPhotonCuts::CutSigmaIEtaIEta(TString sigmaIEtaIEta, TString eta)
+TCut TPhotonCuts::RangeSigmaIEtaIEta()
 {
-  TString cutBStr=sigmaIEtaIEta;
+  TString cutBStr="phoSigmaIEtaIEta";
   cutBStr+="<=";
   cutBStr+=phoSigmaIEtaIEtaBarrelCut_[WP_];
   TCut cutB(cutBStr);
-  TString cutEStr=sigmaIEtaIEta;
+  TString cutEStr="phoSigmaIEtaIEta";
   cutEStr+="<=";
   cutEStr+=phoSigmaIEtaIEtaEndcapCut_[WP_];
   TCut cutE(cutEStr);
-  TCut cut = (cutB && IsBarrel(eta)) || (cutE && IsEndcap(eta));
+  TCut cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
   return cut;
 }
 
@@ -215,17 +215,17 @@ bool TPhotonCuts::IsEndcap(float phoEta)
   return false;
 }
 
-TCut TPhotonCuts::IsBarrel(TString phoEtaStr)
+TCut TPhotonCuts::RangeBarrel()
 {
-  TString str=phoEtaStr+"<1.442 && "+phoEtaStr+">-1.442";
+  TString str="phoEta<1.442 && phoEta>-1.442";
   TCut cut(str);
   return cut;
 }
 
-TCut TPhotonCuts::IsEndcap(TString phoEtaStr)
+TCut TPhotonCuts::RangeEndcap()
 {
-  TString str1 = phoEtaStr+"> 1.566 && "+phoEtaStr+"< 2.5";
-  TString str2 = phoEtaStr+"<-1.566 && "+phoEtaStr+">-2.5";
+  TString str1 = "phoEta > 1.566 && phoEta < 2.5";
+  TString str2 = "phoEta <-1.566 && phoEta >-2.5";
   TCut cut1(str1);
   TCut cut2(str2);
   TCut cut = cut1 || cut2;

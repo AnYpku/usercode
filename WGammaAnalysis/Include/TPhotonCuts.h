@@ -34,10 +34,10 @@ class TPhotonCuts
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
     bool CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta);
     bool CutSigmaIEtaIEta();
-    TCut CutSigmaIEtaIEta(TString sigmaIEtaIEta, TString eta);
+    TCut RangeSigmaIEtaIEta();
     bool CutPhoChIso(float phoChIso, float rho2012, float eta);
-    TCut CutPhoChIso(TString phoChIso, TString eta);
     bool CutPhoChIso();
+    TCut RangePhoChIso();
 
     float EffAreaCharged(float eta);
     float EffAreaCharged();
@@ -47,8 +47,8 @@ class TPhotonCuts
     float PFIsoCorr(float PFIso, float rho, float EA);
     bool IsBarrel(float phoEta);
     bool IsEndcap(float phoEta);
-    TCut IsBarrel(TString phoEtaStr);
-    TCut IsEndcap(TString phoEtaStr);
+    TCut RangeBarrel();
+    TCut RangeEndcap();
     bool IsBarrel();
     bool IsEndcap();
 

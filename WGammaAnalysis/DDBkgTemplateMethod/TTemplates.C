@@ -74,9 +74,9 @@ void TTemplates::SetHists()
     ptBinCutStr+=" && phoEt<=";
     ptBinCutStr+=phoPtBinLimits[i+1];
     TCut ptBinCut(ptBinCutStr);
-    TCut phoChIsoCut = emptyPhoton.CutPhoChIso("phoPFChIsoCorr","phoEta");
-    TCut barrelCut = emptyPhoton.IsBarrel("phoEta");
-    TCut endcapCut = emptyPhoton.IsEndcap("phoEta");
+    TCut phoChIsoCut = emptyPhoton.RangePhoChIso();
+    TCut barrelCut = emptyPhoton.RangeBarrel();
+    TCut endcapCut = emptyPhoton.RangeEndcap();
     TString name;
     TCut cut;
     TString cutStr;
@@ -232,7 +232,10 @@ void TTemplates::FitOne(int ptBin, int etaBin)
     else bkgFractionEndcap_.push_back(integralBkgPdf->getVal()/integralSumPdf->getVal());
   }
   //plot results
-  TCanvas c1("c1", "c1", 800, 600);
+  TString cName="c";
+  cName+=etaBin;
+  cName+=ptBin;
+  TCanvas* c1 = new TCanvas(cName,cName, 800, 600);
   RooPlot* plotter = new RooPlot(sihihVar,varMin,varMax,nBins); 
   dataDataHist.plotOn(plotter);
   sumPdf.plotOn(plotter,Name("sum"),LineColor(kRed));
@@ -248,7 +251,7 @@ void TTemplates::FitOne(int ptBin, int etaBin)
   plotName+=etaBin;
   plotName+=".png";
   fOutForSave_->cd();
-  c1.Write();
+  c1->Write(config_.GetTemplatePicNameBase(ptBin,etaBin));
   delete plotter;
 }
 
@@ -281,7 +284,6 @@ void TTemplates::SaveBkgYields()
     hEndcapBkg_[i-1]->Write();
     hBarrelSignal_[i-1]->Write();
     hEndcapSignal_[i-1]->Write();
-
   }
 
   fractionsBkgB_->Write();

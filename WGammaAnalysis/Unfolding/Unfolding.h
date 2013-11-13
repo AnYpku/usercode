@@ -10,9 +10,8 @@
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
 #include "TTree.h" 
 #include "TMatrixD.h" 
-#include "TMatrixF.h"
 #include "TMath.h" 
-#include "TH2F.h"
+#include "TH2D.h"
   //ROOT package
 
 class Unfolding
@@ -23,10 +22,12 @@ class Unfolding
 
        void PrepareMigrationMatrix();
        void PrepareUnfoldingMatrix();
-
-       void CalculateInvertedMatrixErrors(TMatrixF &T, TMatrixF &TErrPos, TMatrixF &TErrNeg, TMatrixF &TinvErr);
+       float CalculateMatrixSpectralNorm(TMatrixD &matrix);
+       void CalculateInvertedMatrixErrors(TMatrixD &T, TMatrixD &TErrPos, TMatrixD &TErrNeg, TMatrixD &TinvErr);
 
        void ClosureTest();
+
+       void Store();
 
 
      private:
@@ -40,8 +41,8 @@ class Unfolding
 
        TFile* fOut_;
 
-       TH2F* histMigrMatrix_;
-       TH2F* histUnfoMatrix_;
+       TH2D* histMigrMatrix_;
+       TH2D* histUnfoMatrix_;
 
        TH1F* histYieldsRec_;
        TH1F* histYieldsGen_;

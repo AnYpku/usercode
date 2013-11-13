@@ -38,16 +38,17 @@ class TConfiguration
     TString GetAccEffFileName(int channel);
     TString GetAcc1DName();
     TString GetEff1DName();
-    TString GetAccErr1DName();
-    TString GetEffErr1DName();
+    TString GetAccEff1DName();
     TString GetAccTotalName();
     TString GetEffTotalName();
-    TString GetAccErrTotalName();
-    TString GetEffErrTotalName();
+    TString GetAccEffTotalName();
+
 
     TString GetUnfoldingFileName(int channel);
     TString GetMatrUnfo1DName();
     TString GetMatrMigr1DName();
+    TString GetYieldsRec1DName();
+    TString GetYieldsGen1DName();
 
     TString GetNameDebugMode();
 
@@ -72,6 +73,8 @@ class TConfiguration
 //photon Pt binning
 static const int nPhoPtBins_ = 9;
 static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
+//static const int nPhoPtBins_ = 8;
+//static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,600.};
 
 
 static const float phoPtOverflowBinLimit_=1000.;
@@ -118,12 +121,10 @@ static const TString templatePicNameBase_="templateFit_";
 static const TString acceffFile_="Constants/AccEff.root";
 static const TString acc1DName_="acc1D"; 
 static const TString eff1DName_="eff1D"; 
-static const TString accErr1DName_="accErr1D"; 
-static const TString effErr1DName_="effErr1D";
+static const TString acceff1DName_="acceff1D";
 static const TString accTotalName_="accTotal"; 
 static const TString effTotalName_="effTotal"; 
-static const TString accErrTotalName_="accErrTotal"; 
-static const TString effErrTotalName_="effErrTotal";
+static const TString acceffTotalName_="acceffTotal"; 
 
 //////////////////////////////////////////
 //unfolding
@@ -131,6 +132,8 @@ static const TString effErrTotalName_="effErrTotal";
 static const TString unfoldingFileName_="Constants/Unfolding.root";
 static const TString matrUnfo1DName_="matrUnfo1D";
 static const TString matrMigr1DName_="matrMigr1D";
+static const TString yieldsRec1DName_="yieldsRec1D";
+static const TString yieldsGen1DName_="yieldsGen1D";
 
 //////////////////////////////////////////
 static const TString nameDebugMode_ = "_debugMode";

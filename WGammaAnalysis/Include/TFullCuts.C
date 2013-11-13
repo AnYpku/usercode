@@ -247,9 +247,9 @@ float TFullCuts::GetWMtCut()
   return WMtCut_;
 }
 
-TCut TFullCuts::ExtraCut(TString sigmaIEtaIEta, TString phoChIso, TString eta)
+TCut TFullCuts::RangeExtraCut()
 {
   TPhotonCuts emptyPhoton;
-  TCut cut = emptyPhoton.CutPhoChIso(phoChIso,eta) && emptyPhoton.CutSigmaIEtaIEta(sigmaIEtaIEta,eta);
+  TCut cut = emptyPhoton.RangePhoChIso() && emptyPhoton.RangeSigmaIEtaIEta();
   return cut;
 }
