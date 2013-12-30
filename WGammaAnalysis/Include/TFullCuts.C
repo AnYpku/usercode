@@ -32,7 +32,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 {
 
   // This function is called from LoopOverEvents.
-  // returns  1 if entry is accepted.
+  // returns 1 if entry is accepted.
   // returns 0 otherwise.
 
 //   nTotal_++;
@@ -54,12 +54,14 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 
    if (!inpTreeLeaf.isData) {
      //MET smearing
+
      TMetTools met(inpTreeLeaf.event, inpTreeLeaf.pfMET, inpTreeLeaf.pfMETPhi,
-              inpTreeLeaf.nLowPtJet, inpTreeLeaf.jetLowPtRawPt,
-              inpTreeLeaf.jetLowPtRawEn, inpTreeLeaf.jetLowPtPt,  
-              inpTreeLeaf.jetLowPtEta, inpTreeLeaf.jetLowPtPhi,
-              inpTreeLeaf.jetLowPtGenJetPt, inpTreeLeaf.jetLowPtGenJetEta, 
-              inpTreeLeaf.jetLowPtGenJetPhi, inpTreeLeaf.nJet, 
+              //inpTreeLeaf.nLowPtJet, inpTreeLeaf.jetLowPtRawPt,
+              //inpTreeLeaf.jetLowPtRawEn, inpTreeLeaf.jetLowPtPt,  
+              //inpTreeLeaf.jetLowPtEta, inpTreeLeaf.jetLowPtPhi,
+              //inpTreeLeaf.jetLowPtGenJetPt, inpTreeLeaf.jetLowPtGenJetEta, 
+              //inpTreeLeaf.jetLowPtGenJetPhi, 
+              inpTreeLeaf.nJet, 
               inpTreeLeaf.jetRawPt, inpTreeLeaf.jetRawEn, 
               inpTreeLeaf.jetPt, inpTreeLeaf.jetEta, 
               inpTreeLeaf.jetPhi, inpTreeLeaf.jetGenJetPt, 
@@ -67,10 +69,11 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
      met.METSmearCorrection();
      inpTreeLeaf.pfMET = met.GetRecoPfMET();
      inpTreeLeaf.pfMETPhi = met.GetRecoPfMETPhi();
-  
-   }
+ 
+   }//end of "if (!inpTreeLeaf.isData)"
 
    bool goodLeptonPhotonPairsExist=0;
+
    for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++)
      for (int ile=0; ile<nLe; ile++) 
        goodLeptonPhotonPairs[ile][ipho]=0;   
@@ -90,22 +93,22 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
         thisLeptonPassed=0;        
         if (channel==TConfiguration::MUON)
           {
-            TMuonCuts muon(ile,inpTreeLeaf.muPt[ile],
-               inpTreeLeaf.muPt,inpTreeLeaf.muEta[ile],inpTreeLeaf.muEta,
-               inpTreeLeaf.nMu,inpTreeLeaf.muNumberOfValidPixelHits[ile],
-               inpTreeLeaf.muNumberOfValidTrkHits[ile],
-               inpTreeLeaf.muNumberOfValidTrkLayers[ile],
-               inpTreeLeaf.muNumberOfValidMuonHits[ile],
-               inpTreeLeaf.muStations[ile],  
+            TMuonCuts muon(ile,inpTreeLeaf.muPt->at(ile),
+               inpTreeLeaf.muPt,inpTreeLeaf.muEta->at(ile),inpTreeLeaf.muEta,
+               inpTreeLeaf.nMu,inpTreeLeaf.muNumberOfValidPixelHits->at(ile),
+               inpTreeLeaf.muNumberOfValidTrkHits->at(ile),
+               inpTreeLeaf.muNumberOfValidTrkLayers->at(ile),
+               inpTreeLeaf.muNumberOfValidMuonHits->at(ile),
+               inpTreeLeaf.muStations->at(ile),  
                inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[18]],
                inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[19]],
-               inpTreeLeaf.muTrg[ile][0],inpTreeLeaf.muTrg[ile][1],
-               inpTreeLeaf.muChi2NDF[ile],
-               inpTreeLeaf.muD0[ile],inpTreeLeaf.muDz[ile],
-               inpTreeLeaf.muPFIsoR04_CH[ile],
-               inpTreeLeaf.muPFIsoR04_NH[ile],
-               inpTreeLeaf.muPFIsoR04_Pho[ile],
-               inpTreeLeaf.muPFIsoR04_PU[ile]);
+               inpTreeLeaf.muTrg->at(ile),
+               inpTreeLeaf.muChi2NDF->at(ile),
+               inpTreeLeaf.muD0->at(ile),inpTreeLeaf.muDz->at(ile),
+               inpTreeLeaf.muPFIsoR04_CH->at(ile),
+               inpTreeLeaf.muPFIsoR04_NH->at(ile),
+               inpTreeLeaf.muPFIsoR04_Pho->at(ile),
+               inpTreeLeaf.muPFIsoR04_PU->at(ile));
                //variables which are input for TMuonCuts constructor
                //are fields of TEventTree
              if (muon.Passed()) 
@@ -117,7 +120,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 
 //                 nMoreVetoPassed_++;
 
-                 WMt[ile] = sqrt(2*inpTreeLeaf.muPt[ile]*inpTreeLeaf.pfMET*(1-cos(inpTreeLeaf.muPhi[ile]-inpTreeLeaf.pfMETPhi)));
+                 WMt[ile] = sqrt(2*inpTreeLeaf.muPt->at(ile)*inpTreeLeaf.pfMET*(1-cos(inpTreeLeaf.muPhi->at(ile)-inpTreeLeaf.pfMETPhi)));
                  if ( WMt[ile]>WMtCut_ )
                    {
 //                     nWMtPassed_++;
@@ -129,11 +132,12 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
           {
             //TElectronCuts functions are empty now;
             //they are included here for the future
-            TElectronCuts electron(inpTreeLeaf.elePt[ile]);
+            TElectronCuts electron(inpTreeLeaf.elePt->at(ile));
             if (electron.Passed()) 
               {
                 if (!electron.MoreElectronsVeto()) return 0;  
-                WMt[ile] = sqrt(2*inpTreeLeaf.elePt[ile]*inpTreeLeaf.pfMET*(1-cos(inpTreeLeaf.elePhi[ile]-inpTreeLeaf.pfMETPhi)));
+                WMt[ile] = 0; 
+//sqrt(2*inpTreeLeaf.elePt->at(ile)*inpTreeLeaf.pfMET*(1-cos(inpTreeLeaf.elePhi->at(ile)-inpTreeLeaf.pfMETPhi)));
                 if (WMt[ile]>WMtCut_) thisLeptonPassed=1;        
               } 
           }
@@ -162,9 +166,9 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
           {
 
             if (channel==TConfiguration::MUON)
-              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.muPhi[ile],inpTreeLeaf.muEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
+              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.muPhi->at(ile),inpTreeLeaf.muEta->at(ile),inpTreeLeaf.phoPhi->at(ipho),inpTreeLeaf.phoEta->at(ipho));
             else if (channel==TConfiguration::ELECTRON)
-              lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.elePhi[ile],inpTreeLeaf.eleEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
+              lePhoDeltaR[ile][ipho]=0; //DeltaR(inpTreeLeaf.elePhi[ile],inpTreeLeaf.eleEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
 
             if (goodPhoton[ipho] && goodLepton[ile] && 
                 (lePhoDeltaR[ile][ipho]>lePhoDeltaRCut_))
@@ -179,7 +183,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
        }     
 
    return goodLeptonPhotonPairsExist;
-}
+}//end of TFullCuts::Cut
 
 bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
                TEventTree::InputTreeLeaves &inpTreeLeaf,   
@@ -192,27 +196,27 @@ bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
        
 //        nPhotons_++;
         if (inpTreeLeaf.isData) 
-           inpTreeLeaf.phoEt[ipho] = photonCorrector->GetCorrEtData(inpTreeLeaf.phoR9[ipho], 2012, inpTreeLeaf.phoEt[ipho], inpTreeLeaf.phoEta[ipho]);
+           inpTreeLeaf.phoEt->at(ipho) = photonCorrector->GetCorrEtData(inpTreeLeaf.phoR9->at(ipho), 2012, inpTreeLeaf.phoEt->at(ipho), inpTreeLeaf.phoEta->at(ipho));
           //Phosphor correction needs to be applied for the photon Et only, 
           //not for SC Et
         else
           {
             int phoMCIndex = -1;
             for (int iMC=0; iMC<inpTreeLeaf.nMC; iMC++){
-              if (inpTreeLeaf.mcPID[iMC]==22) phoMCIndex = iMC;
+              if (inpTreeLeaf.mcPID->at(iMC)==22) phoMCIndex = iMC;
             }
             if (phoMCIndex > -1) 
-              inpTreeLeaf.phoEt[ipho] = photonCorrector->GetCorrEtMC(inpTreeLeaf.phoR9[ipho], 2012, inpTreeLeaf.phoEt[ipho], inpTreeLeaf.phoEta[ipho], inpTreeLeaf.mcE[phoMCIndex]);
+              inpTreeLeaf.phoEt->at(ipho) = photonCorrector->GetCorrEtMC(inpTreeLeaf.phoR9->at(ipho), 2012, inpTreeLeaf.phoEt->at(ipho), inpTreeLeaf.phoEta->at(ipho), inpTreeLeaf.mcE->at(phoMCIndex));
           }
 
                 
-        TPhotonCuts photon(inpTreeLeaf.phoEleVeto[ipho],
-                    inpTreeLeaf.phoEt[ipho],inpTreeLeaf.phoEta[ipho],
-                    inpTreeLeaf.phoSCEt[ipho],inpTreeLeaf.phoSCEta[ipho],
-                    inpTreeLeaf.phoHoverE12[ipho],
-                    inpTreeLeaf.phoSigmaIEtaIEta[ipho],
-                    inpTreeLeaf.phoPFChIso[ipho],inpTreeLeaf.phoPFNeuIso[ipho],
-                    inpTreeLeaf.phoPFPhoIso[ipho],
+        TPhotonCuts photon(inpTreeLeaf.phoEleVeto->at(ipho),
+                    inpTreeLeaf.phoEt->at(ipho),inpTreeLeaf.phoEta->at(ipho),
+                    inpTreeLeaf.phoSCEt->at(ipho),inpTreeLeaf.phoSCEta->at(ipho),
+                    inpTreeLeaf.phoHoverE12->at(ipho),
+                    inpTreeLeaf.phoSigmaIEtaIEta->at(ipho),
+                    inpTreeLeaf.phoPFChIso->at(ipho),inpTreeLeaf.phoPFNeuIso->at(ipho),
+                    inpTreeLeaf.phoPFPhoIso->at(ipho),
                     inpTreeLeaf.rho2012);
           //variables which are input for TPhotonCuts constructor
           //are fields of TEventTree
@@ -228,8 +232,9 @@ bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
           }
         else goodPhoton[ipho]=0;
       } //end of photon loop   
+
   return goodPhotonExists;
-}
+}//end of TFullCuts::PhotonOnlyCuts
 
 float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 
 { 
@@ -247,9 +252,15 @@ float TFullCuts::GetWMtCut()
   return WMtCut_;
 }
 
+TCut TFullCuts::RangeMetRelatedCut()
+{
+  TCut cut("1");
+  return cut;
+}
+
 TCut TFullCuts::RangeExtraCut()
 {
   TPhotonCuts emptyPhoton;
-  TCut cut = emptyPhoton.RangePhoChIso() && emptyPhoton.RangeSigmaIEtaIEta();
+  TCut cut = emptyPhoton.RangePhoChIso() && emptyPhoton.RangeSigmaIEtaIEta() && RangeMetRelatedCut();
   return cut;
 }

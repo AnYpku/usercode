@@ -4,9 +4,10 @@
 #include <TH1F.h>
 #include <iostream>
 
-SkimLeptonPhoton::SkimLeptonPhoton(TString inputFileName, TString nameDir, TString nameTree, TString outDir, int channel)
+SkimLeptonPhoton::SkimLeptonPhoton(int channel, int sample, TString inputFileName, TString nameDir, TString nameTree, TString outDir)
 {
 
+  sample_=sample;
   channel_=channel;  
 
   nameDir_=nameDir;
@@ -20,7 +21,7 @@ SkimLeptonPhoton::SkimLeptonPhoton(TString inputFileName, TString nameDir, TStri
   }
   inpTemp.ReplaceAll(".root","");
 
-  if (channel == MUON || channel == BOTH){
+  if (channel == config_.MUON || channel == config_.BOTH){
     skimmedFileNameMu_=outDir+inpTemp+"_MuPhoSkim.root";
     fileOutMu_ = new TFile(skimmedFileNameMu_,"recreate");
     fileOutMu_->mkdir(nameDir_);
@@ -31,7 +32,7 @@ SkimLeptonPhoton::SkimLeptonPhoton(TString inputFileName, TString nameDir, TStri
     hskimMu_ = new TH1F("hskim","hskim",2,0,2);
   }
 
-  if (channel == ELECTRON || channel == BOTH){
+  if (channel == config_.ELECTRON || channel == config_.BOTH){
     skimmedFileNameEle_=outDir+inpTemp+"_ElePhoSkim.root"; 
     fileOutEle_ = new TFile(skimmedFileNameEle_,"recreate");
     fileOutEle_->mkdir(nameDir_);
@@ -47,8 +48,8 @@ SkimLeptonPhoton::SkimLeptonPhoton(TString inputFileName, TString nameDir, TStri
 SkimLeptonPhoton::~SkimLeptonPhoton()
 {
   TREE_.fChain = 0;
-  if (channel_==MUON || channel_==BOTH) fileOutMu_->Close();
-  if (channel_==ELECTRON || channel_==BOTH) fileOutEle_->Close();
+  if (channel_==config_.MUON || channel_==config_.BOTH) fileOutMu_->Close();
+  if (channel_==config_.ELECTRON || channel_==config_.BOTH) fileOutEle_->Close();
 }
 
 void SkimLeptonPhoton::LoopOverInputTree()
@@ -81,7 +82,7 @@ void SkimLeptonPhoton::LoopOverInputTree()
         //field of TInputTree
 
   Long64_t nentries = TREE_.fChain->GetEntries();
-  //nentries = 10;
+ // nentries = 100;
   int nMuPassed=0;
   int nElePassed=0;
 
@@ -89,13 +90,20 @@ void SkimLeptonPhoton::LoopOverInputTree()
     {
       if (entry < 0) break;
 
-      TREE_.fChain->GetEntry(entry);
-      if (TREE_.treeLeaf.nPho>0 && TREE_.treeLeaf.nMu>0 && (channel_==MUON || channel_==BOTH))
+      TREE_.GetEntryNeededBranchesOnly(channel_,sample_,entry);
+      
+      if (TREE_.treeLeaf.nPho<1) continue;
+      bool phoExists=0;
+      for (int ipho=0; ipho<TREE_.treeLeaf.nPho; ipho++){
+        if (TREE_.treeLeaf.phoEt->at(ipho)>10) phoExists=1;
+      }
+      if (!phoExists) continue;
+      if (TREE_.treeLeaf.nMu>0 && (channel_==config_.MUON || channel_==config_.BOTH))
         {
           nMuPassed++; 
           outputTreeMu_->Fill();
         }
-      if (TREE_.treeLeaf.nPho>0 && TREE_.treeLeaf.nEle>0 && (channel_==ELECTRON || channel_==BOTH))
+      if (TREE_.treeLeaf.nEle>0 && (channel_==config_.ELECTRON || channel_==config_.BOTH))
         {
           nElePassed++;
           outputTreeEle_->Fill();
@@ -104,7 +112,7 @@ void SkimLeptonPhoton::LoopOverInputTree()
     }//loop over entries ends
 
   //writing output trees to files
-  if (channel_==MUON || channel_==BOTH){
+  if (channel_==config_.MUON || channel_==config_.BOTH){
     fileOutMu_->cd();
     fileOutMu_->cd(nameDir_);
     outputTreeMu_->Write(nameTree_);
@@ -122,7 +130,7 @@ void SkimLeptonPhoton::LoopOverInputTree()
     hskimMu_->Write();
   }
 
-  if (channel_==ELECTRON || channel_==BOTH){
+  if (channel_==config_.ELECTRON || channel_==config_.BOTH){
     fileOutEle_->cd();
     fileOutEle_->cd(nameDir_);
     outputTreeEle_->Write(nameTree_);

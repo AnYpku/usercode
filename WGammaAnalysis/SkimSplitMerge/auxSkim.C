@@ -12,7 +12,7 @@ void auxSkim(TString fileToSkimName)
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
   TString fileToSkimFullName = "/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMC/" + fileToSkimName;
-  SkimLeptonPhoton skimmer(fileToSkimFullName, "ggNtuplizer", "EventTree", "./", SkimLeptonPhoton::MUON);
+  SkimLeptonPhoton skimmer(TConfiguration::MUON, TConfiguration::BKGMC,fileToSkimFullName, "ggNtuplizer", "EventTree", "./", SkimLeptonPhoton::MUON);
   skimmer.LoopOverInputTree();
 
   std::cout<<"file "<<fileToSkimFullName<<" was skimmed"<<std::endl;

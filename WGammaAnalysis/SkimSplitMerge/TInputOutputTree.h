@@ -11,11 +11,11 @@
 #include "../Include/TEventTree.h"
 class TInputOutputTree: public TEventTree{
 public : 
+   TInputOutputTree();
+   virtual ~TInputOutputTree();
    TString nameFile_;
    TString nameDir_;
    TString nameTree_; 
-   TInputOutputTree();
-   virtual ~TInputOutputTree();
    void     InitOutputTree  (TTree* outputTree);
    //void FillOutputTree(int iTree);
 };

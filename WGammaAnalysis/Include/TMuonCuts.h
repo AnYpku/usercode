@@ -1,6 +1,7 @@
 #ifndef TMuonCuts_h
 #define TMuonCuts_h
 
+#include <vector>
 #include "TEventTree.h" //class of this package
 
 class TMuonCuts
@@ -9,9 +10,9 @@ class TMuonCuts
        TMuonCuts ();
        TMuonCuts ( int imu,
                float muPt_imu,
-               float* muPt,
+               vector <float> *muPt,
                float muEta_imu,
-               float* muEta,
+               vector <float> *muEta,
                int nMu,
                int muNumberOfValidPixelHits_imu,
                int muNumberOfValidTrkHits_imu,
@@ -20,8 +21,7 @@ class TMuonCuts
                int muStations_imu,
                int HLT_HLTIndex_18,
                int HLT_HLTIndex_19,
-               int muTrg_imu_0,
-               int muTrg_imu_1,
+               int muTrg_imu,
                float muChi2NDF_imu_,
                float muD0_imu,
                float muDZ_imu,
@@ -55,9 +55,8 @@ class TMuonCuts
        int muNumberOfValidMuonHits_imu_;
        int muStations_imu_;
        int HLT_HLTIndex_18_;
-       int muTrg_imu_0_;
+       int muTrg_imu_;
        int HLT_HLTIndex_19_;
-       int muTrg_imu_1_;
        float muChi2NDF_imu_;
        float muPt_imu_;
        float muEta_imu_;
@@ -67,8 +66,8 @@ class TMuonCuts
        float muPFIsoR04_NH_imu_;
        float muPFIsoR04_Pho_imu_;
        float muPFIsoR04_PU_imu_;
-       float muPt_[TEventTree::kMaxnMu];
-       float muEta_[TEventTree::kMaxnMu];
+       vector <float> muPt_;
+       vector <float> muEta_;
        
  
 

@@ -259,9 +259,9 @@ void Unfolding::PrepareUnfoldingMatrix()
   std::cout<<"cond=||M||*||M^-1|| (spectral norm)="<<CalculateMatrixSpectralNorm(mMigr)<<"*"<<CalculateMatrixSpectralNorm(mUnfo)<<"="<<CalculateMatrixSpectralNorm(mMigr)*CalculateMatrixSpectralNorm(mUnfo)<<std::endl;
   std::cout<<"condLUMigr="<<condLUMigr<<", condLUUnfo="<<condLUUnfo<<std::endl;
   std::cout<<"condSVDMigr="<<condSVDMigr<<", condSVDUnfo="<<condSVDUnfo<<std::endl;
-  std::cout<<"decomposition status: "<<decompSVDUnfo.Decompose()<<std::endl;
-  TMatrixD mU =  decompSVDUnfo.GetU();
-  TMatrixD mV =  decompSVDUnfo.GetV();
+  std::cout<<"decomposition status: "<<decompSVDMigr.Decompose()<<std::endl;
+  TMatrixD mU =  decompSVDMigr.GetU();
+  TMatrixD mV =  decompSVDMigr.GetV();
   TMatrixD mVT(TMatrixD::kTransposed,mV);
   TVectorD mS =  decompSVDUnfo.GetSig();
   std::cout<<"U * vSig * V':"<<std::endl;
@@ -331,8 +331,8 @@ void Unfolding::CalculateInvertedMatrixErrors(TMatrixD &T, TMatrixD &TErrPos, TM
     for(int i = 0; i<nRow; i++){
       for(int j = 0; j<nCol; j++){
         double central = T(i,j);
-        double sigPos = TErrPos(i,j);
-        double sigNeg = TErrNeg(i,j);
+        double sigPos = TErrPos(i,j)/2;
+        double sigNeg = TErrNeg(i,j)/2;
          // Switch to symmetric errors: approximation, but much simpler
         double sig = (sigPos+sigNeg)/2.0;
         Tsmeared(i,j) = gRandom->Gaus(central,sig);
@@ -406,9 +406,10 @@ void Unfolding::ClosureTest()
       recCalcErrSquared12+=histUnfoMatrix_->GetBinContent(i,j)*hRecYields->GetBinError(j)*histUnfoMatrix_->GetBinContent(i,j)*hRecYields->GetBinError(j);
       recCalc2+=histUnfoMatrix_->GetBinContent(i,j)*histYieldsRec_->GetBinContent(j);
       recCalcErrSquared21+=histUnfoMatrix_->GetBinError(i,j)*histYieldsRec_->GetBinContent(j)*histUnfoMatrix_->GetBinError(i,j)*histYieldsRec_->GetBinContent(j);
-      recCalcErrSquared22+=histUnfoMatrix_->GetBinContent(i,j)*histYieldsRec_->GetBinError(j)*histUnfoMatrix_->GetBinContent(i,j)*histYieldsRec_->GetBinError(j);
+      //recCalcErrSquared22+=histUnfoMatrix_->GetBinContent(i,j)*histYieldsRec_->GetBinError(j)*histUnfoMatrix_->GetBinContent(i,j)*histYieldsRec_->GetBinError(j);
+      recCalcErrSquared22+=histUnfoMatrix_->GetBinContent(i,j)*sqrt(histYieldsRec_->GetBinContent(j))*histUnfoMatrix_->GetBinContent(i,j)*sqrt(histYieldsRec_->GetBinContent(j));
     }
-    std::cout<<hGenYields->GetBinContent(i)<<"+-"<<hGenYields->GetBinError(i)<<" = "<<recCalc1<<"+-"<<sqrt(recCalcErrSquared11)<<"+-"<<sqrt(recCalcErrSquared12)<<" = "<<histYieldsGen_->GetBinContent(i)<<"+-"<<histYieldsGen_->GetBinError(i)<<" = "<<recCalc2<<"+-"<<sqrt(recCalcErrSquared21)<<"+-"<<sqrt(recCalcErrSquared22)<<std::endl;
+    std::cout<<histYieldsGen_->GetBinLowEdge(i)<<" - "<<histYieldsGen_->GetBinLowEdge(i)+histYieldsGen_->GetBinWidth(i)<<" GeV: "<</*hGenYields->GetBinContent(i)<<"+-"<<hGenYields->GetBinError(i)<<" = "<<recCalc1<<"+-"<<sqrt(recCalcErrSquared11)<<"+-"<<sqrt(recCalcErrSquared12)<<" = "<<*/histYieldsGen_->GetBinContent(i)<<"+-"<</*histYieldsGen_->GetBinError(i)*/sqrt(histYieldsGen_->GetBinContent(i))<<" = "<<recCalc2<<"+-"<<sqrt(recCalcErrSquared21)<<"+-"<<sqrt(recCalcErrSquared22)<<std::endl;
   }
   std::cout<<"the last bin value and error:"<<std::endl;
   for (int j=1; j<nBins+1; j++){

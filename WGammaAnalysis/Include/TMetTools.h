@@ -16,27 +16,37 @@ class TMetTools
     TMetTools();
     TMetTools(int event, float recoPfMET, float recoPfMETPhi,
               int nLowPtJet,
-              float* jetLowPtRawPt,
-              float* jetLowPtRawEn,
-              float* jetLowPtPt,
-              float* jetLowPtEta,
-              float* jetLowPtPhi,
-              float* jetLowPtGenJetPt,
-              float* jetLowPtGenJetEta,
-              float* jetLowPtGenJetPhi,
+              vector <float> *jetLowPtRawPt,
+              vector <float> *jetLowPtRawEn,
+              vector <float> *jetLowPtPt,
+              vector <float> *jetLowPtEta,
+              vector <float> *jetLowPtPhi,
+              vector <float> *jetLowPtGenJetPt,
+              vector <float> *jetLowPtGenJetEta,
+              vector <float> *jetLowPtGenJetPhi,
               int nJet,
-              float* jetRawPt,
-              float* jetRawEn,
-              float* jetPt,
-              float* jetEta,
-              float* jetPhi,
-              float* jetGenJetPt,
-              float* jetGenJetEta,
-              float* jetGenJetPhi);
+              vector <float> *jetRawPt,
+              vector <float> *jetRawEn,
+              vector <float> *jetPt,
+              vector <float> *jetEta,
+              vector <float> *jetPhi,
+              vector <float> *jetGenJetPt,
+              vector <float> *jetGenJetEta,
+              vector <float> *jetGenJetPhi);
+    TMetTools(int event, float recoPfMET, float recoPfMETPhi,
+              int nJet,
+              vector <float> *jetRawPt,
+              vector <float> *jetRawEn,
+              vector <float> *jetPt,
+              vector <float> *jetEta,
+              vector <float> *jetPhi,
+              vector <float> *jetGenJetPt,
+              vector <float> *jetGenJetEta,
+              vector <float> *jetGenJetPhi);
     virtual ~TMetTools();
 
     void METSmearCorrection();
-    void LoopOverJetsForSmearing(int nJet, float* jetRawPt, float* jetRawEn, float* jetPt, float* jetEta, float* jetPhi);
+    void LoopOverJetsForSmearing(int nJet, vector <float> jetRawPt, vector <float> jetRawEn, vector <float> jetPt, vector <float> jetEta, vector <float> jetPhi);
     double GetMETJetSmearFactor(float metJetEta);
     double ErrEt( double Et, double Eta);
     float DeltaR (float eta1, float phi1, float eta2, float phi2);
@@ -55,23 +65,23 @@ class TMetTools
     float recoPfMET_;
     float recoPfMETPhi_;
     int nLowPtJet_;
-    float jetLowPtRawPt_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtRawEn_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtPt_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtEta_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtPhi_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtGenJetPt_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtGenJetEta_[TEventTree::kMaxnLowPtJet];
-    float jetLowPtGenJetPhi_[TEventTree::kMaxnLowPtJet];
+    vector <float> jetLowPtRawPt_;
+    vector <float> jetLowPtRawEn_;
+    vector <float> jetLowPtPt_;
+    vector <float> jetLowPtEta_;
+    vector <float> jetLowPtPhi_;
+    vector <float> jetLowPtGenJetPt_;
+    vector <float> jetLowPtGenJetEta_;
+    vector <float> jetLowPtGenJetPhi_;
     int nJet_;
-    float jetRawPt_[TEventTree::kMaxnJet];
-    float jetRawEn_[TEventTree::kMaxnJet];
-    float jetPt_[TEventTree::kMaxnJet];
-    float jetEta_[TEventTree::kMaxnJet];
-    float jetPhi_[TEventTree::kMaxnJet];
-    float jetGenJetPt_[TEventTree::kMaxnJet];
-    float jetGenJetEta_[TEventTree::kMaxnJet];
-    float jetGenJetPhi_[TEventTree::kMaxnJet];
+    vector <float> jetRawPt_;
+    vector <float> jetRawEn_;
+    vector <float> jetPt_;
+    vector <float> jetEta_;
+    vector <float> jetPhi_;
+    vector <float> jetGenJetPt_;
+    vector <float> jetGenJetEta_;
+    vector <float> jetGenJetPhi_;
 
 
     TLorentzVector jetSumSmeared_;

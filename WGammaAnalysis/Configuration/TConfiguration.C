@@ -57,6 +57,13 @@ TString TConfiguration::GetEtaBinName(int etaBin)
   return "UNKNOWN_ETABIN";
 }
 
+TString TConfiguration::GetSelectedVeryPreliminaryName(int channel, int sample, TString sourceName)
+{
+  TString name = GetOutputDirName(channel)+selectedVeryPreliminaryEventsNameBase_+GetSampleName(sample);
+  if (sample == BKGMC) return name+"_"+sourceName+".root";
+  return name+".root";
+}
+
 TString TConfiguration::GetSelectedPreliminaryName(int channel, int sample, TString sourceName)
 {
   TString name = GetOutputDirName(channel)+selectedPreliminaryEventsNameBase_+GetSampleName(sample);
@@ -74,6 +81,16 @@ TString TConfiguration::GetSelectedFullyName(int channel, int sample, TString so
 TString TConfiguration::GetNameDebugMode()
 {
   return nameDebugMode_;
+}
+
+TString TConfiguration::GetNameNoPuReweight()
+{
+  return nameNoPuReweight_;
+}
+
+TString TConfiguration::GetNameVeryLooseSelectionMode()
+{
+  return nameVeryLooseSelectionMode_;
 }
 
 TString TConfiguration::GetYieldsFileName(int channel)

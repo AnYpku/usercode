@@ -7,20 +7,28 @@
 
 class SplitWGammaMC{
 public :
-   SplitWGammaMC(TString* nameWGammaSample, TString nameDir, TString nameTree);
+   SplitWGammaMC(TString nameWGammaInput, TString nameWGammaEle, TString nameWGammaMuo, TString nameWGammaTau, TString nameDir, TString nameTree);
    virtual ~SplitWGammaMC();
    void LoopOverInputTree();
      //the main function which is called from outside
-   const static int numberOfTrees=5;
-     //tree [0] is input tree;
-     //trees [1]-[4] are output trees
+   enum {ID_ELECTRON=2, ID_MUON=3, ID_TAU=4};
 private :
+
    TInputOutputTree TREE_;
-   TFile    *fileOut_[numberOfTrees]; //output Files
-   TTree    *outputTree_[numberOfTrees]; //output Trees
-   TString nameWGammaSample_[numberOfTrees]; //names of input [0] and output [1]-[numberOfTrees] files
+
+   TFile    *fileOutEle_; //output Files
+   TFile    *fileOutMuo_; //output Files
+   TFile    *fileOutTau_; //output Files
+   TTree    *outputTreeEle_; //output Trees
+   TTree    *outputTreeMuo_; //output Trees
+   TTree    *outputTreeTau_; //output Trees
+   TString nameWGammaInput_;
+   TString nameWGammaEle_; 
+   TString nameWGammaMuo_; 
+   TString nameWGammaTau_; 
    TString nameDir_;
    TString nameTree_;
+
 };
 
 #endif

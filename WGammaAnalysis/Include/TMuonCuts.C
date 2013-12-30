@@ -1,6 +1,7 @@
 #include "TMuonCuts.h" //class of this package
 #include "math.h" //general C++ class
 #include <iostream> //general C++ class
+#include <vector> //general C++ class
 #include "TMath.h" //ROOT class
 
 TMuonCuts::TMuonCuts()
@@ -9,9 +10,9 @@ TMuonCuts::TMuonCuts()
 
 TMuonCuts::TMuonCuts(  int imu,
                float muPt_imu,
-               float* muPt,
+               vector <float> *muPt,
                float muEta_imu,
-               float* muEta,
+               vector <float> *muEta,
                int nMu,
                int muNumberOfValidPixelHits_imu,
                int muNumberOfValidTrkHits_imu,
@@ -20,8 +21,7 @@ TMuonCuts::TMuonCuts(  int imu,
                int muStations_imu,
                int HLT_HLTIndex_18,
                int HLT_HLTIndex_19,
-               int muTrg_imu_0,
-               int muTrg_imu_1,
+               int muTrg_imu,
                float muChi2NDF_imu,
                float muD0_imu,
                float muDZ_imu,
@@ -40,9 +40,8 @@ TMuonCuts::TMuonCuts(  int imu,
   muNumberOfValidMuonHits_imu_=muNumberOfValidMuonHits_imu;
   muStations_imu_=muStations_imu;
   HLT_HLTIndex_18_=HLT_HLTIndex_18;
-  muTrg_imu_0_=muTrg_imu_0;
+  muTrg_imu_=muTrg_imu;
   HLT_HLTIndex_19_=HLT_HLTIndex_19;
-  muTrg_imu_1_=muTrg_imu_1;
   muChi2NDF_imu_=muChi2NDF_imu;
   muD0_imu_=muD0_imu;
   muDZ_imu_=muDZ_imu;
@@ -52,8 +51,8 @@ TMuonCuts::TMuonCuts(  int imu,
   muPFIsoR04_PU_imu_=muPFIsoR04_PU_imu;
   for (int i=0; i<nMu; i++)
     {
-      muPt_[i]=muPt[i];
-      muEta_[i]=muEta[i];
+      muPt_.push_back(muPt->at(i));
+      muEta_.push_back(muEta->at(i));
     }
 }
 
@@ -88,10 +87,10 @@ bool TMuonCuts::Passed() {
 
 bool TMuonCuts::MuTriggerMatch()
 {
-  if (HLT_HLTIndex_19_ && muTrg_imu_1_) return true;
-    //HLT_IsoMu24_v, muonTriggerMatchHLTIsoMu24
-  if (HLT_HLTIndex_18_ && muTrg_imu_0_) return true;
-    //HLT_IsoMu24_eta2p1_, muonTriggerMatchHLTIsoMu24eta2p1
+  if (HLT_HLTIndex_19_ && muTrg_imu_) return true;
+    //HLT_IsoMu24_v, muonTriggerMatchHLTIsoMu24 (muTrg[1][imu])
+  if (HLT_HLTIndex_18_ && muTrg_imu_) return true;
+    //HLT_IsoMu24_eta2p1_, muonTriggerMatchHLTIsoMu24eta2p1 (muTrg[0][imu])
   return false;
 }
 

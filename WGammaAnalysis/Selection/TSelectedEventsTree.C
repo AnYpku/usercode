@@ -50,15 +50,16 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, int le
                  float phoEta, float phoPhi, float phoEt, int phoGenPID, float phoGenEt,
                  float phoSigmaIEtaIEta,
                  float phoPFChIsoCorr,
-                 float phoSCRChIsoCorr,
+                 float phoSCRChIsoCorr,//up to here is fine
                  float lePhoDeltaR,
                  float WMt,
-                 float pfMET, float pfMETPhi,
+                 float pfMET, float pfMETPhi,//up to here is fine
                  float rho2012,
-                 int run,
+                 int run,//up to here is fine
                  int inputFileN,
                  float weight, float PUweight, float PU)
 {
+
   leEta_=leEta;
   lePhi_=lePhi;
   lePt_=lePt;
@@ -81,4 +82,5 @@ void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, int le
   weight_=weight;
   PUweight_=PUweight;
   PU_=PU;
+
 }

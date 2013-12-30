@@ -22,6 +22,7 @@ public:
                zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0);
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut();
+  TCut RangeMetRelatedCut();
   TCut RangeExtraCut();
 
 private:

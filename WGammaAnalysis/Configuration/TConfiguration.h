@@ -4,6 +4,7 @@
 #include "TString.h" 
 #include "TColor.h" 
   //ROOT class
+#include <vector>
 
 class TConfiguration
 {
@@ -11,7 +12,7 @@ class TConfiguration
     TConfiguration();
     virtual ~TConfiguration();
 
-    enum {MUON, ELECTRON};
+    enum {MUON, ELECTRON, BOTH};
     enum {DATA, SIGMC, BKGMC};
     enum {BARREL, ENDCAP, COMMON};
     enum {TOTAL, ONEDI, TWODI};
@@ -22,6 +23,7 @@ class TConfiguration
     TString GetSampleName(int sample);
     TString GetEtaBinName(int etaBin);
 
+    TString GetSelectedVeryPreliminaryName(int channel, int sample, TString sourceName="");
     TString GetSelectedPreliminaryName(int channel, int sample, TString sourceName="");
     TString GetSelectedFullyName(int channel, int sample, TString sourceName="");
 
@@ -51,6 +53,8 @@ class TConfiguration
     TString GetYieldsGen1DName();
 
     TString GetNameDebugMode();
+    TString GetNameNoPuReweight();
+    TString GetNameVeryLooseSelectionMode();
 
     TString GetPhotonScaleFactorsFileNamePt15to20GeV();
     TString GetPhotonScaleFactorsFileNamePt20toInfGeV();
@@ -71,10 +75,10 @@ class TConfiguration
 
 /////////////////////////////////////////
 //photon Pt binning
+//static const int nPhoPtBins_ = 9;
+//static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
 static const int nPhoPtBins_ = 9;
 static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
-//static const int nPhoPtBins_ = 8;
-//static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,600.};
 
 
 static const float phoPtOverflowBinLimit_=1000.;
@@ -94,6 +98,7 @@ static const TString outputDirEle_="../WGammaOutput/ELECTRON/";
 /////////////////////////////////////////
 //selected files, directory and file names
 //(these files will be output of the script Selection)
+static const TString selectedVeryPreliminaryEventsNameBase_="VeryPreliminarySelected/selected";
 static const TString selectedPreliminaryEventsNameBase_="PreliminarySelected/selected";
 static const TString selectedFullyEventsNameBase_="FullySelected/selected";
 
@@ -137,6 +142,8 @@ static const TString yieldsGen1DName_="yieldsGen1D";
 
 //////////////////////////////////////////
 static const TString nameDebugMode_ = "_debugMode";
+static const TString nameNoPuReweight_="_noPuReweight";
+static const TString nameVeryLooseSelectionMode_="_veryLooseSelectionMode";
 
 //////////////////////////////////////////
 //certrified constants

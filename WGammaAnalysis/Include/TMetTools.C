@@ -12,51 +12,78 @@ TMetTools::TMetTools()
 
 TMetTools::TMetTools(int event, float recoPfMET, float recoPfMETPhi,
               int nLowPtJet,
-              float* jetLowPtRawPt,
-              float* jetLowPtRawEn,
-              float* jetLowPtPt,
-              float* jetLowPtEta,
-              float* jetLowPtPhi,
-              float* jetLowPtGenJetPt,
-              float* jetLowPtGenJetEta,
-              float* jetLowPtGenJetPhi,
+              vector <float> *jetLowPtRawPt,
+              vector <float> *jetLowPtRawEn,
+              vector <float> *jetLowPtPt,
+              vector <float> *jetLowPtEta,
+              vector <float> *jetLowPtPhi,
+              vector <float> *jetLowPtGenJetPt,
+              vector <float> *jetLowPtGenJetEta,
+              vector <float> *jetLowPtGenJetPhi,
               int nJet,
-              float* jetRawPt,
-              float* jetRawEn,
-              float* jetPt,
-              float* jetEta,
-              float* jetPhi,
-              float* jetGenJetPt,
-              float* jetGenJetEta,
-              float* jetGenJetPhi)
+              vector <float> *jetRawPt,
+              vector <float> *jetRawEn,
+              vector <float> *jetPt,
+              vector <float> *jetEta,
+              vector <float> *jetPhi,
+              vector <float> *jetGenJetPt,
+              vector <float> *jetGenJetEta,
+              vector <float> *jetGenJetPhi)
 {
   event_=event;
   recoPfMET_=recoPfMET;
   recoPfMETPhi_=recoPfMETPhi;
   nLowPtJet_=nLowPtJet;
   for (int i=0; i<nLowPtJet_; i++) {
-    jetLowPtRawPt_[i]=jetLowPtRawPt[i];
-    jetLowPtRawEn_[i]=jetLowPtRawEn[i];
-    jetLowPtPt_[i]=jetLowPtPt[i];
-    jetLowPtEta_[i]=jetLowPtEta[i];
-    jetLowPtPhi_[i]=jetLowPtPhi[i];
-    jetLowPtGenJetPt_[i]=jetLowPtGenJetPt[i];
-    jetLowPtGenJetEta_[i]=jetLowPtGenJetEta[i];
-    jetLowPtGenJetPhi_[i]=jetLowPtGenJetPhi[i];    
+    jetLowPtRawPt_.push_back(jetLowPtRawPt->at(i));
+    jetLowPtRawEn_.push_back(jetLowPtRawEn->at(i));
+    jetLowPtPt_.push_back(jetLowPtPt->at(i));
+    jetLowPtEta_.push_back(jetLowPtEta->at(i));
+    jetLowPtPhi_.push_back(jetLowPtPhi->at(i));
+    jetLowPtGenJetPt_.push_back(jetLowPtGenJetPt->at(i));
+    jetLowPtGenJetEta_.push_back(jetLowPtGenJetEta->at(i));
+    jetLowPtGenJetPhi_.push_back(jetLowPtGenJetPhi->at(i));    
   }
   nJet_=nJet;
   for (int i=0; i<nJet_; i++) {
-    jetRawPt_[i]=jetRawPt[i];
-    jetRawEn_[i]=jetRawEn[i];
-    jetPt_[i]=jetPt[i];
-    jetEta_[i]=jetEta[i];
-    jetPhi_[i]=jetPhi[i];
-    jetGenJetPt_[i]=jetGenJetPt[i];
-    jetGenJetEta_[i]=jetGenJetEta[i];
-    jetGenJetPhi_[i]=jetGenJetPhi[i];    
+    jetRawPt_.push_back(jetRawPt->at(i));
+    jetRawEn_.push_back(jetRawEn->at(i));
+    jetPt_.push_back(jetPt->at(i));
+    jetEta_.push_back(jetEta->at(i));
+    jetPhi_.push_back(jetPhi->at(i));
+    jetGenJetPt_.push_back(jetGenJetPt->at(i));
+    jetGenJetEta_.push_back(jetGenJetEta->at(i));
+    jetGenJetPhi_.push_back(jetGenJetPhi->at(i));    
   }
 }
 
+TMetTools::TMetTools(int event, float recoPfMET, float recoPfMETPhi,
+              int nJet,
+              vector <float> *jetRawPt,
+              vector <float> *jetRawEn,
+              vector <float> *jetPt,
+              vector <float> *jetEta,
+              vector <float> *jetPhi,
+              vector <float> *jetGenJetPt,
+              vector <float> *jetGenJetEta,
+              vector <float> *jetGenJetPhi)
+{
+  event_=event;
+  recoPfMET_=recoPfMET;
+  recoPfMETPhi_=recoPfMETPhi;
+  nLowPtJet_=0;
+  nJet_=nJet;
+  for (int i=0; i<nJet_; i++) {
+    jetRawPt_.push_back(jetRawPt->at(i));
+    jetRawEn_.push_back(jetRawEn->at(i));
+    jetPt_.push_back(jetPt->at(i));
+    jetEta_.push_back(jetEta->at(i));
+    jetPhi_.push_back(jetPhi->at(i));
+    jetGenJetPt_.push_back(jetGenJetPt->at(i));
+    jetGenJetEta_.push_back(jetGenJetEta->at(i));
+    jetGenJetPhi_.push_back(jetGenJetPhi->at(i));   
+  }
+}
 
 TMetTools::~TMetTools()
 {
@@ -85,7 +112,7 @@ void TMetTools::METSmearCorrection() {
 
 }
 
-void TMetTools::LoopOverJetsForSmearing(int nJet, float* jetRawPt, float* jetRawEn, float* jetPt, float* jetEta, float* jetPhi) {
+void TMetTools::LoopOverJetsForSmearing(int nJet, vector <float> jetRawPt, vector <float> jetRawEn, vector <float> jetPt, vector <float> jetEta, vector <float> jetPhi) {
 
   for (int iJet=0; iJet<nJet; iJet++) {
     //jetRawPtSmeared[iJet] = jetRawPt[iJet];

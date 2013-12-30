@@ -8,17 +8,18 @@
 
 class SkimLeptonPhoton{
 public :
-   SkimLeptonPhoton(TString inputFileName, TString nameDir, TString nameTree, TString outDir, int channel);
+   SkimLeptonPhoton(int channel, int sample, TString inputFileName, TString nameDir, TString nameTree, TString outDir);
    virtual ~SkimLeptonPhoton();
    void LoopOverInputTree();
      //the main function which is called from outside
-   const static int numberOfTrees=5;
+   //const static int numberOfTrees=5;
      //tree [0] is input tree;
      //trees [1]-[4] are output trees
-   enum {MUON, ELECTRON, BOTH};
 private :
    TInputOutputTree TREE_;
+   TConfiguration config_;
    int channel_;
+   int sample_;
    TFile    *fileOutMu_; //output Files
    TFile    *fileOutEle_; //output Files
    TTree    *outputTreeMu_; //output Trees
