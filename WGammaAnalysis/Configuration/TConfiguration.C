@@ -24,8 +24,7 @@ void TConfiguration::Print()
   std::cout<<"GetSampleName s: "<<GetSampleName(DATA)<<", "<<GetSampleName(SIGMC)<<", "<<GetSampleName(BKGMC)<<std::endl;
   std::cout<<"GetEtaBinName s: "<<GetEtaBinName(BARREL)<<", "<<GetEtaBinName(ENDCAP)<<", "<<GetEtaBinName(COMMON)<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedPreliminaryName(MUON,DATA,"[sourceName]")<<", "<<GetSelectedPreliminaryName(MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedPreliminaryName(MUON,BKGMC,"[sourceName]")<<std::endl;
-  std::cout<<"GetSelectedFullyName s: "<<GetSelectedFullyName(MUON,DATA,"[sourceName]")<<", "<<GetSelectedFullyName(MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedFullyName(MUON,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(PRELIMINARY,MUON,DATA,"[sourceName]")<<", "<<GetSelectedName(PRELIMINARY,MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedName(PRELIMINARY,MUON,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
   std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedHistName(DATA,COMMON,"[sourceName]")<<", "<<GetYieldsSelectedHistName(DATA,BARREL,"[sourceName]")<<", "<<GetYieldsSelectedHistName(DATA,ENDCAP,"[sourceName]")<<", "<<GetYieldsSelectedHistName(SIGMC,BARREL,"[sourceName]")<<", "<<GetYieldsSelectedHistName(BKGMC,BARREL,"[sourceName]")<<std::endl;
@@ -57,25 +56,35 @@ TString TConfiguration::GetEtaBinName(int etaBin)
   return "UNKNOWN_ETABIN";
 }
 
-TString TConfiguration::GetSelectedVeryPreliminaryName(int channel, int sample, TString sourceName)
+TString TConfiguration::GetSelectedName(int selectionStage, int channel, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight, bool isVeryLooseSelectionMode)
 {
-  TString name = GetOutputDirName(channel)+selectedVeryPreliminaryEventsNameBase_+GetSampleName(sample);
-  if (sample == BKGMC) return name+"_"+sourceName+".root";
-  return name+".root";
+  TString name = GetOutputDirName(channel); 
+  if (selectionStage==VERY_PRELIMINARY) 
+    name+=selectedVeryPreliminaryEventsNameBase_;
+  else if (selectionStage==PRELIMINARY)
+    name+=selectedPreliminaryEventsNameBase_;
+  else if (selectionStage==FULLY)
+    name+=selectedFullyEventsNameBase_;
+  name+=GetSampleName(sample);
+  if (sample == BKGMC){
+    name+="_";
+    name+=sourceName;
+  }
+  name+=GetSpecialModeName(isDebugMode, isNoPuReweight, isVeryLooseSelectionMode);
+  name+=".root";
+
+  return name;
+
+
 }
 
-TString TConfiguration::GetSelectedPreliminaryName(int channel, int sample, TString sourceName)
+TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight, bool isVeryLooseSelectionMode)
 {
-  TString name = GetOutputDirName(channel)+selectedPreliminaryEventsNameBase_+GetSampleName(sample);
-  if (sample == BKGMC) return name+"_"+sourceName+".root";
-  return name+".root";
-}
-
-TString TConfiguration::GetSelectedFullyName(int channel, int sample, TString sourceName)
-{
-  TString name = GetOutputDirName(channel)+selectedFullyEventsNameBase_+GetSampleName(sample);
-  if (sample == BKGMC) return name+"_"+sourceName+".root";
-  return name+".root";
+  TString name="";
+  if (isDebugMode) name+=nameDebugMode_;
+  if (isNoPuReweight) name+=nameNoPuReweight_;
+  if (isVeryLooseSelectionMode) name+=nameVeryLooseSelectionMode_;
+  return name;
 }
 
 TString TConfiguration::GetNameDebugMode()

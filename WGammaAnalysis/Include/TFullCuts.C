@@ -28,7 +28,9 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
                     TEventTree::InputTreeLeaves &inpTreeLeaf,   
                     int channel, 
                     float* WMt, float** lePhoDeltaR,
-                    zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut, bool doPhoChIsoCut)
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, 
+                    bool doSigmaIEtaIEtaCut, bool doPhoChIsoCut,
+                    bool isVeryLooseSelectionMode)
 {
 
   // This function is called from LoopOverEvents.
@@ -36,6 +38,15 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
   // returns 0 otherwise.
 
 //   nTotal_++;
+
+   bool goodPhoton[inpTreeLeaf.nPho];
+
+   if (isVeryLooseSelectionMode){
+     bool isGoodPhoton = PhotonsOnlyCuts(goodPhoton,inpTreeLeaf,photonCorrector, doSigmaIEtaIEtaCut,doPhoChIsoCut,isVeryLooseSelectionMode);
+     for (int i=0; i<inpTreeLeaf.nPho; i++)
+       goodLeptonPhotonPairs[0][i]=goodPhoton[i];
+     return isGoodPhoton;
+   }
 
    int nLe=0;
    if (channel==TConfiguration::MUON) nLe=inpTreeLeaf.nMu;
@@ -155,8 +166,7 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
    if (!goodLeptonExists) return 0;
      //skip loop over photons if no good leptons found
 
-   bool goodPhoton[inpTreeLeaf.nPho];
-   if (!PhotonsOnlyCuts(goodPhoton,inpTreeLeaf,photonCorrector, doSigmaIEtaIEtaCut,doPhoChIsoCut)) return 0;
+   if (!PhotonsOnlyCuts(goodPhoton,inpTreeLeaf,photonCorrector, doSigmaIEtaIEtaCut,doPhoChIsoCut,isVeryLooseSelectionMode)) return 0;
      //skip checking lepton-photon matching if no good photons found
 
     //check matching between muon and photon
@@ -187,7 +197,9 @@ bool TFullCuts::Cut(bool** goodLeptonPhotonPairs,
 
 bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
                TEventTree::InputTreeLeaves &inpTreeLeaf,   
-               zgamma::PhosphorCorrectionFunctor* photonCorrector, bool doSigmaIEtaIEtaCut,  bool doPhoChIsoCut){
+               zgamma::PhosphorCorrectionFunctor* photonCorrector, 
+               bool doSigmaIEtaIEtaCut,  bool doPhoChIsoCut, 
+               bool isVeryLooseSelectionMode){
    bool goodPhotonExists=0;
 
    for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++) 
@@ -221,8 +233,10 @@ bool TFullCuts::PhotonsOnlyCuts(bool* goodPhoton,
           //variables which are input for TPhotonCuts constructor
           //are fields of TEventTree
 
-
-	if (photon.Passed(doSigmaIEtaIEtaCut,doPhoChIsoCut)) 
+        int wp;
+        if (isVeryLooseSelectionMode) wp=photon.WP_LOOSE;
+        else wp=photon.GetWP();
+	if (photon.Passed(wp,doSigmaIEtaIEtaCut,doPhoChIsoCut)) 
           {
      
 //            nPhotonsPassed_++;
@@ -254,13 +268,16 @@ float TFullCuts::GetWMtCut()
 
 TCut TFullCuts::RangeMetRelatedCut()
 {
-  TCut cut("1");
+  TString cutStr="WMt>";
+  cutStr+=WMtCut_;
+  TCut cut(cutStr);
   return cut;
 }
 
 TCut TFullCuts::RangeExtraCut()
 {
   TPhotonCuts emptyPhoton;
-  TCut cut = emptyPhoton.RangePhoChIso() && emptyPhoton.RangeSigmaIEtaIEta() && RangeMetRelatedCut();
+  int wp = emptyPhoton.GetWP();
+  TCut cut = emptyPhoton.RangePhoChIso(wp) && emptyPhoton.RangeSigmaIEtaIEta(wp);
   return cut;
 }

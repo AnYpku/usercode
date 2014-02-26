@@ -16,6 +16,7 @@ class TConfiguration
     enum {DATA, SIGMC, BKGMC};
     enum {BARREL, ENDCAP, COMMON};
     enum {TOTAL, ONEDI, TWODI};
+    enum {VERY_PRELIMINARY,PRELIMINARY,FULLY};
 
     void Print();
 
@@ -23,9 +24,9 @@ class TConfiguration
     TString GetSampleName(int sample);
     TString GetEtaBinName(int etaBin);
 
-    TString GetSelectedVeryPreliminaryName(int channel, int sample, TString sourceName="");
-    TString GetSelectedPreliminaryName(int channel, int sample, TString sourceName="");
-    TString GetSelectedFullyName(int channel, int sample, TString sourceName="");
+    TString GetSelectedName(int selectionStage, int channel, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0, bool isVeryLooseSelectionMode=0);
+    //strSelectionStage
+    TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight, bool isVeryLooseSelectionMode);
 
     TString GetYieldsFileName(int channel);
     TString GetYieldsSelectedHistName(int sample, int etaBin, TString sourceName="");
@@ -75,10 +76,11 @@ class TConfiguration
 
 /////////////////////////////////////////
 //photon Pt binning
-//static const int nPhoPtBins_ = 9;
-//static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
 static const int nPhoPtBins_ = 9;
 static const float phoPtBinsLimits_[nPhoPtBins_+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
+
+
+
 
 
 static const float phoPtOverflowBinLimit_=1000.;

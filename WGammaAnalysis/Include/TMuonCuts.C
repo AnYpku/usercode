@@ -87,10 +87,10 @@ bool TMuonCuts::Passed() {
 
 bool TMuonCuts::MuTriggerMatch()
 {
-  if (HLT_HLTIndex_19_ && muTrg_imu_) return true;
-    //HLT_IsoMu24_v, muonTriggerMatchHLTIsoMu24 (muTrg[1][imu])
-  if (HLT_HLTIndex_18_ && muTrg_imu_) return true;
-    //HLT_IsoMu24_eta2p1_, muonTriggerMatchHLTIsoMu24eta2p1 (muTrg[0][imu])
+  if (HLT_HLTIndex_19_ &&   (((muTrg_imu_&(1<<1)))==(1<<1)) ) return true;
+    //HLT_IsoMu24_v, muonTriggerMatchHLTIsoMu24 (1st bit of muTrg[imu])
+  if (HLT_HLTIndex_18_ && (((muTrg_imu_&(1<<0)))==(1<<0))) return true;
+    //HLT_IsoMu24_eta2p1_, muonTriggerMatchHLTIsoMu24eta2p1 (0th bit of muTrg[imu])
   return false;
 }
 

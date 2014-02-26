@@ -45,8 +45,8 @@ void TTemplates::ComputeBackground()
 
 void TTemplates::SetHists()
 {
-  fSig_ = new TFile(config_.GetSelectedPreliminaryName(channel_,config_.SIGMC));
-  fBkg_ = new TFile(config_.GetSelectedPreliminaryName(channel_,config_.DATA));
+  fSig_ = new TFile(config_.GetSelectedName(config_.PRELIMINARY,channel_,config_.SIGMC));
+  fBkg_ = new TFile(config_.GetSelectedName(config_.PRELIMINARY,channel_,config_.DATA));
 
   TTree* treeSignalInitial = (TTree *)fSig_->Get("selectedEvents");
   TTree* treeBkgrawInitial = (TTree *)fBkg_->Get("selectedEvents");
@@ -74,7 +74,7 @@ void TTemplates::SetHists()
     ptBinCutStr+=" && phoEt<=";
     ptBinCutStr+=phoPtBinLimits[i+1];
     TCut ptBinCut(ptBinCutStr);
-    TCut phoChIsoCut = emptyPhoton.RangePhoChIso();
+    TCut phoChIsoCut = emptyPhoton.RangePhoChIso(emptyPhoton.GetWP());
     TCut barrelCut = emptyPhoton.RangeBarrel();
     TCut endcapCut = emptyPhoton.RangeEndcap();
     TString name;

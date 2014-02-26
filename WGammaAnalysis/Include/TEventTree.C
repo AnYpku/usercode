@@ -103,6 +103,7 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
 {
    b_nMC->GetEntry(entry); 
    b_mcPID->GetEntry(entry); 
+   b_mcMomPID->GetEntry(entry); 
    b_mcPt->GetEntry(entry);
    b_mcEta->GetEntry(entry);
    b_mcPhi->GetEntry(entry);
@@ -151,7 +152,7 @@ void TEventTree::Init(TTree *tree)
    treeLeaf.mcE = 0;
    treeLeaf.mcEt = 0;
 //   treeLeaf.mcGMomPID = 0;
-//   treeLeaf.mcMomPID = 0;
+   treeLeaf.mcMomPID = 0;
 //   treeLeaf.mcMomPt = 0;
 //   treeLeaf.mcMomMass = 0;
 //   treeLeaf.mcMomEta = 0;
@@ -712,7 +713,7 @@ void TEventTree::Init(TTree *tree)
    fChain->SetBranchAddress("mcE", &treeLeaf.mcE, &b_mcE);
    fChain->SetBranchAddress("mcEt", &treeLeaf.mcEt, &b_mcEt);
 //   fChain->SetBranchAddress("mcGMomPID", &treeLeaf.mcGMomPID, &b_mcGMomPID);
-//   fChain->SetBranchAddress("mcMomPID", &treeLeaf.mcMomPID, &b_mcMomPID);
+   fChain->SetBranchAddress("mcMomPID", &treeLeaf.mcMomPID, &b_mcMomPID);
 //   fChain->SetBranchAddress("mcMomPt", &treeLeaf.mcMomPt, &b_mcMomPt);
 //   fChain->SetBranchAddress("mcMomMass", &treeLeaf.mcMomMass, &b_mcMomMass);
 //   fChain->SetBranchAddress("mcMomEta", &treeLeaf.mcMomEta, &b_mcMomEta);
