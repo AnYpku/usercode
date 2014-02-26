@@ -27,24 +27,24 @@
 #include <sstream>  
   //standard C++ class
 
-CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isPuReweight, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
 
   INPUT_ = new TAllInputSamples(channel, configFile);
 
   channel_=channel;
   isDebugMode_=isDebugMode;
-  isPuReweight_=isPuReweight;
+  isNoPuReweight_=isNoPuReweight;
   photonCorrector_ = new zgamma::PhosphorCorrectionFunctor((config_.GetPhosphorConstantFileName()) );
     //field of this class
 
-  nEvents_=0;
+  nAccTotal_=0;
   nAccPassed_=0;
-  nEventsInAcc_=0;
+  nEffTotal_=0;
   nEffPassed_=0;
-  nEventsErr_=0;
+  nAccTotalErr_=0;
   nAccPassedErr_=0;
-  nEventsInAccErr_=0;
+  nEffTotalErr_=0;
   nEffPassedErr_=0;
 
   acc_=-1;
@@ -53,13 +53,13 @@ CalcAccAndEff::CalcAccAndEff(int channel, string configFile, bool isPuReweight, 
   effErr_=-1;
 
   for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    vecnEvents_.push_back(0);
+    vecnAccTotal_.push_back(0);
     vecnAccPassed_.push_back(0);
-    vecnEventsInAcc_.push_back(0);
+    vecnEffTotal_.push_back(0);
     vecnEffPassed_.push_back(0);
-    vecnEventsErr_.push_back(0);
+    vecnAccTotalErr_.push_back(0);
     vecnAccPassedErr_.push_back(0);
-    vecnEventsInAccErr_.push_back(0);
+    vecnEffTotalErr_.push_back(0);
     vecnEffPassedErr_.push_back(0);
 
     vecacc_.push_back(-1);
@@ -122,20 +122,6 @@ void CalcAccAndEff::LoopOverInputFiles()
               return;
            }
 
-//           if (!isSkimmed){
-//             nEvents_+=tree->GetEntries();
-//             nSkimPassed_+=tree->GetEntries();
-//           }
-//           else if (isSkimmed){
-//              TH1F* hist = (TH1F*)gDirectory->Get("hskim");
-//              nEvents_ += tree->GetEntries() * hist->GetBinContent(1) / hist->GetBinContent(2);
-//              nSkimPassed_+=tree->GetEntries();
-//              hist = 0;
-//           }
-
-           
-
-
            puWeight_=new TPuReweight(config_.GetPileupDataFileName(),INPUT_->allInputs_[iSource].fileNames_[inputFileN]);
 
            LoopOverTreeEvents();
@@ -147,40 +133,39 @@ void CalcAccAndEff::LoopOverInputFiles()
 
          }//loop over inputFileN_ ends
 
-     nEventsErr_=sqrt(nEventsErr_);
+     nAccTotalErr_=sqrt(nAccTotalErr_);
      nAccPassedErr_=sqrt(nAccPassedErr_);
-     nEventsInAccErr_=sqrt(nEventsInAccErr_);
+     nEffTotalErr_=sqrt(nEffTotalErr_);
      nEffPassedErr_=sqrt(nEffPassedErr_);
      for (int i=0; i<config_.GetNPhoPtBins(); i++){
-       vecnEventsErr_[i]=sqrt(vecnEventsErr_[i]);
+       vecnAccTotalErr_[i]=sqrt(vecnAccTotalErr_[i]);
        vecnAccPassedErr_[i]=sqrt(vecnAccPassedErr_[i]);
-       vecnEventsInAccErr_[i]=sqrt(vecnEventsInAccErr_[i]);
+       vecnEffTotalErr_[i]=sqrt(vecnEffTotalErr_[i]);
        vecnEffPassedErr_[i]=sqrt(vecnEffPassedErr_[i]);
      }
 
-     TMathTools mathTools;
-     if (nEvents_!=0){ 
-       acc_=nAccPassed_/nEvents_;
-       accErr_=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",nAccPassed_,nEvents_,nAccPassedErr_,nEventsErr_);
+     if (nAccTotal_!=0){ 
+       acc_=nAccPassed_/nAccTotal_;
+       accErr_=math_.ErrOfTwoIndependent("x1/(x1+x2)",nAccPassed_,nAccTotal_,nAccPassedErr_,nAccTotalErr_);
      }
-     if (nEventsInAcc_!=0){ 
-       eff_=(double)nEffPassed_/nEventsInAcc_;
-       effErr_=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",nEffPassed_,nEventsInAcc_,nEffPassedErr_,nEventsInAccErr_);
+     if (nEffTotal_!=0){ 
+       eff_=(double)nEffPassed_/nEffTotal_;
+       effErr_=math_.ErrOfTwoIndependent("x1/(x1+x2)",nEffPassed_,nEffTotal_,nEffPassedErr_,nEffTotalErr_);
      }
 
      for (int i=0; i<config_.GetNPhoPtBins(); i++){
-       vecacc_[i]=vecnAccPassed_[i]/vecnEvents_[i];
-       vecaccErr_[i]=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",vecnAccPassed_[i],vecnEvents_[i],vecnAccPassedErr_[i],vecnEventsErr_[i]);
-       veceff_[i]=vecnEffPassed_[i]/vecnEventsInAcc_[i];
-       veceffErr_[i]=mathTools.ErrOfTwoIndependent("x1/(x1+x2)",vecnEffPassed_[i],vecnEventsInAcc_[i],vecnEffPassedErr_[i],vecnEventsInAccErr_[i]);
+       vecacc_[i]=vecnAccPassed_[i]/vecnAccTotal_[i];
+       vecaccErr_[i]=math_.ErrOfTwoIndependent("x1/(x1+x2)",vecnAccPassed_[i],vecnAccTotal_[i],vecnAccPassedErr_[i],vecnAccTotalErr_[i]);
+       veceff_[i]=vecnEffPassed_[i]/vecnEffTotal_[i];
+       veceffErr_[i]=math_.ErrOfTwoIndependent("x1/(x1+x2)",vecnEffPassed_[i],vecnEffTotal_[i],vecnEffPassedErr_[i],vecnEffTotalErr_[i]);
      }
 
      PlotAndSaveOutput();
 
      std::cout<<"Summary:"<<std::endl;
-     std::cout<<"nEvents="<<nEvents_<<"+-"<<nEventsErr_;
+     std::cout<<"nAccTotal="<<nAccTotal_<<"+-"<<nAccTotalErr_;
      std::cout<<", nAccPassed="<<nAccPassed_<<"+-"<<nAccPassedErr_<<", acc="<<acc_<<"+-"<<accErr_<<std::endl;
-     std::cout<<"nEventsInAcc="<<nEventsInAcc_<<"+-"<<nEventsInAccErr_;
+     std::cout<<"nEffTotal="<<nEffTotal_<<"+-"<<nEffTotalErr_;
      std::cout<<", nEffPassed="<<nEffPassed_<<"+-"<<nEffPassedErr_<<", eff="<<eff_<<"+-"<<effErr_<<std::endl;
      std::cout<<std::endl;
 
@@ -188,12 +173,13 @@ void CalcAccAndEff::LoopOverInputFiles()
      for (int i=0; i<config_.GetNPhoPtBins(); i++){
        std::cout<<std::endl;
        std::cout<<"pho Pt: "<<vecPhoPtLimits_[i]<<" - "<<vecPhoPtLimits_[i+1]<<std::endl;
-       std::cout<<" -- nEvents="<<vecnEvents_[i]<<"+-"<<vecnEventsErr_[i];
-       if (vecnEvents_[i]==0) continue;
-       std::cout<<", nAccPassed="<<vecnAccPassed_[i]<<"+-"<<vecnAccPassedErr_[i]<<", acc="<<vecacc_[i]<<"+-"<<vecaccErr_[i]<<std::endl;
-       std::cout<<" -- nEventsInAcc="<<vecnEventsInAcc_[i]<<"+-"<<vecnEventsInAccErr_[i];
-       if (vecnEventsInAcc_[i]==0) continue;
-       std::cout<<", nEffPassed="<<vecnEffPassed_[i]<<"+-"<<vecnEffPassedErr_[i]<<", eff="<<veceff_[i]<<"+-"<<veceffErr_[i]<<std::endl;
+       std::cout<<" -- nAccTotal="<<vecnAccTotal_[i]<<"+-"<<vecnAccTotalErr_[i];
+       if (vecnAccTotal_[i]==0) std::cout<<std::endl;
+       else std::cout<<", nAccPassed="<<vecnAccPassed_[i]<<"+-"<<vecnAccPassedErr_[i]<<", acc="<<vecacc_[i]<<"+-"<<vecaccErr_[i]<<std::endl;
+
+       std::cout<<" -- nEffTotal="<<vecnEffTotal_[i]<<"+-"<<vecnEffTotalErr_[i];
+       if (vecnEffTotal_[i]==0) std::cout<<std::endl; 
+       else std::cout<<", nEffPassed="<<vecnEffPassed_[i]<<"+-"<<vecnEffPassedErr_[i]<<", eff="<<veceff_[i]<<"+-"<<veceffErr_[i]<<std::endl;
      }//end of for (int i=0; i<config_.GetNPhoPtBins(); i++)
 
      std::cout<<std::endl;
@@ -239,26 +225,21 @@ void CalcAccAndEff::LoopOverTreeEvents()
    for (int imc=0; imc<kMaxnMC; imc++)
      accLeptonPhotonPassed[imc]=new bool[kMaxnMC];
 
-   //   CheckMaxNumbersInTree();
+   CheckMaxNumbersInTree();
   
-   TFullCuts fullCuts;
-   TMuonCuts muonEmpty;
-   //   TElectronCuts electronEmpty;
-   TPhotonCuts photonEmpty;
-
-   TMathTools math;
-
+   //nentries=20;
    for (Long64_t entry=0; entry<nentries; entry++) 
    //loop over events in the tree
      {
-        GetEntryNeededBranchesOnly(entry);
+
+        GetEntryNeededBranchesOnly(channel_,TConfiguration::SIGMC,entry);
           //method of TEventTree class
         if (!treeLeaf.isData) GetEntryMCSpecific(entry);
           //method of TEventTree class
 
         float weightPU;
-        if (isPuReweight_)
-          weightPU = puWeight_->GetPuWeightMc(treeLeaf.puTrue[1]);
+        if (isNoPuReweight_)
+          weightPU = puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
         else weightPU=1;
 
         if (channel_==TConfiguration::MUON) nLe_=treeLeaf.nMu;
@@ -267,127 +248,16 @@ void CalcAccAndEff::LoopOverTreeEvents()
           {
              std::cout<<"Error detected in  CalcAccAndEff::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
              return;
-          }
-        
+          }  
+
         // apply acceptance cuts
-        bool accPassed=0;
-        int bin=-1;
 
-        bool genPhotons[TEventTree::kMaxnMC];
-        bool genLeptons[TEventTree::kMaxnMC];
-        for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
-          genPhotons[iMC]=0;
-          genLeptons[iMC]=0;
-          if (treeLeaf.mcPID[iMC]==22)
-            genPhotons[iMC]=1;
-          if (channel_==TConfiguration::MUON && ((treeLeaf.mcPID[iMC]==13) || (treeLeaf.mcPID[iMC]==-13)))
-            genLeptons[iMC]=1;
-          if (channel_==TConfiguration::ELECTRON && ((treeLeaf.mcPID[iMC]==11) || (treeLeaf.mcPID[iMC]==-11)))
-            genLeptons[iMC]=1;
- 
-        } // loop over iMC; search for gen level photons and leptons
+        bool accPassed = AcceptancePassed(accLeptonPhotonPassed);
 
-        for (int iGenLep=0; iGenLep<treeLeaf.nMC; iGenLep++)
-          for (int iGenPho=0; iGenPho<treeLeaf.nMC; iGenPho++){
-            if (!(genLeptons[iGenLep] && genPhotons[iGenPho])) continue;
-            float dR = math.DeltaR(treeLeaf.mcEta[iGenLep],treeLeaf.mcPhi[iGenLep],
-                                     treeLeaf.mcEta[iGenPho],treeLeaf.mcPhi[iGenPho]);
-            if (dR<=config_.GetLePhoDeltaRMin()) continue;
-
-            /////////////////////////////////////////////////
-            // count number of events 
-            if (treeLeaf.mcEt[iGenPho]>config_.GetPhoPtMin()){
-              nEvents_+=lumiWeight_;
-              nEventsErr_+=lumiWeight_*lumiWeight_;
-            }
-            bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt[iGenPho]);
-            if (bin<(int)vecnEvents_.size() && bin!=-1){
-              vecnEvents_[bin]+=lumiWeight_;
-              vecnEventsErr_[bin]+=lumiWeight_*lumiWeight_;
-            }
-              
-            /////////////////////////////////////////////////
-            // count number of events within acceptance
-
-            bool isPhoAcc = photonEmpty.PhoKinematics(treeLeaf.mcEt[iGenPho],treeLeaf.mcEta[iGenPho]) ;
-            bool isLepAcc = (channel_==TConfiguration::MUON && 
-                   muonEmpty.MuKinematics(treeLeaf.mcPt[iGenLep],treeLeaf.mcEta[iGenLep])) ||
-                   (channel_==TConfiguration::ELECTRON);
-            if (isPhoAcc && isLepAcc) {
-              accPassed=1;
-              accLeptonPhotonPassed[iGenLep][iGenPho]=1;
-              if (treeLeaf.mcEt[iGenPho]>config_.GetPhoPtMin()){
-                nAccPassed_+=lumiWeight_;
-                nAccPassedErr_+=lumiWeight_*lumiWeight_;
-              }
-              bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt[iGenPho]);
-              if (bin<(int)vecnAccPassed_.size() && bin!=-1){
-                vecnAccPassed_[bin]+=lumiWeight_;
-                vecnAccPassedErr_[bin]+=lumiWeight_*lumiWeight_;
-              }
-            }  //end of if (isPhoAcc && isLepAcc)
-          }//end of loops over iGenPho and iGenLep
-
-        if (!accPassed) continue;
-
-        ////////////////////////
         //apply efficiency cuts
-        ////////////////////////
-        bool effPassed = fullCuts.Cut(effLeptonPhotonPassed, treeLeaf,   
-                channel_,  WMt, lePhoDeltaR, photonCorrector_);
-        for (int ile=0; ile<nLe_; ile++)
-          for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
-
-            int iGenPho=-1;
-            int iGenLep=-1;
-            for (int imc=0; imc<treeLeaf.nMC; imc++){
-              if (treeLeaf.mcIndex[imc]==treeLeaf.phoGenIndex[ipho]) 
-                iGenPho=imc;
-              if ((channel_==TConfiguration::MUON && treeLeaf.mcIndex[imc]==treeLeaf.muGenIndex[ile]) ||
-                  (channel_==TConfiguration::ELECTRON))   
-                iGenLep=imc;
-            }//end of loop over iMC
-
-            if (iGenPho<0 || iGenLep<0) continue;
-            if (!accLeptonPhotonPassed[iGenLep][iGenPho]) continue;
-              //check if event is "within acceptance"
-
-            float dR = 0;
-            if (channel_==TConfiguration::MUON) 
-              dR = math.DeltaR(treeLeaf.muEta[ile],treeLeaf.muPhi[ile],treeLeaf.phoEta[ipho],treeLeaf.phoPhi[ipho]);
-            else if (channel_==TConfiguration::ELECTRON)
-              dR = math.DeltaR(treeLeaf.eleEta[ile],treeLeaf.elePhi[ile],treeLeaf.phoEta[ipho],treeLeaf.phoPhi[ipho]);
-            if (dR<=config_.GetLePhoDeltaRMin()) continue;
-
-            ///////////////////////////////////
-            // count number of events "in acceptance"
-            // with reconstructed variables bins
-            // so, apply PU weight here
-            if (treeLeaf.phoEt[ipho]>config_.GetPhoPtMin()){
-              nEventsInAcc_+=lumiWeight_*weightPU;
-              nEventsInAccErr_+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
-            }
-            bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt[ipho]);
-            if (bin<(int)vecnEventsInAcc_.size() && bin!=-1){
-              vecnEventsInAcc_[bin]+=lumiWeight_*weightPU;
-              vecnEventsInAccErr_[bin]+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
-            } 
-            
-            if (!effPassed) continue;
-            ////////////////////////////////////
-            // count number of events in efficiency
-            if (effLeptonPhotonPassed[ile][ipho]){
-               if (treeLeaf.phoEt[ipho]>config_.GetPhoPtMin()){
-                 nEffPassed_+=lumiWeight_*weightPU;
-                 nEffPassedErr_+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
-               }
-               bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt[ipho]);
-               if (bin<(int)vecnEffPassed_.size() && bin!=-1){
-                 vecnEffPassed_[bin]+=lumiWeight_*weightPU;
-                 vecnEffPassedErr_[bin]+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
-               }
-             }//end of if (effLeptonPhotonPassed[ile][ipho])
-          }//end of loops over ipho and ile
+        bool effPassed = EfficiencyPassed(effLeptonPhotonPassed,WMt,lePhoDeltaR,weightPU);
+   
+  
 
 
      } //end of loop over events in the tree
@@ -421,6 +291,114 @@ void CalcAccAndEff::LoopOverTreeEvents()
 //  std::cout<<"nPhoLepPassed_="<<nPhoLepPassed_<<std::endl; 
 //  std::cout<<std::endl;
 
+}
+
+bool CalcAccAndEff::AcceptancePassed(bool** accLeptonPhotonPassed)
+{
+   bool accPassed=0;
+   int bin=-1;
+
+   bool genPhotons[TEventTree::kMaxnMC];
+   bool genLeptons[TEventTree::kMaxnMC];
+   for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
+     genPhotons[iMC]=0;
+     genLeptons[iMC]=0;
+     //if (treeLeaf.mcMomPID->at(iMC)==24 || treeLeaf.mcMomPID->at(iMC)==-24){
+       if (treeLeaf.mcPID->at(iMC)==22)
+         genPhotons[iMC]=1;
+       else if (channel_==TConfiguration::MUON && ((treeLeaf.mcPID->at(iMC)==13) || (treeLeaf.mcPID->at(iMC)==-13)))
+         genLeptons[iMC]=1;
+       else if (channel_==TConfiguration::ELECTRON && ((treeLeaf.mcPID->at(iMC)==11) || (treeLeaf.mcPID->at(iMC)==-11)))
+         genLeptons[iMC]=1;
+     //}
+ 
+   } // loop over iMC; search for gen level photons and leptons
+
+   for (int iGenLep=0; iGenLep<treeLeaf.nMC; iGenLep++)
+     for (int iGenPho=0; iGenPho<treeLeaf.nMC; iGenPho++){
+       if (!(genLeptons[iGenLep] && genPhotons[iGenPho])) continue;
+         float dR = math_.DeltaR(treeLeaf.mcEta->at(iGenLep),treeLeaf.mcPhi->at(iGenLep),treeLeaf.mcEta->at(iGenPho),treeLeaf.mcPhi->at(iGenPho));
+         if (dR<=config_.GetLePhoDeltaRMin()) continue;
+
+//         if (treeLeaf.mcEt->at(iGenPho)>80) 
+//           std::cout<<"treeLeaf.mcEt->at(iGenPho)="<<treeLeaf.mcEt->at(iGenPho)<<std::endl;
+         /////////////////////////////////////////////////
+         // count number of events 
+         if (treeLeaf.mcEt->at(iGenPho)>config_.GetPhoPtMin()){
+            nAccTotal_+=lumiWeight_;
+            nAccTotalErr_+=lumiWeight_*lumiWeight_;
+         }
+         bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt->at(iGenPho));
+         if (bin<(int)vecnAccTotal_.size() && bin!=-1){
+           vecnAccTotal_[bin]+=lumiWeight_;
+           vecnAccTotalErr_[bin]+=lumiWeight_*lumiWeight_;
+         }
+         /////////////////////////////////////////////////
+         // count number of events within acceptance
+
+         bool isPhoAcc = photonEmpty_.PhoKinematics(treeLeaf.mcE->at(iGenPho),treeLeaf.mcEta->at(iGenPho)) ;
+         bool isLepAcc = (channel_==TConfiguration::MUON && 
+                   muonEmpty_.MuKinematics(treeLeaf.mcPt->at(iGenLep),treeLeaf.mcEta->at(iGenLep))) ||
+                   (channel_==TConfiguration::ELECTRON);
+         if (isPhoAcc && isLepAcc) {
+           accPassed=1;
+           accLeptonPhotonPassed[iGenLep][iGenPho]=1;
+           if (treeLeaf.mcEt->at(iGenPho)>config_.GetPhoPtMin()){
+             nAccPassed_+=lumiWeight_;
+             nAccPassedErr_+=lumiWeight_*lumiWeight_;
+           }
+           bin = config_.FindPhoPtBinByPhoPt(treeLeaf.mcEt->at(iGenPho));
+           if (bin<(int)vecnAccPassed_.size() && bin!=-1){
+             vecnAccPassed_[bin]+=lumiWeight_;
+             vecnAccPassedErr_[bin]+=lumiWeight_*lumiWeight_;
+            }
+          }  //end of if (isPhoAcc && isLepAcc)
+        }//end of loops over iGenPho and iGenLep
+  return accPassed;
+}
+
+bool CalcAccAndEff::EfficiencyPassed(bool** effLeptonPhotonPassed, float* WMt, float** lePhoDeltaR,float weightPU)
+{
+  
+  bool effPassed = fullCuts_.Cut(effLeptonPhotonPassed, treeLeaf,   
+                channel_,  WMt, lePhoDeltaR, photonCorrector_);
+  for (int ile=0; ile<nLe_; ile++)
+    for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
+
+      float dR = 0;
+      if (channel_==TConfiguration::MUON) 
+      dR = math_.DeltaR(treeLeaf.muEta->at(ile),treeLeaf.muPhi->at(ile),treeLeaf.phoEta->at(ipho),treeLeaf.phoPhi->at(ipho));
+      else if (channel_==TConfiguration::ELECTRON);
+      //dR = math_.DeltaR(treeLeaf.eleEta->at(ile),treeLeaf.elePhi->at(ile),treeLeaf.phoEta->at(ipho),treeLeaf.phoPhi->at(ipho));
+      if (dR<=config_.GetLePhoDeltaRMin()) continue;
+
+      /////////////////////////////////////////////////
+      // count number of events 
+      if (treeLeaf.phoEt->at(ipho)>config_.GetPhoPtMin()){
+        nEffTotal_+=lumiWeight_*weightPU;
+        nEffTotalErr_+=lumiWeight_*weightPU*lumiWeight_*weightPU;
+      }
+      int bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt->at(ipho));
+      if (bin<(int)vecnEffTotal_.size() && bin!=-1){
+        vecnEffTotal_[bin]+=lumiWeight_*weightPU;
+        vecnEffTotalErr_[bin]+=lumiWeight_*weightPU*lumiWeight_*weightPU;
+      }
+      if (!effPassed) continue;
+      ////////////////////////////////////
+      // count number of events in efficiency
+      if (effLeptonPhotonPassed[ile][ipho]){
+        if (treeLeaf.phoEt->at(ipho)>config_.GetPhoPtMin()){
+          nEffPassed_+=lumiWeight_*weightPU;
+          nEffPassedErr_+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
+        }
+        bin = config_.FindPhoPtBinByPhoPt(treeLeaf.phoEt->at(ipho));
+        if (bin<(int)vecnEffPassed_.size() && bin!=-1){
+          vecnEffPassed_[bin]+=lumiWeight_*weightPU;
+          vecnEffPassedErr_[bin]+=(lumiWeight_*weightPU)*(lumiWeight_*weightPU);
+         }
+       }//end of if (effLeptonPhotonPassed[ile][ipho])
+    }//end of loops over ipho and ile
+  return effPassed;
 }
 
 void CalcAccAndEff::PlotAndSaveOutput()
@@ -499,4 +477,25 @@ void CalcAccAndEff::PlotAndSaveOutput()
   cAccEff->SetLogx();
   cAccEff->Write("cAccEff");
 
+}
+
+bool CalcAccAndEff::CheckMaxNumbersInTree()
+{
+  if (fChain->GetMaximum("nMC")>kMaxnMC){
+    std::cout<<"ERROR in CalcAccAndEff::LoopOverTreeEvents: treeLeaf.nMC="<<fChain->GetMaximum("nMC")<<" > kMaxnMC="<<kMaxnMC<<"; go to ../Include/TEventTree.h to increase kMaxnMC"<<std::endl;
+    return 0;
+  }
+  if (fChain->GetMaximum("nPho")>kMaxnPho){
+     std::cout<<"ERROR in CalcAccAndEff::LoopOverTreeEvents: treeLeaf.nPho="<<fChain->GetMaximum("nPho")<<" > kMaxnPho="<<kMaxnPho<<"; go to ../Include/TEventTree.h to increase kMaxnPho"<<std::endl;
+     return 0;
+   }
+   if (channel_==TConfiguration::MUON && fChain->GetMaximum("nMu")>kMaxnMu){
+     std::cout<<"ERROR in CalcAccAndEff::LoopOverTreeEvents: treeLeaf.nMu="<<fChain->GetMaximum("nMu")<<" > kMaxnMu="<<kMaxnMu<<"; go to ../Include/TEventTree.h to increase kMaxnMu"<<std::endl;
+     return 0;
+   }
+   if (channel_==TConfiguration::ELECTRON && fChain->GetMaximum("nEle")>kMaxnEle){
+     std::cout<<"ERROR in CalcAccAndEff::LoopOverTreeEvents: treeLeaf.nEle="<<fChain->GetMaximum("nEle")<<" > kMaxnEle="<<kMaxnEle<<"; go to ../Include/TEventTree.h to increase kMaxnEle"<<std::endl;
+     return 0;
+   }
+  return 1;
 }
