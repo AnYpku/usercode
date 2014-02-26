@@ -1,12 +1,13 @@
 {
+
+  gSystem->Load("../RooUnfold/libRooUnfold.so");
+
   gROOT->ProcessLine(".L ../Configuration/TConfiguration.C+");
   gROOT->ProcessLine(".L ../Configuration/TInputSample.C+");
   gROOT->ProcessLine(".L ../Configuration/TAllInputSamples.C+");
-
   gROOT->ProcessLine(".L ../Include/PhosphorCorrectorFunctor.cc+");
   gROOT->ProcessLine(".L ../Include/TMathTools.C+");
   gROOT->ProcessLine(".L ../Include/TEventTree.C+");
-
   gROOT->ProcessLine(".L ../Include/TPhotonCuts.C+");
   gROOT->ProcessLine(".L ../Include/TPhotonScaleFactor.C+");
   gROOT->ProcessLine(".L ../Include/TElectronCuts.C+");
@@ -19,14 +20,13 @@
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/WGammaSelection.C+");
   gROOT->ProcessLine(".L ../Selection/ExtraSelection.C+");
-
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
 
-//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
+  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
 
-//  gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
+  gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
 
-//  gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
+  gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
 
 //  gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");

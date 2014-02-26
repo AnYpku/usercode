@@ -16,7 +16,7 @@ void ExtraSelection(int channel)
   TTree* tr1=0;
   TTree* tr2=0;
   for (int i=0; i<INPUT.nSources_; i++){
-    TString fInName = config.GetSelectedVeryPreliminaryName(channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
+    TString fInName = config.GetSelectedName(config.VERY_PRELIMINARY,channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
     TFile fIn(fInName);
     if (!fIn.IsOpen()){
       std::cout<<"file "<<fInName<<" can't be open"<<std::endl;
@@ -24,11 +24,12 @@ void ExtraSelection(int channel)
     }
     std::cout<<"file "<<fInName<<" was open"<<std::endl;
     tr = (TTree*)fIn.Get("selectedEvents");
-    TString fOutName1=config.GetSelectedPreliminaryName(channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
+    TString fOutName1=config.GetSelectedName(config.PRELIMINARY,channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
     TFile fOut1(fOutName1,"recreate");
     tr1 = tr->CopyTree(fullCut.RangeMetRelatedCut());
+//    tr1 = tr->CopyTree("1");
     tr1->Write();
-    TString fOutName2=config.GetSelectedFullyName(channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
+    TString fOutName2=config.GetSelectedName(config.FULLY,channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
     TFile fOut2(fOutName2,"recreate");
     tr2 = tr->CopyTree(fullCut.RangeExtraCut());
     tr2->Write();

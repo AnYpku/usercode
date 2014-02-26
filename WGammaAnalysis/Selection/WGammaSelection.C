@@ -111,9 +111,7 @@ void WGammaSelection::LoopOverInputFiles()
        if (sample_==TInputSample::BKGMC)
            if (sampleMode_==DATA || sampleMode_==SIGMC || sampleMode_==NOBKG)
            continue;
-       selectedTreeFileName_=config.GetSelectedVeryPreliminaryName(channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_);
-       if (isDebugMode_)
-         selectedTreeFileName_.ReplaceAll(".root",config.GetNameDebugMode()+".root");
+       selectedTreeFileName_=config.GetSelectedName(config.VERY_PRELIMINARY,channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_,isDebugMode_,isNoPuReweight_,isVeryLooseSelectionMode_);
        TTree* tree;
        int inputFileNMax = INPUT_->allInputs_[iSource].nFiles_;
        //if (isDebugMode_) 
@@ -209,6 +207,8 @@ void WGammaSelection::LoopOverTreeEvents()
        return;
      }
 
+   if (isVeryLooseSelectionMode_) nLeptonMax=1;
+
    float* WMt = new float[nLeptonMax];
 
    float** lePhoDeltaR = new float*[nLeptonMax];
@@ -255,7 +255,7 @@ void WGammaSelection::LoopOverTreeEvents()
        TFullCuts fullCuts;
        if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
                 channel_,
-                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_, doPhoChIsoCut_) == 1)
+                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_, doPhoChIsoCut_,isVeryLooseSelectionMode_) == 1)
               //method of this class (WGammaSelection)
 
           for (int ile=0; ile<nLe_; ile++)
@@ -291,9 +291,23 @@ void WGammaSelection::LoopOverTreeEvents()
                       puWeightVal=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
                       puTrueVal=treeLeaf.puTrue->at(1);
                     }
-                    if (channel_==TConfiguration::MUON) 
+                    if (channel_==TConfiguration::MUON && !isVeryLooseSelectionMode_) 
                        SetValues(treeLeaf.muEta->at(ile),treeLeaf.muPhi->at(ile),
                               treeLeaf.muPt->at(ile), leGenPID_,
+                              treeLeaf.phoEta->at(ipho), 
+                              treeLeaf.phoPhi->at(ipho), treeLeaf.phoEt->at(ipho),phoGenPID_,phoGenEt_,
+                              treeLeaf.phoSigmaIEtaIEta->at(ipho),
+                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
+                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
+                              lePhoDeltaR[ile][ipho],
+                              WMt[ile],
+                              treeLeaf.pfMET, treeLeaf.pfMETPhi,
+                              treeLeaf.rho2012,
+                              treeLeaf.run,
+                              inputFileN_,
+                              totalWeight_,puWeightVal,puTrueVal);
+                    else if (isVeryLooseSelectionMode_)
+                       SetValues(0,0,0,0,
                               treeLeaf.phoEta->at(ipho), 
                               treeLeaf.phoPhi->at(ipho), treeLeaf.phoEt->at(ipho),phoGenPID_,phoGenEt_,
                               treeLeaf.phoSigmaIEtaIEta->at(ipho),
@@ -332,7 +346,7 @@ void WGammaSelection::LoopOverTreeEvents()
   delete[] lePhoDeltaR;
  
   delete WMt;
-
+ 
   std::cout<<"Summary:"<<std::endl;
   std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<std::endl;
 //  std::cout<<"nTotal_="<<nTotal_<<std::endl;

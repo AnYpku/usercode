@@ -21,23 +21,23 @@ class TPhotonCuts
                     float rho2012);
     virtual ~TPhotonCuts();
 
-    bool Passed(bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
-    bool PassedExceptKinematics(bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
+    bool Passed(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
+    bool PassedExceptKinematics(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
     bool PhoKinematics(float phoPt, float phoEta);
     bool PhoKinematics();
-    bool SimpleCutBasedPhotonID2012(bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0); 
+    bool SimpleCutBasedPhotonID2012(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
       //for reference
 
     //the following three functions determine effective areas depending on |eta|
     //the values are taken from
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
-    bool CutSigmaIEtaIEta(float eta, float sigmaIEtaIEta);
-    bool CutSigmaIEtaIEta();
-    TCut RangeSigmaIEtaIEta();
-    bool CutPhoChIso(float phoChIso, float rho2012, float eta);
-    bool CutPhoChIso();
-    TCut RangePhoChIso();
+    bool CutSigmaIEtaIEta(int wp, float eta, float sigmaIEtaIEta);
+    bool CutSigmaIEtaIEta(int wp);
+    TCut RangeSigmaIEtaIEta(int wp);
+    bool CutPhoChIso(int wp, float phoChIso, float rho2012, float eta);
+    bool CutPhoChIso(int wp);
+    TCut RangePhoChIso(int wp);
 
     float EffAreaCharged(float eta);
     float EffAreaCharged();
@@ -53,8 +53,8 @@ class TPhotonCuts
     bool IsEndcap();
 
     float GetPhoPFChIsoCorr(float phoChIso, float rho2012, float eta);
-    float GetPhoSigmaIEtaIEtaCutB(int WP);
-    float GetPhoSigmaIEtaIEtaCutE(int WP);
+    float GetPhoSigmaIEtaIEtaCutB(int wp);
+    float GetPhoSigmaIEtaIEtaCutE(int wp);
     int   GetWP();
 
     const static int nWP_=3;

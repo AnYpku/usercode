@@ -17,7 +17,7 @@ public:
   bool GetTrees(int channel, string confFile, string strSources="ALL");
   bool SetHistograms(TString plotVar, int nBins, float* binLimits, TString cut="1");
   void ScaleHistogramsToData();
-  void DrawSpectrumDataVsMC(TString nameCanvas, TString nameForSave);
+  void DrawSpectrumDataVsMC(TString nameCanvas, TString nameForSave, bool isNoData=0);
   void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);
   bool CheckSizesOfAllVectors();
   void PrintWeightedNumberOfEvents(TString cut);

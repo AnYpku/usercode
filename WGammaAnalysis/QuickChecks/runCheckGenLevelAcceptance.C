@@ -36,7 +36,10 @@
       b_mcEt->GetEntry(entry);
       b_mcEta->GetEntry(entry);
 
-      if (nMC==0) continue;
+      if (nMC==0){
+        std::cout<<"no particles were generated in the event "<<enrty<<std::endl; 
+        continue;
+      }
       bool passed = 0;
       for (int iMC=0; iMC<nMC; iMC++)
         {

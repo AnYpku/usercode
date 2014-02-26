@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "TFile.h"
 #include "TString.h"
@@ -20,6 +21,22 @@ TPrepareYields::TPrepareYields(int channel)
   channel_=channel;
   INPUT_=new TAllInputSamples(channel_,"../Configuration/config.txt");
   isOverflowUsed_=1;
+  fOut_=0;
+  dataYields_=0;
+  dataYieldsB_=0;
+  dataYieldsE_=0;
+  sigMCYields_=0;
+  sigMCYieldsB_=0;
+  sigMCYieldsE_=0;
+  sigMCGenYields_=0;
+  bkgDDYields_=0;
+  bkgDDYieldsB_=0;
+  bkgDDYieldsE_=0;
+  signalYields_=0;
+  signalYieldsB_=0;
+  signalYieldsE_=0;
+  legend_=0;
+  canvDDvsMC_=0;
 
 }
 
@@ -32,8 +49,8 @@ void TPrepareYields::PrepareYields()
 {
   SetYields();
   SubtractBackground();
-  CompareBkgDDandMC();
-  StoreYields();
+//  CompareBkgDDandMC();
+//  StoreYields();
 }
 
 void TPrepareYields::SetYields()
@@ -50,13 +67,18 @@ void TPrepareYields::SetYields()
 void TPrepareYields::SetYieldsOneSource(int iSource)
 {
 
-  TString fInName;
   TString yieldsHistName;
 
+  int sample = INPUT_->allInputs_[iSource].sample_;
+  TString strSourceName = INPUT_->allInputs_[iSource].sourceName_;
 
-  fInName = config_.GetSelectedFullyName(channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_);
-
+  TString fInName = config_.GetSelectedName(config_.FULLY,channel_,sample,strSourceName);
   TFile fIn(fInName);
+  if (!fIn.IsOpen()){
+    std::cout<<"file "<<fInName<<" is not open"<<std::endl;
+    return;
+  }
+
   TTree* tr = (TTree*)fIn.Get("selectedEvents");
 
   vector <float> vecPtBins = config_.GetPhoPtUnfBinsLimits(isOverflowUsed_);
@@ -115,11 +137,16 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   TCut cutE = emptyPhoton.RangeEndcap();
   TString cutStrE = cutE.GetTitle();
   tr->Draw(TString("phoEt>>")+yieldsEName,"("+cutStrE+")*weight","goff");
+
 }
 
 void TPrepareYields::SetYieldsDDBkgTemplate()
 {
   TFile fFractions(config_.GetFractionsDDTemplateBkgFileName(channel_));
+  if (!fFractions.IsOpen()){
+    std::cout<<"file "<<config_.GetFractionsDDTemplateBkgFileName(channel_)<<" is not open"<<std::endl;
+    return;
+  }
   TH1F* frB = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName(config_.BARREL));
   TH1F* frE = (TH1F*)fFractions.Get(config_.GetFractionsDDTemplateBkgHistName(config_.ENDCAP));
   vector <float> vecPtBins = config_.GetPhoPtBinsLimits();

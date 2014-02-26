@@ -41,7 +41,7 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
   nSources_ = 0;
   for (int i=0; i<INPUT.nSources_; i++)
     {
-      TString fileName = (TString)(config.GetSelectedFullyName(channel, INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_)) ;
+      TString fileName = (TString)(config.GetSelectedName(config.FULLY, channel, INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_)) ;
       bool doThisSource=0;
 
       for (int j=0; j<nNames; j++)
@@ -154,7 +154,7 @@ void TSelectionPlots::ScaleHistogramsToData()
 }
 
 
-void TSelectionPlots::DrawSpectrumDataVsMC(TString nameCanvas,TString nameForSave)
+void TSelectionPlots::DrawSpectrumDataVsMC(TString nameCanvas,TString nameForSave, bool isNoData)
 {
 
   TCanvas* c = new TCanvas(nameCanvas,nameCanvas);
@@ -183,13 +183,14 @@ void TSelectionPlots::DrawSpectrumDataVsMC(TString nameCanvas,TString nameForSav
   else maxDataMC = maxMC;
 
 
-  if (dataIndex!=-1) {
+  if (isNoData || dataIndex==0)
+    mcHists->Draw();
+  else {
     hist_[dataIndex]->GetYaxis()->SetRangeUser(0,1.1*maxDataMC);
     hist_[dataIndex]->Draw();
     mcHists->Draw("same");
     hist_[dataIndex]->Draw("EP same");
   }
-  else mcHists->Draw();
 
   legend_->Draw("same");
   c->SaveAs(nameForSave);

@@ -15,11 +15,11 @@
   //WGammaSelection selection( TInputSample::MUON, "DYjets_to_ll", "../Configuration/config.txt");
   //selection.LoopOverInputFiles();
 
-  WGammaSelection selection(TConfiguration::MUON, WGammaSelection::MC);
-  selection.LoopOverInputFiles();
+//  WGammaSelection selection(TConfiguration::MUON, "DYjets_to_ll Wjets_to_lnu");
+//  selection.LoopOverInputFiles();
 
-  //WGammaSelection selection( TConfiguration::MUON, "multibosons");
-  //selection.LoopOverInputFiles();
+  WGammaSelection selection( TConfiguration::MUON, TConfiguration::DATA);
+  selection.LoopOverInputFiles();
 
   gROOT->ProcessLine(".L ExtraSelection.C+");
   ExtraSelection(TConfiguration::MUON);
