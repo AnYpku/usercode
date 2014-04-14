@@ -10,16 +10,19 @@
 ##############################
 1) SkimSplitMerge
 - it is necessary to run the splitter of the WGamma sample
-- it is good to run skimmers of all MC samples for which it works
+- it is good to run skimmers of all MC samples for which it works except Wg_to_numu
 
-does skimming (has problems with some files: ttjets, WWg, qcd_170to300)
-does splitting of WGamma to munu, enu, taunu channels
+performes skimming 
+performes splitting of WGamma to munu, enu, taunu channels
 potentially can easily do merging if needed
 
 ##############################
 2) Selection
-- performs event selection except phoSigmaIEtaIEta and phoChIso cuts
-- currently also no WMt cut applied
+- performs event selection cuts
+- selection is performed in three steps:
+  WGammaSelection::LoopOverTree() - does VeryPreliminary selection
+  ExtraSelection.C - does Preliminary (also applies WMt cut - but no such cut introduced)
+                     and  Fully (applies phoSigmaIEtaIEta and phoChIso cuts)
 - needs results of SkimSplitMerge (WGamma splitter)
 
 ##############################
@@ -29,43 +32,28 @@ potentially can easily do merging if needed
 
 ##############################
 4) PrepareYields
-- not performed at all
 - estimates weighted selected yields and subtracts background
-- must apply phoSigmaIEtaIEta and phoChIso cuts (TFullCuts::ExtraCut)
 - needs results of Selection and DDBkgTemplateMethod
+- now nothing matches
 
 ##############################
 5) AcceptanceAndEfficiency
 - calculates acceptance and efficiency
 - must apply phoSigmaIEtaIEta and phoChIso cuts (TFullCuts::ExtraCut)
 - needs results of SkimSplitMerge (WGamma splitter)
-
-to run it do
-$ root -l runAccAndEff.C
-
-now, it calculates 
-1. skim efficiency if any (it actually is calculated during skimming procedure, this script only extracts this values from historgam hskim; if there is no histogram hskim found in the file - skim efficiency must be 1)
-2. acceptance within skim efficiency. Acceptance cuts are muon and photon kinematic cuts applied on generator level values of reconstructed muon and photon. So, the acceptance is only calculated if at least 1 reconstructed muon and 1 reconstructed photon exists. If no reconstructed muon-photon pair - acceptance fails, even for not skimmed file.
-3. efficiency. Applies exactly all the same cuts as for Selection procedure. Uses function Include/TFullCuts::Cut(). This cut includes kinematic cuts for reconstructed values of muon and photon.
-
-Improvement plans:
-- add photon Pt binning
-- store acc*eff values to .root file
-- make plot (in this or separate class)
-
-2013 June 7
+- is commented in Include/rootlogon.C
 
 ##############################
 6) Unfolding
-- not performed at all 
-- calculates unfolding
-- must apply  phoSigmaIEtaIEta and phoChIso cuts (TFullCuts::ExtraCut)
-- needs results of SkimSplitMerge (WGamma splitter)
+- performes unfolding using RooUnfold
+- needs results of SkimSplitMerge (WGamma splitter) and Selection
+- the plan is to do unfolding on events which are in acceptance but before the selection cuts applied
 
 ##############################
 7) CrossSection
 - calculates cross section
 - needs results of PrepareYields, AcceptanceAndEfficiency, Unfolding
+- is commented in Include/rootlogon.C now
 
 
 
@@ -146,3 +134,6 @@ empty directory; I was trying to rename this directory to SkimSplitMerge
 So, I created directory SkimSplitMerge
 but was not able to remove directory SplitWGammaMC from the CVS
 now it still stays in the CVS but remains empty
+
+##############################
+and more...
