@@ -48,12 +48,12 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
    outputTree->Branch("mcPhi", "vector<float>", &treeLeaf.mcPhi);
    outputTree->Branch("mcE",  "vector<float>",&treeLeaf.mcE);
    outputTree->Branch("mcEt",  "vector<float>",&treeLeaf.mcEt);
-//   outputTree->Branch("mcGMomPID", "vector<int>",&treeLeaf.mcGMomPID);
+   outputTree->Branch("mcGMomPID", "vector<int>",&treeLeaf.mcGMomPID);
    outputTree->Branch("mcMomPID","vector<int>", &treeLeaf.mcMomPID);
-//   outputTree->Branch("mcMomPt", "vector<float>", &treeLeaf.mcMomPt);
+   outputTree->Branch("mcMomPt", "vector<float>", &treeLeaf.mcMomPt);
 //   outputTree->Branch("mcMomMass", "vector<float>", &treeLeaf.mcMomMass);
-//   outputTree->Branch("mcMomEta",  "vector<float>",&treeLeaf.mcMomEta);
-//   outputTree->Branch("mcMomPhi", "vector<float>", &treeLeaf.mcMomPhi);
+   outputTree->Branch("mcMomEta",  "vector<float>",&treeLeaf.mcMomEta);
+   outputTree->Branch("mcMomPhi", "vector<float>", &treeLeaf.mcMomPhi);
    outputTree->Branch("mcIndex","vector<int>", &treeLeaf.mcIndex);
    outputTree->Branch("mcDecayType", "vector<int>",&treeLeaf.mcDecayType);
 //   outputTree->Branch("mcParentage", "vector<int>",&treeLeaf.mcParentage);

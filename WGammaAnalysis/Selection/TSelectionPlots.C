@@ -72,12 +72,12 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
      tree_.push_back((TTree*)file_.back()->Get("selectedEvents"));
      colors_.push_back(INPUT.allInputs_[i].color_);
 
-     if (INPUT.allInputs_[i].sample_ == TInputSample::DATA)
+     if (INPUT.allInputs_[i].sample_ == TConfiguration::DATA)
        isData_.push_back(1);
      else
        isData_.push_back(0);
 
-     if (INPUT.allInputs_[i].sample_ == TInputSample::SIGMC)
+     if (INPUT.allInputs_[i].sample_ == TConfiguration::SIGMC)
        isSigMC_.push_back(1);
      else
        isSigMC_.push_back(0);

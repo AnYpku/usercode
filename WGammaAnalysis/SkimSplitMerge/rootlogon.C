@@ -1,3 +1,3 @@
 {
-  gROOT->ProcessLine(".x ../Include/rootlogon.C+");
+  gROOT->ProcessLine(".x ../Include/rootlogon.C");
 }

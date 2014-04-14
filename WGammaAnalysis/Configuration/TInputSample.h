@@ -18,7 +18,7 @@ class TInputSample
 
     //enum {MUON, ELECTRON, BOTH};
        //shifted to TConfiguration.h
-    enum {DATA, SIGMC, BKGMC};
+//    enum {DATA, SIGMC, BKGMC};
 
     int channel_;
     int sample_;

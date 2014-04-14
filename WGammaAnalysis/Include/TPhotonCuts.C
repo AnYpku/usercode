@@ -21,9 +21,9 @@ TPhotonCuts::TPhotonCuts(    int phoEleVeto_ipho,
                     float phoSCEta_ipho,
                     float phoHoverE12_ipho,
                     float phoSigmaIEtaIEta_ipho,
-                    float phoPFChIso_ipho,
-                    float phoPFNeuIso_ipho,
-                    float phoPFPhoIso_ipho,
+                    float phoChIso_ipho,
+                    float phoNeuIso_ipho,
+                    float phoPhoIso_ipho,
                     float rho2012)
 {
   phoEleVeto_ipho_=phoEleVeto_ipho;
@@ -33,18 +33,18 @@ TPhotonCuts::TPhotonCuts(    int phoEleVeto_ipho,
   phoSCEta_ipho_=phoSCEta_ipho;
   phoHoverE12_ipho_=phoHoverE12_ipho;
   phoSigmaIEtaIEta_ipho_=phoSigmaIEtaIEta_ipho;
-  phoPFChIso_ipho_=phoPFChIso_ipho;
-  phoPFNeuIso_ipho_=phoPFNeuIso_ipho;
-  phoPFPhoIso_ipho_=phoPFPhoIso_ipho;
+  phoChIso_ipho_=phoChIso_ipho;
+  phoNeuIso_ipho_=phoNeuIso_ipho;
+  phoPhoIso_ipho_=phoPhoIso_ipho;
   rho2012_=rho2012;
 
   //calculation of NeuIso and PhoIso cuts:
   for (int wp=0; wp<3; wp++)
     {
-      phoPFNeuIsoBarrelCut_[wp]=phoPFNeuIsoBarrelCutA_[wp]+phoSCEt_ipho_*phoPFNeuIsoBarrelCutB_[wp];
-      phoPFNeuIsoEndcapCut_[wp]=phoPFNeuIsoEndcapCutA_[wp]+phoSCEt_ipho_*phoPFNeuIsoEndcapCutB_[wp];
-      phoPFPhoIsoBarrelCut_[wp]=phoPFPhoIsoBarrelCutA_[wp]+phoSCEt_ipho_*phoPFPhoIsoBarrelCutB_[wp];
-      phoPFPhoIsoEndcapCut_[wp]=phoPFPhoIsoEndcapCutA_[wp]+phoSCEt_ipho_*phoPFPhoIsoEndcapCutB_[wp];     
+      phoNeuIsoBarrelCut_[wp]=phoNeuIsoBarrelCutA_[wp]+phoSCEt_ipho_*phoNeuIsoBarrelCutB_[wp];
+      phoNeuIsoEndcapCut_[wp]=phoNeuIsoEndcapCutA_[wp]+phoSCEt_ipho_*phoNeuIsoEndcapCutB_[wp];
+      phoPhoIsoBarrelCut_[wp]=phoPhoIsoBarrelCutA_[wp]+phoSCEt_ipho_*phoPhoIsoBarrelCutB_[wp];
+      phoPhoIsoEndcapCut_[wp]=phoPhoIsoEndcapCutA_[wp]+phoSCEt_ipho_*phoPhoIsoEndcapCutB_[wp];     
     }
 }
 
@@ -85,18 +85,18 @@ bool TPhotonCuts::SimpleCutBasedPhotonID2012(int wp, bool doSigmaIEtaIEtaCut, bo
   if (IsBarrel())
     {
       if (phoHoverE12_ipho_>phoHoverE12BarrelCut_[wp]) return false;
-      isoCorr = PFIsoCorr(phoPFNeuIso_ipho_, rho2012_, EffAreaNeutral());
-      if (isoCorr>phoPFNeuIsoBarrelCut_[wp]) return false;
-      isoCorr = PFIsoCorr(phoPFPhoIso_ipho_, rho2012_, EffAreaPhotons());
-      if (isoCorr>phoPFPhoIsoBarrelCut_[wp]) return false;
+      isoCorr = IsoCorr(phoNeuIso_ipho_, rho2012_, EffAreaNeutral());
+      if (isoCorr>phoNeuIsoBarrelCut_[wp]) return false;
+      isoCorr = IsoCorr(phoPhoIso_ipho_, rho2012_, EffAreaPhotons());
+      if (isoCorr>phoPhoIsoBarrelCut_[wp]) return false;
     }
   if (IsEndcap())
     {
       if (phoHoverE12_ipho_>phoHoverE12EndcapCut_[wp]) return false;
-      isoCorr = PFIsoCorr(phoPFNeuIso_ipho_, rho2012_, EffAreaNeutral());
-      if (phoPFNeuIso_ipho_>phoPFNeuIsoEndcapCut_[wp]) return false;
-      isoCorr = PFIsoCorr(phoPFPhoIso_ipho_, rho2012_, EffAreaPhotons());
-      if (phoPFPhoIso_ipho_>phoPFPhoIsoEndcapCut_[wp]) return false;
+      isoCorr = IsoCorr(phoNeuIso_ipho_, rho2012_, EffAreaNeutral());
+      if (phoNeuIso_ipho_>phoNeuIsoEndcapCut_[wp]) return false;
+      isoCorr = IsoCorr(phoPhoIso_ipho_, rho2012_, EffAreaPhotons());
+      if (phoPhoIso_ipho_>phoPhoIsoEndcapCut_[wp]) return false;
     }
 
   if (doSigmaIEtaIEtaCut && !CutSigmaIEtaIEta(wp)) return false;
@@ -106,23 +106,44 @@ bool TPhotonCuts::SimpleCutBasedPhotonID2012(int wp, bool doSigmaIEtaIEtaCut, bo
 
 bool TPhotonCuts::CutPhoChIso(int wp, float phoChIso, float rho2012, float eta)
 {
-  float isoCorr = PFIsoCorr(phoChIso, rho2012, EffAreaCharged(eta));
+  float isoCorr = IsoCorr(phoChIso, rho2012, EffAreaCharged(eta));
   if (IsBarrel(eta))
-    if (isoCorr<=phoPFChIsoBarrelCut_[wp]) return true;
+    if (isoCorr<=phoChIsoBarrelCut_[wp]) return true;
   else if (IsEndcap(eta))
-    if (isoCorr<=phoPFChIsoEndcapCut_[wp]) return true;
+    if (isoCorr<=phoChIsoEndcapCut_[wp]) return true;
   return false;
 }
 
-TCut TPhotonCuts::RangePhoChIso(int wp)
+TCut TPhotonCuts::RangePhoChIso(TString strPhoChIso, int wp)
+//strPhoChIso = "phoSCRChIsoCorr" or "phoPFChIsoCorr
 {
   TCut cutB = RangeBarrel();
   TCut cutE = RangeEndcap();
-  TString cutIsoBStr = "phoPFChIsoCorr <= ";
-  cutIsoBStr+=phoPFChIsoBarrelCut_[wp];
+  TString cutIsoBStr = strPhoChIso;
+  cutIsoBStr+=" <= ";
+  cutIsoBStr+=phoChIsoBarrelCut_[wp];
   TCut cutIsoB(cutIsoBStr); 
-  TString cutIsoEStr = "phoPFChIsoCorr <= ";
-  cutIsoEStr+=phoPFChIsoEndcapCut_[wp];
+  TString cutIsoEStr = strPhoChIso;
+  cutIsoEStr+=" <= ";
+  cutIsoEStr+=phoChIsoEndcapCut_[wp];
+  TCut cutIsoE(cutIsoEStr); 
+  TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
+  return cut;
+}
+
+
+TCut TPhotonCuts::SidebandPhoChIso(TString strPhoChIso)
+//strPhoChIso = "phoSCRChIsoCorr" or "phoPFChIsoCorr
+{
+  TCut cutB = RangeBarrel();
+  TCut cutE = RangeEndcap();
+  TString cutIsoBStr = strPhoChIso;
+  cutIsoBStr+=" >= ";
+  cutIsoBStr+=phoChIsoBarrelSideband_;
+  TCut cutIsoB(cutIsoBStr); 
+  TString cutIsoEStr = strPhoChIso;
+  cutIsoEStr+=" >= ";
+  cutIsoEStr+=phoChIsoEndcapSideband_;
   TCut cutIsoE(cutIsoEStr); 
   TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
   return cut;
@@ -130,27 +151,45 @@ TCut TPhotonCuts::RangePhoChIso(int wp)
 
 bool TPhotonCuts::CutPhoChIso(int wp)
 {
-  return CutPhoChIso(wp, phoPFChIso_ipho_, rho2012_,phoEta_ipho_);
+  return CutPhoChIso(wp, phoChIso_ipho_, rho2012_,phoEta_ipho_);
 }
 
 bool TPhotonCuts::CutSigmaIEtaIEta(int wp, float eta, float sigmaIEtaIEta)
 {
-  if ( IsEndcap(eta) && (sigmaIEtaIEta<=phoSigmaIEtaIEtaEndcapCut_[wp]) ) 
+  if ( IsEndcap(eta) && (sigmaIEtaIEta<=phoSigmaIEtaIEtaEndcapCut_[wp]) 
+       && sigmaIEtaIEta>=phoSigmaIEtaIEtaEndcapCutLeft_) 
     return true;
-  if ( IsBarrel(eta) && (sigmaIEtaIEta<=phoSigmaIEtaIEtaBarrelCut_[wp]) ) 
+  if ( IsBarrel(eta) && (sigmaIEtaIEta<=phoSigmaIEtaIEtaBarrelCut_[wp]) 
+       && sigmaIEtaIEta>=phoSigmaIEtaIEtaBarrelCutLeft_) 
     return true;
   return false;
 }
 
 TCut TPhotonCuts::RangeSigmaIEtaIEta(int wp)
 {
-  TString cutBStr="phoSigmaIEtaIEta";
-  cutBStr+="<=";
+  TString cutBStr="phoSigmaIEtaIEta<=";
   cutBStr+=phoSigmaIEtaIEtaBarrelCut_[wp];
+  cutBStr+="&& phoSigmaIEtaIEta>=";
+  cutBStr+=phoSigmaIEtaIEtaBarrelCutLeft_;
+  TCut cutB(cutBStr);
+  TString cutEStr="phoSigmaIEtaIEta<=";
+  cutEStr+=phoSigmaIEtaIEtaEndcapCut_[wp];
+  cutEStr+="&& phoSigmaIEtaIEta>=";
+  cutEStr+=phoSigmaIEtaIEtaEndcapCutLeft_;
+  TCut cutE(cutEStr);
+  TCut cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
+  return cut;
+}
+
+TCut TPhotonCuts::SidebandSigmaIEtaIEta()
+{
+  TString cutBStr="phoSigmaIEtaIEta";
+  cutBStr+=">=";
+  cutBStr+=phoSigmaIEtaIEtaBarrelSideband_;
   TCut cutB(cutBStr);
   TString cutEStr="phoSigmaIEtaIEta";
-  cutEStr+="<=";
-  cutEStr+=phoSigmaIEtaIEtaEndcapCut_[wp];
+  cutEStr+=">=";
+  cutEStr+=phoSigmaIEtaIEtaEndcapSideband_;
   TCut cutE(cutEStr);
   TCut cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
   return cut;
@@ -197,9 +236,9 @@ float TPhotonCuts::EffAreaPhotons()
 }
 
 
-float TPhotonCuts::PFIsoCorr(float PFIso, float rho, float EA)
+float TPhotonCuts::IsoCorr(float iso, float rho, float EA)
 {
-  if (PFIso-rho*EA>0.0) return PFIso-rho*EA;
+  if (iso-rho*EA>0.0) return iso-rho*EA;
   return 0.0;
 }
 
@@ -242,9 +281,9 @@ bool TPhotonCuts::IsEndcap()
     return IsEndcap(phoSCEta_ipho_);
 }
 
-float TPhotonCuts::GetPhoPFChIsoCorr(float phoChIso, float rho2012, float eta)
+float TPhotonCuts::GetPhoChIsoCorr(float phoChIso, float rho2012, float eta)
 {
-  return PFIsoCorr(phoChIso, rho2012, EffAreaCharged(eta));
+  return IsoCorr(phoChIso, rho2012, EffAreaCharged(eta));
 }
 
 int TPhotonCuts::GetWP()
@@ -260,4 +299,14 @@ float TPhotonCuts::GetPhoSigmaIEtaIEtaCutB(int wp)
 float TPhotonCuts::GetPhoSigmaIEtaIEtaCutE(int wp)
 {
   return phoSigmaIEtaIEtaEndcapCut_[wp];
+}
+
+float TPhotonCuts::GetPhoSigmaIEtaIEtaCutLeftB()
+{
+  return phoSigmaIEtaIEtaBarrelCutLeft_;
+}
+
+float TPhotonCuts::GetPhoSigmaIEtaIEtaCutLeftE()
+{
+  return phoSigmaIEtaIEtaEndcapCutLeft_;
 }

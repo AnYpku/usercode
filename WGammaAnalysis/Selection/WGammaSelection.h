@@ -21,7 +21,6 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
      //TEventTree - class for input tree
      //TSelectedEventsTree - class for output tree and output root file
      public:
-//       enum {EVENTSELECTION_, SIGNALTEMPLATE_, BKGTEMPLATE_};
        WGammaSelection (int channel, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
        WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isPuReweight=0, bool isDebugMode=0, bool isVeryLooseSelectionMode=0);
        virtual ~WGammaSelection();

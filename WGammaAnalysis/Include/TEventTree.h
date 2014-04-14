@@ -75,12 +75,12 @@ public:
      vector<float>   *mcPhi;
      vector<float>   *mcE;
      vector<float>   *mcEt;
-//   vector<int>     *mcGMomPID;
+     vector<int>     *mcGMomPID;
      vector<int>     *mcMomPID;
-//   vector<float>   *mcMomPt;
+     vector<float>   *mcMomPt;
 //   vector<float>   *mcMomMass;
-//   vector<float>   *mcMomEta;
-//   vector<float>   *mcMomPhi;
+     vector<float>   *mcMomEta;
+     vector<float>   *mcMomPhi;
      vector<int>     *mcIndex;
      vector<int>     *mcDecayType;
 //   vector<int>     *mcParentage;

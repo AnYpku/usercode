@@ -56,7 +56,7 @@ void SplitWGammaMC::LoopOverInputTree()
         //field of TInputTree
 
   Long64_t nentries = TREE_.fChain->GetEntries();
-  //nentries = 10;
+//  nentries = 100;
   TConfiguration config;
   for (Long64_t entry=0; entry<nentries; entry++) 
     {

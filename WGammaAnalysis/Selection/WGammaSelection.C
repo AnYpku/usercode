@@ -102,13 +102,13 @@ void WGammaSelection::LoopOverInputFiles()
          continue;
 
        sample_ = INPUT_->allInputs_[iSource].sample_;
-       if (sample_==TInputSample::DATA)
+       if (sample_==TConfiguration::DATA)
            if (sampleMode_==SIGMC || sampleMode_==NOBKG || sampleMode_==MC)
              continue;
-       if (sample_==TInputSample::SIGMC)
+       if (sample_==TConfiguration::SIGMC)
            if (sampleMode_==DATA || sampleMode_==BKGMC)
              continue;
-       if (sample_==TInputSample::BKGMC)
+       if (sample_==TConfiguration::BKGMC)
            if (sampleMode_==DATA || sampleMode_==SIGMC || sampleMode_==NOBKG)
            continue;
        selectedTreeFileName_=config.GetSelectedName(config.VERY_PRELIMINARY,channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_,isDebugMode_,isNoPuReweight_,isVeryLooseSelectionMode_);
@@ -150,7 +150,7 @@ void WGammaSelection::LoopOverInputFiles()
            if (tree) 
              {
                 Init(tree);
-                //if (sample_!=TInputSample::DATA) SetMCSpecificAddresses();
+                //if (sample_!=TConfiguration::DATA) SetMCSpecificAddresses();
              }   
            else
              {
@@ -247,92 +247,91 @@ void WGammaSelection::LoopOverTreeEvents()
              std::cout<<"Error detected in  WGammaSelection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
              return;
           }
-       totalWeight_ = lumiWeight_;
-       if (!treeLeaf.isData && !isNoPuReweight_)
-         totalWeight_*=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
-       nTotal+=totalWeight_;
+        totalWeight_ = lumiWeight_;
+        if (!treeLeaf.isData && !isNoPuReweight_)
+          totalWeight_*=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
+        nTotal+=totalWeight_;
 
-       TFullCuts fullCuts;
-       if (fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
+        TFullCuts fullCuts;
+        bool selPassed = fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
                 channel_,
-                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_, doPhoChIsoCut_,isVeryLooseSelectionMode_) == 1)
+                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_, doPhoChIsoCut_,isVeryLooseSelectionMode_);
               //method of this class (WGammaSelection)
+        if (!selPassed) continue;
+        for (int ile=0; ile<nLe_; ile++){
+          for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
+            if (!goodLeptonPhotonPairs[ile][ipho]) continue;
+            nPassed+=totalWeight_;
+            _phoGenPID=-1000;
+            _leGenPID=-1000;
+            _phoGenEt=-1000;
+            //members of TSelectedEvents
+            if (sample_!=TConfiguration::DATA){
+              for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
+                if(treeLeaf.mcIndex->at(iMC)==treeLeaf.phoGenIndex->at(ipho)){
+                  _phoGenPID=treeLeaf.mcPID->at(iMC);
+                  _phoGenMomPID=treeLeaf.mcMomPID->at(iMC);
+                  _phoGenGMomPID=treeLeaf.mcGMomPID->at(iMC);
+                  _phoGenEt=treeLeaf.mcEt->at(iMC);
+                }
 
-          for (int ile=0; ile<nLe_; ile++)
-            for (int ipho=0; ipho<treeLeaf.nPho; ipho++)
-              {
-                if (goodLeptonPhotonPairs[ile][ipho])
-                  {
+//problem with muGenIndex
+//                if (channel_==TConfiguration::MUON) 
+//                  if(treeLeaf.mcIndex->at(iMC)==treeLeaf.muGenIndex->at(ile))
+//                    _leGenPID=treeLeaf.mcPID->at(iMC);
+//
+//                if (channel_==TConfiguration::ELECTRON && 
+//                      treeLeaf.mcIndex->at(iMC)==treeLeaf.eleGenIndex->at(ile))
+//                  leGenPID_=treeLeaf.mcPID->at(iMC);
 
-                    nPassed+=totalWeight_;
-                    phoGenPID_=-1000;
-                    leGenPID_=-1000;
-                    phoGenEt_=-1000;
-                      //members of TSelectedEvents
-                    if (sample_==TInputSample::SIGMC ||
-                        sample_==TInputSample::BKGMC)
-                      {
-                        for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
-                          if(treeLeaf.mcIndex->at(iMC)==treeLeaf.phoGenIndex->at(ipho)){
-                            phoGenPID_=treeLeaf.mcPID->at(iMC);
-                            phoGenEt_=treeLeaf.mcEt->at(iMC);
-                          }
-                          if (channel_==TConfiguration::MUON && 
-                              treeLeaf.mcIndex->at(iMC)==treeLeaf.muGenIndex->at(ile))
-                            leGenPID_=treeLeaf.mcPID->at(iMC);
-                          if (channel_==TConfiguration::ELECTRON && 
-                              treeLeaf.mcIndex->at(iMC)==treeLeaf.eleGenIndex->at(ile))
-                            leGenPID_=treeLeaf.mcPID->at(iMC);
-                        }
-                      }
-                    float puWeightVal=1;
-                    float puTrueVal=1;
-                    if (sample_!=TConfiguration::DATA){
-                      puWeightVal=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
-                      puTrueVal=treeLeaf.puTrue->at(1);
-                    }
-                    if (channel_==TConfiguration::MUON && !isVeryLooseSelectionMode_) 
-                       SetValues(treeLeaf.muEta->at(ile),treeLeaf.muPhi->at(ile),
-                              treeLeaf.muPt->at(ile), leGenPID_,
-                              treeLeaf.phoEta->at(ipho), 
-                              treeLeaf.phoPhi->at(ipho), treeLeaf.phoEt->at(ipho),phoGenPID_,phoGenEt_,
-                              treeLeaf.phoSigmaIEtaIEta->at(ipho),
-                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
-                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
-                              lePhoDeltaR[ile][ipho],
-                              WMt[ile],
-                              treeLeaf.pfMET, treeLeaf.pfMETPhi,
-                              treeLeaf.rho2012,
-                              treeLeaf.run,
-                              inputFileN_,
-                              totalWeight_,puWeightVal,puTrueVal);
-                    else if (isVeryLooseSelectionMode_)
-                       SetValues(0,0,0,0,
-                              treeLeaf.phoEta->at(ipho), 
-                              treeLeaf.phoPhi->at(ipho), treeLeaf.phoEt->at(ipho),phoGenPID_,phoGenEt_,
-                              treeLeaf.phoSigmaIEtaIEta->at(ipho),
-                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoPFChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
-                              emptyPhoton.GetPhoPFChIsoCorr(treeLeaf.phoSCRChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
-                              lePhoDeltaR[ile][ipho],
-                              WMt[ile],
-                              treeLeaf.pfMET, treeLeaf.pfMETPhi,
-                              treeLeaf.rho2012,
-                              treeLeaf.run,
-                              inputFileN_,
-                              totalWeight_,puWeightVal,puTrueVal);
+              }//end of loop over iMC
 
-                    else if (channel_==TConfiguration::ELECTRON); 
+            }//end of if (sample_!=TConfiguration::DATA)
+            float puWeightVal=1;
+            float puTrueVal=1;
+            if (sample_!=TConfiguration::DATA){
+              puWeightVal=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
+              puTrueVal=treeLeaf.puTrue->at(1);
+            }//end of if (sample_!=TConfiguration::DATA)
+            float leEta=0;
+            float lePhi=0;
+            float lePt=0;
+            if (channel_==TConfiguration::MUON && !isVeryLooseSelectionMode_){
+              leEta=treeLeaf.muEta->at(ile);
+              lePhi=treeLeaf.muPhi->at(ile);
+              lePt=treeLeaf.muPt->at(ile);
+            }
+            else if (channel_==TConfiguration::ELECTRON && !isVeryLooseSelectionMode_){
+
+            }            
+
+            SetValues(leEta,lePhi,lePt,_leGenPID,_leGenMomPID,_leGenGMomPID,
+                treeLeaf.phoEta->at(ipho), 
+                treeLeaf.phoPhi->at(ipho), 
+                treeLeaf.phoEt->at(ipho),
+                _phoGenPID,_phoGenMomPID,_phoGenGMomPID,_phoGenEt,
+                treeLeaf.phoSigmaIEtaIEta->at(ipho),
+                emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoPFChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
+                emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoSCRChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
+                lePhoDeltaR[ile][ipho],
+                WMt[ile],
+                treeLeaf.pfMET, 
+                treeLeaf.pfMETPhi,
+                treeLeaf.rho2012,
+                treeLeaf.run,
+                inputFileN_,
+                totalWeight_,puWeightVal,puTrueVal,
+                treeLeaf.nMC,
+                treeLeaf.mcPID,
+                treeLeaf.mcMomPID,
+                treeLeaf.mcGMomPID);
 //
 //                       //method of TSelectedEventsTree
 //                       //variables are fields of TEventTree
-                     Fill();
+            Fill();
                        //method of TSelectedEventsTree
-
-                  }// "if (goodLeptonPhotonPairs[ile][ipho])"
-
-              }// "for (int ipho=0; ipho<treeLeaf.nPho; ipho++)"
-
-        else continue;
+         }// "for (int ipho=0; ipho<treeLeaf.nPho; ipho++)"
+       }  // "for (int ile=0; ile<nLe_; ile++)"
      } //end of loop over events in the tree
 
   //memory release:

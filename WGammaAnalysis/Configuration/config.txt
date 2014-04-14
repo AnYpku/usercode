@@ -53,15 +53,15 @@ $   SIGMC    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634
 $   SIGMC    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    921     
 #921=kGray+1
 
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12Old/job_summer12_Wg_enu.root   461.6  0.3320  
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_enu.root   553.92  0.3320  
 # cross section and branching 
 
 ###################################################################
 $ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  
-#csTotal 30400  
+#csTotal 36257.2  
 #433=kCyan+1
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Wjets_MuPhoSkim.root 30400
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Wjets_MuPhoSkim.root 36257.2
 
 #value of cross section is preliminary
 
@@ -72,77 +72,44 @@ $ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_DYToLL_MuPhoSkim.root   3503.7
 
 ###################################################################
-#$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      401    
+$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      418    
+#418=kGreen+2, same as DY
 #401=kYellow+1
 
-#- _Zg_MuPhoSkim.root   159.12
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Zg_MuPhoSkim.root   159.12
 
 ###################################################################
-$ BKGMC  MUON    multibosons      W#gamma,WW,WZ,ZZ,#gamma#gamma,#gamma+jets       9    
+$ BKGMC   MUON   Wg_to_taunu     W#gamma#rightarrow#tau#nu#gamma      401    
+#418=kGreen+2, same as DY
+#401=kYellow+1
 
-#- _WWg_    1.44
-
-#- _WW_2l2nu_   5.995
-
-#- _WZ_3lnu_   1.057
-
-#- _WZ_2l2q_   5.995
-
-#- ELECTRON _ZZ_4e    0.07691
-
-#- _ZZ_4mu_     0.07691
-
-#- _ZZ_4tau_   0.07691
-
-#- _ZZ_2e2mu_   0.1767
-
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ZZ_2e2tau_MuPhoSkim.root   0.1767
-
-#- _ZZ_2mu2tau_   0.1767
-
-#- _gjet_15to30_   
-
-#- _gjet_30to50_   
-
-#- _gjet_50to80_   
-
-#- _gjet_80to120_ 
-
-#- _gjet_120to170_ 
-
-#- _diphotonsjets_   
-
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Wg_taunu_MuPhoSkim.root    553.92    0.3472 
-#unskimmed
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Wg_taunu_MuPhoSkim.root    553.92    0.3472
 
 ###################################################################
-#$ BKGMC  MUON    top     t,#bar{t},t#bar{t}        799    
+$ BKGMC  MUON    multibosons      multibosons       9    
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_WWg_MuPhoSkim.root    1.44
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_WW_2l2nu_MuPhoSkim.root   5.995
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_WZ_3lnu_MuPhoSkim.root   1.057
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_WZ_2l2q_MuPhoSkim.root   5.995
+
+###################################################################
+$ BKGMC  MUON    ttbarg     t#bar{t}#gamma        799    
 #799=kOrange-1
-Wg
-#- _tbar_s_     
 
-#- _tbar_t_     
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttg_MuPhoSkim.root                 1.444
 
-#- _tbar_tW_   
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttW_MuPhoSkim.root      0.2149
 
-#- _t_s_  
-
-#- _t_t_  
-
-#- _t_tW_ 
-
-#- ttg.root 
-
-#- _ttW_MuPhoSkim.root 
-
-#- _ttZ_MuPhoSkim.root 
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttZ_MuPhoSkim.root      0.1720
 
 ###################################################################
 $ BKGMC   MUON   ttbarjets     t#bar{t}+jets        44    
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_ttjets_1l.root   99.44
-#unskimmed
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttjets_1l_MuPhoSkim.root   99.44
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_ttjets_2l.root   23.83
-#unskimmed
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttjets_2l_MuPhoSkim.root   23.83
 

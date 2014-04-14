@@ -8,6 +8,7 @@
 #include "TFile.h"
 #include "TCanvas.h"
 #include "TLegend.h"
+#include "TTree.h"
 
 #include <vector>
 
@@ -21,43 +22,64 @@ class TPrepareYields
     void SetYieldsOneSource(int iSource);
     void SetYieldsDDBkgTemplate();
     void SubtractBackground();
-    void CompareBkgDDandMC();
-    void CompareYieldsDATAandMC();
+    void CompareFakeBkgDDvsMC();
+    void CompareTotalDATAvsSIGplusBKG();
+    void CompareTotalDATAvsMC();
+    void CompareSignalDATAvsMC();
+    void PrintYields();
     void StoreYields();
 
+    void SetTotalYield(TTree* tr, TCut cut, float& val, float& err);
+
   private:
-    TConfiguration config_;
-    int channel_;
-    TAllInputSamples* INPUT_;
-    bool isOverflowUsed_;
+    TConfiguration _config;
+    int _channel;
+    TAllInputSamples* _INPUT;
 
-    TFile* fOut_;
+    TFile* _fOut;
 
-    TH1F* dataYields_;
-    TH1F* dataYieldsB_;
-    TH1F* dataYieldsE_;
+    TH1F* _dataYields;
+    float _dataYieldTot;
+    float _dataYieldTotErr;
     
-    TH1F* sigMCYields_;
-    TH1F* sigMCYieldsB_;
-    TH1F* sigMCYieldsE_;
+    TH1F* _sigMCYields;
+    float _sigMCYieldTot;
+    float _sigMCYieldTotErr;
 
-    TH1F* sigMCGenYields_;
 
-    vector <TH1F*> vecBkgMCYields_;
-    vector <TH1F*> vecBkgMCYieldsB_;
-    vector <TH1F*> vecBkgMCYieldsE_;
+    TH1F* _sigMCGenYields;
+    float _sigMCGenYieldTot;
+    float _sigMCGenYieldTotErr;
 
-    TH1F* bkgDDYields_;
-    TH1F* bkgDDYieldsB_;
-    TH1F* bkgDDYieldsE_;
+    vector <TH1F*> _vecBkgMCYields;
+    vector <float> _vecBkgMCYieldTot;
+    vector <float> _vecBkgMCYieldTotErr;
 
-    TH1F* signalYields_;
-    TH1F* signalYieldsB_;
-    TH1F* signalYieldsE_;
+    vector <TH1F*> _vecBkgMCTrueGammaYields;
+    vector <float> _vecBkgMCTrueGammaYieldTot;
+    vector <float> _vecBkgMCTrueGammaYieldTotErr;
+    vector <TH1F*> _vecBkgMCFakeGammaYields;
+    vector <float> _vecBkgMCFakeGammaYieldTot;
+    vector <float> _vecBkgMCFakeGammaYieldTotErr;
 
-    TLegend* legend_;
+    TH1F* _bkgDDFakeGammaYields;
+    float _bkgDDFakeGammaYieldTot;
+    float _bkgDDFakeGammaYieldTotErr;
 
-    TCanvas* canvDDvsMC_;
+
+    TH1F* _signalDataYields;
+    float _signalDataYieldTot;
+    float _signalDataYieldTotErr;
+
+    TH1F* _floatingHist;
+
+
+    TLegend* _legend;
+
+    TCanvas* _canvDDvsMC;
+    TCanvas* _canvTotalDATAvsSIGplusBKG;
+    TCanvas* _canvSignalDATAvsMC;
+    TCanvas* _canvTotalDATAvsMC;
     
 
 };

@@ -11,6 +11,9 @@
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
   //currently in this package
 
+#include "TString.h"
+//ROOT
+
 TFullCuts::TFullCuts()
 {
 }
@@ -274,10 +277,11 @@ TCut TFullCuts::RangeMetRelatedCut()
   return cut;
 }
 
-TCut TFullCuts::RangeExtraCut()
+TCut TFullCuts::RangeExtraCut(TString strPhoChIso)
 {
   TPhotonCuts emptyPhoton;
   int wp = emptyPhoton.GetWP();
-  TCut cut = emptyPhoton.RangePhoChIso(wp) && emptyPhoton.RangeSigmaIEtaIEta(wp);
+  TCut cut = emptyPhoton.RangePhoChIso(strPhoChIso, wp) && emptyPhoton.RangeSigmaIEtaIEta(wp);
   return cut;
+//    return "1";
 }

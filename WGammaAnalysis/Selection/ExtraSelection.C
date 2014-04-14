@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-void ExtraSelection(int channel)
+void ExtraSelection(int channel,TString strPhoChIso)
 {
   TFullCuts fullCut;
   TConfiguration config;
@@ -31,7 +31,7 @@ void ExtraSelection(int channel)
     tr1->Write();
     TString fOutName2=config.GetSelectedName(config.FULLY,channel,INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_);
     TFile fOut2(fOutName2,"recreate");
-    tr2 = tr->CopyTree(fullCut.RangeExtraCut());
+    tr2 = tr1->CopyTree(fullCut.RangeExtraCut(strPhoChIso));
     tr2->Write();
   }
 

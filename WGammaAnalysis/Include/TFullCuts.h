@@ -7,6 +7,9 @@
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
   //currently in this package
 
+#include "TString.h"
+//ROOT
+
 class TFullCuts{
 public:
   TFullCuts();
@@ -26,7 +29,7 @@ public:
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut();
   TCut RangeMetRelatedCut();
-  TCut RangeExtraCut();
+  TCut RangeExtraCut(TString strPhoChIso);
 
 private:
   const static float WMtCut_ = 0.;//70.;

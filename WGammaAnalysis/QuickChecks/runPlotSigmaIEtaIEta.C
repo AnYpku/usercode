@@ -1,0 +1,36 @@
+{
+  TFile fDA("../WGammaOutput/MUON/VeryPreliminarySelected/selectedDATA.root");
+  TFile fMC("../WGammaOutput/MUON/VeryPreliminarySelected/selectedSIGMC.root");
+  TTree* trDA = (TTree*)fDA.Get("selectedEvents");
+  TTree* trMC = (TTree*)fMC.Get("selectedEvents");
+  TH1F* hDAB = new TH1F("hDAB","hDAB",17,0.005,0.022);
+  TH1F* hMCB = new TH1F("hMCB","hMCB",17,0.005,0.022);
+  TH1F* hDAE = new TH1F("hDAE","hDAE",24,0.019,0.067);
+  TH1F* hMCE = new TH1F("hMCE","hMCE",24,0.019,0.067);
+  TCut cutB="phoEta>-1.442 && phoEta<1.442";
+  TCut cutE="(phoEta>-2.5 && phoEta<-1.566)||(phoEta<2.5 && phoEta>1.566)";
+  TCut cutWeight="weight";
+  trDA->Draw("phoSigmaIEtaIEta>>hDAB",cutB*cutWeight,"goff");
+  trMC->Draw("phoSigmaIEtaIEta>>hMCB",cutB*cutWeight,"goff");
+  trDA->Draw("phoSigmaIEtaIEta>>hDAE",cutE*cutWeight,"goff");
+  trMC->Draw("phoSigmaIEtaIEta>>hMCE",cutE*cutWeight,"goff");
+  gStyle->SetCanvasColor(kWhite); 
+  TCanvas* canvB = new TCanvas("canvB","canvB");
+  hMCB->SetLineColor(kRed);
+  hMCB->SetLineWidth(2);
+  hDAB->SetLineWidth(2);
+  hMCB->DrawNormalized();
+  hDAB->DrawNormalized("same");
+  TLine* lineB = new TLine(0.011,0,0.011,1);
+  lineB->SetLineWidth(2);
+  lineB->Draw("same");
+  TCanvas* canvE = new TCanvas("canvE","canvE");
+  hMCE->SetLineColor(kRed);
+  hMCE->SetLineWidth(2);
+  hDAE->SetLineWidth(2);
+  hMCE->DrawNormalized();
+  hDAE->DrawNormalized("same");
+  TLine* lineE = new TLine(0.033,0,0.033,1);
+  lineE->SetLineWidth(2);
+  lineE->Draw("same");
+}

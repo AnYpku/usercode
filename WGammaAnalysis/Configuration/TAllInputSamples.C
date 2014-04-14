@@ -1,5 +1,5 @@
 #include "TAllInputSamples.h"
-
+#include "TConfiguration.h"
 #include "TInputSample.h"
 
 #include <string>
@@ -101,7 +101,7 @@ void TAllInputSamples::ReadFileSpecificInfo(string line)
    ss >> fileName;
    allInputs_.back().fileNames_.push_back(fileName);
 
-   if (allInputs_.back().sample_==TInputSample::DATA){
+   if (allInputs_.back().sample_==TConfiguration::DATA){
      float luminocity;
      if (ss >> luminocity) 
      allInputs_.back().lumiEachFile_.push_back(luminocity);
@@ -134,11 +134,11 @@ int TAllInputSamples::ChannelNumber (string channelStr)
 int TAllInputSamples::SampleNumber (string sampleStr)
 {
   if (sampleStr=="DATA")  
-    return TInputSample::DATA;
+    return TConfiguration::DATA;
   else if (sampleStr=="SIGMC") 
-    return TInputSample::SIGMC;
+    return TConfiguration::SIGMC;
   else if (sampleStr=="BKGMC") 
-    return TInputSample::BKGMC;
+    return TConfiguration::BKGMC;
   return -1;
 }
 
@@ -147,7 +147,7 @@ void TAllInputSamples::CalcLumiWeights()
 
    float lumiData = 1;
    for (int i=0; i<nSources_; i++) {
-     if (allInputs_[i].sample_==TInputSample::DATA) {
+     if (allInputs_[i].sample_==TConfiguration::DATA) {
        lumiData = allInputs_[i].lumiTotal_;
        for (int j=0; j<allInputs_[i].nFiles_; j++)
          allInputs_[i].lumiWeights_.push_back(1.0);
@@ -156,7 +156,7 @@ void TAllInputSamples::CalcLumiWeights()
    } //search for lumiData ended
 
    for (int i=0; i<nSources_; i++) {
-     if (allInputs_[i].sample_==TInputSample::DATA) 
+     if (allInputs_[i].sample_==TConfiguration::DATA) 
        continue;
      if (allInputs_[i].isSharedCS_) 
        for (int j=0; j<allInputs_[i].nFiles_; j++)

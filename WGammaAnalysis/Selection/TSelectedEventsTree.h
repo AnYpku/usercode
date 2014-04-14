@@ -14,9 +14,10 @@ class TSelectedEventsTree
     void SetOutputTree(TTree* tree);
     void Fill();
     void SetValues(float leEta, float lePhi, float lePt,
-                   int leGenPID,
+                   int leGenPID, int leGenMomPID, int leGenGMomPID,
                    float phoEta, float phoPhi, float phoEt,
-                   int phoGenPID, float phoGenEt,
+                   int phoGenPID, int phoGenMomPID, int phoGenGMomPID,
+                   float phoGenEt,
                    float phoSigmaIEtaIEta,
                    float phoPFChIsoCorr,
                    float phoSCRChIsoCorr,
@@ -26,32 +27,42 @@ class TSelectedEventsTree
                    float rho2012,
                    int run,
                    int inputFileN,
-                   float weight, float PUweight, float PU); 
+                   float weight, float PUweight, float PU,
+                   int nMC, vector <int> *mcPID,
+                   vector <int> *mcMomPID, vector <int> *mcGMomPID); 
 
   private:
-    TTree *outTree_;
-    float leEta_;
-    float lePhi_;
-    float lePt_;
-    int leGenPID_;
-    float phoEta_;
-    float phoPhi_;
-    float phoEt_;
-    int phoGenPID_;
-    float phoGenEt_;
-    float phoSigmaIEtaIEta_;
-    float phoPFChIsoCorr_;
-    float phoSCRChIsoCorr_;
-    float lePhoDeltaR_;
-    float WMt_;
-    float pfMET_;
-    float pfMETPhi_;
-    float rho2012_;
-    int run_;
-    int inputFileN_;
-    float weight_;
-    float PUweight_;
-    float PU_;
+    TTree* _outTree;
+    float _leEta;
+    float _lePhi;
+    float _lePt;
+    int _leGenPID;
+    int _leGenMomPID;
+    int _leGenGMomPID;
+    float _phoEta;
+    float _phoPhi;
+    float _phoEt;
+    int _phoGenPID;
+    int _phoGenMomPID;
+    int _phoGenGMomPID;
+    float _phoGenEt;
+    float _phoSigmaIEtaIEta;
+    float _phoPFChIsoCorr;
+    float _phoSCRChIsoCorr;
+    float _lePhoDeltaR;
+    float _WMt;
+    float _pfMET;
+    float _pfMETPhi;
+    float _rho2012;
+    int _run;
+    int _inputFileN;
+    float _weight;
+    float _PUweight;
+    float _PU;
+    int _nMC;
+    vector <int>* _mcPID;
+    vector <int>* _mcMomPID;
+    vector <int>* _mcGMomPID;
 };
 
 #endif //#ifndef TSelectedEventsTree_h

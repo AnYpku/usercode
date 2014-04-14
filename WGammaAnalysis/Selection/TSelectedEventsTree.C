@@ -16,71 +16,90 @@ TSelectedEventsTree::~TSelectedEventsTree()
 
 void TSelectedEventsTree::SetOutputTree(TTree* tree)
 {
-  outTree_=tree;
-  outTree_->Branch("leptonEta",&leEta_,"leptonEta/F");
-  outTree_->Branch("leptonPhi",&lePhi_,"leptonPhi/F");
-  outTree_->Branch("leptonPt",&lePt_,"leptonPt/F");
-  outTree_->Branch("leptonGenPID",&leGenPID_,"leptonGenPID/I");
-  outTree_->Branch("phoEta",&phoEta_,"phoEta/F");
-  outTree_->Branch("phoPhi",&phoPhi_,"phoPhi/F");
-  outTree_->Branch("phoEt",&phoEt_,"phoEt/F");
-  outTree_->Branch("phoGenPID",&phoGenPID_,"phoGenPID/I");
-  outTree_->Branch("phoGenEt",&phoGenEt_,"phoGenEt/F");
-  outTree_->Branch("phoSigmaIEtaIEta",&phoSigmaIEtaIEta_,"phoSigmaIEtaIEta/F");
-  outTree_->Branch("phoPFChIsoCorr",&phoPFChIsoCorr_,"phoPFChIsoCorr/F");
-  outTree_->Branch("phoSCRChIsoCorr",&phoSCRChIsoCorr_,"phoSCRChIsoCorr/F");
-  outTree_->Branch("lePhoDeltaR",&lePhoDeltaR_,"lePhoDeltaR/F");
-  outTree_->Branch("WMt",&WMt_,"WMt/F");
-  outTree_->Branch("pfMETPhi",&pfMETPhi_,"pfMETPhi/F");
-  outTree_->Branch("pfMET",&pfMET_,"pfMET/F");
-  outTree_->Branch("rho2012",&rho2012_,"rho2012/F");
-  outTree_->Branch("run",&run_,"run/I");
-  outTree_->Branch("inputFileNumber",&inputFileN_,"inputFileNumber/I");
-  outTree_->Branch("weight",&weight_,"weight/F");
-  outTree_->Branch("PUweight",&PUweight_,"PUweight/F");
-  outTree_->Branch("PU",&PU_,"PU/F");
+  _outTree=tree;
+  _outTree->Branch("leptonEta",&_leEta,"leptonEta/F");
+  _outTree->Branch("leptonPhi",&_lePhi,"leptonPhi/F");
+  _outTree->Branch("leptonPt",&_lePt,"leptonPt/F");
+  _outTree->Branch("leptonGenPID",&_leGenPID,"leptonGenPID/I");
+  _outTree->Branch("leptonGenMomPID",&_leGenMomPID,"leptonGenMomPID/I");
+  _outTree->Branch("leptonGenGMomPID",&_leGenGMomPID,"leptonGenGMomPID/I");
+  _outTree->Branch("phoEta",&_phoEta,"phoEta/F");
+  _outTree->Branch("phoPhi",&_phoPhi,"phoPhi/F");
+  _outTree->Branch("phoEt",&_phoEt,"phoEt/F");
+  _outTree->Branch("phoGenPID",&_phoGenPID,"phoGenPID/I");
+  _outTree->Branch("phoGenMomPID",&_phoGenMomPID,"phoGenMomPID/I");
+  _outTree->Branch("phoGenGMomPID",&_phoGenGMomPID,"phoGenGMomPID/I");
+  _outTree->Branch("phoGenEt",&_phoGenEt,"phoGenEt/F");
+  _outTree->Branch("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,"phoSigmaIEtaIEta/F");
+  _outTree->Branch("phoPFChIsoCorr",&_phoPFChIsoCorr,"phoPFChIsoCorr/F");
+  _outTree->Branch("phoSCRChIsoCorr",&_phoSCRChIsoCorr,"phoSCRChIsoCorr/F");
+  _outTree->Branch("lePhoDeltaR",&_lePhoDeltaR,"lePhoDeltaR/F");
+  _outTree->Branch("WMt",&_WMt,"WMt/F");
+  _outTree->Branch("pfMETPhi",&_pfMETPhi,"pfMETPhi/F");
+  _outTree->Branch("pfMET",&_pfMET,"pfMET/F");
+  _outTree->Branch("rho2012",&_rho2012,"rho2012/F");
+  _outTree->Branch("run",&_run,"run/I");
+  _outTree->Branch("inputFileNumber",&_inputFileN,"inputFileNumber/I");
+  _outTree->Branch("weight",&_weight,"weight/F");
+  _outTree->Branch("PUweight",&_PUweight,"PUweight/F");
+  _outTree->Branch("PU",&_PU,"PU/F");
+  _outTree->Branch("nMC",&_nMC,"nMC/I");
+  _outTree->Branch("mcPID","vector<int>", &_mcPID);
+  _outTree->Branch("mcMomPID","vector<int>", &_mcMomPID);
+  _outTree->Branch("mcGMomPID","vector<int>", &_mcGMomPID);
 }
 
 void TSelectedEventsTree::Fill()
 {
-  outTree_->Fill();
+  _outTree->Fill();
 }
 
-void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt, int leGenPID,
-                 float phoEta, float phoPhi, float phoEt, int phoGenPID, float phoGenEt,
-                 float phoSigmaIEtaIEta,
-                 float phoPFChIsoCorr,
-                 float phoSCRChIsoCorr,//up to here is fine
-                 float lePhoDeltaR,
-                 float WMt,
-                 float pfMET, float pfMETPhi,//up to here is fine
-                 float rho2012,
-                 int run,//up to here is fine
-                 int inputFileN,
-                 float weight, float PUweight, float PU)
+void TSelectedEventsTree::SetValues(float leEta, float lePhi, float lePt,
+                   int leGenPID, int leGenMomPID, int leGenGMomPID,
+                   float phoEta, float phoPhi, float phoEt,
+                   int phoGenPID, int phoGenMomPID, int phoGenGMomPID,
+                   float phoGenEt,
+                   float phoSigmaIEtaIEta,
+                   float phoPFChIsoCorr,
+                   float phoSCRChIsoCorr,
+                   float lePhoDeltaR,
+                   float WMt,
+                   float pfMET, float pfMETPhi,
+                   float rho2012,
+                   int run,
+                   int inputFileN,
+                   float weight, float PUweight, float PU,
+                   int nMC, vector <int> *mcPID,
+                   vector <int> *mcMomPID, vector <int> *mcGMomPID)
 {
-
-  leEta_=leEta;
-  lePhi_=lePhi;
-  lePt_=lePt;
-  leGenPID_=leGenPID;
-  phoEta_=phoEta;
-  phoPhi_=phoPhi;
-  phoEt_=phoEt;
-  phoGenPID_=phoGenPID;
-  phoGenEt_=phoGenEt;
-  phoSigmaIEtaIEta_=phoSigmaIEtaIEta;
-  phoPFChIsoCorr_=phoPFChIsoCorr;
-  phoSCRChIsoCorr_=phoSCRChIsoCorr;
-  lePhoDeltaR_=lePhoDeltaR;
-  WMt_=WMt;
-  pfMET_=pfMET;
-  pfMETPhi_=pfMETPhi;
-  rho2012_=rho2012;
-  run_=run;
-  inputFileN_=inputFileN;
-  weight_=weight;
-  PUweight_=PUweight;
-  PU_=PU;
-
+  _leEta=leEta;
+  _lePhi=lePhi;
+  _lePt=lePt;
+  _leGenPID=leGenPID;
+  _leGenMomPID=leGenMomPID;
+  _leGenGMomPID=leGenGMomPID;
+  _phoEta=phoEta;
+  _phoPhi=phoPhi;
+  _phoEt=phoEt;
+  _phoGenPID=phoGenPID;
+  _phoGenMomPID=phoGenMomPID;
+  _phoGenGMomPID=phoGenGMomPID;
+  _phoGenEt=phoGenEt;
+  _phoSigmaIEtaIEta=phoSigmaIEtaIEta;
+  _phoPFChIsoCorr=phoPFChIsoCorr;
+  _phoSCRChIsoCorr=phoSCRChIsoCorr;
+  _lePhoDeltaR=lePhoDeltaR;
+  _WMt=WMt;
+  _pfMET=pfMET;
+  _pfMETPhi=pfMETPhi;
+  _rho2012=rho2012;
+  _run=run;
+  _inputFileN=inputFileN;
+  _weight=weight;
+  _PUweight=PUweight;
+  _PU=PU;
+  _nMC=nMC;
+  _mcPID=mcPID;
+  _mcMomPID=mcMomPID;
+  _mcGMomPID=mcGMomPID;
 }

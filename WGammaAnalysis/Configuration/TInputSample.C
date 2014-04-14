@@ -99,7 +99,7 @@ void TInputSample::Print()
 
 void TInputSample::CalcLuminocities()
 {
-  if (sample_==DATA) return; 
+  if (sample_==TConfiguration::DATA) return; 
 
   double nEventsTotal = 0;
 

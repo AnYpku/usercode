@@ -11,44 +11,50 @@ echo ${skimmedDirName}
 nameRoot=.root
 nameMuPhoSkim=_MuPhoSkim
 
-fileName1=job_summer12_DYtoLL
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_2e2tau
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
 
-fileName1=job_summer12_ttjets_2l
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_2l2nu
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
 
-fileName1=job_summer12_Wg_munu
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_2mu2tau
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
 
-fileName1=job_summer12_Wg_taunu
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_2q2nu
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
 
-fileName1=job_summer12_Wjets
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_4mu
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
 
-fileName1=job_summer12_WZ_2l2q
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_4e
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
 
-fileName1=job_summer12_WZ_3lnu
-fileNameFull1=${fileName1}${nameRoot}
+fileName1=job_summer12_ZZ_4tau
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
+fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
+root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
+mv ${fileNameSkimmed1} ${skimmedDirName}
+
+fileName1=job_summer12_ZZZ
+fileNameFull1=${inputDirName}${fileName1}${nameRoot}
 fileNameSkimmed1=${fileName1}${nameMuPhoSkim}${nameRoot}
 root -l -b -q auxSkim.C+\(\"${fileNameFull1}\"\)
 mv ${fileNameSkimmed1} ${skimmedDirName}
