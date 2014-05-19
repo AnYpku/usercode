@@ -1,9 +1,9 @@
 {
-  TFile fSig("../WGammaOutput/MUON/FullySelected/selectedSIGMC.root");
-  TFile fbDY("../WGammaOutput/MUON/FullySelected/selectedBKGMC_DYjets_to_ll.root");
-  TFile fbWj("../WGammaOutput/MUON/FullySelected/selectedBKGMC_Wjets_to_lnu.root");
-  TFile fbmu("../WGammaOutput/MUON/FullySelected/selectedBKGMC_multibosons.root");
-  TFile fbtt("../WGammaOutput/MUON/FullySelected/selectedBKGMC_ttbarjets.root");
+  TFile fSig("../WGammaOutput/MUON/PreliminaryForMEtCutSelected/selectedSIGMC.root");
+  TFile fbDY("../WGammaOutput/MUON/PreliminaryForMEtCutSelected/selectedBKGMC_DYjets_to_ll.root");
+  TFile fbWj("../WGammaOutput/MUON/PreliminaryForMEtCutSelected/selectedBKGMC_Wjets_to_lnu.root");
+  TFile fbmu("../WGammaOutput/MUON/PreliminaryForMEtCutSelected/selectedBKGMC_multibosons.root");
+  TFile fbtt("../WGammaOutput/MUON/PreliminaryForMEtCutSelected/selectedBKGMC_ttbarjets.root");
 
   gStyle->SetCanvasColor(kWhite); 
   TTree* tSig = (TTree*)fSig.Get("selectedEvents");
@@ -41,7 +41,7 @@
     tbmu->Draw("WMt>>hbmuWMt",cutStr,"goff");
     tbtt->Draw("WMt>>hbttWMt",cutStr,"goff");   
     
-    qualityOverall[i]=1.0*hSig->GetBinContent(1)/sqrt(hSig->GetBinContent(1)+hbDY->GetBinContent(1)+hbWj->GetBinContent(1)+hbmu->GetBinContent(1)+hbtt->GetBinContent(1));
+    qualityOverall[i]=1.0*hSig->GetBinContent(1)/sqrt(hbDY->GetBinContent(1)+hbWj->GetBinContent(1)+hbmu->GetBinContent(1)+hbtt->GetBinContent(1));
     qualityNoWjets[i]=1.0*hSig->GetBinContent(1)/sqrt(hSig->GetBinContent(1)+hbDY->GetBinContent(1)+hbmu->GetBinContent(1)+hbtt->GetBinContent(1));
     qualityDyOnly[i]=1.0*hSig->GetBinContent(1)/sqrt(hSig->GetBinContent(1)+hbDY->GetBinContent(1));
 
@@ -73,7 +73,7 @@
 
   leg->AddEntry(grQ1,"#frac{N_{sig}}{#sqrt{N_{sig}+N_{DY}}}","pf");
   leg->AddEntry(grQ2,"#frac{N_{sig}}{#sqrt{N_{sig}+N_{DY}+N_{multibosons}+N_{ttjets}}}","pf");
-  leg->AddEntry(grQ3,"#frac{N_{sig}}{#sqrt{N_{sig}+N_{DY}+N_{multibosons}+N_{ttjets}+N_{Wjets}}}","pf");
+  leg->AddEntry(grQ3,"#frac{N_{sig}}{#sqrt{N_{DY}+N_{multibosons}+N_{ttjets}+N_{Wjets}}}","pf");
   leg->SetFillColor(0);
   leg->SetLineColor(1);
   leg->Draw("same");

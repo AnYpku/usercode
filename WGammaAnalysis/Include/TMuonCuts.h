@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "TEventTree.h" //class of this package
+#include "TCut.h" //ROOT class
 
 class TMuonCuts
   {
@@ -31,20 +32,33 @@ class TMuonCuts
                float muPFIsoR04_PU_imu);
 
        virtual ~TMuonCuts();
-       bool MoreMuonsVeto();
+       bool HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <float> *muEta);
+//       bool MoreMuonsVeto();
          //veto on having another muon
        bool Passed();
          //if muon passed the whole selection requirement 
          //(except veto on having another muon)
        bool PassedExceptKinematics();
        bool MuTriggerMatch();
-       bool MuKinematics(float muPt, float muEta);
-       bool MuIsolation();
+       bool PassedKinematics(float muPt, float muEta);
+       float MuIsolation(float muPt, 
+                 float muPFIsoR04_NH, float muPFIsoR04_Pho, 
+                 float muPFIsoR04_PU,float muPFIsoR04_CH);
+       bool MuIsolationPassed();
         //mu Isolation as recommended here:
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation
-       bool MuId ();
+       bool MuId(float muChi2NDF, float muD0, float muDZ, 
+                int muNumberOfValidMuonHits, int muNumberOfValidTrkHits, 
+                int muNumberOfValidPixelHits, int muNumberOfValidTrkLayers, 
+                int muStations);
+       bool MuId();
         //tight muon ID as recommended here:
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
+
+       TCut RangeId();
+       TCut RangeIsolation();
+       TCut RangeTriggerMatch();
+       TCut RangeMuon(bool doIsoCut=1, bool doIdCut=1, bool doTrgCut=1);
 
      private:
        int imu_;

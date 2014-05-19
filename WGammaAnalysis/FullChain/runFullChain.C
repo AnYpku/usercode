@@ -6,19 +6,15 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  //initial selection
-  WGammaSelection selection( TConfiguration::MUON, TConfiguration::DATA);
-  selection.LoopOverInputFiles();
-  //extra selection
-  gROOT->ProcessLine(".L ../Selection/ExtraSelection.C+");
-  ExtraSelection(TConfiguration::MUON);
-  //compute fake-gamma background by data-driven template method
-  TTemplates temp(TConfiguration::MUON);
-  temp.ComputeBackground();
-  //prepare yields
-  TPrepareYields yields(TConfiguration::MUON);
-  yields.PrepareYields();
-
+  FullChain fch;
+  FullChain::FullChainParameters anPars;
+  fch.SetDefaultFullChainParameters(anPars);
+  anPars.noPreSelection=1;
+  anPars.noExtraSelection=1;
+  anPars.noDDBkgComputation=0;
+  anPars.noPrepareYields=0;
+  anPars.noCalcAccAndEff=1;
+  fch.RunAnalysis(anPars);
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

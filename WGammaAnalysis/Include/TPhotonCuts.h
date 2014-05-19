@@ -23,7 +23,7 @@ class TPhotonCuts
 
     bool Passed(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
     bool PassedExceptKinematics(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
-    bool PhoKinematics(float phoPt, float phoEta);
+    bool PassedKinematics(float phoPt, float phoEta);
     bool PhoKinematics();
     bool SimpleCutBasedPhotonID2012(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
@@ -34,14 +34,12 @@ class TPhotonCuts
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
     bool CutSigmaIEtaIEta(int wp, float eta, float sigmaIEtaIEta);
     bool CutSigmaIEtaIEta(int wp);
-    TCut RangeSigmaIEtaIEta(int wp);
-    TCut SidebandSigmaIEtaIEta();
     bool CutPhoChIso(int wp, float phoChIso, float rho2012, float eta);
     bool CutPhoChIso(int wp);
-    TCut RangePhoChIso(TString strPhoChIso, int wp);
-    TCut SidebandPhoChIso(TString strPhoChIso);
 
     float EffAreaCharged(float eta);
+    float EffAreaNeutral(float eta);
+    float EffAreaPhotons(float eta);
     float EffAreaCharged();
     float EffAreaNeutral();
     float EffAreaPhotons();
@@ -49,17 +47,36 @@ class TPhotonCuts
     float IsoCorr(float iso, float rho, float EA);
     bool IsBarrel(float phoEta);
     bool IsEndcap(float phoEta);
-    TCut RangeBarrel();
-    TCut RangeEndcap();
     bool IsBarrel();
     bool IsEndcap();
 
     float GetPhoChIsoCorr(float phoChIso, float rho2012, float eta);
+    float GetPhoNeuIsoCorr(float phoNeuIso, float rho2012, float eta);
+    float GetPhoPhoIsoCorr(float phoPhoIso, float rho2012, float eta);
     float GetPhoSigmaIEtaIEtaCutB(int wp);
     float GetPhoSigmaIEtaIEtaCutE(int wp);
     float GetPhoSigmaIEtaIEtaCutLeftB();
     float GetPhoSigmaIEtaIEtaCutLeftE();
     int   GetWP();
+
+    TCut RangeBarrel();
+    TCut RangeEndcap();
+    TCut RangeSigmaIEtaIEta(int wp);
+    TCut SidebandSigmaIEtaIEta();
+    TCut RangePhoChIso(TString strIso, int wp);
+    TCut SidebandPhoChIso(TString strIso);
+    TCut RangePhoNeuIso(TString strIso, int wp);
+    TCut RangePhoPhoIso(TString strIso, int wp);
+    TCut RangeHoverE12();
+    TCut RangePhoEleVeto();
+    TCut RangePhoton(int wp, TString isoBase, 
+           bool doSigmaIEtaIEtaCut=1, bool doChIsoCut=1, 
+           bool doNeuIsoCut=1, bool doPhoIsoCut=1, 
+           bool doHoverE12Cut=1, bool doElectronVetoCut=1);
+
+    TCut RangeGenFakePhoton();
+    TCut RangeGenTruePhoton();
+
 
     const static int nWP_=3;
     enum {WP_LOOSE, WP_MEDIUM, WP_TIGHT};
@@ -86,8 +103,8 @@ class TPhotonCuts
     float phoPhoIsoBarrelCut_[3];
     float phoPhoIsoEndcapCut_[3];
 
-    const static float phoPtCut_ = 15.0;
-    const static int WP_=WP_LOOSE; 
+    const static float phoPtCut_ = 10.0;
+    const static int WP_=WP_MEDIUM; 
       //WP - working point
       //nWP - total number of working points
       //0 - loose  (90% for barrel, 85% for endcap) 
@@ -101,8 +118,9 @@ class TPhotonCuts
 //so, I introduce them outside:
 //(and they are arrays because there are 3 working points)
 
-    const static float phoHoverE12BarrelCut_[TPhotonCuts::nWP_]={0.05,0.05,0.05};
-    const static float phoHoverE12EndcapCut_[TPhotonCuts::nWP_]={0.05,0.05,0.05};
+//    const static float phoHoverE12BarrelCut_[TPhotonCuts::nWP_]={0.05,0.05,0.05};
+//    const static float phoHoverE12EndcapCut_[TPhotonCuts::nWP_]={0.05,0.05,0.05};
+    const static float _phoHoverE12Cut=0.05;
     const static float phoSigmaIEtaIEtaBarrelCut_[TPhotonCuts::nWP_]={0.012,0.011,0.011};
     const static float phoSigmaIEtaIEtaEndcapCut_[TPhotonCuts::nWP_]={0.034,0.033,0.031};
     const static float phoSigmaIEtaIEtaBarrelCutLeft_=0.005;

@@ -9,20 +9,14 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  //WGammaSelection(int channel, int sampleMode, string configFile, bool isNoPuReweight, bool isDebugMode)
-  //WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isNoPuReweight, bool isDebugMode)
-
-  //WGammaSelection selection( TInputSample::MUON, "DYjets_to_ll", "../Configuration/config.txt");
-  //selection.LoopOverInputFiles();
-
-  //WGammaSelection selection(TConfiguration::MUON, "Wjets_to_lnu");
-  //selection.LoopOverInputFiles();
-  WGammaSelection selection(TConfiguration::MUON,"DYjets_to_ll Zg Wg_to_taunu multibosons ttbarg ttbarjets");
-  selection.LoopOverInputFiles();
-
-  gROOT->ProcessLine(".L ExtraSelection.C+");
-  ExtraSelection(TConfiguration::MUON,"phoSCRChIsoCorr");
-
+//  WGammaSelection sel(TConfiguration::MUON,WGammaSelection::SIGMC);
+//  sel.LoopOverInputFiles();
+//  WGammaSelection sel(TConfiguration::MUON);
+//  sel.LoopOverInputFiles();
+  
+  TPhotonCuts emptyPhoton;
+  int wp = emptyPhoton.GetWP();
+  ExtraSelection(TConfiguration::MUON,wp,"SCR");
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

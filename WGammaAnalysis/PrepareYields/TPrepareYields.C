@@ -31,6 +31,8 @@ TPrepareYields::TPrepareYields(int channel)
   _canvDDvsMC=0;
   _canvTotalDATAvsSIGplusBKG=0;
   _canvSignalDATAvsMC=0;
+  _phoPtBinLimits = new float[_config.GetNPhoPtBins()];
+  _config.GetPhoPtBinsLimits(_phoPtBinLimits);
 }
 
 TPrepareYields::~TPrepareYields()
@@ -47,7 +49,7 @@ void TPrepareYields::PrepareYields()
   CompareTotalDATAvsMC();
   CompareSignalDATAvsMC();
   PrintYields();
-//  StoreYields();
+  StoreYields();
 }
 
 void TPrepareYields::SetYields()
@@ -64,6 +66,8 @@ void TPrepareYields::SetYields()
 void TPrepareYields::SetYieldsOneSource(int iSource)
 {
 
+  TCut cutWeight="weight";
+
   TString yieldsHistName;
 
   int sample = _INPUT->allInputs_[iSource].sample_;
@@ -75,33 +79,28 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
     std::cout<<"file "<<fInName<<" is not open"<<std::endl;
     return;
   }
-
+  _fOut->cd();
   TTree* tr = (TTree*)fIn.Get("selectedEvents");
+  TString yieldsName  = (_config.GetYieldsSelectedName(_config.ONEDI,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_));
 
-  vector <float> vecPtBins = _config.GetPhoPtBinsLimits();
-  float ptBinsLimits[_config.GetNPhoPtBins()+1];
-  for (int i=0; i<_config.GetNPhoPtBins()+1; i++)
-    ptBinsLimits[i] = vecPtBins[i];
-  TString yieldsName  = (_config.GetYieldsSelectedName(_config.ONEDI,_config.VAL,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_));
-
-  TString yieldsGenName = _config.GetYieldsSelectedSignalMCGenName(_config.ONEDI,_config.VAL);
+  TString yieldsGenName = _config.GetYieldsSelectedSignalMCGenName(_config.ONEDI);
 
   _fOut->cd();
 
   if (_INPUT->allInputs_[iSource].sample_==TConfiguration::DATA){
     _dataYields = new TH1F(yieldsName,yieldsName,
-                _config.GetNPhoPtBins(),ptBinsLimits);
-    tr->Draw(TString("phoEt>>")+yieldsName,"(1)*weight","goff");
+                _config.GetNPhoPtBins(),_phoPtBinLimits);
+    tr->Draw(TString("phoEt>>")+yieldsName,cutWeight,"goff");
     std::cout<<"set _dataYieldTot: "<<std::endl;
     SetTotalYield(tr, "weight", _dataYieldTot, _dataYieldTotErr);
   }
   else if (_INPUT->allInputs_[iSource].sample_==TConfiguration::SIGMC){
     _sigMCYields = new TH1F(yieldsName,yieldsName,
-                _config.GetNPhoPtBins(),ptBinsLimits);
-    tr->Draw(TString("phoEt>>")+yieldsName,"(1)*weight","goff");
+                _config.GetNPhoPtBins(),_phoPtBinLimits);
+    tr->Draw(TString("phoEt>>")+yieldsName,cutWeight,"goff");
     _sigMCGenYields = new TH1F(yieldsGenName,yieldsGenName,
-                _config.GetNPhoPtBins(),ptBinsLimits);
-    tr->Draw(TString("phoGenEt>>")+yieldsGenName,"(1)*weight","goff");
+                _config.GetNPhoPtBins(),_phoPtBinLimits);
+    tr->Draw(TString("phoGenEt>>")+yieldsGenName,cutWeight,"goff");
     std::cout<<"set _sigMCYieldTot: "<<std::endl;
     SetTotalYield(tr, "weight", _sigMCYieldTot, _sigMCYieldTotErr);
     std::cout<<"set _sigMCGenYieldTot: "<<std::endl;
@@ -110,8 +109,8 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
   else if (_INPUT->allInputs_[iSource].sample_==TConfiguration::BKGMC){
 
     _vecBkgMCYields.push_back( new TH1F(yieldsName,yieldsName,
-                _config.GetNPhoPtBins(),ptBinsLimits));
-    tr->Draw(TString("phoEt>>")+yieldsName,"(1)*weight","goff");
+                _config.GetNPhoPtBins(),_phoPtBinLimits));
+    tr->Draw(TString("phoEt>>")+yieldsName,cutWeight,"goff");
     float val;
     float err;
     std::cout<<"set _vecBkgMCYieldTot: #"<<iSource<<std::endl;
@@ -120,12 +119,14 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
     _vecBkgMCYieldTotErr.push_back(err);
 
     _vecBkgMCTrueGammaYields.push_back( new TH1F(yieldsName+TString("true"),yieldsName+TString("true"),
-                _config.GetNPhoPtBins(),ptBinsLimits));
-    if (_INPUT->allInputs_[iSource].sourceName_!="Wjets_to_lnu"){
-      tr->Draw(TString("phoEt>>")+yieldsName+TString("true"),"(phoGenPID==22)*weight","goff");
+                _config.GetNPhoPtBins(),_phoPtBinLimits));
+    if (_INPUT->allInputs_[iSource].sourceName_!="Wjets_to_lnu" &&
+        _INPUT->allInputs_[iSource].sourceName_!="DYjets_to_ll" &&
+        _INPUT->allInputs_[iSource].sourceName_!="ttbarjets"){
+      tr->Draw(TString("phoEt>>")+yieldsName+TString("true"),cutWeight*_emptyPhoton.RangeGenTruePhoton(),"goff");
  
       std::cout<<"set _vecBkgMCTrueGammaYieldTot: #"<<iSource<<std::endl;
-      SetTotalYield(tr,"(phoGenPID==22)*weight", val, err);
+      SetTotalYield(tr,cutWeight*_emptyPhoton.RangeGenTruePhoton(), val, err);
       _vecBkgMCTrueGammaYieldTot.push_back(val);
       _vecBkgMCTrueGammaYieldTotErr.push_back(err);    
     }
@@ -134,10 +135,10 @@ void TPrepareYields::SetYieldsOneSource(int iSource)
       _vecBkgMCTrueGammaYieldTotErr.push_back(0);
     }
     _vecBkgMCFakeGammaYields.push_back( new TH1F(yieldsName+TString("fake"),yieldsName+TString("fake"),
-                _config.GetNPhoPtBins(),ptBinsLimits));
-    tr->Draw(TString("phoEt>>")+yieldsName+TString("fake"),"(phoGenPID==-1000)*weight","goff");
+                _config.GetNPhoPtBins(),_phoPtBinLimits));
+    tr->Draw(TString("phoEt>>")+yieldsName+TString("fake"),cutWeight*_emptyPhoton.RangeGenFakePhoton(),"goff");
     std::cout<<"set _vecBkgMCFakeGammaYieldTot: #"<<iSource<<std::endl;
-    SetTotalYield(tr,"(phoGenPID==-1000)*weight", val, err);
+    SetTotalYield(tr,cutWeight*_emptyPhoton.RangeGenFakePhoton(), val, err);
     _vecBkgMCFakeGammaYieldTot.push_back(val);
     _vecBkgMCFakeGammaYieldTotErr.push_back(err);  
   }
@@ -156,51 +157,52 @@ void TPrepareYields::SetTotalYield(TTree* tr, TCut cut, float& val, float& err)
 
 void TPrepareYields::SetYieldsDDBkgTemplate()
 {
-  TFile fDDBkgTemplate(_config.GetDDTemplateBkgFileName(_channel));
-  if (!fDDBkgTemplate.IsOpen()){
+  TFile* fDDBkgTemplate= new TFile(_config.GetDDTemplateBkgFileName(_channel));
+  if (!fDDBkgTemplate->IsOpen()){
     std::cout<<"file "<<_config.GetDDTemplateBkgFileName(_channel)<<" is not open"<<std::endl;
     return;
   }
-  TString nameYield1D = _config.GetYieldsDDTemplateBkgName(_config.ONEDI, _config.VAL);
-  TString nameYieldErrStat1D = _config.GetYieldsDDTemplateBkgName(_config.ONEDI, _config.ERRSTAT);
-  TString nameYieldErrSyst1D = _config.GetYieldsDDTemplateBkgName(_config.ONEDI, _config.ERRSYST);
-  TVectorD* vec1D = (TVectorD*)fDDBkgTemplate.Get(nameYield1D);
-  TVectorD* vecErrStat1D = (TVectorD*)fDDBkgTemplate.Get(nameYieldErrStat1D);
-  TVectorD* vecErrSyst1D = (TVectorD*)fDDBkgTemplate.Get(nameYieldErrSyst1D);
-  int nBins = _config.GetNPhoPtBins();
-  vector <float> vecPtBins = _config.GetPhoPtBinsLimits();
-  float ptBinsLimits[_config.GetNPhoPtBins()+1];
-  for (int i=0; i<_config.GetNPhoPtBins()+1; i++)
-    ptBinsLimits[i] = vecPtBins[i];
-   _fOut->cd();
-  _bkgDDFakeGammaYields = new TH1F(nameYield1D,nameYield1D,nBins,ptBinsLimits);
-  for (int i=0; i<nBins; i++){
-    _bkgDDFakeGammaYields->SetBinContent(i+1,vec1D->operator[](i));
-    _bkgDDFakeGammaYields->SetBinError(i+1,vecErrStat1D->operator[](i));
+  TString nameYield1D = _config.GetYieldsDDTemplateBkgName(_config.ONEDI);
+  _fOut->cd();
+  _bkgDDFakeGammaYields = (TH1F*)fDDBkgTemplate->Get(nameYield1D);
+  std::cout<<"_bkgDDFakeGammaYields:"<<std::endl;
+  _bkgDDFakeGammaYields->Print();
+  for (int ib=1; ib<=_bkgDDFakeGammaYields->GetNbinsX(); ib++){
+    std::cout<<ib<<": "<<_bkgDDFakeGammaYields->GetBinContent(ib)<<"+-"<<_bkgDDFakeGammaYields->GetBinError(ib)<<std::endl;
   }
   
-  TString nameYieldTot = _config.GetYieldsDDTemplateBkgName(_config.TOTAL, _config.VAL);
-  TString nameYieldErrStatTot = _config.GetYieldsDDTemplateBkgName(_config.TOTAL, _config.ERRSTAT);
-  TString nameYieldErrSystTot = _config.GetYieldsDDTemplateBkgName(_config.TOTAL, _config.ERRSYST);
-  TVectorD* vecTot = (TVectorD*)fDDBkgTemplate.Get(nameYieldTot);
-  TVectorD* vecErrStatTot = (TVectorD*)fDDBkgTemplate.Get(nameYieldErrStatTot);
-  TVectorD* vecErrSystTot = (TVectorD*)fDDBkgTemplate.Get(nameYieldErrSystTot);
-  _bkgDDFakeGammaYieldTot = vecTot->operator[](0);
-  _bkgDDFakeGammaYieldTotErr = vecErrStatTot->operator[](0);  
+  TString nameYieldTot = _config.GetYieldsDDTemplateBkgName(_config.TOTAL);
+  TH1F* hT = (TH1F*)fDDBkgTemplate->Get(nameYieldTot);
+  _bkgDDFakeGammaYieldTot = hT->GetBinContent(1);
+  _bkgDDFakeGammaYieldTotErr = hT->GetBinError(1);
 }
 
 void TPrepareYields::SubtractBackground()
 {
-  TString yieldsName  = (_config.GetYieldsSelectedName(_config.ONEDI,_config.VAL,_config.DATA));
+  std::cout<<"#####################"<<std::endl;
+  std::cout<<"Subtract Background"<<std::endl;
+  std::cout<<"_bkgDDFakeGammaYields:"<<std::endl;
+  _bkgDDFakeGammaYields->Print();
+  for (int ib=1; ib<=_bkgDDFakeGammaYields->GetNbinsX(); ib++){
+    std::cout<<ib<<": "<<_bkgDDFakeGammaYields->GetBinContent(ib)<<"+-"<<_bkgDDFakeGammaYields->GetBinError(ib)<<std::endl;
+  }
+
+  TString yieldsName  = (_config.GetYieldsSelectedName(_config.ONEDI,_config.DATA));
   yieldsName+="sig";
   _signalDataYields = (TH1F*)_dataYields->Clone(yieldsName);
+  std::cout<<"_bkgDDFakeGammaYields:"<<std::endl;
+  _bkgDDFakeGammaYields->Print();
+  for (int ib=1; ib<=_bkgDDFakeGammaYields->GetNbinsX(); ib++){
+    std::cout<<ib<<": "<<_bkgDDFakeGammaYields->GetBinContent(ib)<<"+-"<<_bkgDDFakeGammaYields->GetBinError(ib)<<std::endl;
+  }
 
   int nBins = _signalDataYields->GetNbinsX();
 //  float yields[nBins];
 //  float errsSquared[nBins];
-
   _signalDataYields->Add(_bkgDDFakeGammaYields,-1);
+
   _signalDataYieldTot=_dataYieldTot-_bkgDDFakeGammaYieldTot;
+
   _signalDataYieldTotErr= _dataYieldTotErr*_dataYieldTotErr+_bkgDDFakeGammaYieldTotErr*_bkgDDFakeGammaYieldTotErr;
   for (int i=0; i<_vecBkgMCTrueGammaYields.size(); i++){
         if (_INPUT->allInputs_[i+2].sourceName_=="Wjets_to_lnu") 
@@ -214,6 +216,7 @@ void TPrepareYields::SubtractBackground()
         _signalDataYieldTotErr+=_vecBkgMCTrueGammaYieldTotErr[i]*_vecBkgMCTrueGammaYieldTotErr[i];
   }
   _signalDataYieldTotErr=sqrt(_signalDataYieldTotErr);
+  std::cout<<"#####################"<<std::endl;
 }
 
 void TPrepareYields::CompareFakeBkgDDvsMC()
@@ -396,5 +399,11 @@ void TPrepareYields::PrintYields()
 void TPrepareYields::StoreYields()
 {
   _fOut->cd();
+  _signalDataYields->Write();
   _canvDDvsMC->Write();
+  TString yieldsName  = (_config.GetYieldsSelectedName(_config.TOTAL,_config.DATA));
+  TH1F hT = TH1F(yieldsName,yieldsName,1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
+  hT.SetBinContent(1,_signalDataYieldTot);
+  hT.SetBinError(1,_signalDataYieldTotErr);
+  hT.Write(yieldsName);
 }

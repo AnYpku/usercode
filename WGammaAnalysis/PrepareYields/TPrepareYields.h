@@ -3,6 +3,7 @@
 
 #include "../Configuration/TConfiguration.h"
 #include "../Configuration/TAllInputSamples.h"
+#include "../Include/TPhotonCuts.h"
 
 #include "TH1F.h"
 #include "TFile.h"
@@ -35,6 +36,9 @@ class TPrepareYields
     TConfiguration _config;
     int _channel;
     TAllInputSamples* _INPUT;
+    TPhotonCuts _emptyPhoton;
+
+    float* _phoPtBinLimits;
 
     TFile* _fOut;
 

@@ -31,38 +31,36 @@ class Unfolding
 
        bool PlotAndStore();
 
-       bool FillBinLimits(int nBins, vector<float> vecLims, float* lims);
-
-
-
 
      private:
 
-       TAllInputSamples* INPUT_;
+       TAllInputSamples* _INPUT;
        int _channel;
 
-       TConfiguration config_;
+       TConfiguration _config;
 
-       vector <float> vecPhoPtLimitsRec_;
-       vector <float> vecPhoPtLimitsGen_;
+       float* _phoPtLimitsRec;
+       float* _phoPtLimitsGen;
+      // vector <float> vecPhoPtLimitsRec_;
+      // vector <float> vecPhoPtLimitsGen_;
        
-       int nBinsRec_;
-       int nBinsGen_;
+       int _nBinsRec;
+       int _nBinsGen;
 
-       TFile* fIn_;
-       TFile* fOut_;
+       TFile* _fIn;
+       TFile* _fOut;
 
-       TH2D* histEventCountMigrMatrix_;
-       TH2D* histMigrMatrixNotNormalized_;
+       TH2D* _histEventCountMigrMatrix;
+       TH2D* _histMigrMatrixNotNormalized;
 
-       TH1D* histYieldsRec_;
-       TH1D* histYieldsRecSmeared_;
-       TH1D* histYieldsGen_;
+       TH1D* _histYieldsRec;
+       TH1D* _histYieldsRecSmeared;
+       TH1D* _histYieldsGen;
 
-       TTree* tr_;
+       TTree* _tr;
 
-       bool isOverflowRec_;
-       bool isOverflowGen_;
+       bool _isOverflowRec;
+       bool _isOverflowGen;
   };
 
 #endif 

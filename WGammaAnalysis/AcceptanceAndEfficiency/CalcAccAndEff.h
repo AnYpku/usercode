@@ -17,77 +17,92 @@
 #include "TMath.h" 
   //ROOT package
 
-class CalcAccAndEff: public TEventTree
+class CalcAccAndEff
   {
      public:
-       CalcAccAndEff (int channel, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       CalcAccAndEff (int channel, int phoWP, TString phoIsoBase, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
 
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
        bool    AcceptancePassed(bool** accLeptonPhotonPassed);    
-       bool    EfficiencyPassed(bool** effLeptonPhotonPassed, float* WMt, float** lePhoDeltaR, float weightPU);
+       bool    EfficiencyPassed(bool** effLeptonPhotonPassed, float** lePhoDeltaR, float weightPU);
        void    PlotAndSaveOutput();
        bool    CheckMaxNumbersInTree();
 //       void    PrintErrorMessageMaxNumberOf(int particle);
 
      private:
 
-       TAllInputSamples* INPUT_;
+       TFile* _fSelectedVeryPreliminary;
 
-//       enum {MUON_, ELECTRON_, PHOTON_, JET_, LOWPTJET_, MC_};
-       int channel_;
 
-       bool isDebugMode_;
-       bool isNoPuReweight_;
+       TAllInputSamples* _INPUT;
+       TEventTree _eventTree;
 
-       float lumiWeight_;
-       float debugModeWeight_;
-       float totalWeight_;
+       int _channel;
+       int _phoWP;
+       TString _phoIsoBase;
 
-       int nLe_;
+       bool _isDebugMode;
+       bool _isNoPuReweight;
 
-       float nAccTotal_;
-       float nAccPassed_;
-       float nEffTotal_;
-       float nEffPassed_;
-       float nAccTotalErr_;
-       float nAccPassedErr_;
-       float nEffTotalErr_;
-       float nEffPassedErr_;
+       float _lumiWeight;
+       float _debugModeWeight;
+       float _totalWeight;
 
-       float acc_;
-       float eff_;
-       float accErr_;
-       float effErr_;
+       TFullCuts::PassedLevels _passed;
 
-       vector <float> vecPhoPtLimits_;
+       int _nLe;
+       float* _phoPtLimits;
 
-       vector <float> vecnAccTotal_;
-       vector <float> vecnAccPassed_;
-       vector <float> vecnEffTotal_;
-       vector <float> vecnEffPassed_;
-       vector <float> vecnAccPassedErr_;
-       vector <float> vecnAccTotalErr_;
-       vector <float> vecnEffPassedErr_;
-       vector <float> vecnEffTotalErr_;
+       //Acceptance:
+       float  _nAccTotEvents;
+       float  _nAccTotEventsErr;
+       float  _nAccTotPassed;
+       float  _nAccTotPassedErr;
+       float* _nAcc1DEvents;
+       float* _nAcc1DEventsErr;
+       float* _nAcc1DPassed;
+       float* _nAcc1DPassedErr;
 
-       vector <float> vecacc_;
-       vector <float> veceff_;
-       vector <float> vecaccErr_;
-       vector <float> veceffErr_;
+       float  _accTot;
+       float  _accTotErr;
+       float* _acc1D;
+       float* _acc1DErr;
 
-       TFullCuts fullCuts_;
-       TMathTools math_;
-       TPhotonCuts photonEmpty_;
-       TMuonCuts muonEmpty_;
+       //Efficiency:
+       float  _nEffTotEvents;
+       float  _nEffTotEventsErr;
+       float  _nEffTotPrePassed;
+       float  _nEffTotPrePassedErr;
+       float  _nEffTotPrePassed2;
+       float  _nEffTotPrePassed2Err;
+       float  _nEffTotPassed;
+       float  _nEffTotPassedErr;
+       float* _nEff1DEvents;
+       float* _nEff1DEventsErr;
+       float* _nEff1DPrePassed;
+       float* _nEff1DPrePassedErr;
+       float* _nEff1DPrePassed2;
+       float* _nEff1DPrePassed2Err;
+       float* _nEff1DPassed;
+       float* _nEff1DPassedErr;
+       float  _effTot;
+       float  _effTotErr;
+       float* _eff1D;
+       float* _eff1DErr;
+
+       TFullCuts _fullCuts;
+       TMathTools _math;
+       TPhotonCuts _photonEmpty;
+       TMuonCuts _muonEmpty;
  //      TElectronCuts electronEmpty_;
 
-       const static int debugModeNEntries_=100000;
+       const static int _debugModeNEntries=100000;
 
-       zgamma::PhosphorCorrectionFunctor* photonCorrector_;
-       TPuReweight* puWeight_;
-       TConfiguration config_;
+       zgamma::PhosphorCorrectionFunctor* _photonCorrector;
+       TPuReweight* _puWeight;
+       TConfiguration _config;
   };
 
 #endif 

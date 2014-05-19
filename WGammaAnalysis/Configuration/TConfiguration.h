@@ -16,8 +16,11 @@ class TConfiguration
     enum {DATA, SIGMC, BKGMC};//sample
     enum {BARREL, ENDCAP, COMMON};//eta bin
     enum {TOTAL, ONEDI, TWODI};//csMode
-    enum {VAL, ERRSTAT, ERRSYST};//valType
-    enum {VERY_PRELIMINARY,PRELIMINARY,FULLY};//selectin stage
+    enum {VERY_PRELIMINARY,
+          PRELIMINARY_FOR_MET_CUT,
+          PRELIMINARY_FOR_TEMPLATE_METHOD,
+          PRELIMINARY_FOR_UNFOLDING,
+          FULLY};//selection stage
 
     void Print();
 
@@ -25,24 +28,23 @@ class TConfiguration
     TString GetSampleName(int sample);
     TString GetEtaBinName(int etaBin);
     TString GetCsModeName(int csMode);
-    TString GetValTypeName(int valType);
 
-    TString GetSelectedName(int selectionStage, int channel, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0, bool isVeryLooseSelectionMode=0);
+    TString GetSelectedName(int selectionStage, int channel, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0);
     //strSelectionStage
-    TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight, bool isVeryLooseSelectionMode);
+    TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight);
 
     TString GetYieldsFileName(int channel);
-    TString GetYieldsSelectedName(int csMode, int valType, int sample, TString sourceName="");
-    TString GetYieldsSelectedSignalMCGenName(int csMode, int valType);
-    TString GetYieldsDDTemplateBkgName(int csMode, int valType);
-    TString GetYieldsSignalName(int csMode, int valType);
+    TString GetYieldsSelectedName(int csMode, int sample, TString sourceName="");
+    TString GetYieldsSelectedSignalMCGenName(int csMode);
+    TString GetYieldsDDTemplateBkgName(int csMode);
+    TString GetYieldsSignalName(int csMode);
 
     TString GetDDTemplateBkgFileName(int channel);
 
-//    TString GetAccEffFileName(int channel);
-//    TString GetAccName(int csMode, int valType);
-//    TString GetEffName(int csMode, int valType);
-//    TString GetAccEff1DName(int csMode, int valType);
+    TString GetAccFileName(int channel);
+    TString GetAccName(int csMode);
+    TString GetEffFileName(int channel);
+    TString GetEffName(int csMode);
 
 //    TString GetUnfoldingFileName(int channel);
 //    TString GetMatrUnfo1DName();
@@ -56,14 +58,15 @@ class TConfiguration
     TString GetPhosphorConstantFileName();
 
     int GetNPhoPtBins();
-    vector <float> GetPhoPtBinsLimits();
+    void GetPhoPtBinsLimits(float* lims);
     int FindPhoPtBinByPhoPt(float pt);
 
     float GetPhoPtMin();
+    float GetPhoPtMax();
     float GetLePhoDeltaRMin();
 
     int GetNPhoPtUnfBins(bool isOverflowUsed);
-    vector <float> GetPhoPtUnfBinsLimits(bool isOverflowUsed);
+    void GetPhoPtUnfBinsLimits(float* lims,bool isOverflowUsed);
     int FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed);
 
 };
@@ -71,10 +74,12 @@ class TConfiguration
 /////////////////////////////////////////
 //photon Pt binning
 //and other analysis constants
-static const int _nPhoPtBins = 9;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
-static const float _phoPtOverflowBinLimit=1000.;
+//static const int _nPhoPtBins = 9;
+//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
+static const int _nPhoPtBins = 2;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
 static const float _phoPtMin=15.;
+static const float _phoPtMax=2000.;
   //minimum value for total CS
 static const float _lePhoDeltaRMin=0.7;
   //minimum value for total and differential cross section; 
@@ -90,10 +95,8 @@ static const TString _outputDirEle="../WGammaOutput/ELECTRON/";
 /////////////////////////////////////////
 //selected files, directory and file names
 //(these files will be output of the script Selection)
-static const TString selectedVeryPreliminaryEventsNameBase_="VeryPreliminarySelected/selected";
-static const TString selectedPreliminaryEventsNameBase_="PreliminarySelected/selected";
-static const TString selectedFullyEventsNameBase_="FullySelected/selected";
-
+//names are listed in the constructor for now
+TString _selectedNameBase[5];
 
 //////////////////////////////////////////
 //yields
@@ -114,13 +117,10 @@ static const TString _DDTemplateBkgFileName="YieldsAndBackground/bkgDDTemplate.r
 //////////////////////////////////////////
 //acceptance and efficiency
 //
-static const TString acceffFile_="Constants/AccEff.root";
-static const TString acc1DName_="acc1D"; 
-static const TString eff1DName_="eff1D"; 
-static const TString acceff1DName_="acceff1D";
-static const TString accTotalName_="accTotal"; 
-static const TString effTotalName_="effTotal"; 
-static const TString acceffTotalName_="acceffTotal"; 
+static const TString _accFileName="Constants/Acc.root";
+static const TString _accName="acc"; 
+static const TString _effFileName="Constants/Eff.root";
+static const TString _effName="eff"; 
 
 //////////////////////////////////////////
 //unfolding
@@ -134,7 +134,6 @@ static const TString yieldsGen1DName_="yieldsGen1D";
 //////////////////////////////////////////
 static const TString nameDebugMode_ = "_debugMode";
 static const TString nameNoPuReweight_="_noPuReweight";
-static const TString nameVeryLooseSelectionMode_="_veryLooseSelectionMode";
 
 //////////////////////////////////////////
 //certrified constants

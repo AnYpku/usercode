@@ -5,6 +5,7 @@
 #include "TSelectedEventsTree.h"
 #include "../Include/TMuonCuts.h" 
 #include "../Include/TElectronCuts.h" 
+#include "../Include/TFullCuts.h" 
 #include "../Include/TPhotonCuts.h" 
 #include "../Include/TPuReweight.h" 
 #include "../Configuration/TAllInputSamples.h"
@@ -16,13 +17,13 @@
 #include "TMath.h" 
   //ROOT package
 
-class WGammaSelection : public TEventTree, public TSelectedEventsTree 
+class WGammaSelection
   {
      //TEventTree - class for input tree
      //TSelectedEventsTree - class for output tree and output root file
      public:
        WGammaSelection (int channel, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
-       WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isPuReweight=0, bool isDebugMode=0, bool isVeryLooseSelectionMode=0);
+       WGammaSelection(int channel, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
        virtual ~WGammaSelection();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
@@ -33,54 +34,35 @@ class WGammaSelection : public TEventTree, public TSelectedEventsTree
 
      private:
 
-       TAllInputSamples* INPUT_;
+       TAllInputSamples* _INPUT;
+       TEventTree _eventTree;
+       TSelectedEventsTree _selEvTree;
+       TConfiguration _config;
 
-       enum {MUON_, ELECTRON_, PHOTON_, JET_, LOWPTJET_, MC_};
+       enum {_MUON, _ELECTRON, _PHOTON, _JET, _MC};
 
-       int selectionPurpose_;
-       bool doSigmaIEtaIEtaCut_;
-       bool doPhoChIsoCut_;
+       int _channel;//_config.ELECTRON, _config.MUON
+       int _sample; //_config.DATA, _config.SIGMC, _config.BKGMC
 
-       int channel_;//ELECTRON, MUON
-       int sample_; //DATA, SIGMC, BKGMC
-//       int mode_; //EVENTSELECTION_, SIGNALTEMPLATE_, BKGTEMPLATE_
-
-       bool isDebugMode_;
-       bool isNoPuReweight_;
-       bool isVeryLooseSelectionMode_;
-       int sampleMode_;
-       vector <bool> doAnalizeSample_;
+       bool _isDebugMode;
+       bool _isNoPuReweight;
+       int _sampleMode;
+       vector <bool> _doAnalizeSample;
 
        
-       
+       float _lumiData;
+       float _lumiWeight;
+       float _totalWeight;
+       int _nLe;
+       int _inputFileN;
 
-       int nTotal_;
-       int nBeforeLeptonLoop_;
-       int nLeptons_;
-       int nLeptonsPassed_; 
-       int nMoreVetoPassed_;
-       int nWMtPassed_;
-       int nPhotons_;
-       int nPhotonsPassed_;
-       int nPhoLepPassed_; 
+       const static int _debugModeNEntries=1000000;
+    
+       TFullCuts::PassedLevels _passed;
 
-       float lumiWeight_;
-       float debugModeWeight_;
-       float totalWeight_;
-       int nLe_;
-       int inputFileN_;
-//       float WMt_[kMaxnMu+kMaxnEle];
-//       float lePhoDeltaR_[kMaxnMu+kMaxnEle][kMaxnPho];
-         //kMaxnMu,kMaxnEle,kMaxnPho - 
-         //constant fields of TEventTree
-//       const static float WMtCut_ = 70.;//70.;
-//       const static float lePhoDeltaRCut_ = 0.7;//0.7;
-
-       const static int debugModeNEntries_=100000;
-
-       zgamma::PhosphorCorrectionFunctor* photonCorrector_;
-       TPuReweight* puWeight_;
-       TString selectedTreeFileName_;
+       zgamma::PhosphorCorrectionFunctor* _photonCorrector;
+       TPuReweight* _puWeight;
+       TString _selectedTreeFileName;
   };
 
 #endif //#ifndef WGammaSelection_h

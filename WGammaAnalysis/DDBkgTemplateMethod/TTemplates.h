@@ -57,7 +57,7 @@ class TTemplates
     TTree* _treeData;
     vector <TTree*> _vecTreeBkg;
 
-    vector <float> _phoPtBinLimits;
+    float* _phoPtBinLimits;
 
     TString _varFit;
     TString _varSideband;

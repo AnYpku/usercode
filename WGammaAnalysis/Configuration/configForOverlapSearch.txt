@@ -1,0 +1,66 @@
+###################################################################
+###  SYNTAX RULES OF THE CONFIGURATION FILE:
+########
+###  1) if first symbol in the line is '#' - this is a comment
+###  2) if first symbol in the line is '$' - here information about new sample starts
+###       the first word is sample type (DATA, SIGMC, BKGMC)
+###       the second word is name of channel (MUON, ELECTRON)
+###       next, for SIGMC and BKGMC only: name of sample (e.g. Wg_to_munu)
+###       next, for SIGMC and BKGMC only: label of the sample for legend (e.g.  W#gamma#rightarrow#mu#nu#gamma)
+###       next, number - color from TColor.h table (ROOT)
+###       next, for DATA only: may or may not be word "lumiTotal" with lumiTotal value after that
+###       next, for SIGMC and BKGMC only: may or may not be work "csTotal" with csTotal value after that
+###         (csTotal is used for luminocity reweight for MC samples for which original file was splitted)
+###  3) if first symbol in the line is '-' - this is a file for given sample
+###       next, name of the file
+###       next, for DATA only: may or may not be luminocity value
+###         (might be used for purposes of fast processing only one data file rather then full data)
+###       next, for SIGMC and BKGMC only: cross section value for 8 TeV from the twiki table
+###       next, for SIGMC and BKGMC only: may or may not be branching ration or filter efficiency or whatever other factor
+###  4) empty lines or lines started with any other symbol are just ignored for now
+########
+###  reading from the config.txt is implemented in 
+###  TAllInputSamples::ReadConfig(int channel, char* configFile)
+###################################################################
+         
+
+###################################################################
+$   DATA     MUON    1    lumiTotal 19593.0        
+# 1 is kBlack, 19593.0 - luminocity
+
+###################################################################
+#$   DATA     ELECTRON    1
+# no files yet
+
+
+
+###################################################################
+$ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  
+#csTotal 36257.2  
+#433=kCyan+1
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wjets_KeepMCbranches.root 36257.2
+
+#value of cross section is preliminary
+
+###################################################################
+$   BKGMC    MUON   Wg  W#gamma    634     
+#634=kRed+2
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_KeepMCbranches.root   553.92 
+
+###################################################################
+$ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
+#418=kGreen+2
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_DYToLL_KeepMCbranches.root   3503.7
+
+###################################################################
+$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      440    
+#418=kGreen+2, same as DY
+#401=kYellow+1
+
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New//job_summer12_Zg_KeepMCbranches.root   159.12
+
+
+

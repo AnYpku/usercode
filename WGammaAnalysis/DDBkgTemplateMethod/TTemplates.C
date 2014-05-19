@@ -35,22 +35,26 @@ TTemplates::TTemplates(int channel)
   _channel=channel;
   _INPUT = new TAllInputSamples(_channel,"../Configuration/config.txt");
   _fOutForSave = new TFile(_config.GetDDTemplateBkgFileName(_channel),"recreate");
-//  _varFit="phoSigmaIEtaIEta";
-//  _varSideband="phoSCRChIsoCorr";
-//  _labelVarFit="#sigma_{i#etai#eta}";
-  _varFit="phoSCRChIsoCorr";
-  _varSideband="phoSigmaIEtaIEta";
-  _labelVarFit="ch iso";
-  _fSign = new TFile(_config.GetSelectedName(_config.PRELIMINARY,_channel,_config.SIGMC));
-  _fData = new TFile(_config.GetSelectedName(_config.PRELIMINARY,_channel,_config.DATA));
+  _varFit="phoSigmaIEtaIEta";
+  _varSideband="phoSCRChIsoCorr";
+  _labelVarFit="#sigma_{i#etai#eta}";
+//  _varFit="phoSCRChIsoCorr";
+//  _varSideband="phoSigmaIEtaIEta";
+//  _labelVarFit="I_ch";
+
+  _fSign = new TFile(_config.GetSelectedName(_config.PRELIMINARY_FOR_TEMPLATE_METHOD,_channel,_config.SIGMC));
+  _fData = new TFile(_config.GetSelectedName(_config.PRELIMINARY_FOR_TEMPLATE_METHOD,_channel,_config.DATA));
   _treeSign = (TTree *)_fSign->Get("selectedEvents");
   _treeData = (TTree *)_fData->Get("selectedEvents");
-  for (int i=2; i<_INPUT->allInputs_.size(); i++){
+  for (unsigned int i=0; i<_INPUT->allInputs_.size(); i++){
+    int sample = _INPUT->allInputs_[i].sample_;
+    if (sample==_config.DATA || sample==_config.SIGMC)
+      continue;
     TString sourceName =  _INPUT->allInputs_[i].sourceName_;
     if (sourceName=="Wjets_to_lnu" || sourceName=="DYjets_to_ll" || sourceName=="ttbarjets") 
       continue;
     std::cout<<"bkg source Name_="<<_INPUT->allInputs_[i].sourceName_<<std::endl;
-    _vecFBkg.push_back(new TFile(_config.GetSelectedName(_config.PRELIMINARY,_channel,_config.BKGMC,sourceName)));
+    _vecFBkg.push_back(new TFile(_config.GetSelectedName(_config.PRELIMINARY_FOR_TEMPLATE_METHOD,_channel,_config.BKGMC,sourceName)));
     _vecTreeBkg.push_back((TTree*)_vecFBkg.back()->Get("selectedEvents"));
 
   }
@@ -68,7 +72,8 @@ TTemplates::TTemplates(int channel)
     _minVarFitE = 0;
     _maxVarFitE = 4;
   }
- _phoPtBinLimits = _config.GetPhoPtBinsLimits();
+  _phoPtBinLimits = new float[_config.GetNPhoPtBins()];
+  _config.GetPhoPtBinsLimits(_phoPtBinLimits);
 }
 
 TTemplates::~TTemplates()
@@ -77,31 +82,32 @@ TTemplates::~TTemplates()
 
 void TTemplates::ComputeBackground(bool noPrint, bool noPlot)
 {
-  _nBinsLeftTot[_config.BARREL] = 25;//20;//total Pt
-  _nBinsLeftTot[_config.ENDCAP] = 25;//8;//total Pt
-  _nBinsLeft[0][_config.BARREL] = 25;//2;//15 to 20
-  _nBinsLeft[0][_config.ENDCAP] = 20;//5;//15 to 20
-  _nBinsLeft[1][_config.BARREL] =  4;//10;//20 to 25
-  _nBinsLeft[1][_config.ENDCAP] = 16;//20;//20 to 25
-  _nBinsLeft[2][_config.BARREL] = 25;//20;//25 to 30
-  _nBinsLeft[2][_config.ENDCAP] = 20;//5;//25 to 30
-  _nBinsLeft[3][_config.BARREL] = 20;//20;//30 to 35
-  _nBinsLeft[3][_config.ENDCAP] =  8;//10;//30 to 35
-  _nBinsLeft[4][_config.BARREL] = 25;//16;//35 to 40; 
-  _nBinsLeft[4][_config.ENDCAP] = 25;//20;//35 to 40;
-  _nBinsLeft[5][_config.BARREL] =  8;//5;//40 to 60
-  _nBinsLeft[5][_config.ENDCAP] = 20;//10;//40 to 60; 
-  _nBinsLeft[6][_config.BARREL] = 20;//16;//60 to 80; 
-  _nBinsLeft[6][_config.ENDCAP] = 20; //4;//60 to 80
-  _nBinsLeft[7][_config.BARREL] = 25;//10;//80 to 200
-  _nBinsLeft[7][_config.ENDCAP] = 16;// 8;//80 to 200
-  _nBinsLeft[8][_config.BARREL] =  4;// 2;//200 to 600
-  _nBinsLeft[8][_config.ENDCAP] = 10;// 2;//200 to 600
-
+  _nBinsLeftTot[_config.BARREL] = 4;//25;//20;//total Pt
+  _nBinsLeftTot[_config.ENDCAP] = 4;//25;//8;//total Pt
+  _nBinsLeft[0][_config.BARREL] = 4;//25;//2;//15 to 20
+  _nBinsLeft[0][_config.ENDCAP] = 4;//20;//5;//15 to 20
+  _nBinsLeft[1][_config.BARREL] = 4;// 4;//10;//20 to 25
+  _nBinsLeft[1][_config.ENDCAP] = 4;//16;//20;//20 to 25
+/*
+  _nBinsLeft[2][_config.BARREL] = 4;//25;//20;//25 to 30
+  _nBinsLeft[2][_config.ENDCAP] = 4;//20;//5;//25 to 30
+  _nBinsLeft[3][_config.BARREL] = 4;//20;//20;//30 to 35
+  _nBinsLeft[3][_config.ENDCAP] = 4;// 8;//10;//30 to 35
+  _nBinsLeft[4][_config.BARREL] = 4;//25;//16;//35 to 40; 
+  _nBinsLeft[4][_config.ENDCAP] = 4;//25;//20;//35 to 40;
+  _nBinsLeft[5][_config.BARREL] = 4;// 8;//5;//40 to 60
+  _nBinsLeft[5][_config.ENDCAP] = 4;//20;//10;//40 to 60; 
+  _nBinsLeft[6][_config.BARREL] = 4;//20;//16;//60 to 80; 
+  _nBinsLeft[6][_config.ENDCAP] = 4;//20; //4;//60 to 80
+  _nBinsLeft[7][_config.BARREL] = 4;//25;//10;//80 to 200
+  _nBinsLeft[7][_config.ENDCAP] = 4;//16;// 8;//80 to 200
+  _nBinsLeft[8][_config.BARREL] = 4;// 4;// 2;//200 to 600
+  _nBinsLeft[8][_config.ENDCAP] = 4;//10;// 2;//200 to 600
+*/
 //  SelectOptimalNBinsLeft();
   int nPtBins = _config.GetNPhoPtBins();
   for (int ipt=-1; ipt<nPtBins; ipt++){
-  //for (int ipt=-1; ipt<1; ipt++){
+  //for (int ipt=0; ipt<2; ipt++){
     ComputeBackgroundOne(ipt,noPrint,noPlot);
   }
   PrintBkgYieldsAndChi2();
@@ -273,7 +279,9 @@ void TTemplates::SetThreeHists(int ptBin, int etaBin, bool noPrint){
   TCut cutSideband=SidebandCut(_varSideband);
   TCut cutEta = CutEtaBin(etaBin);
   TCut cutPt = CutPtBin(ptBin);
-  cutPt = "phoEt>15";
+  TString cutStrPt="phoEt>";
+  cutStrPt+=_config.GetPhoPtMin();
+  cutPt=cutStrPt;
 //  if (ptBin>0)
 //    if (_phoPtBinLimits[ptBin]>80)
 //      cutPt = "phoEt>80";
@@ -294,10 +302,11 @@ void TTemplates::SetThreeHists(int ptBin, int etaBin, bool noPrint){
   {min=_minVarFitE; max=_maxVarFitE;}
   else if (etaBin==_config.COMMON) 
   {min=_minVarFitB; max=_maxVarFitE;}
+//  if (!noPrint) std::cout<<"min="<<min<<", max="<<max<<std::endl;
 
   //define nBins, min and max more accurately
   double cutNominalVarFit = ValueCutNominalVarFit(_varFit, etaBin);
-  double unit;
+  double unit=0;
   if (cutNominalVarFit>max || cutNominalVarFit<min){
     std::cout<<"varFit min="<<min<<"; varFit max = "<<max<<"; cut val = "<<cutNominalVarFit<<std::endl;
   }
@@ -306,8 +315,11 @@ void TTemplates::SetThreeHists(int ptBin, int etaBin, bool noPrint){
     if (ptBin>=0) {nBLeft=_nBinsLeft[ptBin][etaBin];}
     if (ptBin==-1) {nBLeft=_nBinsLeftTot[etaBin];}
     unit = (cutNominalVarFit-min)/nBLeft;
+//    if (!noPrint) std::cout<<"min="<<min<<", cut="<<cutNominalVarFit<<", unit="<<unit<<", nBinsLeft="<<nBLeft<<std::endl;
     nFitBins = (max-min)/unit;
+//    if (!noPrint) std::cout<<"min="<<min<<", max="<<max<<", unit="<<unit<<", nFitBins="<<nFitBins<<std::endl;
     max = min+unit*nFitBins;
+//    if (!noPrint) std::cout<<"min="<<min<<", max="<<max<<", unit="<<unit<<", nFitBins="<<nFitBins<<std::endl;
   }
 
   if (_varFit=="phoSCRChIsoCorr"||_varFit=="phoPFChIsoCorr")
@@ -338,8 +350,13 @@ void TTemplates::SetThreeHists(int ptBin, int etaBin, bool noPrint){
 
 
 
-    for (int i=0; i<=nFitBins; i++)
-      fitBinLims[i]=min+i*unit;
+  if (!noPrint)
+    std::cout<<"bin lims:";
+  for (int i=0; i<=nFitBins; i++){
+    fitBinLims[i]=min+i*unit;
+    std::cout<<fitBinLims[i]<<", ";
+  }
+  std::cout<<std::endl;
 
   if (!noPrint){
     std::cout<<"SetThreeHists:"<<StrLabelPt(ptBin)<<StrLabelEta(etaBin)<<std::endl;
@@ -398,7 +415,10 @@ void TTemplates::SetBackgrTemplate(TH1D* hBkgr, TH1D* hLeak, TH1D* hLeakTemp, TC
   if (!noPrint) std::cout<<"(true gamma bkg leaks):";
 
   TString nameLeakTemp=hLeakTemp->GetName();
-  for (int is=0; is<_vecTreeBkg.size(); is++){
+
+  TCut cutTrueGamma = "(phoGenPID==22 && (phoGenMomPID>=-24 && phoGenMomPID<=24))*weight";
+
+  for (unsigned int is=0; is<_vecTreeBkg.size(); is++){
     
     _vecTreeBkg[is]->Draw(_varFit+TString(">>")+nameLeakTemp,cut,"goff");
     hLeak->Add(hLeakTemp);
@@ -442,7 +462,7 @@ TString TTemplates::StrLabelEta(int etaBin){
 
 TString TTemplates::StrLabelPt(int ptBin){
   if (ptBin==-1) return "_PtTotal_";
-  if (ptBin>=(int)_phoPtBinLimits.size()) return "_PtUnknown_";
+  if (ptBin>=(int)_config.GetNPhoPtBins()) return "_PtUnknown_";
   TString str="_Pt";
   str+=_phoPtBinLimits[ptBin];
   str+="to";
@@ -530,7 +550,7 @@ void TTemplates::FitOne(int ptBin, int etaBin, bool noPrint, bool noPlot)
   //load data
   RooArgSet argSetData(rooVarFit,rooVarSideband,rooPhoEta,rooPhoEt,rooWeight);
 
-  _fData = new TFile(_config.GetSelectedName(_config.PRELIMINARY,_channel,_config.DATA));
+  _fData = new TFile(_config.GetSelectedName(_config.PRELIMINARY_FOR_TEMPLATE_METHOD,_channel,_config.DATA));
 
   TTree* treeData = (TTree *)_fData->Get("selectedEvents");
   TCut sidebandCut = SidebandCut(_varSideband);
@@ -702,28 +722,21 @@ void TTemplates::SaveBkgYields()
 {
   _fOutForSave->cd();
   int nPtBins = _config.GetNPhoPtBins();
-  TVectorD vecBkgYield(nPtBins);
-  TVectorD vecBkgYieldErrStat(nPtBins);
-  TVectorD vecBkgYieldErrSyst(nPtBins);
-  TVectorD totBkgYield(1);
-  TVectorD totBkgYieldErrStat(1);
-  TVectorD totBkgYieldErrSyst(1);
-  totBkgYield(0) = _nBkgrYieldsValTot;
-  totBkgYieldErrStat(0) = _nBkgrYieldsErrTot;
-  totBkgYieldErrSyst(0) = 0;
 
-  for (int i=0; i<nPtBins; i++){
-    vecBkgYield(i)=_nBkgrYieldsVal[i];
-    vecBkgYieldErrStat=_nBkgrYieldsErr[i];
-    vecBkgYieldErrSyst=0;    
+  TString strTot=_config.GetYieldsDDTemplateBkgName(_config.TOTAL);
+  TH1F hTotBkgYield(strTot,strTot,1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
+  TString str1D=_config.GetYieldsDDTemplateBkgName(_config.ONEDI);
+  TH1F h1DBkgYield(str1D,str1D,nPtBins,_phoPtBinLimits);
+
+  hTotBkgYield.SetBinContent(1,_nBkgrYieldsValTot);
+  hTotBkgYield.SetBinError(1,_nBkgrYieldsErrTot);
+  for (int i=1; i<nPtBins+1; i++){  
+    h1DBkgYield.SetBinContent(i,_nBkgrYieldsVal[i-1]);
+    h1DBkgYield.SetBinError(i,_nBkgrYieldsErr[i-1]);
   }
 
-  totBkgYield.Write(_config.GetYieldsDDTemplateBkgName(_config.TOTAL,_config.VAL)); 
-  totBkgYieldErrStat.Write(_config.GetYieldsDDTemplateBkgName(_config.TOTAL,_config.ERRSTAT)); 
-  totBkgYieldErrSyst.Write(_config.GetYieldsDDTemplateBkgName(_config.TOTAL,_config.ERRSYST)); 
-  vecBkgYield.Write(_config.GetYieldsDDTemplateBkgName(_config.ONEDI,_config.VAL)); 
-  vecBkgYieldErrStat.Write(_config.GetYieldsDDTemplateBkgName(_config.ONEDI,_config.ERRSTAT)); 
-  vecBkgYieldErrSyst.Write(_config.GetYieldsDDTemplateBkgName(_config.ONEDI,_config.ERRSYST));
+  hTotBkgYield.Write(strTot); 
+  h1DBkgYield.Write(_config.GetYieldsDDTemplateBkgName(_config.ONEDI)); 
 }
 
 TCut TTemplates::CutPtBin(int ptBin){
@@ -732,7 +745,7 @@ TCut TTemplates::CutPtBin(int ptBin){
     TCut cut("1");
     return cut;
   }
-  if (ptBin<0 || ptBin>=(int)_phoPtBinLimits.size()){
+  if (ptBin<0 || ptBin>=(int)_config.GetNPhoPtBins()){
     TCut cut("0");
     return cut;
   }
@@ -831,87 +844,3 @@ void TTemplates::FractionOfSidebandVarInRange(int ipt, int ieta, double& frac, d
 
 }
 
-//code for trying to make unbinned templates
-//  RooRealVar rooVarFitB(varFit,varFit,_minVarFitB,_maxVarFitB);
-//  RooRealVar rooVarFitE(varFit,varFit,_minVarFitE,_maxVarFitE);
-//  RooRealVar rooVarSideband(varSideband,varSideband,minVarSideband,maxVarSideband);
-//  RooRealVar rooPhoEta("phoEta","phoEta",minPhoEta,maxPhoEta);
-//  RooRealVar rooPhoEt("phoEt","phoEt",minPhoEt,maxPhoEt);
-//  RooRealVar rooWeight("weight","weight",minWeight,maxWeight);
-//  RooArgSet argSetB(rooVarFitB,rooVarSideband,rooPhoEta,rooPhoEt,rooWeight);
-//  RooArgSet argSetE(rooVarFitE,rooVarSideband,rooPhoEta,rooPhoEt,rooWeight);
-//  RooDataSet* dataSetSign[nBins][2];
-//  RooDataSet* dataSetLeak[nBins][2];
-//  RooDataSet* dataSetData[nBins][2]; //bkg = Data - Leak
-    //binning in phoEt and phoEta(BARREL,ENDCAP)
-
-//  RooPlot* plotSignB = rooVarFitB.frame();
-//  RooPlot* plotSignE = rooVarFitE.frame();
-//  RooPlot* plotLeakB = rooVarFitB.frame();
-//  RooPlot* plotLeakE = rooVarFitE.frame();
-//  RooPlot* plotDataB = rooVarFitB.frame();
-//  RooPlot* plotDataE = rooVarFitE.frame();
-  
-/*
-    for (int iEta=_config.BARREL; iEta<=_config.ENDCAP; iEta++){
-      TString dataSetSignName = "dataSetSign";
-      dataSetSignName+=i;
-      dataSetSignName+=iEta;
-      TString dataSetLeakName = "dataSetLeak";
-      dataSetLeakName+=i;
-      dataSetLeakName+=iEta;
-      TString dataSetDataName = "dataSetData";
-      dataSetDataName+=i;
-      dataSetDataName+=iEta;
-      if (iEta==_config.BARREL){
-        dataSetSign[i][iEta] = new RooDataSet(dataSetSignName, dataSetSignName, _treeSign, argSetB, (barrelCut && ptBinCut)*weightCut);
-        dataSetLeak[i][iEta] = new RooDataSet(dataSetLeakName, dataSetLeakName, _treeSign, argSetB, (barrelCut && ptBinCut && sidebandCut)*weightCut);
-        dataSetData[i][iEta] = new RooDataSet(dataSetDataName, dataSetDataName, _treeData, argSetB, (barrelCut && ptBinCut && sidebandCut)*weightCut);
-      }
-      else if (iEta==_config.ENDCAP){
-        dataSetSign[i][iEta] = new RooDataSet(dataSetSignName, dataSetSignName, _treeSign, argSetE, (endcapCut && ptBinCut)*weightCut);
-        dataSetLeak[i][iEta] = new RooDataSet(dataSetLeakName, dataSetLeakName, _treeSign, argSetE, (endcapCut && ptBinCut && sidebandCut)*weightCut);
-        dataSetData[i][iEta] = new RooDataSet(dataSetDataName, dataSetDataName, _treeData, argSetE, (endcapCut && ptBinCut && sidebandCut)*weightCut);
-      }
-
-    } //end of loop over iEta
-
-    dataSetSign[i][_config.BARREL]->plotOn(plotSignB,LineColor(i+1),MarkerColor(i+1));
-    dataSetSign[i][_config.ENDCAP]->plotOn(plotSignE,LineColor(i+1),MarkerColor(i+1));
-    dataSetLeak[i][_config.BARREL]->plotOn(plotLeakB,LineColor(i+1),MarkerColor(i+1));
-    dataSetLeak[i][_config.ENDCAP]->plotOn(plotLeakE,LineColor(i+1),MarkerColor(i+1));
-    dataSetData[i][_config.BARREL]->plotOn(plotDataB,LineColor(i+1),MarkerColor(i+1));
-    dataSetData[i][_config.ENDCAP]->plotOn(plotDataE,LineColor(i+1),MarkerColor(i+1));
-*/
-
-
-/*
-  TCanvas *cSignB = new TCanvas("cSignB","cSignB");
-  plotSignB->Draw();
-  TCanvas *cSignE = new TCanvas("cSignE","cSignE");
-  plotSignE->Draw();
-  TCanvas *cLeakB = new TCanvas("cLeakB","cLeakB");
-  plotLeakB->Draw();
-  TCanvas *cLeakE = new TCanvas("cLeakE","cLeakE");
-  plotLeakE->Draw();
-  TCanvas *cDataB = new TCanvas("cDataB","cDataB");
-  plotDataB->Draw();
-  TCanvas *cDataE = new TCanvas("cDataE","cDataE");
-  plotDataE->Draw();
-*/
-//  RooDataHist hist("hist", "hist", argSetB, *dataSetSign[0][0]);
-
-
-//Code for computing integral of pdf
-
-/*
-
-  TPhotonCuts emptyPhoton;
-  double sihihCut = 0;
-  if (etaBin==_config.BARREL) sihihCut = emptyPhoton.GetPhoSigmaIEtaIEtaCutB(emptyPhoton.GetWP());
-  else if (etaBin==_config.ENDCAP) sihihCut = emptyPhoton.GetPhoSigmaIEtaIEtaCutE(emptyPhoton.GetWP());
-  sihihVar.setRange("inSelection",0,sihihCut);
-  RooAbsReal* integralSumPdf = sumPdf.createIntegral(sihihVar,NormSet(sihihVar),Range("inSelection"));
-  RooAbsReal* integralBkgPdf = backgroundPdf.createIntegral(sihihVar,NormSet(sihihVar),Range("inSelection"));
-
-*/

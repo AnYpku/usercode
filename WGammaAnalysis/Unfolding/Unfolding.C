@@ -45,94 +45,60 @@
 Unfolding::Unfolding(int channel, string configFile)
 {
   _channel=channel; 
-  fIn_ = new TFile(config_.GetSelectedName(config_.FULLY,_channel,config_.SIGMC));  
+  _fIn = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_config.SIGMC));  
 
-  fOut_ = new TFile("fOut.root","recreate");
+  _fOut = new TFile("fOut.root","recreate");
 
-//  fOut_ = new TFile(config_.GetUnfoldingFileName(_channel),"recreate");
-//  if (fOut_->IsOpen()) fOut_->cd();
+//  _fOut = new TFile(_config.GetUnfoldingFileName(_channel),"recreate");
+//  if (_fOut->IsOpen()) _fOut->cd();
 //  else {
-//    std::cout<<"ERROR in Unfolding::PrepareUnfoldingMatrix: file "<<config_.GetUnfoldingFileName(_channel)<<" is not open"<<std::endl;
+//    std::cout<<"ERROR in Unfolding::PrepareUnfoldingMatrix: file "<<_config.GetUnfoldingFileName(_channel)<<" is not open"<<std::endl;
 //  }
-  INPUT_ = new TAllInputSamples(channel, configFile);
+  _INPUT = new TAllInputSamples(channel, configFile);
 
 }
 
 Unfolding::~Unfolding()
 {
-//  if (fIn_->IsOpen()) fIn_->Close();
-//  if (fOut_->IsOpen()) fOut_->Close();
-//  delete fIn_;
-//  delete fOut_;
-//  delete INPUT_;
+//  if (_fIn->IsOpen()) _fIn->Close();
+//  if (_fOut->IsOpen()) _fOut->Close();
+//  delete _fIn;
+//  delete _fOut;
+//  delete _INPUT;
 }
 
 bool Unfolding::TestDifferentMethods()
 {
-  float binLimsRec[nBinsRec_+1]; 
-  float binLimsGen[nBinsGen_+1]; 
-  FillBinLimits(nBinsRec_, vecPhoPtLimitsRec_, binLimsRec);
-  FillBinLimits(nBinsGen_, vecPhoPtLimitsGen_, binLimsGen);
 
-  TH1D* dataSignYields = new TH1D("data","data yields  for test",nBinsGen_,binLimsGen);
+  TH1D* dataSignYields = new TH1D("data","data yields  for test",_nBinsGen,_phoPtLimitsGen);
 
-//  dataSignYields->SetBinContent(0,histYieldsRecSmeared_->GetBinContent(0));
-//  dataSignYields->SetBinError(0,histYieldsRecSmeared_->GetBinError(0));
-
-  dataSignYields->SetBinContent(0,0);
-  dataSignYields->SetBinError(0,0);
-
-  dataSignYields->SetBinContent(1,94400-74200);
-  dataSignYields->SetBinError(1,sqrt(330*330+300*300));
-
-  dataSignYields->SetBinContent(2,50600-28300);
-  dataSignYields->SetBinError(2,sqrt(200*200+220*220));
-
-  dataSignYields->SetBinContent(3,32120-12000);
-  dataSignYields->SetBinError(3,sqrt(2700*2700+180*180));
-
-  dataSignYields->SetBinContent(4,23000-8360);
-  dataSignYields->SetBinError(4,sqrt(110*110+150*150));
-
-  dataSignYields->SetBinContent(5,16600-4880);
-  dataSignYields->SetBinError(5,sqrt(90*90+130*130));
-
-  dataSignYields->SetBinContent(6,24850-7950);
-  dataSignYields->SetBinError(6,sqrt(160*160+110*110));
-
-  dataSignYields->SetBinContent(7,6760-1450);
-  dataSignYields->SetBinError(7,sqrt(220*220+80*80));
-
-  dataSignYields->SetBinContent(8,5655-970);
-  dataSignYields->SetBinError(8,sqrt(75*75+40*40));
-
-  dataSignYields->SetBinContent(9,319-28);
-  dataSignYields->SetBinError(9,sqrt(18*18+4*4));
+  dataSignYields->SetBinContent(0,_histYieldsRecSmeared->GetBinContent(0));
+  dataSignYields->SetBinError(0,_histYieldsRecSmeared->GetBinError(0));
   
 
-  TH1D* unfYieldsRooUnfInv = new TH1D("unfYieldsInv","unfolded yields Inversion",nBinsGen_,binLimsGen);
-  TMatrixD errCovStatInv(nBinsGen_,nBinsGen_);
-  TVectorD errStatInv(nBinsGen_);
-  TVectorD errSystInv(nBinsGen_);
-  TVectorD errCovStatVInv(nBinsGen_);
-//  ApplyRooUnfold(histYieldsRecSmeared_,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv);
+  TH1D* unfYieldsRooUnfInv = new TH1D("unfYieldsInv","unfolded yields Inversion",_nBinsGen,_phoPtLimitsGen);
+  TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
+  TVectorD errStatInv(_nBinsGen);
+  TVectorD errSystInv(_nBinsGen);
+  TVectorD errCovStatVInv(_nBinsGen);
+//  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv);
 
-  TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",nBinsGen_,binLimsGen);
-  TMatrixD errCovStatDAg(nBinsGen_,nBinsGen_);
-  TVectorD errStatDAg(nBinsGen_);
-  TVectorD errSystDAg(nBinsGen_);
-  TVectorD errCovStatVDAg(nBinsGen_);
-  ApplyRooUnfold(histYieldsRecSmeared_,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
-//  ApplyRooUnfold(histYieldsRecSmeared_,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
-//  ApplyRooUnfold(histYieldsRecSmeared_,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+  TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",_nBinsGen,_phoPtLimitsGen);
+  TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
+  TVectorD errStatDAg(_nBinsGen);
+  TVectorD errSystDAg(_nBinsGen);
+  TVectorD errCovStatVDAg(_nBinsGen);
+  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+//  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+//  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 
   std::cout<<std::endl;
   std::cout<<"   limits;      RooUnf inv;       RooUnf D'Ag"<<std::endl;  
 
   std::cout<<std::endl;
   
-  for (int i=1; i<=nBinsGen_; i++){
-    std::cout<<std::setw(3)<<std::setprecision(0)<<binLimsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<binLimsGen[i]<<" GeV: ";
+  for (int i=1; i<=_nBinsGen; i++){
+    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" GeV: ";
       //limits
 
     std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatInv(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystInv(i-1)<<"=";
@@ -148,8 +114,8 @@ bool Unfolding::TestDifferentMethods()
 
   std::cout<<std::endl;
   std::cout<<"Stat Covariance Matrix, RooUnf inversion"<<std::endl;  
-  for (int i=0; i<nBinsGen_; i++){
-    for (int j=0; j<nBinsGen_; j++){
+  for (int i=0; i<_nBinsGen; i++){
+    for (int j=0; j<_nBinsGen; j++){
       std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatInv(i,j)<<" ";
     }
     std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVInv(i);
@@ -158,8 +124,8 @@ bool Unfolding::TestDifferentMethods()
 
   std::cout<<std::endl;
   std::cout<<"Stat Covariance Matrix, RooUnf D'Agostini"<<std::endl;  
-  for (int i=0; i<nBinsGen_; i++){
-    for (int j=0; j<nBinsGen_; j++){
+  for (int i=0; i<_nBinsGen; i++){
+    for (int j=0; j<_nBinsGen; j++){
       std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatDAg(i,j)<<" ";
     }
     std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVDAg(i);
@@ -175,112 +141,134 @@ bool Unfolding::TestDifferentMethods()
 bool Unfolding::PrepareMigrationMatrix()
 {
 
-  tr_ = (TTree*)fIn_->Get("selectedEvents");
+  _tr = (TTree*)_fIn->Get("selectedEvents");
   Float_t phoEtRec;
   Float_t phoEtGen;
   Float_t weight;
+  Int_t event;
   TBranch* b_phoEtRec;
   TBranch* b_phoEtGen;
   TBranch* b_weight;
-  tr_->SetBranchAddress("phoEt",&phoEtRec,&b_phoEtRec);
-  tr_->SetBranchAddress("phoGenEt",&phoEtGen,&b_phoEtGen);
-  tr_->SetBranchAddress("weight",&weight,&b_weight);
+  TBranch* b_event;
 
-  vecPhoPtLimitsRec_ = config_.GetPhoPtUnfBinsLimits(0);
-  nBinsRec_ = config_.GetNPhoPtUnfBins(0);
+  _tr->SetBranchAddress("phoEt",&phoEtRec,&b_phoEtRec);
+  _tr->SetBranchAddress("phoGenEt",&phoEtGen,&b_phoEtGen);
+  _tr->SetBranchAddress("weight",&weight,&b_weight);
+  _tr->SetBranchAddress("event",&event,&b_event);
+
+  _nBinsRec = _config.GetNPhoPtUnfBins(0);
+  float* limsNoOverflow = new float[_nBinsRec+1];
+  _config.GetPhoPtUnfBinsLimits(limsNoOverflow,0);
 
   TString strOverflowRec = "phoEt>";
-  strOverflowRec+=vecPhoPtLimitsRec_[nBinsRec_];
-  isOverflowRec_ = tr_->GetEntries(strOverflowRec);
+  strOverflowRec+=limsNoOverflow[_nBinsRec];
+  _isOverflowRec = _tr->GetEntries(strOverflowRec);
   TString strOverflowGen = "phoGenEt>";
-  strOverflowGen+=vecPhoPtLimitsRec_[nBinsRec_];
-  isOverflowGen_ = tr_->GetEntries(strOverflowGen);
-  vecPhoPtLimitsRec_ = config_.GetPhoPtUnfBinsLimits(isOverflowRec_);
-  nBinsRec_ = config_.GetNPhoPtUnfBins(isOverflowRec_);
-  vecPhoPtLimitsGen_ = config_.GetPhoPtUnfBinsLimits(isOverflowGen_);
-  nBinsGen_ = config_.GetNPhoPtUnfBins(isOverflowGen_);
+  strOverflowGen+=limsNoOverflow[_nBinsRec];
+  _isOverflowGen = _tr->GetEntries(strOverflowGen);
+  delete limsNoOverflow;
 
-  std::cout<<"tr->GetEntries("<<strOverflowRec<<")="<<isOverflowRec_<<", mBinsRec_="<<nBinsRec_<<std::endl;
-  std::cout<<"tr->GetEntries("<<strOverflowGen<<")="<<isOverflowGen_<<", mBinsGen_="<<nBinsGen_<<std::endl;
+  _nBinsRec = _config.GetNPhoPtUnfBins(_isOverflowRec);
+  _phoPtLimitsRec = new float[_nBinsRec+1];
+  _config.GetPhoPtUnfBinsLimits(_phoPtLimitsRec,_isOverflowRec);
 
-  //good up to here
+  _nBinsGen = _config.GetNPhoPtUnfBins(_isOverflowGen);
+  _phoPtLimitsGen = new float[_nBinsGen+1];
+  _config.GetPhoPtUnfBinsLimits(_phoPtLimitsGen,_isOverflowGen);
 
-  float binLimsRec[nBinsRec_+1]; 
-  float binLimsGen[nBinsGen_+1]; 
-  FillBinLimits(nBinsRec_, vecPhoPtLimitsRec_, binLimsRec);
-  FillBinLimits(nBinsGen_, vecPhoPtLimitsGen_, binLimsGen);
 
-  fOut_->cd();
+  std::cout<<"tr->GetEntries("<<strOverflowRec<<")="<<_isOverflowRec<<", mBinsRec_="<<_nBinsRec<<std::endl;
+  std::cout<<"tr->GetEntries("<<strOverflowGen<<")="<<_isOverflowGen<<", mBinsGen_="<<_nBinsGen<<std::endl;
 
-  histMigrMatrixNotNormalized_ = new TH2D("migrNotNorm","histMigrMatrixNotNormalized_",nBinsRec_,binLimsRec,nBinsGen_,binLimsGen);
-  histMigrMatrixNotNormalized_->Sumw2();
-  histEventCountMigrMatrix_ = new TH2D("migrMatrix","Migration Matrix: Counts (no weights)",nBinsRec_,binLimsRec,nBinsGen_,binLimsGen);
 
-  histYieldsRec_ = new TH1D("yieldsRec","yields rec",nBinsRec_,binLimsRec);
-  histYieldsRec_->Sumw2();
-  histYieldsRecSmeared_ = new TH1D("yieldsRecSmeared","yields rec smeared",nBinsRec_,binLimsRec);
+  _fOut->cd();
+
+  _histMigrMatrixNotNormalized = new TH2D("migrNotNorm","_histMigrMatrixNotNormalized",_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
+  _histMigrMatrixNotNormalized->Sumw2();
+  _histEventCountMigrMatrix = new TH2D("migrMatrix","Migration Matrix: Counts (no weights)",_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
+
+  _histYieldsRec = new TH1D("yieldsRec","yields rec",_nBinsRec,_phoPtLimitsRec);
+  _histYieldsRec->Sumw2();
+  _histYieldsRecSmeared = new TH1D("yieldsRecSmeared","yields rec smeared",_nBinsRec,_phoPtLimitsRec);
     //the smeared histogram is prepared in order to test the procedure on the 
     //signal MC like if it were data;
     //that is why the errors on rec smeared are sqrt(N)
-  histYieldsGen_ = new TH1D("yieldsGen","yields gen",nBinsGen_,binLimsGen);
-  histYieldsGen_->Sumw2();
+  _histYieldsGen = new TH1D("yieldsGen","yields gen",_nBinsGen,_phoPtLimitsGen);
+  _histYieldsGen->Sumw2();
 
   
  
-  int nEntries = tr_->GetEntries();
+  int nEntries = _tr->GetEntries();
   
   //filling out 
-  // - generated yields vector (histYieldsGen_)
-  // - reconstructed yields vector (histYieldsRec_)
-  // - migration matrix (histMigrMatrixNotNormalized_)
-  // - migration counts matrix (histEventCountMigrMatrix_)
+  // - generated yields vector (_histYieldsGen)
+  // - reconstructed yields vector (_histYieldsRec)
+  // - migration matrix (_histMigrMatrixNotNormalized)
+  // - migration counts matrix (_histEventCountMigrMatrix)
   for (int entry=0; entry<nEntries; entry++){
     b_phoEtRec->GetEntry(entry);
     b_phoEtGen->GetEntry(entry);
     b_weight->GetEntry(entry);
+    b_event->GetEntry(entry);
     if (phoEtGen<0 || phoEtRec<0) continue;
-
-    histEventCountMigrMatrix_->Fill(phoEtRec,phoEtGen,1);
-    histMigrMatrixNotNormalized_->Fill(phoEtRec,phoEtGen,weight);
-    histYieldsGen_->Fill(phoEtGen,weight);
-    histYieldsRec_->Fill(phoEtRec,weight);
+//    std::cout<<"phoEtGen="<<phoEtGen<<", phoEtRec="<<phoEtRec<<", weight="<<weight<<std::endl;
+    _histEventCountMigrMatrix->Fill(phoEtRec,phoEtGen,1);
+    _histMigrMatrixNotNormalized->Fill(phoEtRec,phoEtGen,weight);
+    _histYieldsGen->Fill(phoEtGen,weight);
+    _histYieldsRec->Fill(phoEtRec,weight);
   } // loop over entries
 
+  _histEventCountMigrMatrix->Print();
+  _histMigrMatrixNotNormalized->Print();
   std::cout<<std::endl;
   std::cout<<"contents and errors before normalization"<<std::endl;
-  for (int i=0; i<nBinsRec_; i++){
+  for (int i=0; i<_nBinsRec; i++){
     TRandom rnd;
-    double cont = rnd.Gaus(histYieldsRec_->GetBinContent(i+1),histYieldsRec_->GetBinError(i+1));
-    histYieldsRecSmeared_->SetBinContent(i+1,cont);
-    histYieldsRecSmeared_->SetBinError(i+1,sqrt(cont));
+    double cont = rnd.Gaus(_histYieldsRec->GetBinContent(i+1),_histYieldsRec->GetBinError(i+1));
+    _histYieldsRecSmeared->SetBinContent(i+1,cont);
+    _histYieldsRecSmeared->SetBinError(i+1,sqrt(cont));
       //the smeared histogram is prepared in order to test the procedure on the 
       //signal MC like if it were data;
       //that is why the errors on rec smeared are sqrt(N)
-    for (int j=0; j<nBinsGen_; j++){
-      std::cout<<std::fixed << std::setw(4) << std::setprecision(2)<<histMigrMatrixNotNormalized_->GetBinContent(i+1,j+1)<<"+-"<<std::fixed << std::setw(4)<< std::setprecision(2)<<histMigrMatrixNotNormalized_->GetBinError(i+1,j+1)<<" ";
+    for (int j=0; j<_nBinsGen; j++){
+      std::cout<<std::fixed << std::setw(5) << std::setprecision(0)<<_histMigrMatrixNotNormalized->GetBinContent(i+1,j+1)<<"+-"<<std::fixed << std::setw(5)<< std::setprecision(0)<<_histMigrMatrixNotNormalized->GetBinError(i+1,j+1)<<" ";
     }
     std::cout<<std::endl;
   }
   std::cout<<std::endl;
-
+  std::cout<<"unweighted counts:"<<std::endl;
+  for (int i=0; i<_nBinsRec; i++){
+    for (int j=0; j<_nBinsGen; j++){
+      std::cout<<std::fixed << std::setw(5) << std::setprecision(0)<<_histEventCountMigrMatrix->GetBinContent(i+1,j+1)<<"+-"<<std::fixed << std::setw(5)<< std::setprecision(0)<<_histEventCountMigrMatrix->GetBinError(i+1,j+1)<<" ";
+    }
+    std::cout<<std::endl;
+  }
+  std::cout<<std::endl;
+  std::cout<<"gen yields:"<<std::endl;
+  for (int j=0; j<_nBinsGen; j++){
+      std::cout<<std::fixed << std::setw(5) << std::setprecision(0)<<_histYieldsGen->GetBinLowEdge(j+1)<<"- "<<std::fixed << std::setw(5)<< std::setprecision(0)<<_histYieldsGen->GetBinLowEdge(j+1)+_histYieldsGen->GetBinWidth(j+1)<<" ";
+  }
+  std::cout<<std::endl;
+  for (int j=0; j<_nBinsGen; j++){
+      std::cout<<std::fixed << std::setw(5) << std::setprecision(0)<<_histYieldsGen->GetBinContent(j+1)<<"+-"<<std::fixed << std::setw(5)<< std::setprecision(0)<<_histYieldsGen->GetBinError(j+1)<<" ";
+  }
+  std::cout<<std::endl;
+  std::cout<<std::endl;
+  std::cout<<"rec yields:"<<std::endl;
+  for (int j=0; j<_nBinsRec; j++){
+      std::cout<<std::fixed << std::setw(5) << std::setprecision(0)<<_histYieldsRec->GetBinContent(j+1)<<"+-"<<std::fixed << std::setw(5)<< std::setprecision(0)<<_histYieldsRec->GetBinError(j+1)<<" ";
+  }
+  std::cout<<std::endl;
+  std::cout<<std::endl;
   return 1;
 }
-
-
-
-
 
 bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg,TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV)
 {  
   std::cout<<"#######################"<<std::endl;
   std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
 
-  float binLimsRec[nBinsRec_+1]; 
-  float binLimsGen[nBinsGen_+1]; 
-  FillBinLimits(nBinsRec_, vecPhoPtLimitsRec_, binLimsRec);
-  FillBinLimits(nBinsGen_, vecPhoPtLimitsGen_, binLimsGen);
-
-  RooUnfoldResponse response(histYieldsRec_,histYieldsGen_,histMigrMatrixNotNormalized_,"response","RooUnfoldResponse matrix");
+  RooUnfoldResponse response(_histYieldsRec,_histYieldsGen,_histMigrMatrixNotNormalized,"response","RooUnfoldResponse matrix");
   std::cout<<"RooUnfold";
   if (alg==RooUnfold::kInvert) std::cout<<" Invert"<<std::endl;
   else if (alg==RooUnfold::kBayes) std::cout<<" D'Agostini"<<std::endl;
@@ -299,8 +287,8 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
 
   //Compute errors due to finite MC statistics
 
-  float errSyst[nBinsGen_+1];
-  for (int i=1; i<nBinsGen_+1; i++)
+  float errSyst[_nBinsGen+1];
+  for (int i=1; i<_nBinsGen+1; i++)
     errSyst[i]=0;
 
   int NSmears=1000;
@@ -308,13 +296,20 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
 //  ComputeStatErrors(histInputYields, errStat, alg, NSmears);
 //  ComputeStatErrors(histInputYields, errSyst, alg, NSmears);
 
-  std::cout<<"Unfolded yiedls:"<<std::endl;
-  for (int i=1; i<=nBinsGen_; i++){
-    std::cout<<std::setprecision(0)<<histUnfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histUnfoldedYields->GetBinError(i)<<"+-"<<std::setprecision(0)<<errSyst[i];
+  for (int i=1; i<=_nBinsGen; i++){
     unfoldedYields->SetBinContent(i,histUnfoldedYields->GetBinContent(i));
     unfoldedYields->SetBinError(i,sqrt(histUnfoldedYields->GetBinError(i)*histUnfoldedYields->GetBinError(i)+errSyst[i]*errSyst[i]));
     errStatV[i-1]=histUnfoldedYields->GetBinError(i);
     errSystV[i-1]=errSyst[i];
+  }
+
+  std::cout<<"Input yields:"<<std::endl;
+  for (int i=1; i<=_nBinsGen; i++){
+    std::cout<<std::setprecision(0)<<histInputYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histInputYields->GetBinError(i)<<std::endl;
+  }
+  std::cout<<"Unfolded yields:"<<std::endl;
+  for (int i=1; i<=_nBinsGen; i++){
+    std::cout<<std::setprecision(0)<<histUnfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histUnfoldedYields->GetBinError(i)<<"+-"<<std::setprecision(0)<<errSyst[i];
     std::cout<<" = "<<std::setprecision(0)<<unfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<unfoldedYields->GetBinError(i)<<std::endl;
   }
 
@@ -327,34 +322,30 @@ bool Unfolding::ComputeSystErrors(TH1D* histInputYields, float* errSyst, RooUnfo
 {
 
   //Compute errors due to finite MC statistics
-  float binLimsRec[nBinsRec_+1]; 
-  float binLimsGen[nBinsGen_+1]; 
-  FillBinLimits(nBinsRec_, vecPhoPtLimitsRec_, binLimsRec);
-  FillBinLimits(nBinsGen_, vecPhoPtLimitsGen_, binLimsGen);
 
   TString name="n";
   name+=alg;
   name+=NSmears;
   name+="migr";
 
-  TH2D* histMigrMatrixSmeared = new TH2D(name,name,nBinsRec_,binLimsRec,nBinsGen_,binLimsGen);
+  TH2D* histMigrMatrixSmeared = new TH2D(name,name,_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
   name.ReplaceAll("migr","rec");
-  TH1D* histYieldsRecSmeared = new TH1D(name,name,nBinsRec_,binLimsRec);
+  TH1D* histYieldsRecSmeared = new TH1D(name,name,_nBinsRec,_phoPtLimitsRec);
   name.ReplaceAll("rec","gen");
-  TH1D* histYieldsGenSmeared = new TH1D(name,name,nBinsGen_,binLimsGen);
+  TH1D* histYieldsGenSmeared = new TH1D(name,name,_nBinsGen,_phoPtLimitsGen);
 
-//  TH2D* histMigrMatrixSmeared = (TH2D*)histMigrMatrixNotNormalized_->Clone();
-// TH1D* histYieldsRecSmeared = (TH1D*)histYieldsRec_->Clone();
-//  TH1D* histYieldsGenSmeared = (TH1D*)histYieldsGen_->Clone();
+//  TH2D* histMigrMatrixSmeared = (TH2D*)_histMigrMatrixNotNormalized->Clone();
+// TH1D* histYieldsRecSmeared = (TH1D*)_histYieldsRec->Clone();
+//  TH1D* histYieldsGenSmeared = (TH1D*)_histYieldsGen->Clone();
 
 
   TRandom rnd;
 
-  double SumValsSqr[nBinsGen_+1];
-  double SumVals[nBinsGen_+1];
-  double ExSqr[nBinsGen_+1];
-  double Ex[nBinsGen_+1];
-  for (int i=1; i<=nBinsGen_; i++){
+  double SumValsSqr[_nBinsGen+1];
+  double SumVals[_nBinsGen+1];
+  double ExSqr[_nBinsGen+1];
+  double Ex[_nBinsGen+1];
+  for (int i=1; i<=_nBinsGen; i++){
     SumValsSqr[i]=0;
     SumVals[i]=0;
     ExSqr[i]=0;
@@ -363,21 +354,21 @@ bool Unfolding::ComputeSystErrors(TH1D* histInputYields, float* errSyst, RooUnfo
 
   for (int iSm=0; iSm<NSmears; iSm++){
 
-    for (int irec=1; irec<=nBinsRec_; irec++)
-      for (int igen=1; igen<=nBinsGen_; igen++){
-        double cont = rnd.Gaus(histMigrMatrixNotNormalized_->GetBinContent(irec,igen),histMigrMatrixNotNormalized_->GetBinError(irec,igen));
+    for (int irec=1; irec<=_nBinsRec; irec++)
+      for (int igen=1; igen<=_nBinsGen; igen++){
+        double cont = rnd.Gaus(_histMigrMatrixNotNormalized->GetBinContent(irec,igen),_histMigrMatrixNotNormalized->GetBinError(irec,igen));
         histMigrMatrixSmeared->SetBinContent(irec,igen,cont);
       }
-    for (int irec=1; irec<=nBinsRec_; irec++){
+    for (int irec=1; irec<=_nBinsRec; irec++){
       double recYield=0;
-      for (int igen=1; igen<=nBinsGen_; igen++){
+      for (int igen=1; igen<=_nBinsGen; igen++){
         recYield+=histMigrMatrixSmeared->GetBinContent(irec,igen);
       }   
       histYieldsRecSmeared->SetBinContent(irec,recYield);
     }     
-    for (int igen=1; igen<=nBinsGen_; igen++){
+    for (int igen=1; igen<=_nBinsGen; igen++){
       double genYield=0;
-      for (int irec=1; irec<=nBinsRec_; irec++){
+      for (int irec=1; irec<=_nBinsRec; irec++){
         genYield+=histMigrMatrixSmeared->GetBinContent(irec,igen);
       }   
       histYieldsGenSmeared->SetBinContent(igen,genYield);
@@ -386,7 +377,7 @@ bool Unfolding::ComputeSystErrors(TH1D* histInputYields, float* errSyst, RooUnfo
     RooUnfold* unfoldSmeared = RooUnfold::New(alg,&responseSmeared,histInputYields);
 
     TH1D* histUnfSmeared = (TH1D*) unfoldSmeared->Hreco(RooUnfold::kNoError);
-    for (int igen=1; igen<=nBinsGen_; igen++){
+    for (int igen=1; igen<=_nBinsGen; igen++){
       double val = histUnfSmeared->GetBinContent(igen);
       SumVals[igen]+=val;
       SumValsSqr[igen]+=val*val;
@@ -394,7 +385,7 @@ bool Unfolding::ComputeSystErrors(TH1D* histInputYields, float* errSyst, RooUnfo
 
   } //end of loop over smears
 
-  for (int i=1; i<=nBinsGen_; i++){
+  for (int i=1; i<=_nBinsGen; i++){
     Ex[i]=SumVals[i]/NSmears;
     ExSqr[i]=SumValsSqr[i]/NSmears;
     errSyst[i] =  sqrt(ExSqr[i]-Ex[i]*Ex[i]);
@@ -407,26 +398,22 @@ bool Unfolding::ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfo
 {
 
   //Compute errors due to finite MC statistics
-  float binLimsRec[nBinsRec_+1]; 
-  float binLimsGen[nBinsGen_+1]; 
-  FillBinLimits(nBinsRec_, vecPhoPtLimitsRec_, binLimsRec);
-  FillBinLimits(nBinsGen_, vecPhoPtLimitsGen_, binLimsGen);
 
   TString name="n";
   name+=alg;
   name+=NSmears;
   name+="input";
 
-  TH1D* histInputYieldsSmeared = new TH1D(name,name,nBinsGen_,binLimsGen);
+  TH1D* histInputYieldsSmeared = new TH1D(name,name,_nBinsGen,_phoPtLimitsGen);
 
 
   TRandom rnd;
 
-  double SumValsSqr[nBinsGen_+1];
-  double SumVals[nBinsGen_+1];
-  double ExSqr[nBinsGen_+1];
-  double Ex[nBinsGen_+1];
-  for (int i=1; i<=nBinsGen_; i++){
+  double SumValsSqr[_nBinsGen+1];
+  double SumVals[_nBinsGen+1];
+  double ExSqr[_nBinsGen+1];
+  double Ex[_nBinsGen+1];
+  for (int i=1; i<=_nBinsGen; i++){
     SumValsSqr[i]=0;
     SumVals[i]=0;
     ExSqr[i]=0;
@@ -434,15 +421,15 @@ bool Unfolding::ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfo
   }
 
   for (int iSm=0; iSm<NSmears; iSm++){
-      for (int igen=1; igen<=nBinsGen_; igen++){
+      for (int igen=1; igen<=_nBinsGen; igen++){
         double cont = rnd.Gaus(histInputYields->GetBinContent(igen),histInputYields->GetBinError(igen));
         histInputYieldsSmeared->SetBinContent(igen,cont);
       }
-      RooUnfoldResponse response(histYieldsRec_,histYieldsGen_,histMigrMatrixNotNormalized_,"response","RooUnfoldResponse matrix");
+      RooUnfoldResponse response(_histYieldsRec,_histYieldsGen,_histMigrMatrixNotNormalized,"response","RooUnfoldResponse matrix");
     RooUnfold* unfoldSmeared = RooUnfold::New(alg,&response,histInputYieldsSmeared);
 
     TH1D* histUnfSmeared = (TH1D*) unfoldSmeared->Hreco(RooUnfold::kNoError);
-    for (int igen=1; igen<=nBinsGen_; igen++){
+    for (int igen=1; igen<=_nBinsGen; igen++){
       double val = histUnfSmeared->GetBinContent(igen);
       SumVals[igen]+=val;
       SumValsSqr[igen]+=val*val;
@@ -450,7 +437,7 @@ bool Unfolding::ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfo
 
   } //end of loop over smears
 
-  for (int i=1; i<=nBinsGen_; i++){
+  for (int i=1; i<=_nBinsGen; i++){
     Ex[i]=SumVals[i]/NSmears;
     ExSqr[i]=SumValsSqr[i]/NSmears;
     errStat[i] =  sqrt(ExSqr[i]-Ex[i]*Ex[i]);
@@ -462,29 +449,29 @@ bool Unfolding::ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfo
 bool Unfolding::PlotAndStore()
 {
 
-  fOut_->cd();
+  _fOut->cd();
 
-  float limsRecDraw[nBinsRec_+1];
-  float limsGenDraw[nBinsGen_+1];
+  float limsRecDraw[_nBinsRec+1];
+  float limsGenDraw[_nBinsGen+1];
  
 
-   if (vecPhoPtLimitsRec_[0]==0) limsRecDraw[0]= vecPhoPtLimitsRec_[1]/2;
-  else limsRecDraw[0]= vecPhoPtLimitsRec_[0];
-  if (vecPhoPtLimitsGen_[0]==0) limsGenDraw[0]= vecPhoPtLimitsGen_[1]/2;
-  else limsGenDraw[0]= vecPhoPtLimitsGen_[0];
-  for (int ir=1; ir<=nBinsRec_; ir++)
-    limsRecDraw[ir]= vecPhoPtLimitsRec_[ir];
-  for (int ig=1; ig<=nBinsRec_; ig++)
-    limsGenDraw[ig]= vecPhoPtLimitsGen_[ig];
+   if (_phoPtLimitsRec[0]==0) limsRecDraw[0]= _phoPtLimitsRec[1]/2;
+  else limsRecDraw[0]= _phoPtLimitsRec[0];
+  if (_phoPtLimitsGen[0]==0) limsGenDraw[0]= _phoPtLimitsGen[1]/2;
+  else limsGenDraw[0]= _phoPtLimitsGen[0];
+  for (int ir=1; ir<=_nBinsRec; ir++)
+    limsRecDraw[ir]= _phoPtLimitsRec[ir];
+  for (int ig=1; ig<=_nBinsRec; ig++)
+    limsGenDraw[ig]= _phoPtLimitsGen[ig];
 
-  TH2D* histEventCountDraw = new TH2D("histEventCount","Migration Matrix: Counts (no weights)",nBinsRec_,limsRecDraw,nBinsGen_,limsGenDraw);
-  TH2D* histMigrMatrixDraw = new TH2D("histMigrMatrix","Migration Matrix: no normalization",nBinsRec_,limsRecDraw,nBinsGen_,limsGenDraw);
+  TH2D* histEventCountDraw = new TH2D("histEventCount","Migration Matrix: Counts (no weights)",_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
+  TH2D* histMigrMatrixDraw = new TH2D("histMigrMatrix","Migration Matrix: no normalization",_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
 
 
-  for (int ir=1; ir<nBinsRec_+1; ir++)
-    for (int ig=1; ig<nBinsGen_+1; ig++){
-      histEventCountDraw->SetBinContent(ir,ig,histEventCountMigrMatrix_->GetBinContent(ir,ig));
-      histMigrMatrixDraw->SetBinContent(ir,ig,histMigrMatrixNotNormalized_->GetBinContent(ir,ig));
+  for (int ir=1; ir<_nBinsRec+1; ir++)
+    for (int ig=1; ig<_nBinsGen+1; ig++){
+      histEventCountDraw->SetBinContent(ir,ig,_histEventCountMigrMatrix->GetBinContent(ir,ig));
+      histMigrMatrixDraw->SetBinContent(ir,ig,_histMigrMatrixNotNormalized->GetBinContent(ir,ig));
 
     }
     
@@ -521,15 +508,16 @@ bool Unfolding::PlotAndStore()
   TCanvas* cPtSpectra = new TCanvas("cPtSpectra","cPtSpectra");
   cPtSpectra->SetLogx();
   cPtSpectra->SetLogy();
-  histYieldsRec_->SetLineColor(1);
-  histYieldsRec_->SetLineWidth(2);
-  histYieldsRec_->Draw();
-  histYieldsGen_->SetLineColor(4);
-  histYieldsGen_->SetLineWidth(2);
-  histYieldsGen_->Draw("same");
+  _histYieldsRec->SetLineColor(1);
+  _histYieldsRec->SetLineWidth(2);
+  _histYieldsRec->Draw();
+  _histYieldsGen->SetLineColor(4);
+  _histYieldsGen->SetLineWidth(2);
+  _histYieldsGen->Draw("same");
 
-  int nBinsAnalysis = config_.GetNPhoPtBins(); 
-  vector <float> limsAnalysis = config_.GetPhoPtBinsLimits();
+  int nBinsAnalysis = _config.GetNPhoPtBins(); 
+  float* limsAnalysis = new float[nBinsAnalysis+1];
+  _config.GetPhoPtBinsLimits(limsAnalysis);
   TCanvas* cResolution[nBinsAnalysis];
   for (int ib=0; ib<nBinsAnalysis; ib++){
 
@@ -546,16 +534,16 @@ bool Unfolding::PlotAndStore()
     strCut+=" && phoGenEt>0 && (";
     strCut+=strDraw;
     strCut+=">10)";
-    std::cout<<"tr_->Draw(\""<<strDraw<<"\",\""<<strCut<<"\");"<<std::endl;
+    std::cout<<"_tr->Draw(\""<<strDraw<<"\",\""<<strCut<<"\");"<<std::endl;
  
-    tr_->SetLineWidth(2);
-    tr_->SetLineColor(ib+1);
+    _tr->SetLineWidth(2);
+    _tr->SetLineColor(ib+1);
 
     TString canvName="cResolution";
     canvName+=ib;
     cResolution[ib] = new TCanvas(canvName,"pho Pt resolution in different bins");
     cResolution[ib]->SetLogy();
-    tr_->Draw(strDraw,strCut);
+    _tr->Draw(strDraw,strCut);
     for (int ib2=0; ib2<nBinsAnalysis; ib2++){
       float low2 = limsAnalysis[ib2];
       float up2 = limsAnalysis[ib2+1];
@@ -570,31 +558,20 @@ bool Unfolding::PlotAndStore()
       strCut2+=" && phoGenEt>0 && (";
       strCut2+=strDraw2;
       strCut2+=">10)";
-//      std::cout<<"tr_->Draw(\""<<strDraw<<"\",\""<<strCut<<"\");"<<std::endl;
+//      std::cout<<"_tr->Draw(\""<<strDraw<<"\",\""<<strCut<<"\");"<<std::endl;
  
-      tr_->SetLineWidth(2);
-      tr_->SetLineColor(ib2+1);
+      _tr->SetLineWidth(2);
+      _tr->SetLineColor(ib2+1);
 
-      tr_->Draw(strDraw2,strCut2,"same");
+      _tr->Draw(strDraw2,strCut2,"same");
     }
   }
 
 
-//  histYieldsRec_->Write(config_.GetYieldsRec1DName());
-//  histYieldsGen_->Write(config_.GetYieldsGen1DName());
+//  _histYieldsRec->Write(_config.GetYieldsRec1DName());
+//  _histYieldsGen->Write(_config.GetYieldsGen1DName());
   cEventCount->Write("cEventCount");
   cMigrMatrix->Write("cMigrMatrix");
 
-  return 1;
-}
-
-bool Unfolding::FillBinLimits(int nBins, vector<float> vecLims, float* lims){
-  if (vecLims.size()!=(unsigned int)nBins+1){
-    std::cout<<"ERROR in Unfolding::FillBinLimits: (vecLims.size()="<<vecLims.size()<<") != (nBins+1 = "<<nBins+1<<" ) "<<std::endl;
-    return 0;
-  }
-  for (int i=0; i<nBins+1; i++){
-    lims[i]=vecLims[i];
-  }
   return 1;
 }

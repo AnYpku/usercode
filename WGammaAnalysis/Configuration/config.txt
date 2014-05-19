@@ -44,7 +44,8 @@ $   DATA     ELECTRON    1
 $   SIGMC    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634     
 #634=kRed+2
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_munu.root   553.92  0.3262
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_munu.root   553.92  
+#0.3262
 #unskimmed
 
 # cross section and branching 
@@ -53,7 +54,8 @@ $   SIGMC    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634
 $   SIGMC    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    921     
 #921=kGray+1
 
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_enu.root   553.92  0.3320  
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_enu.root   553.92  
+#0.3320  
 # cross section and branching 
 
 ###################################################################
@@ -72,7 +74,7 @@ $ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_DYToLL_MuPhoSkim.root   3503.7
 
 ###################################################################
-$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      418    
+$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      440    
 #418=kGreen+2, same as DY
 #401=kYellow+1
 
@@ -83,7 +85,8 @@ $ BKGMC   MUON   Wg_to_taunu     W#gamma#rightarrow#tau#nu#gamma      401
 #418=kGreen+2, same as DY
 #401=kYellow+1
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Wg_taunu_MuPhoSkim.root    553.92    0.3472
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_Wg_taunu_MuPhoSkim.root    553.92    
+#0.3472
 
 ###################################################################
 $ BKGMC  MUON    multibosons      multibosons       9    

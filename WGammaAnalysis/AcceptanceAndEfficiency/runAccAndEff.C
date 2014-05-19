@@ -9,7 +9,7 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  CalcAccAndEff accAndEff( TConfiguration::MUON, "../Configuration/config.txt", 0, 1);
+  CalcAccAndEff accAndEff( TConfiguration::MUON, TPhotonCuts::WP_MEDIUM, "SCR", "../Configuration/config.txt");
   //CalcAccAndEff accAndEff( TInputSample::MUON);
   accAndEff.LoopOverInputFiles();
 

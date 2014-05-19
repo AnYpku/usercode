@@ -23,42 +23,41 @@
 WGammaSelection::WGammaSelection(int channel, int sampleMode, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
 
-  INPUT_ = new TAllInputSamples(channel, configFile);
+  _INPUT = new TAllInputSamples(channel, configFile);
 
-  channel_=channel;
-  isNoPuReweight_=isNoPuReweight;
-  isDebugMode_=isDebugMode;
-  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor(config.GetPhosphorConstantFileName());
+  _channel=channel;
+  _isNoPuReweight=isNoPuReweight;
+  _isDebugMode=isDebugMode;
+  _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
     //field of this class, WGammaSelection
 
-  sampleMode_=sampleMode;
-  if (sampleMode_==NOTSPECIFIED){
-    std::cout<<"ERROR in WGammaSelection::WGammaSelection: sampleMode_ is NONSPECIFIED"<<std::endl;
+  _sampleMode=sampleMode;
+  if (_sampleMode==NOTSPECIFIED){
+    std::cout<<"ERROR in WGammaSelection::WGammaSelection: _sampleMode is NONSPECIFIED"<<std::endl;
     return;
   }
-  else if (sampleMode_>NOTSPECIFIED){
-    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong sampleMode_ "<<std::endl;
+  else if (_sampleMode>NOTSPECIFIED){
+    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong _sampleMode "<<std::endl;
     return;    
   }
-  for (int i=0; i<INPUT_->nSources_; i++)
+  for (int i=0; i<_INPUT->nSources_; i++)
     {
-      doAnalizeSample_.push_back(1);      
+      _doAnalizeSample.push_back(1);      
     } 
 }
 
-WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isNoPuReweight, bool isDebugMode, bool isVeryLooseSelectionMode)
+WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
 
-  INPUT_ = new TAllInputSamples(channel, configFile);
+  _INPUT = new TAllInputSamples(channel, configFile);
 
-  channel_=channel;
-  isNoPuReweight_=isNoPuReweight;
-  isDebugMode_=isDebugMode;
-  isVeryLooseSelectionMode_=isVeryLooseSelectionMode;
-  photonCorrector_ = new zgamma::PhosphorCorrectionFunctor(config.GetPhosphorConstantFileName());
+  _channel=channel;
+  _isNoPuReweight=isNoPuReweight;
+  _isDebugMode=isDebugMode;
+  _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
     //field of this class, WGammaSelection
 
-  sampleMode_=NOTSPECIFIED;
+  _sampleMode=NOTSPECIFIED;
   stringstream ss(analyzedSampleNames);
   vector <string> names;
   string name;
@@ -67,139 +66,149 @@ WGammaSelection::WGammaSelection(int channel, string analyzedSampleNames, string
   int nNames = names.size();
 
   std::cout<<"1 - will do, 0 - will not do"<<std::endl;
-  for (int i=0; i<INPUT_->nSources_; i++)
+  for (int i=0; i<_INPUT->nSources_; i++)
     {
-      doAnalizeSample_.push_back(0);  
+      _doAnalizeSample.push_back(0);  
       for (int j=0; j<nNames; j++)
         {
-          if (names[j]==INPUT_->allInputs_[i].sourceName_)
-            doAnalizeSample_.back()=1; 
+          if (names[j]==_INPUT->allInputs_[i].sourceName_)
+            _doAnalizeSample.back()=1; 
         }
-      std::cout<<INPUT_->allInputs_[i].sourceName_<<": "<<doAnalizeSample_[i]<<std::endl;
+      std::cout<<_INPUT->allInputs_[i].sourceName_<<": "<<_doAnalizeSample[i]<<std::endl;
     }  
-  if ((int)doAnalizeSample_.size()!=INPUT_->nSources_)
-    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong doAnalizeSample_.size()"<<std::endl;
+  if ((int)_doAnalizeSample.size()!=_INPUT->nSources_)
+    std::cout<<"ERROR in WGammaSelection::WGammaSelection: wrong _doAnalizeSample.size()"<<std::endl;
 
-  doSigmaIEtaIEtaCut_=1;
 }
 
 WGammaSelection::~WGammaSelection()
 {
-   fChain = 0;
+   _eventTree.fChain = 0;
      //field of TEventTree 
-   delete photonCorrector_;
+   delete _photonCorrector;
 }
 
 void WGammaSelection::LoopOverInputFiles()
 {
-  int nSources = INPUT_->nSources_; 
-  //if (isDebugMode_ && nSources>3)
+  int nSources = _INPUT->nSources_; 
+  //if (_isDebugMode && nSources>3)
   //  nSources = 3;
 
   for (int iSource=0; iSource<nSources; iSource++)
     {
-       if (!doAnalizeSample_[iSource])
+       if (!_doAnalizeSample[iSource])
          continue;
 
-       sample_ = INPUT_->allInputs_[iSource].sample_;
-       if (sample_==TConfiguration::DATA)
-           if (sampleMode_==SIGMC || sampleMode_==NOBKG || sampleMode_==MC)
+       _sample = _INPUT->allInputs_[iSource].sample_;
+       if (_sample==TConfiguration::DATA){
+           _lumiData=_INPUT->allInputs_[iSource].lumiTotal_;
+           if (_sampleMode==SIGMC || _sampleMode==NOBKG || _sampleMode==MC)
              continue;
-       if (sample_==TConfiguration::SIGMC)
-           if (sampleMode_==DATA || sampleMode_==BKGMC)
+       }
+       if (_sample==TConfiguration::SIGMC)
+           if (_sampleMode==DATA || _sampleMode==BKGMC)
              continue;
-       if (sample_==TConfiguration::BKGMC)
-           if (sampleMode_==DATA || sampleMode_==SIGMC || sampleMode_==NOBKG)
+       if (_sample==TConfiguration::BKGMC)
+           if (_sampleMode==DATA || _sampleMode==SIGMC || _sampleMode==NOBKG)
            continue;
-       selectedTreeFileName_=config.GetSelectedName(config.VERY_PRELIMINARY,channel_,INPUT_->allInputs_[iSource].sample_,INPUT_->allInputs_[iSource].sourceName_,isDebugMode_,isNoPuReweight_,isVeryLooseSelectionMode_);
+       _selectedTreeFileName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
        TTree* tree;
-       int inputFileNMax = INPUT_->allInputs_[iSource].nFiles_;
-       //if (isDebugMode_) 
+       int inputFileNMax = _INPUT->allInputs_[iSource].nFiles_;
+       //if (_isDebugMode) 
        //  {
-       //    if (INPUT_->allInputs_[iSource].nFiles_<1) inputFileNMax=INPUT_->allInputs_[iSource].nFiles_;
+       //    if (_INPUT->allInputs_[iSource].nFiles_<1) inputFileNMax=_INPUT->allInputs_[iSource].nFiles_;
        //    else inputFileNMax=1;
        //  }
 
        TString fileOutName;
-       fileOutName = selectedTreeFileName_;
+       fileOutName = _selectedTreeFileName;
        TFile fileOut(fileOutName,"recreate");
        TTree* outTree = new TTree("selectedEvents","selected Events");
-       SetOutputTree(outTree); 
+       _selEvTree.SetOutputTree(outTree); 
 
-       for (inputFileN_=0; inputFileN_< inputFileNMax; inputFileN_++)
-         {
+       for (_inputFileN=0; _inputFileN< inputFileNMax; _inputFileN++){
 
-           lumiWeight_=INPUT_->allInputs_[iSource].lumiWeights_[inputFileN_];
-           if (!treeLeaf.isData && isDebugMode_){
-             if (INPUT_->allInputs_[iSource].isSharedCS_)
-               debugModeWeight_=1.0/INPUT_->allInputs_[iSource].csTotal_;
-              else
-               debugModeWeight_=1.0/INPUT_->allInputs_[iSource].cs_[inputFileN_];
+         TFile f(_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);
+         if (f.IsOpen()) 
+           std::cout<<std::endl<<"processing file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<std::endl;
+         else{
+            std::cout<<"ERROR detected in WGammaSelection::LoopOverInputFiles: file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<" was not found"<<std::endl;
+            return;
+         } 
+         f.cd("ggNtuplizer");
+         tree = (TTree*)gDirectory->Get("EventTree");
+         if (tree){
+           _eventTree.Init(tree);
+           //if (_sample!=TConfiguration::DATA) SetMCSpecificAddresses();
+         }   
+         else{
+           std::cout<<"ERROR detected in WGammaSelection::LoopOverInputFiles: tree in the file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<" does not exist"<<std::endl;
+           return;
+         }  
+
+         //determine _lumiWeight
+         if (_eventTree.treeLeaf.isData)
+           _lumiWeight=1;
+         else{
+           _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[_inputFileN];
+           if (!_eventTree.treeLeaf.isData && _isDebugMode){
+             float cs;
+             if (_INPUT->allInputs_[iSource].isSharedCS_)
+               cs=_INPUT->allInputs_[iSource].csTotal_;
+             else cs=_INPUT->allInputs_[iSource].cs_[_inputFileN];
+             TH1F* hEvents = (TH1F*)gDirectory->Get("hEvents");
+             double nEvents = (double)hEvents->GetBinContent(1);
+             hEvents=0;
+             nEvents = nEvents/_INPUT->allInputs_[iSource].factor_[_inputFileN];
+             double nDebugEvents=nEvents*_debugModeNEntries/_eventTree.fChain->GetEntries();
+             _lumiWeight=cs*_lumiData/nDebugEvents;
            }
+         }
 
-           TFile f(INPUT_->allInputs_[iSource].fileNames_[inputFileN_]);
-           if (f.IsOpen()) 
-             std::cout<<std::endl<<"processing file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<std::endl;
-           else
-             {
-                std::cout<<"ERROR detected in WGammaSelection::LoopOverInputFiles: file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<" was not found"<<std::endl;
-                return;
-             } 
-           f.cd("ggNtuplizer");
-           tree = (TTree*)gDirectory->Get("EventTree");
-           if (tree) 
-             {
-                Init(tree);
-                //if (sample_!=TConfiguration::DATA) SetMCSpecificAddresses();
-             }   
-           else
-             {
-                std::cout<<"ERROR detected in WGammaSelection::LoopOverInputFiles: tree in the file "<<INPUT_->allInputs_[iSource].fileNames_[inputFileN_]<<" does not exist"<<std::endl;
-                return;
-             }  
- 
-           puWeight_=new TPuReweight(config.GetPileupDataFileName(),INPUT_->allInputs_[iSource].fileNames_[inputFileN_]);
 
-           
-          LoopOverTreeEvents();
+         _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);         
+         LoopOverTreeEvents();
              //method of this class (WGammaSelection)
-           fChain=0;
+         _eventTree.fChain=0;
              //field of TEventTree
-
-           delete puWeight_;
-
-         }//loop over inputFileN_ ends
-
+         delete _puWeight;
+       }//loop over _inputFileN ends
       std::cout<<"the output will be saved to "<<fileOut.GetName()<<std::endl<<std::endl;
       fileOut.cd();
       outTree->Write();
       fileOut.Close();
       //delete outTree;
       outTree = 0;
-
-
     } //loop over iSource ends
 }
 
 
 void WGammaSelection::LoopOverTreeEvents()
 {
-   if (fChain == 0) return;
-   Long64_t nentries = fChain->GetEntries();
-   if (isDebugMode_) 
+   if (_eventTree.fChain == 0) return;
+   Long64_t nentries = _eventTree.fChain->GetEntries();
+   if (_isDebugMode) 
      {
-       if (fChain->GetEntries()<debugModeNEntries_) nentries=fChain->GetEntries();
-       else nentries=debugModeNEntries_;
+       if (_eventTree.fChain->GetEntries()<_debugModeNEntries) nentries=_eventTree.fChain->GetEntries();
+       else nentries=_debugModeNEntries;
      }
 
    float nTotal=0;
    float nPassed=0;
 
+   _passed.leptonPtPassed=0;
+   _passed.leptonEtaPassed=0;
+   _passed.phoPtPassed=0;
+   _passed.phoBarrelPassed=0;
+   _passed.phoEndcapPassed=0;
+   _passed.leptonPtPassed=0;
+   _passed.dRPassed=0;
+
    //goodLeptonPhotonPairs(two-dimentional array of bool-s)
    //memory allocation for some variables: 
    int nLeptonMax;
-   if (channel_==TConfiguration::MUON) nLeptonMax=kMaxnMu;
-   else if (channel_==TConfiguration::ELECTRON) nLeptonMax=kMaxnEle;
+   if (_channel==TConfiguration::MUON) nLeptonMax=_eventTree.kMaxnMu;
+   else if (_channel==TConfiguration::ELECTRON) nLeptonMax=_eventTree.kMaxnEle;
      //kMaxnMu - field of TEventTree
    else
      {
@@ -207,131 +216,62 @@ void WGammaSelection::LoopOverTreeEvents()
        return;
      }
 
-   if (isVeryLooseSelectionMode_) nLeptonMax=1;
-
    float* WMt = new float[nLeptonMax];
 
    float** lePhoDeltaR = new float*[nLeptonMax];
    for (int ile=0; ile<nLeptonMax; ile++)
-     lePhoDeltaR[ile]=new float[kMaxnPho];
+     lePhoDeltaR[ile]=new float[_eventTree.kMaxnPho];
    
    bool** goodLeptonPhotonPairs = new bool*[nLeptonMax];
    for (int ile=0; ile<nLeptonMax; ile++)
-     goodLeptonPhotonPairs[ile]=new bool[kMaxnPho];
+     goodLeptonPhotonPairs[ile]=new bool[_eventTree.kMaxnPho];
 
    CheckMaxNumbersInTree();
-
-   nTotal_=0;
-   nBeforeLeptonLoop_=0;
-   nLeptons_=0;
-   nLeptonsPassed_=0; 
-   nMoreVetoPassed_=0;
-   nWMtPassed_=0;
-   nPhotons_=0;
-   nPhotonsPassed_=0;
-   nPhoLepPassed_=0;
 
 
    TPhotonCuts emptyPhoton;
    for (Long64_t entry=0; entry<nentries; entry++) 
    //loop over events in the tree
      {
-
-        GetEntryNeededBranchesOnly(channel_,sample_,entry);
-        if (!treeLeaf.isData) GetEntryMCSpecific(entry);
+        _eventTree.GetEntryNeededBranchesOnly(_channel,_sample,entry);
+        if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(entry);
           //method of TEventTree class
-        if (channel_==TConfiguration::MUON) nLe_=treeLeaf.nMu;
-        else if (channel_==TConfiguration::ELECTRON) nLe_=treeLeaf.nEle;
+        if (_channel==TConfiguration::MUON) _nLe=_eventTree.treeLeaf.nMu;
+        else if (_channel==TConfiguration::ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
         else
           {
              std::cout<<"Error detected in  WGammaSelection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
              return;
           }
-        totalWeight_ = lumiWeight_;
-        if (!treeLeaf.isData && !isNoPuReweight_)
-          totalWeight_*=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
-        nTotal+=totalWeight_;
+        _totalWeight = _lumiWeight;
+        if (!_eventTree.treeLeaf.isData && !_isNoPuReweight)
+          _totalWeight*=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+        nTotal+=_totalWeight;
 
         TFullCuts fullCuts;
-        bool selPassed = fullCuts.Cut(goodLeptonPhotonPairs, treeLeaf,   
-                channel_,
-                WMt, lePhoDeltaR, photonCorrector_, doSigmaIEtaIEtaCut_, doPhoChIsoCut_,isVeryLooseSelectionMode_);
+        bool selPassed = fullCuts.VeryPreliminaryCut(goodLeptonPhotonPairs,
+          _eventTree.treeLeaf,_channel,lePhoDeltaR,_passed);
+        
               //method of this class (WGammaSelection)
         if (!selPassed) continue;
-        for (int ile=0; ile<nLe_; ile++){
-          for (int ipho=0; ipho<treeLeaf.nPho; ipho++){
+        for (int ile=0; ile<_nLe; ile++){
+          for (int ipho=0; ipho<_eventTree.treeLeaf.nPho; ipho++){
             if (!goodLeptonPhotonPairs[ile][ipho]) continue;
-            nPassed+=totalWeight_;
-            _phoGenPID=-1000;
-            _leGenPID=-1000;
-            _phoGenEt=-1000;
-            //members of TSelectedEvents
-            if (sample_!=TConfiguration::DATA){
-              for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
-                if(treeLeaf.mcIndex->at(iMC)==treeLeaf.phoGenIndex->at(ipho)){
-                  _phoGenPID=treeLeaf.mcPID->at(iMC);
-                  _phoGenMomPID=treeLeaf.mcMomPID->at(iMC);
-                  _phoGenGMomPID=treeLeaf.mcGMomPID->at(iMC);
-                  _phoGenEt=treeLeaf.mcEt->at(iMC);
-                }
-
-//problem with muGenIndex
-//                if (channel_==TConfiguration::MUON) 
-//                  if(treeLeaf.mcIndex->at(iMC)==treeLeaf.muGenIndex->at(ile))
-//                    _leGenPID=treeLeaf.mcPID->at(iMC);
-//
-//                if (channel_==TConfiguration::ELECTRON && 
-//                      treeLeaf.mcIndex->at(iMC)==treeLeaf.eleGenIndex->at(ile))
-//                  leGenPID_=treeLeaf.mcPID->at(iMC);
-
-              }//end of loop over iMC
-
-            }//end of if (sample_!=TConfiguration::DATA)
+            nPassed+=_totalWeight;
             float puWeightVal=1;
             float puTrueVal=1;
-            if (sample_!=TConfiguration::DATA){
-              puWeightVal=puWeight_->GetPuWeightMc(treeLeaf.puTrue->at(1));
-              puTrueVal=treeLeaf.puTrue->at(1);
-            }//end of if (sample_!=TConfiguration::DATA)
-            float leEta=0;
-            float lePhi=0;
-            float lePt=0;
-            if (channel_==TConfiguration::MUON && !isVeryLooseSelectionMode_){
-              leEta=treeLeaf.muEta->at(ile);
-              lePhi=treeLeaf.muPhi->at(ile);
-              lePt=treeLeaf.muPt->at(ile);
-            }
-            else if (channel_==TConfiguration::ELECTRON && !isVeryLooseSelectionMode_){
-
-            }            
-
-            SetValues(leEta,lePhi,lePt,_leGenPID,_leGenMomPID,_leGenGMomPID,
-                treeLeaf.phoEta->at(ipho), 
-                treeLeaf.phoPhi->at(ipho), 
-                treeLeaf.phoEt->at(ipho),
-                _phoGenPID,_phoGenMomPID,_phoGenGMomPID,_phoGenEt,
-                treeLeaf.phoSigmaIEtaIEta->at(ipho),
-                emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoPFChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
-                emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoSCRChIso->at(ipho),treeLeaf.rho2012,treeLeaf.phoEta->at(ipho)),
-                lePhoDeltaR[ile][ipho],
-                WMt[ile],
-                treeLeaf.pfMET, 
-                treeLeaf.pfMETPhi,
-                treeLeaf.rho2012,
-                treeLeaf.run,
-                inputFileN_,
-                totalWeight_,puWeightVal,puTrueVal,
-                treeLeaf.nMC,
-                treeLeaf.mcPID,
-                treeLeaf.mcMomPID,
-                treeLeaf.mcGMomPID);
-//
-//                       //method of TSelectedEventsTree
-//                       //variables are fields of TEventTree
-            Fill();
-                       //method of TSelectedEventsTree
+            if (_sample!=TConfiguration::DATA){
+              puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+              puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
+            }//end of if (_sample!=TConfiguration::DATA)            
+            _selEvTree.SetValues(_channel, _sample, 
+               _eventTree.treeLeaf,  ipho, ile, 
+               lePhoDeltaR[ile][ipho], _inputFileN, 
+               _totalWeight, puWeightVal, puTrueVal,
+               _photonCorrector);
+            _selEvTree.Fill();
          }// "for (int ipho=0; ipho<treeLeaf.nPho; ipho++)"
-       }  // "for (int ile=0; ile<nLe_; ile++)"
+       }  // "for (int ile=0; ile<_nLe; ile++)"
      } //end of loop over events in the tree
 
   //memory release:
@@ -348,59 +288,48 @@ void WGammaSelection::LoopOverTreeEvents()
  
   std::cout<<"Summary:"<<std::endl;
   std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<std::endl;
-//  std::cout<<"nTotal_="<<nTotal_<<std::endl;
-//  std::cout<<"nBeforeLeptonLoop_="<<nBeforeLeptonLoop_<<" (IsVtxGood!=-1, nPho >= 0, nLe_ >=0, metFilters[6]==1)"<<std::endl;
-//  std::cout<<"nLeptons_="<<nLeptons_<<std::endl;
-//  if (nLeptons_!=0)       
-//    std::cout<<"nLeptonsPassed_="<<nLeptonsPassed_<<", eff="<<1.0*nLeptonsPassed_/nLeptons_<<std::endl; 
-//  std::cout<<"nMoreVetoPassed_="<<nMoreVetoPassed_<<std::endl;
-//  std::cout<<"nWMtPassed_="<<nWMtPassed_<<std::endl;
-//  std::cout<<"nPhotons_="<<nPhotons_<<std::endl;
-//  if (nPhotons_!=0) 
-//    std::cout<<"nPhotonsPassed_="<<nPhotonsPassed_<<", eff="<<1.0*nPhotonsPassed_/nPhotons_<<std::endl;
-//  std::cout<<"nPhoLepPassed_="<<nPhoLepPassed_<<std::endl; 
-//  std::cout<<std::endl;
+  std::cout<<"leptonPt="<<_passed.leptonPtPassed<<", leptonEta="<<_passed.leptonEtaPassed<<", ptoPt="<<_passed.phoPtPassed<<", phoBarrel="<<_passed.phoBarrelPassed<<", phoEndcap="<<_passed.phoEndcapPassed<<", dR="<<_passed.dRPassed<<std::endl;
 
 }
 
 bool WGammaSelection::CheckMaxNumbersInTree()
 {
-   if ((channel_=TConfiguration::MUON) 
-       && (fChain->GetMaximum("nMu")>kMaxnMu))
+   if ((_channel=TConfiguration::MUON) 
+       && (_eventTree.fChain->GetMaximum("nMu")>_eventTree.kMaxnMu))
      //kMaxnMu - field of TEventTree
      {
-       PrintErrorMessageMaxNumberOf(MUON_);
+       PrintErrorMessageMaxNumberOf(_MUON);
           //methof of this class (WGammaSelection)
        return 0;
      }
-   if (channel_==TConfiguration::ELECTRON 
-       && fChain->GetMaximum("nEle")>kMaxnEle)
+   if (_channel==TConfiguration::ELECTRON 
+       && _eventTree.fChain->GetMaximum("nEle")>_eventTree.kMaxnEle)
      {
-       PrintErrorMessageMaxNumberOf(ELECTRON_);
+       PrintErrorMessageMaxNumberOf(_ELECTRON);
           //methof of this class (WGammaSelection)
        return 0;
      }
-   if (fChain->GetMaximum("nPho")>kMaxnPho)
+   if (_eventTree.fChain->GetMaximum("nPho")>_eventTree.kMaxnPho)
      {
-       PrintErrorMessageMaxNumberOf(PHOTON_);
+       PrintErrorMessageMaxNumberOf(_PHOTON);
           //methof of this class (WGammaSelection)
        return 0;
      }
 //   if (fChain->GetMaximum("nJet")>kMaxnJet)
 //     {
-//       PrintErrorMessageMaxNumberOf(JET_);
+//       PrintErrorMessageMaxNumberOf(_JET);
 //          //methof of this class (WGammaSelection)
 //       return 0;
 //     }
 //   if (fChain->GetMaximum("nLowPtJet")>kMaxnLowPtJet)
 //     {
-//       PrintErrorMessageMaxNumberOf(LOWPTJET_);
+//       PrintErrorMessageMaxNumberOf(LOWPT_JET);
 //          //methof of this class (WGammaSelection)
 //       return 0;
 //     }
 //   if (!treeLeaf.isData && fChain->GetMaximum("nMC")>kMaxnMC)
 //     {
-//       PrintErrorMessageMaxNumberOf(MC_);
+//       PrintErrorMessageMaxNumberOf(_MC);
 //          //methof of this class (WGammaSelection)
 //       return 0;
 //     }
@@ -411,17 +340,17 @@ void WGammaSelection::PrintErrorMessageMaxNumberOf(int particle)
 {
        std::cout<<std::endl;
        std::cout<<"Error detected in WGammaSelection::PrintErrorMessageMaxNumberOf:"<<std::endl;
-       if (particle==MUON_)
-         std::cout<<"maximum number of muons in the file nMu="<<fChain->GetMaximum("nMu")<<", when kMaxnMu="<<kMaxnMu<<" only"<<std::endl;
-       else if (particle==ELECTRON_)
-         std::cout<<"maximum number of electrons in the file nEle="<<fChain->GetMaximum("nEle")<<", when kMaxnEle="<<kMaxnEle<<" only"<<std::endl;
-       else if (particle==PHOTON_)
-         std::cout<<"maximum number of photons in the file nPho="<<fChain->GetMaximum("nPho")<<", when kMaxnPho="<<kMaxnPho<<" only"<<std::endl;
-//       else if (particle==JET_)
+       if (particle==_MUON)
+         std::cout<<"maximum number of muons in the file nMu="<<_eventTree.fChain->GetMaximum("nMu")<<", when kMaxnMu="<<_eventTree.kMaxnMu<<" only"<<std::endl;
+       else if (particle==_ELECTRON)
+         std::cout<<"maximum number of electrons in the file nEle="<<_eventTree.fChain->GetMaximum("nEle")<<", when kMaxnEle="<<_eventTree.kMaxnEle<<" only"<<std::endl;
+       else if (particle==_PHOTON)
+         std::cout<<"maximum number of photons in the file nPho="<<_eventTree.fChain->GetMaximum("nPho")<<", when kMaxnPho="<<_eventTree.kMaxnPho<<" only"<<std::endl;
+//       else if (particle==_JET)
 //         std::cout<<"maximum number of jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnJet="<<kMaxnJet<<" only"<<std::endl;
-//      else if (particle==LOWPTJET_)
+//      else if (particle==LOWPT_JET)
 //         std::cout<<"maximum number of low Pt jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnLowPtJet="<<kMaxnLowPtJet<<" only"<<std::endl;
-//      else if (particle==MC_)
+//      else if (particle==_MC)
 //         std::cout<<"maximum number of mc particles in the file nMC="<<fChain->GetMaximum("nMC")<<", when kMaxnMC="<<kMaxnMC<<" only"<<std::endl;
        std::cout<<"please, go to TEventTree.h to increase this number up to proper value"<<std::endl;
        std::cout<<std::endl;

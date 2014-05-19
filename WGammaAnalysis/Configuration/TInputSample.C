@@ -112,18 +112,20 @@ void TInputSample::CalcLuminocities()
        }
        f.cd("ggNtuplizer");
 
-       TTree* tr = (TTree*)gDirectory->Get("EventTree");
-       double nEvents = (double)tr->GetEntries();
+       TH1F* hEvents = (TH1F*)gDirectory->Get("hEvents");
+       //TTree* tr = (TTree*)gDirectory->Get("EventTree");
+       double nEvents = (double)hEvents->GetBinContent(1);
+       //double nEvents = (double)tr->GetEntries();
        nEvents = nEvents/factor_[iFile];
 
-       bool isSkimmed = gDirectory->GetListOfKeys()->Contains("hskim");
+       //bool isSkimmed = gDirectory->GetListOfKeys()->Contains("hskim");
 
-       if (isSkimmed){
-            TH1F* hist = (TH1F*)gDirectory->Get("hskim");
-            nEvents = nEvents * hist->GetBinContent(1) / hist->GetBinContent(2);
-            hist = 0;
-       }
-       tr = 0;
+       //if (isSkimmed){
+       //     TH1F* hist = (TH1F*)gDirectory->Get("hskim");
+       //     nEvents = nEvents * hist->GetBinContent(1) / hist->GetBinContent(2);
+       //     hist = 0;
+       //}
+       //tr = 0;
        if (!isSharedCS_) lumiEachFile_[iFile]=1.0*nEvents/cs_[iFile];
        else nEventsTotal+=nEvents;
     }

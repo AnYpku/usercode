@@ -11,6 +11,11 @@
 
 TConfiguration::TConfiguration()
 {
+  _selectedNameBase[VERY_PRELIMINARY]="VeryPreliminarySelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_MET_CUT]="PreliminaryForMEtCutSelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_TEMPLATE_METHOD]="PreliminaryForTemplateMethodSelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_UNFOLDING]="PreliminaryForUnfoldingSelected/selected";
+  _selectedNameBase[FULLY]="FullySelected/selected";
 }
 
 TConfiguration::~TConfiguration()
@@ -24,10 +29,10 @@ void TConfiguration::Print()
   std::cout<<"GetSampleName s: "<<GetSampleName(DATA)<<", "<<GetSampleName(SIGMC)<<", "<<GetSampleName(BKGMC)<<std::endl;
   std::cout<<"GetEtaBinName s: "<<GetEtaBinName(BARREL)<<", "<<GetEtaBinName(ENDCAP)<<", "<<GetEtaBinName(COMMON)<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(PRELIMINARY,MUON,DATA,"[sourceName]")<<", "<<GetSelectedName(PRELIMINARY,MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedName(PRELIMINARY,MUON,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
-  std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,DATA,COMMON,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,DATA,BARREL,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,DATA,ENDCAP,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,SIGMC,BARREL,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BKGMC,BARREL,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetFractionsDDTemplateBkgFileName s"<<GetDDTemplateBkgFileName(MUON)<<std::endl;
 
@@ -64,40 +69,26 @@ TString TConfiguration::GetCsModeName(int csMode)
   return "UNKNOWN_CSMODE";
 }
 
-TString TConfiguration::GetValTypeName(int valType)
-{
-  if (valType==VAL) return "Val";
-  else if (valType==ERRSTAT) return "ErrStat";
-  else if (valType==ERRSYST) return "ErrSyst";
-  return "UNKNOWN_ValType";
-}
-
-TString TConfiguration::GetSelectedName(int selectionStage, int channel, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight, bool isVeryLooseSelectionMode)
+TString TConfiguration::GetSelectedName(int selectionStage, int channel, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight)
 {
   TString name = GetOutputDirName(channel); 
-  if (selectionStage==VERY_PRELIMINARY) 
-    name+=selectedVeryPreliminaryEventsNameBase_;
-  else if (selectionStage==PRELIMINARY)
-    name+=selectedPreliminaryEventsNameBase_;
-  else if (selectionStage==FULLY)
-    name+=selectedFullyEventsNameBase_;
+  name+=_selectedNameBase[selectionStage];
   name+=GetSampleName(sample);
   if (sample == BKGMC){
     name+="_";
     name+=sourceName;
   }
-  name+=GetSpecialModeName(isDebugMode, isNoPuReweight, isVeryLooseSelectionMode);
+  name+=GetSpecialModeName(isDebugMode, isNoPuReweight);
   name+=".root";
 
   return name;
 }
 
-TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight, bool isVeryLooseSelectionMode)
+TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight)
 {
   TString name="";
   if (isDebugMode) name+=nameDebugMode_;
   if (isNoPuReweight) name+=nameNoPuReweight_;
-  if (isVeryLooseSelectionMode) name+=nameVeryLooseSelectionMode_;
   return name;
 }
 
@@ -107,26 +98,26 @@ TString TConfiguration::GetYieldsFileName(int channel)
 }
 
 
-TString TConfiguration::GetYieldsSelectedName(int csMode,  int valType, int sample, TString sourceName)
+TString TConfiguration::GetYieldsSelectedName(int csMode,int sample, TString sourceName)
 {
   TString name = _yieldsSelectedName+GetSampleName(sample);
   if (sample==BKGMC) name+=sourceName;
-  return name+GetCsModeName(csMode)+GetValTypeName(valType);
+  return name+GetCsModeName(csMode);
 }
 
-TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode, int valType)
+TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode)
 {
-  return _yieldsSelectedSignalMCGenName+GetCsModeName(csMode)+GetValTypeName(valType);
+  return _yieldsSelectedSignalMCGenName+GetCsModeName(csMode);
 }
 
-TString TConfiguration::GetYieldsDDTemplateBkgName(int csMode, int valType)
+TString TConfiguration::GetYieldsDDTemplateBkgName(int csMode)
 {
-  return _yieldsDDTemplateBkgName+GetCsModeName(csMode)+GetValTypeName(valType);
+  return _yieldsDDTemplateBkgName+GetCsModeName(csMode);
 }
 
-TString TConfiguration::GetYieldsSignalName(int csMode, int valType)
+TString TConfiguration::GetYieldsSignalName(int csMode)
 {
-  return _yieldsSignalName+GetCsModeName(csMode)+GetValTypeName(valType);
+  return _yieldsSignalName+GetCsModeName(csMode);
 }
 
 TString TConfiguration::GetDDTemplateBkgFileName(int channel)
@@ -134,41 +125,28 @@ TString TConfiguration::GetDDTemplateBkgFileName(int channel)
   return GetOutputDirName(channel)+_DDTemplateBkgFileName;
 }
 
+
+TString TConfiguration::GetAccFileName(int channel)
+{
+  return GetOutputDirName(channel)+_accFileName;
+}
+
+TString TConfiguration::GetAccName(int csMode)
+{
+  return _accName+GetCsModeName(csMode);
+}
+
+TString TConfiguration::GetEffFileName(int channel)
+{
+  return GetOutputDirName(channel)+_effFileName;
+}
+
+TString TConfiguration::GetEffName(int csMode)
+{
+  return _effName+GetCsModeName(csMode);
+}
+
 /*
-TString TConfiguration::GetAccEffFileName(int channel)
-{
-  return GetOutputDirName(channel)+acceffFile_;
-}
-
-TString TConfiguration::GetAcc1DName()
-{
-  return acc1DName_;
-}
-
-TString TConfiguration::GetEff1DName()
-{
-  return eff1DName_;
-}
-
-TString TConfiguration::GetAccEff1DName()
-{
-  return acceff1DName_;
-}
-
-TString TConfiguration::GetAccTotalName()
-{
-  return accTotalName_;
-}
-
-TString TConfiguration::GetEffTotalName()
-{
-  return effTotalName_;
-}
-
-TString TConfiguration::GetAccEffTotalName()
-{
-  return acceffTotalName_;
-}
 
 TString TConfiguration::GetUnfoldingFileName(int channel)
 {
@@ -220,12 +198,11 @@ int TConfiguration::GetNPhoPtBins()
   return _nPhoPtBins;
 }
 
-vector <float> TConfiguration::GetPhoPtBinsLimits()
+void TConfiguration::GetPhoPtBinsLimits(float* lims)
 {
-  vector <float> lims;
   for (int i=0; i<_nPhoPtBins+1; i++)
-    lims.push_back(_phoPtBinsLimits[i]);
-  return lims;   
+    lims[i]=_phoPtBinsLimits[i];
+ 
 }
 
 int TConfiguration::FindPhoPtBinByPhoPt(float pt)
@@ -241,6 +218,11 @@ float TConfiguration::GetPhoPtMin()
   return _phoPtMin;
 }
 
+float TConfiguration::GetPhoPtMax()
+{
+  return _phoPtMax;
+}
+
 float TConfiguration::GetLePhoDeltaRMin()
 {
   return _lePhoDeltaRMin;
@@ -252,17 +234,13 @@ int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed)
   return GetNPhoPtBins()+1;
 }
 
-vector <float> TConfiguration::GetPhoPtUnfBinsLimits(bool isOverflowUsed)
+void TConfiguration::GetPhoPtUnfBinsLimits(float* lims,bool isOverflowUsed)
 {
-  vector <float> analysLims;
-  vector <float> unfoldLims;
-  analysLims = GetPhoPtBinsLimits();
-  unfoldLims.push_back(0.0);
-  for (int i=0; i<_nPhoPtBins+1; i++)
-    unfoldLims.push_back(analysLims[i]);
+  lims[0]=0.0;
+  for (int i=0; i<_nPhoPtBins+2; i++)
+    lims[i+1]=_phoPtBinsLimits[i];
   if (isOverflowUsed) 
-    unfoldLims.push_back(_phoPtOverflowBinLimit);
-  return unfoldLims;
+    lims[_nPhoPtBins+2]=_phoPtMax;
 }
 
 int TConfiguration::FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed)

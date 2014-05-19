@@ -20,4 +20,6 @@ rm Unfolding/*.so Unfolding/*.d Unfolding/*~ Unfolding/.nfs00*
 
 rm QuickChecks/*.so QuickChecks/*.d QuickChecks/*~ QuickChecks/.nfs00*
 
+rm FullChain/*.so FullChain/*.d FullChain/*~ FullChain/.nfs00*
+
 rm *.so *.d *~ .nfs00*

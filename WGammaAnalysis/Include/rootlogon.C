@@ -17,9 +17,12 @@
   gROOT->ProcessLine(".L ../Include/TPuReweight.C+");
   gROOT->ProcessLine(".L ../Include/TFullCuts.C+");
 
+  gROOT->ProcessLine(".L ../SearchForOverlapInMC/SearchForOverlap.C+");
+
   gROOT->ProcessLine(".L ../Selection/TSelectedEventsTree.C+");
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/WGammaSelection.C+");
+
   gROOT->ProcessLine(".L ../Selection/ExtraSelection.C+");
 
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
@@ -28,12 +31,14 @@
 
   gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
 
-/*
+
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
 
 //  gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
-*/
+
+  gROOT->ProcessLine(".L ../FullChain/FullChain.C+");
+
   gROOT->ProcessLine(".L ../SkimSplitMerge/TInputOutputTree.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SkimLeptonPhoton.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SplitWGammaMC.C+");
