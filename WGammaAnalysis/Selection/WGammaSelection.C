@@ -411,12 +411,12 @@ void WGammaSelection::ExtraSelection(int channel, int sampleMode, int wp, TStrin
 {
   TFullCuts fullCut;
   TConfiguration config;
-//  TAllInputSamples INPUT(channel,"../Configuration/config.txt");
+  TAllInputSamples INPUT(channel,"../Configuration/config.txt");
   _tr=0;
   _tr1=0;
   _tr2=0;
   _tr3=0;
-/*
+
   for (int i=0; i<INPUT.nSources_; i++){
 
     int sample=INPUT.allInputs_[i].sample_;
@@ -436,7 +436,7 @@ void WGammaSelection::ExtraSelection(int channel, int sampleMode, int wp, TStrin
       ExtraSelectionOne(INPUT,i, config, fullCut,channel,wp,strPhoIsoBase,config.UNBLIND);
     }
   }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
-*/
+
 }
 
 void WGammaSelection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int channel, int wp, TString strPhoIsoBase, int blind)
