@@ -42,10 +42,10 @@
 #include <sstream>  
   //standard C++ class
 
-Unfolding::Unfolding(int channel, string configFile)
+Unfolding::Unfolding(int channel)
 {
   _channel=channel; 
-  _fIn = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_config.SIGMC));  
+  _fIn = new TFile(_config.GetSelectedName(_config.FULLY,_channel,_config.UNBLIND,_config.SIGMC));  
 
   _fOut = new TFile("fOut.root","recreate");
 
@@ -54,7 +54,7 @@ Unfolding::Unfolding(int channel, string configFile)
 //  else {
 //    std::cout<<"ERROR in Unfolding::PrepareUnfoldingMatrix: file "<<_config.GetUnfoldingFileName(_channel)<<" is not open"<<std::endl;
 //  }
-  _INPUT = new TAllInputSamples(channel, configFile);
+//  _INPUT = new TAllInputSamples(channel, configFile);
 
 }
 
@@ -77,18 +77,18 @@ bool Unfolding::TestDifferentMethods()
   
 
   TH1D* unfYieldsRooUnfInv = new TH1D("unfYieldsInv","unfolded yields Inversion",_nBinsGen,_phoPtLimitsGen);
-  TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
-  TVectorD errStatInv(_nBinsGen);
-  TVectorD errSystInv(_nBinsGen);
-  TVectorD errCovStatVInv(_nBinsGen);
+//  TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
+//  TVectorD errStatInv(_nBinsGen);
+//  TVectorD errSystInv(_nBinsGen);
+//  TVectorD errCovStatVInv(_nBinsGen);
 //  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv);
 
   TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",_nBinsGen,_phoPtLimitsGen);
-  TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
-  TVectorD errStatDAg(_nBinsGen);
-  TVectorD errSystDAg(_nBinsGen);
-  TVectorD errCovStatVDAg(_nBinsGen);
-  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+//  TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
+//  TVectorD errStatDAg(_nBinsGen);
+//  TVectorD errSystDAg(_nBinsGen);
+//  TVectorD errCovStatVDAg(_nBinsGen);
+  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes);
 //  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 //  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 
@@ -98,15 +98,15 @@ bool Unfolding::TestDifferentMethods()
   std::cout<<std::endl;
   
   for (int i=1; i<=_nBinsGen; i++){
-    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" GeV: ";
+//    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" GeV: ";
       //limits
 
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatInv(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystInv(i-1)<<"=";
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<unfYieldsRooUnfInv->GetBinError(i)<<";     ";
+//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatInv(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystInv(i-1)<<"=";
+//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<unfYieldsRooUnfInv->GetBinError(i)<<";     ";
       //inversion
 
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatDAg(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystDAg(i-1)<<"=";
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<unfYieldsRooUnfDAg->GetBinError(i)<<";     ";
+//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatDAg(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystDAg(i-1)<<"=";
+//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<unfYieldsRooUnfDAg->GetBinError(i)<<";     ";
       //D'Agostini
 
     std::cout<<std::endl;
@@ -116,9 +116,9 @@ bool Unfolding::TestDifferentMethods()
   std::cout<<"Stat Covariance Matrix, RooUnf inversion"<<std::endl;  
   for (int i=0; i<_nBinsGen; i++){
     for (int j=0; j<_nBinsGen; j++){
-      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatInv(i,j)<<" ";
+//      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatInv(i,j)<<" ";
     }
-    std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVInv(i);
+//    std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVInv(i);
     std::cout<<std::endl;
   }
 
@@ -126,9 +126,9 @@ bool Unfolding::TestDifferentMethods()
   std::cout<<"Stat Covariance Matrix, RooUnf D'Agostini"<<std::endl;  
   for (int i=0; i<_nBinsGen; i++){
     for (int j=0; j<_nBinsGen; j++){
-      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatDAg(i,j)<<" ";
+//      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatDAg(i,j)<<" ";
     }
-    std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVDAg(i);
+//    std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVDAg(i);
     std::cout<<std::endl;
   }
 
@@ -263,7 +263,24 @@ bool Unfolding::PrepareMigrationMatrix()
   return 1;
 }
 
-bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg,TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV)
+bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg)
+{  
+  std::cout<<"#######################"<<std::endl;
+  std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
+
+  TMatrixD errCovStat(_nBinsGen,_nBinsGen);
+  TVectorD errStatV(_nBinsGen);
+  TVectorD errSystV(_nBinsGen);
+  TVectorD errCovStatV(_nBinsGen);
+
+  bool isOk = ApplyRooUnfold(histInputYields,unfoldedYields,alg,errCovStat,errStatV, errSystV, errCovStatV);
+
+  std::cout<<std::endl<<"DoRooUnfold() ends here"<<std::endl;
+  std::cout<<"#######################"<<std::endl;
+  return isOk;
+}
+
+bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV)
 {  
   std::cout<<"#######################"<<std::endl;
   std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
@@ -281,6 +298,8 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
 //  RooUnfoldBayes* unfold = new RooUnfoldBayes(&response,histInputYields,5,0,0);
 //  unfold->SetNToys(1000);
   TH1D* histUnfoldedYields = (TH1D*) unfold->Hreco(RooUnfold::kCovToy);
+
+
   errCovStat=unfold->Ereco(RooUnfold::kCovToy);
   errCovStatV=unfold->ErecoV(RooUnfold::kCovToy);
 //  TH1D* histUnfoldedYields = (TH1D*) unfold->Hreco(RooUnfold::kErrors);
@@ -474,7 +493,7 @@ bool Unfolding::PlotAndStore()
       histMigrMatrixDraw->SetBinContent(ir,ig,_histMigrMatrixNotNormalized->GetBinContent(ir,ig));
 
     }
-    
+ 
   TStyle* style = new TStyle("style","style");
 
   style->SetPalette(1);
@@ -508,13 +527,15 @@ bool Unfolding::PlotAndStore()
   TCanvas* cPtSpectra = new TCanvas("cPtSpectra","cPtSpectra");
   cPtSpectra->SetLogx();
   cPtSpectra->SetLogy();
+  _histYieldsRec->GetXaxis()->SetMoreLogLabels();
+  _histYieldsRec->GetXaxis()->SetNoExponent();
   _histYieldsRec->SetLineColor(1);
   _histYieldsRec->SetLineWidth(2);
   _histYieldsRec->Draw();
   _histYieldsGen->SetLineColor(4);
   _histYieldsGen->SetLineWidth(2);
   _histYieldsGen->Draw("same");
-
+/*
   int nBinsAnalysis = _config.GetNPhoPtBins(); 
   float* limsAnalysis = new float[nBinsAnalysis+1];
   _config.GetPhoPtBinsLimits(limsAnalysis);
@@ -543,6 +564,8 @@ bool Unfolding::PlotAndStore()
     canvName+=ib;
     cResolution[ib] = new TCanvas(canvName,"pho Pt resolution in different bins");
     cResolution[ib]->SetLogy();
+ //   std::cout<<"strDraw="<<strDraw<<", strCut="<<strCut<<std::endl;
+   
     _tr->Draw(strDraw,strCut);
     for (int ib2=0; ib2<nBinsAnalysis; ib2++){
       float low2 = limsAnalysis[ib2];
@@ -566,7 +589,7 @@ bool Unfolding::PlotAndStore()
       _tr->Draw(strDraw2,strCut2,"same");
     }
   }
-
+*/
 
 //  _histYieldsRec->Write(_config.GetYieldsRec1DName());
 //  _histYieldsGen->Write(_config.GetYieldsGen1DName());

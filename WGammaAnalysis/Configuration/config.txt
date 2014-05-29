@@ -10,13 +10,13 @@
 ###       next, number - color from TColor.h table (ROOT)
 ###       next, for DATA only: may or may not be word "lumiTotal" with lumiTotal value after that
 ###       next, for SIGMC and BKGMC only: may or may not be work "csTotal" with csTotal value after that
-###         (csTotal is used for luminocity reweight for MC samples for which original file was splitted)
+###         (csTotal is used for luminocity reweight for MC samples for which original file was splitted - actually there are no this kind of files now)
 ###  3) if first symbol in the line is '-' - this is a file for given sample
 ###       next, name of the file
 ###       next, for DATA only: may or may not be luminocity value
 ###         (might be used for purposes of fast processing only one data file rather then full data)
 ###       next, for SIGMC and BKGMC only: cross section value for 8 TeV from the twiki table
-###       next, for SIGMC and BKGMC only: may or may not be branching ration or filter efficiency or whatever other factor
+###       next, for SIGMC and BKGMC only: may or may not be branching ratio or filter efficiency or whatever other factor
 ###  4) empty lines or lines started with any other symbol are just ignored for now
 ########
 ###  reading from the config.txt is implemented in 

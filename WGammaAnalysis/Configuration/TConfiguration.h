@@ -14,6 +14,7 @@ class TConfiguration
 
     enum {MUON, ELECTRON, BOTH};//channel
     enum {DATA, SIGMC, BKGMC};//sample
+    enum {UNBLIND, BLIND_PRESCALE, BLIND_DECRACC};//blinding type
     enum {BARREL, ENDCAP, COMMON};//eta bin
     enum {TOTAL, ONEDI, TWODI};//csMode
     enum {VERY_PRELIMINARY,
@@ -28,8 +29,9 @@ class TConfiguration
     TString GetSampleName(int sample);
     TString GetEtaBinName(int etaBin);
     TString GetCsModeName(int csMode);
+    TString GetBlindModeName(int sample, int blindMode);
 
-    TString GetSelectedName(int selectionStage, int channel, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0);
+    TString GetSelectedName(int selectionStage, int channel, int blindType, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0);
     //strSelectionStage
     TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight);
 
@@ -65,6 +67,9 @@ class TConfiguration
     float GetPhoPtMax();
     float GetLePhoDeltaRMin();
 
+    int GetBlindPrescale();
+    int GetPhoPtBlindThreshold();
+
     int GetNPhoPtUnfBins(bool isOverflowUsed);
     void GetPhoPtUnfBinsLimits(float* lims,bool isOverflowUsed);
     int FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed);
@@ -74,16 +79,18 @@ class TConfiguration
 /////////////////////////////////////////
 //photon Pt binning
 //and other analysis constants
-//static const int _nPhoPtBins = 9;
-//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
-static const int _nPhoPtBins = 2;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
+static const int _nPhoPtBins = 9;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
+//static const int _nPhoPtBins = 5;
+//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
 static const float _phoPtMin=15.;
 static const float _phoPtMax=2000.;
   //minimum value for total CS
 static const float _lePhoDeltaRMin=0.7;
   //minimum value for total and differential cross section; 
   //cut value may be bigger or equal to this value
+static const int _blindPrescale=13;//13;
+static const float _phoPtBlindThreshold=40.;
 
 /////////////////////////////////////////
 //general locations

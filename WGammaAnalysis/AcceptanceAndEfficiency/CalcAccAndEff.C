@@ -163,51 +163,60 @@ void CalcAccAndEff::LoopOverInputFiles()
          }//loop over inputFileN_ ends
 
     //Acceptance
-     _nAccTotEventsErr=sqrt(_nAccTotEventsErr);
-     _nAccTotPassedErr=sqrt(_nAccTotPassedErr);
+     if (_nAccTotEventsErr>0) _nAccTotEventsErr=sqrt(_nAccTotEventsErr);
+     if (_nAccTotPassedErr>0) _nAccTotPassedErr=sqrt(_nAccTotPassedErr);
      for (int i=0; i<_config.GetNPhoPtBins(); i++){
-       _nAcc1DEventsErr[i]=sqrt(_nAcc1DEventsErr[i]);
-       _nAcc1DPassedErr[i]=sqrt(_nAcc1DPassedErr[i]);
+       if (_nAcc1DEventsErr[i]>0) _nAcc1DEventsErr[i]=sqrt(_nAcc1DEventsErr[i]);
+       if (_nAcc1DPassedErr[i]>0) _nAcc1DPassedErr[i]=sqrt(_nAcc1DPassedErr[i]);
      }
      if (_nAccTotEvents!=0){ 
        _accTot=_nAccTotPassed/_nAccTotEvents;
        _accTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nAccTotPassed,_nAccTotEvents,_nAccTotPassedErr,_nAccTotEventsErr);
      }
      for (int i=0; i<_config.GetNPhoPtBins(); i++){
-       _acc1D[i]=_nAcc1DPassed[i]/_nAcc1DEvents[i];
-       _acc1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nAcc1DPassed[i],_nAcc1DEvents[i],_nAcc1DPassedErr[i],_nAcc1DEventsErr[i]);
+       if (_nAcc1DEvents[i]!=0){
+         _acc1D[i]=_nAcc1DPassed[i]/_nAcc1DEvents[i];
+         _acc1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nAcc1DPassed[i],_nAcc1DEvents[i],_nAcc1DPassedErr[i],_nAcc1DEventsErr[i]);
+       }
      }
 
      //Efficiency
-     _nEffTotEventsErr=sqrt(_nEffTotEventsErr);
-     _nEffTotPrePassedErr=sqrt(_nEffTotPrePassedErr);
+     if (_nEffTotEventsErr!=0) _nEffTotEventsErr=sqrt(_nEffTotEventsErr);
+     if (_nEffTotPassedErr!=0) _nEffTotPrePassedErr=sqrt(_nEffTotPrePassedErr);
      for (int i=0; i<_config.GetNPhoPtBins(); i++){
-       _nEff1DEventsErr[i]=sqrt(_nEff1DEventsErr[i]);
-       _nEff1DPrePassedErr[i]=sqrt(_nEff1DPrePassedErr[i]);
+       if (_nEff1DEventsErr[i]!=0) _nEff1DEventsErr[i]=sqrt(_nEff1DEventsErr[i]);
+       if (_nEff1DPassedErr[i]!=0) _nEff1DPrePassedErr[i]=sqrt(_nEff1DPrePassedErr[i]);
      }
 
-     TFile* fVeryPreliminary = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel, _config.SIGMC));
+     TFile* fVeryPreliminary = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel,_config.UNBLIND, _config.SIGMC));
      TTree* tr = (TTree*)fVeryPreliminary->Get("selectedEvents");
      TH1F* hTot = new TH1F("hTot","hTot",1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
      TH1F* h1D = new TH1F("h1D","h1D",_config.GetNPhoPtBins(),_phoPtLimits);
      TCut cutWeight="weight";
      TCut cut = cutWeight*_fullCuts.RangeFullCut(_channel,_phoWP,_phoIsoBase);
-     tr->Draw("phoEt>>hTot",cutWeight,"goff");
-     tr->Draw("phoEt>>h1D",cutWeight,"goff");
+     tr->Draw("phoGenEt>>hTot",cutWeight,"goff");
+     tr->Draw("phoGenEt>>h1D",cutWeight,"goff");
+     std::cout<<"file for efficiency selection: "<<_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel,_config.UNBLIND, _config.SIGMC)<<std::endl;
+     std::cout<<"preselected tree has "<<tr->GetEntries()<<" events"<<std::endl;
+     std::cout<<"tree with full cut has "<<tr->GetEntries(cut)<<"  events"<<std::endl;
+     std::cout<<"Print histograms:"<<std::endl;
+     h1D->Print();
+     hTot->Print();
      _nEffTotPrePassed2=hTot->GetBinContent(1);
      _nEffTotPrePassed2Err=hTot->GetBinError(1);
      for (int i=1; i<=_config.GetNPhoPtBins(); i++){
        _nEff1DPrePassed2[i-1]=h1D->GetBinContent(i);
        _nEff1DPrePassed2Err[i-1]=h1D->GetBinError(i);
      }
-     tr->Draw("phoEt>>hTot",cut,"goff");
-     tr->Draw("phoEt>>h1D",cut,"goff");
+     tr->Draw("phoGenEt>>hTot",cut,"goff");
+     tr->Draw("phoGenEt>>h1D",cut,"goff");
      _nEffTotPassed=hTot->GetBinContent(1);
      _nEffTotPassedErr=hTot->GetBinError(1);
      for (int i=1; i<=_config.GetNPhoPtBins(); i++){
        _nEff1DPassed[i-1]=h1D->GetBinContent(i);
        _nEff1DPassedErr[i-1]=h1D->GetBinError(i);
      }
+/*
      if (_nEffTotEvents!=0){ 
        _effTot=(double)_nEffTotPassed/_nEffTotEvents;
        _effTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEffTotPassed,_nEffTotEvents,_nEffTotPassedErr,_nEffTotEventsErr);
@@ -216,6 +225,26 @@ void CalcAccAndEff::LoopOverInputFiles()
      for (int i=0; i<_config.GetNPhoPtBins(); i++){
        _eff1D[i]=_nEff1DPassed[i]/_nEff1DEvents[i];
        _eff1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEff1DPassed[i],_nEff1DEvents[i],_nEff1DPassedErr[i],_nEff1DEventsErr[i]);
+     }
+*/
+       if (_nEffTotPrePassed2==0){
+         _effTot=-1;
+         _effTotErr=1;      
+       }
+       else{
+         _effTot=(double)_nEffTotPassed/_nEffTotPrePassed2;
+         _effTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEffTotPassed,_nEffTotPrePassed2,_nEffTotPassedErr,_nEffTotPrePassed2Err);
+       }
+
+     for (int i=0; i<_config.GetNPhoPtBins(); i++){
+       if (_nEff1DPrePassed2[i]==0){
+         _eff1D[i]=-1;
+         _eff1DErr[i]=1;
+       }
+       else{
+         _eff1D[i]=_nEff1DPassed[i]/_nEff1DPrePassed2[i];
+         _eff1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEff1DPassed[i],_nEff1DPrePassed2[i],_nEff1DPassedErr[i],_nEff1DPrePassed2Err[i]);
+       }
      }
 
      PlotAndSaveOutput();
@@ -284,10 +313,13 @@ void CalcAccAndEff::LoopOverTreeEvents()
    CheckMaxNumbersInTree();
   
    //nentries=20;
+   std::cout<<"n entries in MC tree: "<<_eventTree.fChain->GetEntries()<<std::endl;
    for (Long64_t entry=0; entry<nentries; entry++) {
+
    //loop over events in the tree{
      _eventTree.GetEntryNeededBranchesOnly(_channel,TConfiguration::SIGMC,entry);
           //method of TEventTree class
+
      if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(entry);
           //method of TEventTree class
 
@@ -309,6 +341,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
 
      //apply efficiency cuts
      bool effPassed = EfficiencyPassed(effLeptonPhotonPassed,lePhoDeltaR,weightPU);
+
   } //end of loop over events in the tree
 
   //memory release:
@@ -462,35 +495,36 @@ void CalcAccAndEff::PlotAndSaveOutput()
 
 
   //Draw
-  TCanvas* cAccEff = new TCanvas("cAccEff","cAccEff");
-  
-
-  TLegend* leg = new TLegend(0.2,0.7,0.5,0.85);
-  leg->AddEntry(hAcc1D,"acceptance","L");
-  leg->AddEntry(hEff1D,"efficiency","L");
-
+  TCanvas* cAcc = new TCanvas("cAcc","cAcc");
+  cAcc->SetLogx();
   hAcc1D->SetStats(0);
-  hAcc1D->GetYaxis()->SetRangeUser(0.0,1.0);
-  hAcc1D->SetTitle("acceptance and efficiency");
+  hAcc1D->SetTitle("Acceptance");
+  hAcc1D->GetXaxis()->SetMoreLogLabels();
+  hAcc1D->GetXaxis()->SetNoExponent();
   hAcc1D->Draw();
-  hEff1D->Draw("same");
   hAccTot->Draw("same");
+
+  TCanvas* cEff = new TCanvas("cEff","cEff");
+  cEff->SetLogx();
+  hEff1D->SetStats(0);
+  hEff1D->SetTitle("Efficiency");
+  hEff1D->GetXaxis()->SetMoreLogLabels();
+  hEff1D->GetXaxis()->SetNoExponent();
+  hEff1D->Draw();
   hEffTot->Draw("same");
-  leg->Draw("same");
-  cAccEff->SetLogx();
 
   //save
   TString fNameAcc=_config.GetAccFileName(_channel) ;
   TFile fAcc(fNameAcc,"recreate");
   hAcc1D->Write((_config.GetAccName(_config.ONEDI)) );
   hAccTot->Write((_config.GetAccName(_config.TOTAL)) );
-  cAccEff->Write("cAccEff");
+  cAcc->Write("cAcc");
 
   TString fNameEff=_config.GetEffFileName(_channel) ;
   TFile fEff(fNameEff,"recreate");  
   hEff1D->Write((_config.GetEffName(_config.ONEDI)) );
   hEffTot->Write((_config.GetEffName(_config.TOTAL)) );
-  cAccEff->Write("cAccEff");
+  cEff->Write("cEff");
 
 }
 

@@ -31,7 +31,7 @@ public:
   TCut RangeFullCut(int channel, int phoWP, TString phoIsoBase);
 
 private:
-  const static float _WMtCut = 50.;//70.;
+  const static float _WMtCut = 50.;//50.;
   const static float _lePhoDeltaRCut = 0.7;//0.7;
 };
 

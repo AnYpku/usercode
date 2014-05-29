@@ -18,14 +18,15 @@
 class Unfolding
   {
      public:
-       Unfolding (int channel, string configfile="../Configuration/config.txt");
+       Unfolding (int channel);
        virtual ~Unfolding();
 
        bool TestDifferentMethods();
 
        bool PrepareMigrationMatrix();
 
-       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg,TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV);
+       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg=RooUnfold::kBayes);
+       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV);
        bool ComputeSystErrors(TH1D* histInputYields, float* errSyst,RooUnfold::Algorithm alg, int NSmears);
        bool ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfold::Algorithm alg, int NSmears);
 
@@ -34,7 +35,7 @@ class Unfolding
 
      private:
 
-       TAllInputSamples* _INPUT;
+//       TAllInputSamples* _INPUT;
        int _channel;
 
        TConfiguration _config;

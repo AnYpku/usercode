@@ -60,7 +60,7 @@ $ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      440
 #418=kGreen+2, same as DY
 #401=kYellow+1
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New//job_summer12_Zg_KeepMCbranches.root   159.12
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Zg_KeepMCbranches.root   159.12
 
 
 

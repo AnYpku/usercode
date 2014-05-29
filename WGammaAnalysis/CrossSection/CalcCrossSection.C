@@ -4,10 +4,12 @@
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
 #include "../Include/TMathTools.h"
+#include "../Unfolding/Unfolding.h"
   //this package
   //currently in this package
 #include <string>
 #include <iostream>
+#include <iomanip>
   //standard C++ class
 #include "TFile.h"
 #include "TTree.h"
@@ -18,20 +20,19 @@
 #include "TAxis.h"
   //ROOT class
 
-CalcCrossSection::CalcCrossSection(int channel, string configFile)
+CalcCrossSection::CalcCrossSection(int channel, int blind, string configFile)
 {
-
-  INPUT_ = new TAllInputSamples(channel, configFile);
-
-  channel_=channel;
-
-  vecPhoPtLimits_ = config_.GetPhoPtBinsLimits();
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    signalYields1D_.push_back(0.0);
-    signalYieldsErr1D_.push_back(0.0);
+  _INPUT = new TAllInputSamples(channel, configFile);
+  _channel=channel;
+  _fOut = new TFile("fCrossSection.root","recreate");
+  for (int iSource=0; iSource<_INPUT->nSources_; iSource++){
+       if (_INPUT->allInputs_[iSource].sample_==_config.DATA){
+           _lumi=_INPUT->allInputs_[iSource].lumiTotal_;
+           if (blind==_config.BLIND_PRESCALE) 
+             _lumi=_lumi/_config.GetBlindPrescale();
+           break;
+       }
   }
-  signalYieldTotal_=0;
-  signalYieldErrTotal_=0;
 }
 
 CalcCrossSection::~CalcCrossSection()
@@ -42,167 +43,122 @@ CalcCrossSection::~CalcCrossSection()
 void CalcCrossSection::Calc()
 {
   GetSignalYields();
-  ApplyAccAndEff();
+  ApplyEfficiency();
+  ApplyUnfolding();
+  ApplyAcceptance();
   DivideOverLumi();
   DivideOverBinWidth();
-  PlotAndSaveOutput();
+  Plot();
 }
 
 void CalcCrossSection::GetSignalYields()
 {
-/*
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    signalYields1D_.push_back(0.0);
-    signalYieldsErr1D_.push_back(0.0);
-  }
-  signalYieldTotal_=0;
-  signalYieldErrTotal_=0;
-
-  int nSources = INPUT_->nSources_;
-  for (int iSource=0; iSource<nSources; iSource++)
-    {
-       int sample = INPUT_->allInputs_[iSource].sample_;
-       if (sample==TInputSample::SIGMC) continue;
-       if (sample==TInputSample::DATA)
-         lumi_=INPUT_->allInputs_[iSource].lumiTotal_;
-       TString fileName = (TString)(INPUT_->allInputs_[iSource].fileSelected_) ;
-       TFile f(fileName);
-       if (!f.IsOpen()) continue;
-       bool hasTree = f.GetListOfKeys()->Contains("selectedEvents");
-       if (!hasTree) continue;
-       TTree* tr = (TTree *)f.Get("selectedEvents");
-
-       TString dRCut="lePhoDeltaR>";
-       dRCut+=config_.GetLePhoDeltaRMin();
-
-       TH1F *hist = new TH1F("hist","hist",10,config_.GetPhoPtMin(),tr->GetMaximum("phoEt"));
-       tr->Draw("phoEt>>hist","("+dRCut+")*weight","goff");
-       TH1F *histErr = new TH1F("histErr","histErr",10,config_.GetPhoPtMin(),tr->GetMaximum("phoEt"));
-       tr->Draw("phoEt>>histErr","("+dRCut+")*weight*weight","goff");
-
-       if (sample==TInputSample::DATA) 
-         signalYieldTotal_+=hist->Integral();
-       else if (sample==TInputSample::BKGMC)
-         signalYieldTotal_-=hist->Integral();
-
-       signalYieldErrTotal_+=histErr->Integral();
-       delete hist;
-       delete histErr;
-
-       for (int i=0; i<config_.GetNPhoPtBins(); i++){
-         TH1F *hist1D = new TH1F("hist1D","hist1D",10,vecPhoPtLimits_[i],vecPhoPtLimits_[i+1]);
-         tr->Draw("phoEt>>hist1D","("+dRCut+")*weight","goff");
-         TH1F *hist1DErr = new TH1F("hist1DErr","hist1DErr",10,vecPhoPtLimits_[i],vecPhoPtLimits_[i+1]);
-         tr->Draw("phoEt>>hist1DErr","("+dRCut+")*weight*weight","goff");
-
-         if (sample==TInputSample::DATA) 
-           signalYields1D_[i]+=hist1D->Integral();
-         else if (sample==TInputSample::BKGMC)
-           signalYields1D_[i]-=hist1D->Integral();
-
-         signalYieldsErr1D_[i]+=hist1DErr->Integral();
-         delete hist1D;
-         delete hist1DErr;
-       } //loop over phoEt bins ends: for (int i=0; i<config_.GetNPhoPtBins(); i++)
-                
-    } //loop over iSource ends
-  signalYieldErrTotal_=sqrt(signalYieldErrTotal_);
-  for (int i=0; i<config_.GetNPhoPtBins(); i++)
-    signalYieldsErr1D_[i]=sqrt(signalYieldsErr1D_[i]);
-  std::cout<<"Raw yields:"<<std::endl;
-  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
-  for (int i=0; i<config_.GetNPhoPtBins(); i++)
-    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
-*/
+  TFile* fSig = new TFile(_config.GetYieldsFileName(_channel));
+  std::cout<<"file with signal yields: "<<_config.GetYieldsFileName(_channel)<<std::endl;
+  std::cout<<"total yields: "<<_config.GetYieldsSignalName(_config.TOTAL)<<std::endl;
+  std::cout<<"1D yields: "<<_config.GetYieldsSignalName(_config.ONEDI)<<std::endl;
+  _signalYieldTotal=(TH1F*)fSig->Get(_config.GetYieldsSignalName(_config.TOTAL));
+  _signalYields1D=(TH1F*)fSig->Get(_config.GetYieldsSignalName(_config.ONEDI));
+  _fOut->cd();
+  _signalYieldTotal->Write("signalYieldTotal"); 
+  _signalYields1D->Write("signalYield1D");
+  Print("Signal Yields:");
 }
 
-void CalcCrossSection::ApplyAccAndEff()
+void CalcCrossSection::ApplyUnfolding()
 {
-  TString fName=(config_.GetAccEffFileName(channel_)) ;
-  TFile f(fName,"read");
-  TVectorF* vacc = (TVectorF*)f.Get((config_.GetAcc1DName()) );
-  TVectorF* veff = (TVectorF*)f.Get((config_.GetEff1DName()) );
-  TVectorF* vaccErr = (TVectorF*)f.Get((config_.GetAccErr1DName()) );
-  TVectorF* veffErr = (TVectorF*)f.Get((config_.GetEffErr1DName()) );
-  TVectorF* acc = (TVectorF*)f.Get((config_.GetAccTotalName()) );
-  TVectorF* eff = (TVectorF*)f.Get((config_.GetEffTotalName()) );
-  TVectorF* accErr = (TVectorF*)f.Get((config_.GetAccErrTotalName()) );
-  TVectorF* effErr = (TVectorF*)f.Get((config_.GetEffErrTotalName()) );
-
-  TMathTools math;
-  signalYieldErrTotal_=math.ErrOfThreeIndependent("x1/(x2*x3)",signalYieldTotal_,acc->operator()(0),eff->operator()(0),signalYieldErrTotal_,accErr->operator()(0),effErr->operator()(0));
-  signalYieldTotal_=signalYieldTotal_/((acc->operator()(0))*(eff->operator()(0)));
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    signalYieldsErr1D_[i]=math.ErrOfThreeIndependent("x1/(x2*x3)",signalYields1D_[i],vacc->operator()(i),veff->operator()(i),signalYieldsErr1D_[i],vaccErr->operator()(i),veffErr->operator()(i));
-    signalYields1D_[i]=signalYields1D_[i]/((vacc->operator()(i))*(veff->operator()(i)));
+  Unfolding unf(_channel);
+  bool isOk = unf.PrepareMigrationMatrix();
+  if (!isOk){
+    std::cout<<"ERROR: PrepareMigrationMatrix() for Unfolding failed"<<std::endl;
+    return;
   }
-  std::cout<<"Acc and eff corrected yields:"<<std::endl;
-  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
-  for (int i=0; i<config_.GetNPhoPtBins(); i++)
-    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
+//  TH1D sign1D;
+//  _signalYields1D->Copy(sign1D);
+  TH1D* signInput1D = (TH1D*)_signalYields1D;
+  TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone("hUnfolded");
+  isOk = unf.ApplyRooUnfold(signInput1D,signUnfolded1D);
+  if (!isOk){
+    std::cout<<"ERROR: ApplyRooUnfold() for Unfolding failed"<<std::endl;
+    return;
+  } 
+  unf.PlotAndStore();
+  Print("Yields before Unfolding:");
+  _signalYields1D=(TH1F*)signUnfolded1D;
+  Print("Unfolded Yields:");
+//  unf.PlotAndStore();
+}
 
+void CalcCrossSection::ApplyEfficiency()
+{
+  TFile* fEff = new TFile(_config.GetEffFileName(_channel));
+  TH1F* hEffTot = (TH1F*)fEff->Get(_config.GetEffName(_config.TOTAL));
+  TH1F* hEff1D = (TH1F*)fEff->Get(_config.GetEffName(_config.ONEDI));
+  _signalYieldTotal->Divide(hEffTot);
+  _signalYields1D->Divide(hEff1D);
+  Print("Efficiency Corrected Yields:");
+}
+
+void CalcCrossSection::ApplyAcceptance()
+{
+  TFile* fAcc = new TFile(_config.GetAccFileName(_channel));
+  TH1F* hAccTot = (TH1F*)fAcc->Get(_config.GetAccName(_config.TOTAL));
+  TH1F* hAcc1D = (TH1F*)fAcc->Get(_config.GetAccName(_config.ONEDI));
+  _signalYieldTotal->Divide(hAccTot);
+  _signalYields1D->Divide(hAcc1D);
+  Print("Acceptance Corrected Yields:");
 }
 
 void CalcCrossSection::DivideOverLumi()
 {
-  signalYieldTotal_=signalYieldTotal_/lumi_;
-  signalYieldErrTotal_=signalYieldErrTotal_/lumi_;
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    signalYields1D_[i]=signalYields1D_[i]/lumi_;
-    signalYieldsErr1D_[i]=signalYieldsErr1D_[i]/lumi_;
+  float cont=_signalYieldTotal->GetBinContent(1);
+  float err=_signalYieldTotal->GetBinError(1);
+  _signalYieldTotal->SetBinContent(1,cont/_lumi);
+  _signalYieldTotal->SetBinError(1,err/_lumi);
+  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
+    cont=_signalYields1D->GetBinContent(ib);
+    err=_signalYields1D->GetBinError(ib);
+    _signalYields1D->SetBinContent(ib,cont/_lumi);
+    _signalYields1D->SetBinError(ib,err/_lumi);
   }
-  std::cout<<"yields over lumi:"<<std::endl;
-  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
-  for (int i=0; i<config_.GetNPhoPtBins(); i++)
-    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
+  Print("Yields over Lumi (pb):");
 }
 
 void CalcCrossSection::DivideOverBinWidth()
 {
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    signalYields1D_[i]=signalYields1D_[i]/(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
-    signalYieldsErr1D_[i]=signalYieldsErr1D_[i]/(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
+  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
+    float cont=_signalYields1D->GetBinContent(ib);
+    float err=_signalYields1D->GetBinError(ib);
+    float width=_signalYields1D->GetBinWidth(ib);
+    _signalYields1D->SetBinContent(ib,cont/width);
+    _signalYields1D->SetBinError(ib,err/width);
   }
-  std::cout<<"Cross section, pb:"<<std::endl;
-  std::cout<<"Total:"<<signalYieldTotal_<<"+-"<<signalYieldErrTotal_<<std::endl;
-  std::cout<<"Differential, pb/GeV:"<<std::endl;
-  for (int i=0; i<config_.GetNPhoPtBins(); i++)
-    std::cout<<"phoEt "<<vecPhoPtLimits_[i]<<"-"<<vecPhoPtLimits_[i+1]<<" GeV: "<<signalYields1D_[i]<<"+-"<<signalYieldsErr1D_[i]<<std::endl;
+  Print("Total (pb) and differential(pb/GeV) cross sections:");
 }
 
-void CalcCrossSection::PlotAndSaveOutput()
+void CalcCrossSection::Plot()
 {
-  TVectorF csTotal(1);
-  TVectorF csErrTotal(1);
-  TVectorF cs1D(config_.GetNPhoPtBins());
-  TVectorF csErr1D(config_.GetNPhoPtBins());
+  TCanvas* canv=new TCanvas("cCS","cCS",1200,600);
+  canv->Divide(1);
+  TPad* pad1D = (TPad*)canv->GetPad(1);
+  pad1D->SetLogx();
+  pad1D->SetLogy();
+  _signalYields1D->GetXaxis()->SetNoExponent();
+  _signalYields1D->GetXaxis()->SetMoreLogLabels();
+  _signalYields1D->SetLineWidth(2);
+  _signalYields1D->SetTitle("PRELIMINARY: d#sigma/dP_{T}^{#gamma}, pb/GeV");
+  pad1D->cd();
+  _signalYields1D->Draw();
+}
 
-  csTotal[0]=signalYieldTotal_;
-  csErrTotal[0]=signalYieldErrTotal_;
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    cs1D[i]=signalYields1D_[i];
-    csErr1D[i]=signalYieldsErr1D_[i];
+void CalcCrossSection::Print(TString strYields)
+{
+  std::cout<<std::endl;
+  std::cout<<strYields<<std::endl;
+  std::cout<<"tot: "<<_signalYieldTotal->GetBinContent(1)<<"+-"<<_signalYieldTotal->GetBinError(1)<<std::endl;
+  std::cout<<"1D: "<<std::endl;
+  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
+    std::cout<<_signalYields1D->GetBinLowEdge(ib)<<"-"<<_signalYields1D->GetBinLowEdge(ib)+_signalYields1D->GetBinWidth(ib)<<": "<<_signalYields1D->GetBinContent(ib)<<"+-"<<_signalYields1D->GetBinError(ib)<<std::endl;
   }
-  
-  TVectorF phoBins(config_.GetNPhoPtBins());
-  TVectorF phoBinsErr(config_.GetNPhoPtBins());
-  for (int i=0; i<config_.GetNPhoPtBins(); i++){
-    phoBins[i]=0.5*(vecPhoPtLimits_[i+1]+vecPhoPtLimits_[i]);
-    phoBinsErr[i]=0.5*(vecPhoPtLimits_[i+1]-vecPhoPtLimits_[i]);
-  }
-
-  TCanvas c("cCS","cCS");
-  TGraphErrors grCS(phoBins,cs1D,phoBinsErr,csErr1D);
-  TAxis* xAx=grCS.GetXaxis();
-  xAx->SetTitle("Pt_{#gamma}, GeV/c");
-  grCS.GetXaxis()->SetMoreLogLabels(kTRUE);
-  TAxis* yAx=grCS.GetYaxis();
-  yAx->SetTitle("d#sigma/dPt_{#gamma}, pb x c/GeV");
-  c.SetLogx();
-  c.SetLogy();
-  grCS.SetLineWidth(2);
-  grCS.Draw("AP");
-  c.SaveAs("cCS.png");
-  c.SaveAs("cCS.root");
-
+  std::cout<<std::endl;
 }

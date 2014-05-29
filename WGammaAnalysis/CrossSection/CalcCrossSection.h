@@ -7,32 +7,36 @@
 #include <vector>
 #include <string>
   //C++
+#include "TH1F.h"
+#include "TFile.h"
 
 class CalcCrossSection
   {
      public:
-       CalcCrossSection (int channel, string configfile="../Configuration/config.txt");
+       CalcCrossSection (int channel, int blind, string configfile="../Configuration/config.txt");
 
        virtual ~CalcCrossSection();
        void    Calc();
        void    GetSignalYields();
-       void    ApplyAccAndEff();
+       void    ApplyEfficiency();
+       void    ApplyUnfolding();
+       void    ApplyAcceptance();
        void    DivideOverLumi();
        void    DivideOverBinWidth();
-       void    PlotAndSaveOutput();
+       void    Plot();
+       void    Print(TString strYields);
+
+
 
      private:
 
-       int channel_;
-       TAllInputSamples* INPUT_;
-       TConfiguration config_;
-       float signalYieldTotal_;
-       float signalYieldErrTotal_;
-       vector <float> signalYields1D_;
-       vector <float> signalYieldsErr1D_;
-       float lumi_;
-
-       vector <float> vecPhoPtLimits_;
+       int _channel;
+       TAllInputSamples* _INPUT;
+       TConfiguration _config;
+       TFile* _fOut;
+       TH1F* _signalYieldTotal;
+       TH1F* _signalYields1D;
+       float _lumi;
   };
 
 #endif 

@@ -29,7 +29,7 @@ void TConfiguration::Print()
   std::cout<<"GetSampleName s: "<<GetSampleName(DATA)<<", "<<GetSampleName(SIGMC)<<", "<<GetSampleName(BKGMC)<<std::endl;
   std::cout<<"GetEtaBinName s: "<<GetEtaBinName(BARREL)<<", "<<GetEtaBinName(ENDCAP)<<", "<<GetEtaBinName(COMMON)<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,UNBLIND,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,UNBLIND,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,BLIND_PRESCALE,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
   std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BKGMC,"[sourceName]")<<std::endl;
@@ -69,10 +69,24 @@ TString TConfiguration::GetCsModeName(int csMode)
   return "UNKNOWN_CSMODE";
 }
 
-TString TConfiguration::GetSelectedName(int selectionStage, int channel, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight)
+TString TConfiguration::GetBlindModeName(int sample, int blindMode)
+{
+  if (sample!=DATA) return "";
+  if (blindMode==UNBLIND) return "UNblind";
+  else if (blindMode==BLIND_PRESCALE) return "blindPRESCALE";
+  else if (blindMode==BLIND_DECRACC) return "blindDECRACC";
+  return "UNKNOWN_BLIND_MODE";
+}
+
+TString TConfiguration::GetSelectedName(int selectionStage, int channel, int blindType, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight)
 {
   TString name = GetOutputDirName(channel); 
   name+=_selectedNameBase[selectionStage];
+  if (sample==DATA){
+    name+="_";
+    name+=GetBlindModeName(sample,blindType);
+    name+="_";
+  }
   name+=GetSampleName(sample);
   if (sample == BKGMC){
     name+="_";
@@ -226,6 +240,16 @@ float TConfiguration::GetPhoPtMax()
 float TConfiguration::GetLePhoDeltaRMin()
 {
   return _lePhoDeltaRMin;
+}
+
+int TConfiguration::GetBlindPrescale()
+{
+  return _blindPrescale;
+}
+
+int TConfiguration::GetPhoPtBlindThreshold()
+{
+  return _phoPtBlindThreshold;
 }
 
 int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed)

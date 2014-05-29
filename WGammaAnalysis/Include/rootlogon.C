@@ -23,8 +23,6 @@
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/WGammaSelection.C+");
 
-  gROOT->ProcessLine(".L ../Selection/ExtraSelection.C+");
-
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
@@ -35,7 +33,7 @@
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
 
-//  gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
+  gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
 
   gROOT->ProcessLine(".L ../FullChain/FullChain.C+");
 
@@ -44,7 +42,7 @@
   gROOT->ProcessLine(".L ../SkimSplitMerge/SplitWGammaMC.C+");
 
   gStyle->SetPalette(1);
-  gStyle->SetPaintTextFormat("0.2f");
+  gStyle->SetPaintTextFormat("0.0f");
   gStyle->SetCanvasColor(kWhite); 
 
 

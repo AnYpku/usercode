@@ -17,11 +17,11 @@ class TSelectedEventsTree
     virtual ~TSelectedEventsTree();
 
     void SetOutputTree(TTree* tree);
-    void Fill();
+//    void Fill();
     void SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, int ipho, int ile, float lePhoDeltaR, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector); 
 
   private:
-    TTree* _outTree;
+//    TTree* _outTree;
     int _event;
     int _iMCle;
     float _leEta;

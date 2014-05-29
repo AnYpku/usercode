@@ -33,7 +33,7 @@ TSelectionPlots::~TSelectionPlots()
 {
 }
 
-bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
+bool TSelectionPlots::GetTrees(int channel, int blind, string confFile, string strSources)
 {
 
   stringstream ss(strSources);
@@ -50,7 +50,7 @@ bool TSelectionPlots::GetTrees(int channel, string confFile, string strSources)
   for (int i=0; i<INPUT.nSources_; i++)
     {
 //      TString fileName = (TString)(config.GetSelectedName(config.VERY_PRELIMINARY, channel, INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_)) ;
-      TString fileName = (TString)(config.GetSelectedName(config.FULLY, channel, INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_)) ;
+      TString fileName = (TString)(config.GetSelectedName(config.FULLY, channel, blind, INPUT.allInputs_[i].sample_,INPUT.allInputs_[i].sourceName_)) ;
       bool doThisSource=0;
 
       for (int j=0; j<nNames; j++)

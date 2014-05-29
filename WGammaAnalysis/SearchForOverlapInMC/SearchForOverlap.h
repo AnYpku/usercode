@@ -19,6 +19,8 @@ class SearchForOverlap
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
 
+       void PlotTwoHistograms(TString canvName, TH1F* hGamma, TH1F* hJets);
+
      private:
 
        TAllInputSamples* _INPUT;
@@ -27,6 +29,17 @@ class SearchForOverlap
 
        int _channel;//ELECTRON, MUON
        int _sample; //DATA, SIGMC, BKGMC
+
+       TFile* _fOut;
+       
+       bool _hasWGamma;
+       bool _hasWJets;
+       bool _hasZGamma;
+       bool _hasZJets;
+       int _idWGamma;
+       int _idWJets;
+       int _idZGamma;
+       int _idZJets;
 
        bool _isDebugMode;
        bool _isNoPuReweight;
@@ -40,13 +53,24 @@ class SearchForOverlap
        int _iSource;
 
        TH1F* _histPhoPt[10];
-       TH1F* _histLepPt[10];
-       TH1F* _histdR[10];
+       TH1F* _histPhoEta[10];
+       TH1F* _histPhoPhi[10];
+       TH1F* _histLep1Pt[10];
+       TH1F* _histLep1Eta[10];
+       TH1F* _histLep1Phi[10];
+       TH1F* _histLep2Pt[10];
+       TH1F* _histLep2Eta[10];
+       TH1F* _histLep2Phi[10];
+
+       TH1F* _histLep1PhodR[10];
+       TH1F* _histLep2PhodR[10];
+       TH1F* _histLepLepdR[10];
+       TH1F* _histLepLepMass[10];
 
        const static int _debugModeNEntries=100000;
 
        TPuReweight* _puWeight;
-       TString _selectedTreeFileName;
+//       TString _selectedTreeFileName;
 
        float _nEvents;
        float _nEventsWithPhotons;

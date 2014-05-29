@@ -4,8 +4,10 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1D.h"
+#include "THStack.h"
 #include "TCut.h"
 #include "TString.h"
+#include "RooPlot.h"
 
 #include <vector>
 
@@ -15,38 +17,44 @@
 class TTemplates
 {
   public:
-    TTemplates(int channel);
+    TTemplates(int channel, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, int* nBinsLeftB, float* maxVarFitB, int* nBinsLeftE, float* maxVarFitE, int nBinsLeftBTot, float maxVarFitBTot, int nBinsLeftETot, float maxVarFitETot, bool isMetCutOptimization=0);
     virtual ~TTemplates();
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
-    void ComputeBackgroundOne(int ipt, bool noPrint=0, bool noPlot=0);
-    void PrepareTemplatesOnePtBin(int ipt, bool noPrint=0);
-    void SetThreeHists(int ptBin, int etaBin, bool noPrint=0);
-    void DeleteThreeHists(int ptBin, int etaBin);
+    void ComputeBackgroundOne(int ikin, bool noPrint=0, bool noPlot=0);
+    void PrepareTemplatesOneKinBin(int ikin, bool noPrint=0);
+    void SetThreeHists(int kinBin, int etaBin, bool noPrint=0);
+    void DeleteThreeHists(int kinBin, int etaBin);
 
-    void FitOne(int ptBin, int etaBin, bool noPrint=0, bool noPlot=0);
+    void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
     void PrintBkgYieldsAndChi2();
-    void ComputeBkgYieldOnePtBin(int ipt, bool noPrint=0);
-    void ComputeBkgYieldOne(TH1D* hBkgr, double nBkgrVal, double nBkgrErr, double& nBkgrYieldVal, double& nBkgrYieldErr,int ieta, int ipt, bool noPrint=0);
+    void ComputeBkgYieldOneKinBin(int ikin, bool noPrint=0);
+    void ComputeBkgYieldOne(TH1D* hBkgr, double nBkgrVal, double nBkgrErr, double& nBkgrYieldVal, double& nBkgrYieldErr,int ieta, int ikin, bool noPrint=0);
 
     void SetSignalTemplate(TH1D* hSign, TCut cut);
     void SetBackgrTemplate(TH1D* hBkgr, TH1D* hLeak, TH1D* hLeakTemp, TCut cut, bool noPrint=0);
 
+    void PlotTemplates();
+    void PlotOneTemplate(int kinBin, int etaBin, RooPlot* plotter, TH1D* hRatio, TH1D* hRatioSum);
+
     void SaveBkgYields();
 
     TCut SidebandCut(TString varSideband);
-    TCut CutPtBin(int ptBin);
+    TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
     TString StrLabelEta(int etaBin);
-    TString StrLabelPt(int ptBin);
+    TString StrLabelKin(int kinBin);
 
     double ValueCutNominalVarFit(TString varFit, int etaBin);
-    void FractionOfSidebandVarInRange(int ipt, int ieta, double& frac, double& fracErr);
-
-    void SelectOptimalNBinsLeft();
+    void FractionOfSidebandVarInRange(int ikin, int ieta, double& frac, double& fracErr);
 
   private:
     TConfiguration _config;
     int _channel;
+    int _blind;
+    bool _isMetCutOptimization;
+    int _selectionStage;
+
+    int _phoWP;
     TAllInputSamples* _INPUT;
     TFile* _fSign;
     TFile* _fData;
@@ -56,17 +64,30 @@ class TTemplates
     TTree* _treeSign;
     TTree* _treeData;
     vector <TTree*> _vecTreeBkg;
+    vector <TString> _vecBkgNames;
+    vector <int> _vecBkgColors;
 
-    float* _phoPtBinLimits;
+    TString _varKin;
+    int _nKinBins;
+    float* _kinBinLims;
 
     TString _varFit;
     TString _varSideband;
     TString _labelVarFit;
 
-    const static int _nBinsMax=20;
+    const static int _nBinsMax=50;
     TH1D* _hSign[_nBinsMax][3];
     TH1D* _hBkgr[_nBinsMax][3];
     TH1D* _hLeak[_nBinsMax][3];
+
+    //for plotting:
+    RooPlot* _plotter[_nBinsMax][3];
+    TH1D* _hRatio[_nBinsMax][3];
+    TH1D* _hSumForRatio[_nBinsMax][3];
+    RooPlot* _plotterTot[3];
+    TH1D* _hRatioTot[3];
+    TH1D* _hSumForRatioTot[3];
+
     double _chi2ToNDF[_nBinsMax][3];
     double _nBkgrVal[_nBinsMax][3];
     double _nBkgrErr[_nBinsMax][3];
@@ -82,6 +103,7 @@ class TTemplates
     TH1D* _hSignTot[3];
     TH1D* _hBkgrTot[3];
     TH1D* _hLeakTot[3];
+    THStack* _hBkgrAndLeakTot[3];
     double _chi2ToNDFTot[3];
     double _nBkgrValTot[3];
     double _nBkgrErrTot[3];
@@ -97,10 +119,10 @@ class TTemplates
 //    vector <double> bkgFractionEndcap_;
 //    vector <double> bkgFractionBarrelErr_;
 //    vector <double> bkgFractionEndcapErr_;
-    double _minVarFitB; //sIEtaIEtaBarrelMin_ = 0.007;
-    double _maxVarFitB; //sIEtaIEtaBarrelMax_ = 0.020;
-    double _minVarFitE; //sIEtaIEtaEndcapMin_ = 0.020;
-    double _maxVarFitE; //sIEtaIEtaEndcapMax_ = 0.050;
+    float _minVarFit[3]; //sIEtaIEtaBarrelMin_ = 0.007;
+    float _maxVarFitTot[3];
+    float _maxVarFit[_nBinsMax][3];
+
     //TTree** trData_;
     //TTree** trSignal_;
     //TTree** trBkg_;

@@ -10,13 +10,14 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TTree.h"
+#include "THStack.h"
 
 #include <vector>
 
 class TPrepareYields
 {
   public:
-    TPrepareYields(int channel);
+    TPrepareYields(int channel, int blind, TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization=0, int phoWP=TPhotonCuts::WP_TIGHT, TString phoIsoBase="SCR");
     virtual ~TPrepareYields();
     void PrepareYields();
     void SetYields();
@@ -27,6 +28,7 @@ class TPrepareYields
     void CompareTotalDATAvsSIGplusBKG();
     void CompareTotalDATAvsMC();
     void CompareSignalDATAvsMC();
+    void CompareStackVsHist(TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
     void PrintYields();
     void StoreYields();
 
@@ -35,10 +37,19 @@ class TPrepareYields
   private:
     TConfiguration _config;
     int _channel;
+    int _blind;
+    bool _isMetCutOptimization;
     TAllInputSamples* _INPUT;
     TPhotonCuts _emptyPhoton;
+    TCut _cutAdd;
 
-    float* _phoPtBinLimits;
+    bool _doLogX;
+    bool _doLogY;
+
+    TString _varKin;
+    int _nKinBins;
+    float* _kinBinLims;
+    TString _varKinLabel;
 
     TFile* _fOut;
 
@@ -78,7 +89,7 @@ class TPrepareYields
     TH1F* _floatingHist;
 
 
-    TLegend* _legend;
+ //   TLegend* _legend;
 
     TCanvas* _canvDDvsMC;
     TCanvas* _canvTotalDATAvsSIGplusBKG;

@@ -75,6 +75,8 @@ void CountPhotonSources()
   TCut cutWeight="weight";
   TCut cutFakeGamma="!(phoGenPID==22)";
   TCut cutTrueGamma="phoGenPID==22";
+  TCut cutCS="phoEt>15 && lePhoDeltaR>0.7";
+
 
   std::cout<<std::setw(15)<<"sample";
   std::cout<<std::setw(8)<<" n";
@@ -88,7 +90,7 @@ void CountPhotonSources()
 
 //    TString fileName = config.GetSelectedName(config.VERY_PRELIMINARY, config.MUON, vecSamples[iSource], vecNames[iSource]);
 
-    TString fileName = config.GetSelectedName(config.FULLY, config.MUON, vecSamples[iSource], vecNames[iSource]);
+    TString fileName = config.GetSelectedName(config.FULLY, config.MUON, config.UNBLIND, vecSamples[iSource], vecNames[iSource]);
 
     TFile f(fileName);
     if (!f.IsOpen()){
@@ -98,13 +100,13 @@ void CountPhotonSources()
     TTree* tr = (TTree*)f.Get("selectedEvents");
     TH1D* hist = new TH1D("hist","hist",1,0,10000);
 
-    tr->Draw("weight>>hist",cutWeight,"goff");
+    tr->Draw("weight>>hist",cutCS*cutWeight,"goff");
     int nEntries = hist->GetSumOfWeights();
 
-    tr->Draw("weight>>hist",cutFakeGamma*cutWeight,"goff");
+    tr->Draw("weight>>hist",(cutCS && cutFakeGamma)*cutWeight,"goff");
     int nFakes = hist->GetSumOfWeights();
 
-    tr->Draw("weight>>hist",cutTrueGamma*cutWeight,"goff");
+    tr->Draw("weight>>hist",(cutCS && cutTrueGamma)*cutWeight,"goff");
     int nTrues = hist->GetSumOfWeights();
 
     std::cout<<std::setw(15)<<vecNames[iSource];
@@ -118,7 +120,7 @@ void CountPhotonSources()
       strCut+=" || phoGenMomPID==-";
       strCut+=particle.id[i];
       TCut cut(strCut);
-      tr->Draw("weight>>hist",(cutTrueGamma&&cut)*cutWeight,"goff");
+      tr->Draw("weight>>hist",(cutCS && cutTrueGamma && cut)*cutWeight,"goff");
       particle.counts[i] = hist->GetSumOfWeights();
       std::cout<<std::setw(6)<<100*particle.counts[i]/nTrues<<std::setw(2)<<"%";
     }
@@ -175,7 +177,7 @@ void CountFakePhotonRates()
 //    if (vecInputs[iSource].sample_==config.DATA)
 //      continue;
 
-    TString fileName = config.GetSelectedName(config.VERY_PRELIMINARY, config.MUON, vecSamples[iSource], vecNames[iSource]);
+    TString fileName = config.GetSelectedName(config.VERY_PRELIMINARY, config.MUON, config.UNBLIND, vecSamples[iSource], vecNames[iSource]);
 
     TFile f(fileName);
     if (!f.IsOpen()){
@@ -232,7 +234,7 @@ void GetList(int sample, TString sourceName, int eventNeeded)
 {
 
   TConfiguration config;
-  TString fileName = config.GetSelectedName(config.FULLY, config.MUON, sample, sourceName);
+  TString fileName = config.GetSelectedName(config.FULLY, config.MUON, config.UNBLIND, sample, sourceName);
 
   TFile f(fileName);
   if (!f.IsOpen()){

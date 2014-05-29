@@ -101,6 +101,7 @@ void TEventTree::GetEntryEleSpecific(Long64_t entry)
 
 void TEventTree::GetEntryMCSpecific(Long64_t entry)
 {
+
    b_nMC->GetEntry(entry); 
    b_mcPID->GetEntry(entry); 
    b_mcMomPID->GetEntry(entry); 
@@ -113,8 +114,10 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
    b_mcMomPhi->GetEntry(entry);
    b_mcE->GetEntry(entry);
    b_mcEt->GetEntry(entry);
+
    b_mcIndex->GetEntry(entry);
-   b_mcDecayType->GetEntry(entry);
+//   b_mcDecayType->GetEntry(entry);
+//CalcAccAndEff broke at this point for some reason
 
    b_nPUInfo->GetEntry(entry);
    b_puTrue->GetEntry(entry);

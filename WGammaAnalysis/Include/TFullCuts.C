@@ -154,7 +154,7 @@ TCut TFullCuts::RangeMetRelatedCut()
 
 TCut TFullCuts::RangeForMetCut(int channel, int phoWP, TString phoIsoBase){
   TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(phoWP, phoIsoBase);
+  TCut cutPhoton=emptyPhoton.RangePhoton(phoWP, phoIsoBase, 0, 0);
   //phoIsoBase = "PF" or "SCR"
   TCut cutLepton;
   if (channel==TConfiguration::MUON){

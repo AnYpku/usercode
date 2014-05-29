@@ -24,64 +24,63 @@ TSelectedEventsTree::~TSelectedEventsTree()
 
 void TSelectedEventsTree::SetOutputTree(TTree* tree)
 {
-  _outTree=tree;
-  _outTree->Branch("event",&_event,"event/I");
-  _outTree->Branch("iMCle",&_iMCle,"iMCle/I");
-  _outTree->Branch("leptonEta",&_leEta,"leptonEta/F");
-  _outTree->Branch("leptonPhi",&_lePhi,"leptonPhi/F");
-  _outTree->Branch("leptonPt",&_lePt,"leptonPt/F");
-  _outTree->Branch("leptonGenPID",&_leGenPID,"leptonGenPID/I");
-  _outTree->Branch("leptonGenMomPID",&_leGenMomPID,"leptonGenMomPID/I");
-  _outTree->Branch("leptonGenGMomPID",&_leGenGMomPID,"leptonGenGMomPID/I");
-  _outTree->Branch("leptonId",&_leId,"leptonId/O");
-  _outTree->Branch("leptonIsolation",&_leIsolation,"leptonIsolation/F");
-  _outTree->Branch("leptonTrg",&_leTrg,"leptonTrg/I");
-  _outTree->Branch("trgMatchIsoMu24eta2p1",&_trgMatchIsoMu24eta2p1,"trgMatchIsoMu24eta2p1/O");
-  _outTree->Branch("trgMatchIsoMu24",&_trgMatchIsoMu24,"trgMatchIsoMu24/O");
-  _outTree->Branch("hasMoreLeptons",&_hasMoreLeptons,"hasMoreLeptons/O");
-  _outTree->Branch("HLT_IsoMu24_eta2p1_",&_HLT_IsoMu24_eta2p1_,"HLT_IsoMu24_eta2p1_/I");
-  _outTree->Branch("HLT_IsoMu24_v",&_HLT_IsoMu24_v,"HLT_IsoMu24_v/I");
-  _outTree->Branch("iMCpho",&_iMCpho,"iMCpho/I");
-  _outTree->Branch("phoElectronVeto",&_phoEleVeto,"phoElectronVeto/I");
-  _outTree->Branch("phoEta",&_phoEta,"phoEta/F");
-  _outTree->Branch("phoPhi",&_phoPhi,"phoPhi/F");
-  _outTree->Branch("phoEt",&_phoEt,"phoEt/F");
-  _outTree->Branch("phoEtNoPhosphor",&_phoEtNoPhosphor,"phoEtNoPhosphor/F");
-  _outTree->Branch("phoSCEta",&_phoSCEta,"phoSCEta/F");
-  _outTree->Branch("phoSCPhi",&_phoSCPhi,"phoSCPhi/F");
-  _outTree->Branch("phoSCEt",&_phoSCEt,"phoSCEt/F");
-  _outTree->Branch("phoGenPID",&_phoGenPID,"phoGenPID/I");
-  _outTree->Branch("phoGenMomPID",&_phoGenMomPID,"phoGenMomPID/I");
-  _outTree->Branch("phoGenGMomPID",&_phoGenGMomPID,"phoGenGMomPID/I");
-  _outTree->Branch("phoGenEt",&_phoGenEt,"phoGenEt/F");
-  _outTree->Branch("phoHoverE12",&_phoHoverE12,"phoHoverE12/F");
-  _outTree->Branch("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,"phoSigmaIEtaIEta/F");
-  _outTree->Branch("phoPFChIsoCorr",&_phoPFChIsoCorr,"phoPFChIsoCorr/F");
-  _outTree->Branch("phoSCRChIsoCorr",&_phoSCRChIsoCorr,"phoSCRChIsoCorr/F");
-  _outTree->Branch("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,"phoPFNeuIsoCorr/F");
-  _outTree->Branch("phoSCRNeuIsoCorr",&_phoSCRNeuIsoCorr,"phoSCRNeuIsoCorr/F");
-  _outTree->Branch("phoPFPhoIsoCorr",&_phoPFPhoIsoCorr,"phoPFPhoIsoCorr/F");
-  _outTree->Branch("phoSCRPhoIsoCorr",&_phoSCRPhoIsoCorr,"phoSCRPhoIsoCorr/F");
-  _outTree->Branch("lePhoDeltaR",&_lePhoDeltaR,"lePhoDeltaR/F");
-  _outTree->Branch("WMt",&_WMt,"WMt/F");
-  _outTree->Branch("pfMET",&_pfMET,"pfMET/F");
-  _outTree->Branch("pfMETPhi",&_pfMETPhi,"pfMETPhi/F");
-  _outTree->Branch("rho2012",&_rho2012,"rho2012/F");
-  _outTree->Branch("run",&_run,"run/I");
-  _outTree->Branch("inputFileNumber",&_inputFileN,"inputFileNumber/I");
-  _outTree->Branch("weight",&_weight,"weight/F");
-  _outTree->Branch("PUweight",&_PUweight,"PUweight/F");
-  _outTree->Branch("PU",&_PU,"PU/F");
-  _outTree->Branch("nMC",&_nMC,"nMC/I");
-  _outTree->Branch("mcPID","vector<int>", &_mcPID);
-  _outTree->Branch("mcMomPID","vector<int>", &_mcMomPID);
-  _outTree->Branch("mcGMomPID","vector<int>", &_mcGMomPID);
+  tree->Branch("event",&_event,"event/I");
+  tree->Branch("iMCle",&_iMCle,"iMCle/I");
+  tree->Branch("leptonEta",&_leEta,"leptonEta/F");
+  tree->Branch("leptonPhi",&_lePhi,"leptonPhi/F");
+  tree->Branch("leptonPt",&_lePt,"leptonPt/F");
+  tree->Branch("leptonGenPID",&_leGenPID,"leptonGenPID/I");
+  tree->Branch("leptonGenMomPID",&_leGenMomPID,"leptonGenMomPID/I");
+  tree->Branch("leptonGenGMomPID",&_leGenGMomPID,"leptonGenGMomPID/I");
+  tree->Branch("leptonId",&_leId,"leptonId/O");
+  tree->Branch("leptonIsolation",&_leIsolation,"leptonIsolation/F");
+  tree->Branch("leptonTrg",&_leTrg,"leptonTrg/I");
+  tree->Branch("trgMatchIsoMu24eta2p1",&_trgMatchIsoMu24eta2p1,"trgMatchIsoMu24eta2p1/O");
+  tree->Branch("trgMatchIsoMu24",&_trgMatchIsoMu24,"trgMatchIsoMu24/O");
+  tree->Branch("hasMoreLeptons",&_hasMoreLeptons,"hasMoreLeptons/O");
+  tree->Branch("HLT_IsoMu24_eta2p1_",&_HLT_IsoMu24_eta2p1_,"HLT_IsoMu24_eta2p1_/I");
+  tree->Branch("HLT_IsoMu24_v",&_HLT_IsoMu24_v,"HLT_IsoMu24_v/I");
+  tree->Branch("iMCpho",&_iMCpho,"iMCpho/I");
+  tree->Branch("phoElectronVeto",&_phoEleVeto,"phoElectronVeto/I");
+  tree->Branch("phoEta",&_phoEta,"phoEta/F");
+  tree->Branch("phoPhi",&_phoPhi,"phoPhi/F");
+  tree->Branch("phoEt",&_phoEt,"phoEt/F");
+  tree->Branch("phoEtNoPhosphor",&_phoEtNoPhosphor,"phoEtNoPhosphor/F");
+  tree->Branch("phoSCEta",&_phoSCEta,"phoSCEta/F");
+  tree->Branch("phoSCPhi",&_phoSCPhi,"phoSCPhi/F");
+  tree->Branch("phoSCEt",&_phoSCEt,"phoSCEt/F");
+  tree->Branch("phoGenPID",&_phoGenPID,"phoGenPID/I");
+  tree->Branch("phoGenMomPID",&_phoGenMomPID,"phoGenMomPID/I");
+  tree->Branch("phoGenGMomPID",&_phoGenGMomPID,"phoGenGMomPID/I");
+  tree->Branch("phoGenEt",&_phoGenEt,"phoGenEt/F");
+  tree->Branch("phoHoverE12",&_phoHoverE12,"phoHoverE12/F");
+  tree->Branch("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,"phoSigmaIEtaIEta/F");
+  tree->Branch("phoPFChIsoCorr",&_phoPFChIsoCorr,"phoPFChIsoCorr/F");
+  tree->Branch("phoSCRChIsoCorr",&_phoSCRChIsoCorr,"phoSCRChIsoCorr/F");
+  tree->Branch("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,"phoPFNeuIsoCorr/F");
+  tree->Branch("phoSCRNeuIsoCorr",&_phoSCRNeuIsoCorr,"phoSCRNeuIsoCorr/F");
+  tree->Branch("phoPFPhoIsoCorr",&_phoPFPhoIsoCorr,"phoPFPhoIsoCorr/F");
+  tree->Branch("phoSCRPhoIsoCorr",&_phoSCRPhoIsoCorr,"phoSCRPhoIsoCorr/F");
+  tree->Branch("lePhoDeltaR",&_lePhoDeltaR,"lePhoDeltaR/F");
+  tree->Branch("WMt",&_WMt,"WMt/F");
+  tree->Branch("pfMET",&_pfMET,"pfMET/F");
+  tree->Branch("pfMETPhi",&_pfMETPhi,"pfMETPhi/F");
+  tree->Branch("rho2012",&_rho2012,"rho2012/F");
+  tree->Branch("run",&_run,"run/I");
+  tree->Branch("inputFileNumber",&_inputFileN,"inputFileNumber/I");
+  tree->Branch("weight",&_weight,"weight/F");
+  tree->Branch("PUweight",&_PUweight,"PUweight/F");
+  tree->Branch("PU",&_PU,"PU/F");
+  tree->Branch("nMC",&_nMC,"nMC/I");
+  tree->Branch("mcPID","vector<int>", &_mcPID);
+  tree->Branch("mcMomPID","vector<int>", &_mcMomPID);
+  tree->Branch("mcGMomPID","vector<int>", &_mcGMomPID);
 }
 
-void TSelectedEventsTree::Fill()
-{
-  _outTree->Fill();
-}
+//void TSelectedEventsTree::Fill(TTree* tree)
+//{
+//  tree->Fill();
+//}
 
 void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, int ipho, int ile, float lePhoDeltaR, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector)
 {
