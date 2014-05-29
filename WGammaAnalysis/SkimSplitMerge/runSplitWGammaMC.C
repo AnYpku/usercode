@@ -1,7 +1,5 @@
 {
-  gROOT->ProcessLine(".L ../Include/TEventTree.C+");
-  gROOT->ProcessLine(".L TInputOutputTree.C+");
-  gROOT->ProcessLine(".L SplitWGammaMC.C+");
+  gROOT->ProcessLine(".x ../Include/rootlogon.C");
 
   //mcDecayType when the mcPID is 24 (W)
   //mcDecayType==1 => Wjetjet (no events here)
