@@ -453,17 +453,15 @@ void WGammaSelection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TC
     std::cout<<"file "<<fInName<<" was open"<<std::endl;
     _tr = (TTree*)fIn.Get("selectedEvents");
 
-    TPhotonCuts photon;
-    int phoWP=photon.GetWP();
 
     TString fOutName1=config.GetSelectedName(config.PRELIMINARY_FOR_MET_CUT,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut1(fOutName1,"recreate");
-    _tr1 = _tr->CopyTree(fullCut.RangeForMetCut(channel,phoWP, strPhoIsoBase));
+    _tr1 = _tr->CopyTree(fullCut.RangeForMetCut(channel,wp, strPhoIsoBase));
     _tr1->Write();
 
     TString fOutName2=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut2(fOutName2,"recreate");
-    _tr2 = _tr->CopyTree(fullCut.RangeForTemplateMethodCut(channel,phoWP, strPhoIsoBase));
+    _tr2 = _tr->CopyTree(fullCut.RangeForTemplateMethodCut(channel,wp, strPhoIsoBase));
     _tr2->Write();
 
     TString fOutName3=config.GetSelectedName(config.FULLY,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);

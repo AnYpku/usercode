@@ -117,7 +117,6 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
 
    b_mcIndex->GetEntry(entry);
    b_mcDecayType->GetEntry(entry);
-//CalcAccAndEff broke at this point for some reason
 
    b_nPUInfo->GetEntry(entry);
    b_puTrue->GetEntry(entry);
@@ -165,7 +164,7 @@ void TEventTree::Init(TTree *tree)
    treeLeaf.mcMomEta = 0;
    treeLeaf.mcMomPhi = 0;
    treeLeaf.mcIndex = 0;
-//   treeLeaf.mcDecayType = 0;
+   treeLeaf.mcDecayType = 0;
 //   treeLeaf.mcParentage = 0;
 //   treeLeaf.mcStatus = 0;
 //   treeLeaf.nPU = 0;

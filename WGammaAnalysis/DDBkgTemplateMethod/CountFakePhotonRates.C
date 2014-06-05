@@ -75,7 +75,7 @@ void CountPhotonSources()
   TCut cutWeight="weight";
   TCut cutFakeGamma="!(phoGenPID==22)";
   TCut cutTrueGamma="phoGenPID==22";
-  TCut cutCS="phoEt>15 && lePhoDeltaR>0.7";
+  TCut cutCS="phoEt>15 && phoEt<600 && lePhoDeltaR>0.7";
 
 
   std::cout<<std::setw(15)<<"sample";

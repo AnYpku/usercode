@@ -9,49 +9,18 @@ class TMuonCuts
   {
      public:
        TMuonCuts ();
-       TMuonCuts ( int imu,
-               float muPt_imu,
-               vector <float> *muPt,
-               float muEta_imu,
-               vector <float> *muEta,
-               int nMu,
-               int muNumberOfValidPixelHits_imu,
-               int muNumberOfValidTrkHits_imu,
-               int muNumberOfValidTrkLayers_imu_,
-               int muNumberOfValidMuonHits_imu_,
-               int muStations_imu,
-               int HLT_HLTIndex_18,
-               int HLT_HLTIndex_19,
-               int muTrg_imu,
-               float muChi2NDF_imu_,
-               float muD0_imu,
-               float muDZ_imu,
-               float muPFIsoR04_CH_imu,
-               float muPFIsoR04_NH_imu,
-               float muPFIsoR04_Pho_imu,
-               float muPFIsoR04_PU_imu);
-
        virtual ~TMuonCuts();
        bool HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <float> *muEta);
-//       bool MoreMuonsVeto();
-         //veto on having another muon
-       bool Passed();
-         //if muon passed the whole selection requirement 
-         //(except veto on having another muon)
-       bool PassedExceptKinematics();
-       bool MuTriggerMatch();
        bool PassedKinematics(float muPt, float muEta);
        float MuIsolation(float muPt, 
                  float muPFIsoR04_NH, float muPFIsoR04_Pho, 
                  float muPFIsoR04_PU,float muPFIsoR04_CH);
-       bool MuIsolationPassed();
         //mu Isolation as recommended here:
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation
        bool MuId(float muChi2NDF, float muD0, float muDZ, 
                 int muNumberOfValidMuonHits, int muNumberOfValidTrkHits, 
                 int muNumberOfValidPixelHits, int muNumberOfValidTrkLayers, 
                 int muStations);
-       bool MuId();
         //tight muon ID as recommended here:
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
 
@@ -61,29 +30,6 @@ class TMuonCuts
        TCut RangeMuon(bool doIsoCut=1, bool doIdCut=1, bool doTrgCut=1);
 
      private:
-       int imu_;
-       int nMu_;
-       int muNumberOfValidPixelHits_imu_;
-       int muNumberOfValidTrkHits_imu_;
-       int muNumberOfValidTrkLayers_imu_;
-       int muNumberOfValidMuonHits_imu_;
-       int muStations_imu_;
-       int HLT_HLTIndex_18_;
-       int muTrg_imu_;
-       int HLT_HLTIndex_19_;
-       float muChi2NDF_imu_;
-       float muPt_imu_;
-       float muEta_imu_;
-       float muD0_imu_;
-       float muDZ_imu_;
-       float muPFIsoR04_CH_imu_;
-       float muPFIsoR04_NH_imu_;
-       float muPFIsoR04_Pho_imu_;
-       float muPFIsoR04_PU_imu_;
-       vector <float> muPt_;
-       vector <float> muEta_;
-       
- 
 
        const static float muPtCut_=26.;
        const static float extraMuPtCut_=10.;

@@ -46,9 +46,27 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.noCalcAccAndEff=0;
   anPars.noCalcCrossSection=0;
 
+
   //for template method:
   anPars.strDDbkgVarFit="phoSCRChIsoCorr";
   anPars.strDDbkgVarSideband="phoSigmaIEtaIEta";
+//  anPars.strDDbkgVarFit="phoSigmaIEtaIEta";
+//  anPars.strDDbkgVarSideband="phoSCRChIsoCorr";
+  if (anPars.strDDbkgVarFit=="phoSCRChIsoCorr"){
+    anPars.nBinsLeftBTot=2;
+    //anPars.maxVarFitBTot=14.0;
+    anPars.maxVarFitBTot=6.0;
+    anPars.nBinsLeftETot=2;
+    //anPars.maxVarFitETot=14.0;
+    anPars.maxVarFitETot=6.0;
+  }
+  else if (anPars.strDDbkgVarFit=="phoSigmaIEtaIEta"){
+    anPars.nBinsLeftBTot=4;
+    anPars.maxVarFitBTot=0.022;
+    anPars.nBinsLeftETot=4;
+    anPars.maxVarFitETot=0.067;
+  }
+
   if (varKin=="phoEt")
     SetAnalysisKinParameters(anPars);
   else
@@ -62,10 +80,6 @@ void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
   anPars.nKinBins=_config.GetNPhoPtBins();
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   _config.GetPhoPtBinsLimits(anPars.kinBinLims);
-  anPars.nBinsLeftBTot=2;
-  anPars.maxVarFitBTot=14.0;
-  anPars.nBinsLeftETot=2;
-  anPars.maxVarFitETot=14.0;
   anPars.nBinsLeftB=new int[anPars.nKinBins];
   anPars.maxVarFitB=new float[anPars.nKinBins];
   anPars.nBinsLeftE=new int[anPars.nKinBins];
@@ -75,32 +89,38 @@ void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
     anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
     anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
     anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    if (anPars.kinBinLims[i]>24){
-      anPars.nBinsLeftB[i]=1;
-      anPars.nBinsLeftE[i]=1;
+/*
+    if (anPars.strDDbkgVarFit=="phoSCRChIsoCorr"){
+      if (anPars.kinBinLims[i]>24){
+        anPars.nBinsLeftB[i]=2;
+        anPars.nBinsLeftE[i]=2;
+      }
+      if (anPars.kinBinLims[i]>36){
+        anPars.maxVarFitE[i]=10.5;//20 events in last bin
+      }
+      if (anPars.kinBinLims[i]>61){
+        anPars.maxVarFitB[i]=10.5;//16 events in last bin
+        anPars.maxVarFitE[i]=8.5;//20 events in last bin
+      }
+      if (anPars.kinBinLims[i+1]>81){
+        anPars.maxVarFitB[i]=12.0;//20 events in last bin
+        anPars.maxVarFitE[i]=7.5;//15 events in last bin
+      }
+      if (anPars.kinBinLims[i]>201){
+        anPars.nBinsLeftB[i]=1;
+        anPars.nBinsLeftE[i]=1;
+        anPars.maxVarFitB[i]=4.0;//5 events in last bin; may limit at 2.0
+        anPars.maxVarFitE[i]=4.0;//4 events in last bin; may limit at 2.0
+      }
     }
-    if (anPars.kinBinLims[i]>36){
-      anPars.maxVarFitE[i]=10.5;//20 events in last bin
-    }
-    if (anPars.kinBinLims[i]>61){
-      anPars.maxVarFitB[i]=10.5;//16 events in last bin
-      anPars.maxVarFitE[i]=8.5;//20 events in last bin
-    }
-    if (anPars.kinBinLims[i+1]>81){
-      anPars.maxVarFitB[i]=12.0;//20 events in last bin
-      anPars.maxVarFitE[i]=7.5;//15 events in last bin
-    }
-    if (anPars.kinBinLims[i]>201){
-      anPars.maxVarFitB[i]=4.0;//5 events in last bin; may limit at 2.0
-      anPars.maxVarFitE[i]=4.0;//4 events in last bin; may limit at 2.0
-    }
+*/
   }
 }
 
 void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin)
 {
-  if (varKin=="phoEta"){
-    anPars.varKin="phoEta";
+  if (varKin=="phoSCEta" || varKin=="phoEta"){
+    anPars.varKin=varKin;
     anPars.nKinBins=4;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=-2.5;
@@ -205,7 +225,7 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
   if (varKin=="WMt"){
     anPars.isMetCutOptimization=1;
     anPars.varKin="WMt";
-    anPars.nKinBins=12;
+    anPars.nKinBins=15;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0+10*ib;
@@ -215,18 +235,10 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.nBinsLeftE=new int[anPars.nKinBins];
     anPars.maxVarFitE=new float[anPars.nKinBins];
     for (int i=0; i<anPars.nKinBins; i++){
-      if (anPars.kinBinLims[i]>9 && anPars.kinBinLims[i+1]<111){
         anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
         anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
         anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
         anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-      }
-      else{
-        anPars.nBinsLeftB[i]=2;
-        anPars.maxVarFitB[i]=5.0;
-        anPars.nBinsLeftE[i]=2;
-        anPars.maxVarFitE[i]=5.0;
-      }
     }
   }
 

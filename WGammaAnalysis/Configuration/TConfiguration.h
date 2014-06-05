@@ -89,7 +89,7 @@ static const float _phoPtMax=2000.;
 static const float _lePhoDeltaRMin=0.7;
   //minimum value for total and differential cross section; 
   //cut value may be bigger or equal to this value
-static const int _blindPrescale=13;//13;
+static const int _blindPrescale=20;//13;
 static const float _phoPtBlindThreshold=40.;
 
 /////////////////////////////////////////

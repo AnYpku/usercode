@@ -45,7 +45,7 @@ TPrepareYields::TPrepareYields(int channel,int blind,TString varKin, int nKinBin
   }
   _doLogX=0; _doLogY=0;
   _varKinLabel=_varKin;
-  if (_varKin=="phoEt" || _varKin=="phoSCEt") _varKinLabel="Pt_{#gamma}, GeV";
+  if (_varKin=="phoEt" || _varKin=="phoSCEt") _varKinLabel="Pt^{#gamma}, GeV";
 //  if (_kinBinLims[0]==0) _doLogX=1;
 //  else if (_kinBinLims[nKinBins]/_kinBinLims[0]>10) _doLogX=1;
 //  else _doLogX=0;
@@ -512,6 +512,44 @@ void TPrepareYields::PrintYields()
 {
   int nBins = _nKinBins;
 
+  //BKG MC yields
+  std::cout<<"BKG MC yields"<<std::endl;
+  std::cout<<"Total: ";
+  for (int i=0; i<_vecBkgMCYieldTot.size(); i++)
+    std::cout<<_vecBkgMCYieldTot[i]<<" ";
+  std::cout<<std::endl;
+  for (int ib=1; ib<=nBins; ib++){
+    std::cout<<"ib="<<ib<<": ";
+    for (int i=0; i<_vecBkgMCYields.size(); i++)
+      std::cout<<_vecBkgMCYields[i]->GetBinContent(ib)<<" ";
+    std::cout<<std::endl;
+  }
+
+  //BKG MC fake gamma yields
+  std::cout<<"BKG MC fake gamma yields"<<std::endl;
+  std::cout<<"Total: ";
+  for (int i=0; i<_vecBkgMCFakeGammaYieldTot.size(); i++)
+    std::cout<<_vecBkgMCFakeGammaYieldTot[i]<<" ";
+  std::cout<<std::endl;
+  for (int ib=1; ib<=nBins; ib++){
+    std::cout<<"ib="<<ib<<": ";
+    for (int i=0; i<_vecBkgMCFakeGammaYields.size(); i++)
+      std::cout<<_vecBkgMCFakeGammaYields[i]->GetBinContent(ib)<<" ";
+    std::cout<<std::endl;
+  }
+
+  //BKG MC true gamma yields
+  std::cout<<"BKG MC true gamma yields"<<std::endl;
+  std::cout<<"Total: ";
+  for (int i=0; i<_vecBkgMCTrueGammaYieldTot.size(); i++)
+    std::cout<<_vecBkgMCTrueGammaYieldTot[i]<<" ";
+  std::cout<<std::endl;
+  for (int ib=1; ib<=nBins; ib++){
+    std::cout<<"ib="<<ib<<": ";
+    for (int i=0; i<_vecBkgMCTrueGammaYields.size(); i++)
+      std::cout<<_vecBkgMCTrueGammaYields[i]->GetBinContent(ib)<<" ";
+    std::cout<<std::endl;
+  }
 
   //DATA
   std::cout<<"DATA"<<std::endl;

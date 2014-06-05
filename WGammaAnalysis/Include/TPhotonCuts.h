@@ -8,47 +8,28 @@ class TPhotonCuts
 {
   public:
     TPhotonCuts();
-    TPhotonCuts(    int phoEleVeto_ipho,
-                    float phoEt_ipho,
-                    float phoEta_ipho,
-                    float phoSCEt_ipho,
-                    float phoSCEta_ipho,
-                    float phoHoverE12_ipho,
-                    float phoSigmaIEtaIEta_ipho,
-                    float phoChIso_ipho,//phoPFChIso or phoSCRChIso
-                    float phoNeuIso_ipho,
-                    float phoPhoIso_ipho,
-                    float rho2012);
     virtual ~TPhotonCuts();
 
-    bool Passed(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
-    bool PassedExceptKinematics(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsocut=0);
+
     bool PassedKinematics(float phoPt, float phoEta);
-    bool PhoKinematics();
-    bool SimpleCutBasedPhotonID2012(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0); 
+
+//    bool SimpleCutBasedPhotonID2012(int wp, bool doSigmaIEtaIEtaCut=0, bool doPhoChIsoCut=0); 
       //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
       //for reference
 
     //the following three functions determine effective areas depending on |eta|
     //the values are taken from
     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
-    bool CutSigmaIEtaIEta(int wp, float eta, float sigmaIEtaIEta);
-    bool CutSigmaIEtaIEta(int wp);
-    bool CutPhoChIso(int wp, float phoChIso, float rho2012, float eta);
-    bool CutPhoChIso(int wp);
 
     float EffAreaCharged(float eta);
     float EffAreaNeutral(float eta);
     float EffAreaPhotons(float eta);
-    float EffAreaCharged();
-    float EffAreaNeutral();
-    float EffAreaPhotons();
+
     //the following function calculated corrected particle flow isolation
     float IsoCorr(float iso, float rho, float EA);
     bool IsBarrel(float phoEta);
     bool IsEndcap(float phoEta);
-    bool IsBarrel();
-    bool IsEndcap();
+
 
     float GetPhoChIsoCorr(float phoChIso, float rho2012, float eta);
     float GetPhoNeuIsoCorr(float phoNeuIso, float rho2012, float eta);
@@ -57,7 +38,6 @@ class TPhotonCuts
     float GetPhoSigmaIEtaIEtaCutE(int wp);
     float GetPhoSigmaIEtaIEtaCutLeftB();
     float GetPhoSigmaIEtaIEtaCutLeftE();
-    int   GetWP();
 
     TCut RangeBarrel();
     TCut RangeEndcap();
@@ -83,28 +63,8 @@ class TPhotonCuts
 
 
   private:
-    int phoEleVeto_ipho_; //conversion safe lectron veto
-    float phoEt_ipho_; //super cluster photon et
-    float phoEta_ipho_; //super cluster photon eta
-    float phoSCEt_ipho_; //super cluster detector et
-    float phoSCEta_ipho_; //super cluster detector eta
-    float phoHoverE12_ipho_; //single tower H/E
-    float phoSigmaIEtaIEta_ipho_; //shower shape variable
-    float phoChIso_ipho_; //particle flow charged isolation, PF or SCR
-    float phoNeuIso_ipho_;//particle flow neutral isolation, PF or SCR
-    float phoPhoIso_ipho_;//particle flow photon isolation, PF or SCR
-    float rho2012_;
 
-    //the following cuts depend on photon Pt
-    //(which will be phoSCEt_ here)
-    //these cut-arrays are filled in the constructor 
-    float phoNeuIsoBarrelCut_[3];
-    float phoNeuIsoEndcapCut_[3];
-    float phoPhoIsoBarrelCut_[3];
-    float phoPhoIsoEndcapCut_[3];
-
-    const static float phoPtCut_ = 10.0;
-    const static int WP_=WP_MEDIUM; 
+    const static float _phoPtCut = 10.0;
       //WP - working point
       //nWP - total number of working points
       //0 - loose  (90% for barrel, 85% for endcap) 

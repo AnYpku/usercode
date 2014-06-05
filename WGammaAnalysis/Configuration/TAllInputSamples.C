@@ -28,6 +28,7 @@ TAllInputSamples::~TAllInputSamples()
 
 void TAllInputSamples::ReadConfig(int channel, string configFile)
 {
+  std::cout<<"configfile: "<<configFile.c_str()<<std::endl;
   ifstream ifs;
   ifs.open(configFile.c_str());
   assert(ifs.is_open());
