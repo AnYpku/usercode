@@ -60,7 +60,7 @@ bool TFullCuts::VeryPreliminaryCut(bool** goodLeptonPhotonPairs,
      if (channel==TConfiguration::MUON){
        TMuonCuts emptyMuon;
        if (inpTreeLeaf.muPt->at(ile)>26)  passed.leptonPtPassed++;
-       if (inpTreeLeaf.muEta->at(ile)<2.1)    passed.leptonEtaPassed++;
+       if (fabs(inpTreeLeaf.muEta->at(ile))<2.1)    passed.leptonEtaPassed++;
        if (emptyMuon.PassedKinematics(inpTreeLeaf.muPt->at(ile),inpTreeLeaf.muEta->at(ile))){ 
          kinLeptonExists=1;
          kinLepton[ile]=1; 
@@ -148,6 +148,14 @@ TCut TFullCuts::RangeMetRelatedCut()
 {
   TString cutStr="WMt>";
   cutStr+=_WMtCut;
+  TCut cut(cutStr);
+  return cut;
+}
+
+TCut TFullCuts::RangePhoEt()
+{
+  TString cutStr="phoEt>";
+  cutStr+=_config.GetPhoPtMin();
   TCut cut(cutStr);
   return cut;
 }

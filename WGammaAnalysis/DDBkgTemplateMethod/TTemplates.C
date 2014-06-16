@@ -25,6 +25,7 @@
 #include "TCanvas.h"
 #include "TString.h"
 #include "TText.h"
+#include "TLatex.h"
 #include "TLine.h"
 #include "TGraph.h"
 #include "TGraphErrors.h"
@@ -35,7 +36,7 @@ using namespace RooFit ;
 TTemplates::TTemplates(int channel, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, int* nBinsLeftB, float* maxVarFitB, int* nBinsLeftE, float* maxVarFitE, int nBinsLeftBTot, float maxVarFitBTot, int nBinsLeftETot, float maxVarFitETot, bool isMetCutOptimization)
 {
 
-  //_isClosureTest=CLOSURE_TEST_1;
+ // _isClosureTest=CLOSURE_TEST_3;
   _isClosureTest=NO_CLOSURE_TEST;
   _cutWeight="weight";
   if (_isClosureTest) _cutWeight="1";
@@ -46,7 +47,7 @@ TTemplates::TTemplates(int channel, int blind, int phoWP, TString varFit, TStrin
   _blind=_config.UNBLIND;
   _phoWP=phoWP;
   _INPUT = new TAllInputSamples(_channel,"../Configuration/config.txt");
-  _fOutForSave = new TFile(_config.GetDDTemplateBkgFileName(_channel),"recreate");
+  _fOutForSave = new TFile(_config.GetDDTemplateFileName(_channel),"recreate");
   _varFit=varFit;
   _varSideband=varSideband;
   if (_varFit=="phoSigmaIEtaIEta") _labelVarFit="#sigma_{i#etai#eta}";
@@ -126,7 +127,7 @@ void TTemplates::ComputeBackgroundOne(int ikin, bool noPrint, bool noPlot)
   FitOne(ikin,_config.BARREL,noPrint,noPlot);
   SetThreeHists(ikin, _config.ENDCAP, noPrint);
   FitOne(ikin,_config.ENDCAP,noPrint,noPlot);
-  if (!_isClosureTest) ComputeBkgYieldOneKinBin(ikin,noPrint);
+  ComputeBkgYieldOneKinBin(ikin,noPrint);
 }
 
 void TTemplates::SetThreeHists(int kinBin, int etaBin, bool noPrint){
@@ -190,9 +191,9 @@ void TTemplates::SetThreeHists(int kinBin, int etaBin, bool noPrint){
     cutKin="phoEt>60";
 
   name+="_Sign"; 
-  cut = (cutEta && cutKin)*_cutWeight;
+  cut = cutEta && cutKin;
   if (_isClosureTest==CLOSURE_TEST_1) 
-      cut = (cutEta && cutKin && SidebandVarNominalCut())*_cutWeight; 
+      cut = cutEta && cutKin && SidebandVarNominalCut(); 
   if (!noPrint) {
     std::cout<<"cutEta="<<cutEta.GetTitle()<<std::endl;
     std::cout<<"cutKin="<<cutKin.GetTitle()<<std::endl;
@@ -203,12 +204,12 @@ void TTemplates::SetThreeHists(int kinBin, int etaBin, bool noPrint){
   _fOutForSave->cd();
   _hSign[kinBin][etaBin] = new TH1D(name,name,nFitBins,fitBinLims);
   _hSign[kinBin][etaBin]->Sumw2();
-  SetSignalTemplate(_hSign[kinBin][etaBin],cut);
+  SetSignalTemplate(_hSign[kinBin][etaBin],cut,noPrint);
 
   name.ReplaceAll("_Sign","_Bkgr");
-  cut = (cutEta && cutKin && cutSideband)*_cutWeight;
+  cut = cutEta && cutKin && cutSideband;
   if (_isClosureTest==CLOSURE_TEST_1) 
-      cut = (cutEta && cutKin && SidebandVarNominalCut())*_cutWeight;
+      cut = cutEta && cutKin && SidebandVarNominalCut();
   if (!noPrint) std::cout<<"bkgr template cut="<<cut.GetTitle()<<std::endl;
 
   _hBkgr[kinBin][etaBin] = new TH1D(name,name,nFitBins,fitBinLims);
@@ -224,34 +225,76 @@ void TTemplates::SetThreeHists(int kinBin, int etaBin, bool noPrint){
   if (!noPrint)     std::cout<<std::endl;
 }
 
-void TTemplates::SetSignalTemplate(TH1D* hSign, TCut cut)
+void TTemplates::SetSignalTemplate(TH1D* hSign, TCut cut, bool noPrint)
 {
   TString name=hSign->GetName();
-  _treeSign->Draw(_varFit+TString(">>")+name,cut,"goff");
+  _treeSign->Draw(_varFit+TString(">>")+name,cut*_cutWeight,"goff");
   if (_isClosureTest==CLOSURE_TEST_1 || _isClosureTest==CLOSURE_TEST_2){
     TPhotonCuts emptyPhoton;
     TCut cutTrue = emptyPhoton.RangeGenTruePhoton();
-    _treeData->Draw(_varFit+TString(">>")+name,cut && cutTrue*_cutWeight,"goff");
+    _treeData->Draw(_varFit+TString(">>")+name,(cut && cutTrue)*_cutWeight,"goff");
   }
+
+  TH1F* histTemp = new TH1F("hist","hist",1,_treeData->GetMinimum("weight"),_treeData->GetMaximum("weight"));
+  histTemp->Sumw2();
+  if (_isClosureTest==CLOSURE_TEST_1 || _isClosureTest==CLOSURE_TEST_2) 
+    _treeData->Draw("weight>>hist",cut,"goff");
+  else
+    _treeSign->Draw("weight>>hist",cut,"goff");
+  std::cout<<std::endl;
+  std::cout<<"Signal Template, mean weight =";
+  std::cout<<std::setprecision(2)<<histTemp->GetMean()<<"+-";
+  std::cout<<std::setprecision(2)<<histTemp->GetRMS()<<"; ";
+  std::cout<<std::endl;
+  std::cout<<std::endl;
+  delete histTemp;
+
 }
 
 void TTemplates::SetBackgrTemplate(TH1D* hBkgr, TH1D* hLeak, TH1D* hLeakTemp, TCut cut, bool noPrint)
 {
 
   TString nameBkgr=hBkgr->GetName();
-  _treeData->Draw(_varFit+TString(">>")+nameBkgr,cut,"goff");
+  _treeData->Draw(_varFit+TString(">>")+nameBkgr,cut*_cutWeight,"goff");
+  if (!noPrint)
+    std::cout<<"cut for hBkgr: "<<(cut*_cutWeight).GetTitle()<<std::endl;
   TPhotonCuts emptyPhoton;
+  TCut cutFake = emptyPhoton.RangeGenFakePhoton();
   if (_isClosureTest==CLOSURE_TEST_1){
-    TCut cutFake = emptyPhoton.RangeGenFakePhoton();
-    _treeData->Draw(_varFit+TString(">>")+nameBkgr,cut && cutFake*_cutWeight,"goff");
+    _treeData->Draw(_varFit+TString(">>")+nameBkgr,(cut && cutFake)*_cutWeight,"goff");
+  }
+
+  TH1F* histTemp = new TH1F("hist","hist",100,_treeData->GetMinimum("weight")-1,_treeData->GetMaximum("weight")+1);
+  histTemp->Sumw2();
+  if (_isClosureTest==CLOSURE_TEST_1) 
+    _treeData->Draw("weight>>hist",cut && cutFake,"goff");
+  else
+    _treeData->Draw("weight>>hist",cut,"goff");
+  std::cout<<std::endl;
+  std::cout<<"Backgr Template, mean weight =";
+  std::cout<<std::setprecision(2)<<histTemp->GetMean()<<"+-";
+  std::cout<<std::setprecision(2)<<histTemp->GetRMS()<<"; ";
+  std::cout<<std::endl;
+  std::cout<<std::endl;
+  delete histTemp;  
+
+  if (_isClosureTest==CLOSURE_TEST_1){
     return;
   }
 
+
   TString nameLeak=hLeak->GetName();
-  _treeSign->Draw(_varFit+TString(">>")+nameLeak,cut,"goff");
+  _treeSign->Draw(_varFit+TString(">>")+nameLeak,cut*_cutWeight,"goff");
+
+  TCut cutTrueGamma = emptyPhoton.RangeGenTruePhoton();
+  if (_isClosureTest) {
+    _treeData->Draw(_varFit+TString(">>")+nameLeak,(cut && cutTrueGamma)*_cutWeight,"goff");
+    if (!noPrint)
+      std::cout<<"cut for closure test for hLeak: "<<((cut && cutTrueGamma)*_cutWeight).GetTitle()<<std::endl;
+  }
 
   if (!noPrint){
-      std::cout<<"(fake bkrg)+leak="<<hBkgr->GetSumOfWeights()<<", (sign leak)="<<hLeak->GetSumOfWeights()<<std::endl;
+      std::cout<<"(fake bkrg)+leak="<<hBkgr->GetSumOfWeights()<<"="<<hBkgr->GetEntries()<<"*weight; (sign leak)="<<hLeak->GetSumOfWeights()<<"="<<hLeak->GetEntries()<<"*weight; "<<std::endl;
   }
 
   if (!noPrint) std::cout<<"_vecTreeBkg.size()="<<_vecTreeBkg.size()<<std::endl;
@@ -259,23 +302,22 @@ void TTemplates::SetBackgrTemplate(TH1D* hBkgr, TH1D* hLeak, TH1D* hLeakTemp, TC
 
   TString nameLeakTemp=hLeakTemp->GetName();
 
-  TCut cutTrueGamma = emptyPhoton.RangeGenFakePhoton();
+//  TCut cutFakeGamma = emptyPhoton.RangeGenFakePhoton();
 
   for (unsigned int is=0; is<_vecTreeBkg.size(); is++){
-    if (_isClosureTest){
-      if (_vecBkgNames[is]=="Wjets_to_lnu"){
-        _treeData->Draw(_varFit+TString(">>")+nameLeak,cut && cutTrueGamma*_cutWeight,"goff");
-        break;
-      }
-      else continue;
+    if (_isClosureTest) continue;
+    if (_vecBkgNames[is]=="Wjets_to_lnu" || _vecBkgNames[is]=="DYjets_to_ll" || _vecBkgNames[is]=="ttbarjets")
+      continue;
+    _vecTreeBkg[is]->Draw(_varFit+TString(">>")+nameLeakTemp,(cut && cutTrueGamma)*_cutWeight,"goff");
+    hLeak->Add(hLeakTemp);
+    if (!noPrint) std::cout<<" "<<_vecBkgNames[is]<<": "<<hLeakTemp->GetSumOfWeights();
+    //compute GetSum of Weights by hand
+    float histArea=0;
+    for (int ib=1; ib<=hLeakTemp->GetNbinsX(); ib++){
+      histArea+=hLeakTemp->GetBinContent(ib);
     }
-    else{
-      if (_vecBkgNames[is]=="Wjets_to_lnu" || _vecBkgNames[is]=="DYjets_to_ll" || _vecBkgNames[is]=="ttjets")
-        continue;
-      _vecTreeBkg[is]->Draw(_varFit+TString(">>")+nameLeakTemp,cut && cutTrueGamma*_cutWeight,"goff");
-      hLeak->Add(hLeakTemp);
-      if (!noPrint) std::cout<<" "<<hLeakTemp->GetSumOfWeights();
-    }
+    if (!noPrint) std::cout<<"="<<histArea<<"=";
+    if (!noPrint) std::cout<<hLeakTemp->GetEntries()<<"*weight; ";
   }
   if (!noPrint) std::cout<<std::endl;
   hBkgr->Add(hLeak,-1);
@@ -417,7 +459,7 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
     std::cout<<"kinCut="<<kinCut.GetTitle()<<std::endl;
     std::cout<<"sidebandVarNominalCut="<<sidebandVarNonimalCut.GetTitle()<<std::endl;
   }
-  TCut cut = (kinCut && etaCut && sidebandVarNonimalCut)*_cutWeight;
+  TCut cut = kinCut && etaCut && sidebandVarNonimalCut;
 	
   TString hName="hCloned";
   hName+=StrLabelKin(kinBin);
@@ -427,7 +469,19 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   varDraw+=">>";
   varDraw+=hName;
 
-  _treeData->Draw(varDraw,cut,"goff");
+  _treeData->Draw(varDraw,cut*_cutWeight,"goff");
+
+  TH1F* histTemp = new TH1F("hist","hist",1,_treeData->GetMinimum("weight"),_treeData->GetMaximum("weight"));
+  histTemp->Sumw2();
+  _treeData->Draw("weight>>hist",cut,"goff");
+  std::cout<<std::endl;
+  std::cout<<"Data Template, mean weight =";
+  std::cout<<std::setprecision(2)<<histTemp->GetMean()<<"+-";
+  std::cout<<std::setprecision(2)<<histTemp->GetRMS()<<"; ";
+  std::cout<<std::endl;
+  std::cout<<std::endl;
+  delete histTemp; 
+
   RooDataHist dataHist("hist", "data set converted to hist", argList, _hData[kinBin][etaBin]);
   std::cout<<"data hist TH1D* hist: "<<std::endl;
   _hData[kinBin][etaBin]->Print();
@@ -453,7 +507,7 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   RooExtendPdf ebkgPdf("ebkg","extended bkg",backgroundPdf,rooNBkg);
   RooAddPdf fullPdf("fitModel","fit model",RooArgList(esigPdf,ebkgPdf));
   //fit
-  fullPdf.fitTo(dataHist);
+  fullPdf.fitTo(dataHist,SumW2Error(kFALSE),Extended(kTRUE));
 
   //calc chi squared
   RooChi2Var chi2("chi2","chi2",fullPdf,dataHist);
@@ -478,8 +532,8 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   dataHist.plotOn(_plotter[kinBin][etaBin]);
   fullPdf.plotOn(_plotter[kinBin][etaBin],Name("sum"),LineColor(kRed));
   fullPdf.plotOn(_plotter[kinBin][etaBin],Components("signalPdf"), Name("signal"),
-  LineColor(kGreen));
-  fullPdf.plotOn(_plotter[kinBin][etaBin], Components("backgroundPdf"),Name("background"),LineColor(kBlue));
+  LineColor(kGreen),LineStyle(9));
+  fullPdf.plotOn(_plotter[kinBin][etaBin], Components("backgroundPdf"),Name("background"),LineColor(kBlue),LineStyle(9));
   fullPdf.paramOn(_plotter[kinBin][etaBin]);
   
 
@@ -490,28 +544,49 @@ void TTemplates::ComputeBkgYieldOneKinBin(int ikin, bool noPrint)
 {
   double nBkg[2];
   double nBkgErr[2];
+
+  if (!noPrint)
+    std::cout<<"Compute fake background yield: "<<std::endl;
+
   for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
     if (_nBkgrFromFitVal[ikin][ieta]==0){
       nBkg[ieta]=_nBkgrFromFitVal[ikin][ieta];
       nBkgErr[ieta]=_nBkgrFromFitErr[ikin][ieta];
     }
-    else ComputeBkgYieldOne(_hBkgr[ikin][ieta], _nBkgrFromFitVal[ikin][ieta], _nBkgrFromFitErr[ikin][ieta], nBkg[ieta], nBkgErr[ieta], ieta, ikin, noPrint);
+    else ComputeYieldOne(_hBkgr[ikin][ieta], _nBkgrFromFitVal[ikin][ieta], _nBkgrFromFitErr[ikin][ieta], nBkg[ieta], nBkgErr[ieta], ieta, ikin, noPrint);
   }
   _nBkgrYieldsVal[ikin]=nBkg[_config.BARREL]+nBkg[_config.ENDCAP];
-  _nBkgrYieldsErr[ikin]=sqrt(nBkgErr[_config.BARREL]*nBkgErr[_config.BARREL]+nBkgErr[_config.ENDCAP]*nBkgErr[_config.ENDCAP]);    
+  _nBkgrYieldsErr[ikin]=sqrt(nBkgErr[_config.BARREL]*nBkgErr[_config.BARREL]+nBkgErr[_config.ENDCAP]*nBkgErr[_config.ENDCAP]); 
+
+  double nSig[2];
+  double nSigErr[2];
+
+  if (!noPrint)
+    std::cout<<"Compute signal + true bkg yield (for checking purposes only) : "<<std::endl;
+
+  for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
+    if (_nSignFromFitVal[ikin][ieta]==0){
+      nBkg[ieta]=_nSignFromFitVal[ikin][ieta];
+      nBkgErr[ieta]=_nSignFromFitErr[ikin][ieta];
+    }
+    else ComputeYieldOne(_hSign[ikin][ieta], _nSignFromFitVal[ikin][ieta], _nSignFromFitErr[ikin][ieta], nSig[ieta], nSigErr[ieta], ieta, ikin, noPrint);
+  }
+  _nSignYieldsVal[ikin]=nSig[_config.BARREL]+nSig[_config.ENDCAP];
+  _nSignYieldsErr[ikin]=sqrt(nSigErr[_config.BARREL]*nSigErr[_config.BARREL]+nSigErr[_config.ENDCAP]*nSigErr[_config.ENDCAP]); 
+
 }
 
-void TTemplates::ComputeBkgYieldOne(TH1D* hBkgr, double nBkgrVal, double nBkgrErr, double& nBkgrYieldVal, double& nBkgrYieldErr, int ieta, int ikin, bool noPrint)
+void TTemplates::ComputeYieldOne(TH1D* hTemplate, double nValFromFit, double nErrFromFit, double& nYieldVal, double& nYieldErr, int ieta, int ikin, bool noPrint)
 {
 
   if (!noPrint){
     std::cout<<std::endl;
-    std::cout<<"ComputeBkgYieldOne: "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<std::endl;
+    std::cout<<"ComputeYieldOne: "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<std::endl;
     std::cout<<std::endl;
   }
 
-  int nHistBins = hBkgr->GetNbinsX();
-  nBkgrYieldVal=0;
+  int nHistBins = hTemplate->GetNbinsX();
+  nYieldVal=0;
   double Scut = 0;
   double Stot = 0;
   int nCut = 0;
@@ -519,38 +594,44 @@ void TTemplates::ComputeBkgYieldOne(TH1D* hBkgr, double nBkgrVal, double nBkgrEr
   int nBLeft=0;
   nBLeft=_nBinsLeft[ikin][ieta];
   for (int i=1; i<=nBLeft; i++){
-    Scut+=hBkgr->GetBinContent(i);
-    Stot+=hBkgr->GetBinContent(i);
+    Scut+=hTemplate->GetBinContent(i);
+    Stot+=hTemplate->GetBinContent(i);
   }
   if (!noPrint){
-    std::cout<<"fit var cut value = "<<hBkgr->GetBinLowEdge(nBLeft)+hBkgr->GetBinWidth(nBLeft)<<std::endl;
+    std::cout<<"nBLeft = "<<nBLeft<<std::endl;
+    std::cout<<"fit var cut value = "<<hTemplate->GetBinLowEdge(nBLeft)+hTemplate->GetBinWidth(nBLeft)<<std::endl;
   }
   for (int i=nBLeft+1; i<=nHistBins; i++){
-    Stot+=hBkgr->GetBinContent(i);
+    Stot+=hTemplate->GetBinContent(i);
   }
 
   if (Stot==0){
-    nBkgrYieldVal=0;
-    nBkgrYieldErr=0;
+    nYieldVal=0;
+    nYieldErr=0;
     return;
   }
 
-  nBkgrYieldVal=nBkgrVal*Scut/Stot;
+  nYieldVal=nValFromFit*Scut/Stot;
   //compute error
-  double firstTerm = nBkgrErr*nBkgrErr*Scut*Scut/(Stot*Stot);
+  double firstTerm = nErrFromFit*nErrFromFit*Scut*Scut/(Stot*Stot);
   double secondTerm = 0;
-  for (int j=1; j<=nCut; j++){
-    secondTerm += hBkgr->GetBinError(j)*hBkgr->GetBinError(j)* nBkgrVal*nBkgrVal*(Stot-Scut)*(Stot-Scut)/(Stot*Stot*Stot*Stot);
+  for (int j=1; j<=nBLeft; j++){
+    secondTerm += hTemplate->GetBinError(j)*hTemplate->GetBinError(j)* nValFromFit*nValFromFit*(Stot-Scut)*(Stot-Scut)/(Stot*Stot*Stot*Stot);
   }
   double thirdTerm = 0;
-  for (int j=nCut+1; j<=nHistBins; j++){
-    thirdTerm += hBkgr->GetBinError(j)*hBkgr->GetBinError(j)* nBkgrVal*nBkgrVal*Scut*Scut/(Stot*Stot*Stot*Stot);
+  for (int j=nBLeft+1; j<=nHistBins; j++){
+    thirdTerm += hTemplate->GetBinError(j)*hTemplate->GetBinError(j)* nValFromFit*nValFromFit*Scut*Scut/(Stot*Stot*Stot*Stot);
   }  
 
-  nBkgrYieldErr = sqrt(firstTerm+secondTerm+thirdTerm);
+  nYieldErr = sqrt(firstTerm+secondTerm+thirdTerm);
   if (!noPrint){
-    std::cout<<"Error computation, "<<StrLabelEta(ieta)<<std::endl;
-    std::cout<<"1st term = "<<sqrt(firstTerm)<<", 2nd term = "<<sqrt(secondTerm)<<", 3rd term = "<<sqrt(thirdTerm)<<std::endl;
+    std::cout<<std::endl;
+    std::cout<<"Compute Yield One: "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<std::endl;
+    std::cout<<"nBLeft="<<nBLeft<<", "<<" cut Value = "<<hTemplate->GetBinLowEdge(nBLeft)+hTemplate->GetBinWidth(nBLeft)<<std::endl;
+    std::cout<<"nVal(from fit)="<<nValFromFit<<", Scut="<<Scut<<", Stot="<<Stot<<std::endl;
+    std::cout<<"Error computation: "<<std::endl;
+    std::cout<<"1st term = "<<sqrt(firstTerm)<<", 2nd term = "<<sqrt(secondTerm)<<", 3rd term = "<<sqrt(thirdTerm)<<", err = "<<nYieldErr<<std::endl;
+    std::cout<<std::endl;
   }
 }
 
@@ -602,7 +683,7 @@ void TTemplates::PrintBkgYieldsAndChi2()
   std::cout<<std::endl;
   std::cout<<"--- Closure test only ---"<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"Bkgr values from fit vs fake gamma Wjets MC truth:"<<std::endl;
+  std::cout<<"Bkgr values from fit vs fake gamma Wjets MC truth vs _hBkgr->SumOfWeights()::"<<std::endl;
   for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
     std::cout<<StrLabelEta(ieta)<<": "<<std::endl;
     TCut cutVarFit;
@@ -610,14 +691,19 @@ void TTemplates::PrintBkgYieldsAndChi2()
     strCutVarFit+="<";
     strCutVarFit+=ValueCutNominalVarFit(ieta);
     cutVarFit=strCutVarFit;
-    for (int ikin=0; ikin<1; ikin++){
-    //for (int ikin=0; ikin<_nKinBins+1; ikin++){
+    //for (int ikin=0; ikin<1; ikin++){
+    for (int ikin=0; ikin<_nKinBins+1; ikin++){
       std::cout<<"ikin="<<ikin<<", "<<StrLabelKin(ikin)<<": ";
       std::cout<<_nBkgrFromFitVal[ikin][ieta]<<"+-";
       std::cout<<_nBkgrFromFitErr[ikin][ieta]<<"; ";
-      int y=_treeData->GetEntries( (CutKinBin(ikin) && CutEtaBin(ieta)&& cutFakeGamma && SidebandVarNominalCut())*_cutWeight);
-      std::cout<<y<<"+-";
-      std::cout<<sqrt(y)<<"; ";
+
+      TH1F* histTemp = new TH1F("hist","hist",1,_treeData->GetMinimum("event"),_treeData->GetMaximum("event"));
+      histTemp->Sumw2();
+      _treeData->Draw("event>>hist",(CutKinBin(ikin) && CutEtaBin(ieta)&& cutFakeGamma && SidebandVarNominalCut())*_cutWeight,"goff");
+      std::cout<<histTemp->GetBinContent(1)<<"+-";
+      std::cout<<histTemp->GetBinError(1)<<"; ";
+      delete histTemp;
+
       float yh=_hBkgr[ikin][ieta]->GetSumOfWeights();
       std::cout<<yh<<"+-";
       std::cout<<sqrt(yh)<<"; ";
@@ -632,8 +718,8 @@ void TTemplates::PrintBkgYieldsAndChi2()
     strCutVarFit+="<";
     strCutVarFit+=ValueCutNominalVarFit(ieta);
     cutVarFit=strCutVarFit;
-    for (int ikin=0; ikin<1; ikin++){
-    //for (int ikin=0; ikin<_nKinBins+1; ikin++){
+    //for (int ikin=0; ikin<1; ikin++){
+    for (int ikin=0; ikin<_nKinBins+1; ikin++){
       std::cout<<"ikin="<<ikin<<", "<<StrLabelKin(ikin)<<": ";
       std::cout<<_nSignFromFitVal[ikin][ieta]<<"+-";
       std::cout<<_nSignFromFitErr[ikin][ieta]<<"; ";
@@ -666,12 +752,20 @@ void TTemplates::PlotTemplates()
 void TTemplates::PlotOneTemplate(int kinBin, int etaBin)
 {
 
+  TString strBin = StrLabelKin(kinBin)+StrLabelEta(etaBin);
   TString strChi = "#chi^{2}/ndf=";
   float chiFloat=(100*_chi2ToNDF[kinBin][etaBin]);
   int chiInt=chiFloat;    
   strChi+=(chiInt/100);
   strChi+=".";
   strChi+=(chiInt%100);
+  TLatex* textChi2; 
+  textChi2 =new TLatex(0.75,0.65,strChi);
+  textChi2->SetNDC();
+
+  TText* textBin; 
+  textBin =new TText(0.55,0.75,strBin);
+  textBin->SetNDC();
 
 
   TString strRatio="hRatio";
@@ -774,6 +868,10 @@ void TTemplates::PlotOneTemplate(int kinBin, int etaBin)
     TLine* cutLine = new TLine(valCut,0,valCut,_hSumm[kinBin][etaBin]->GetMaximum());
     cutLine->SetLineWidth(3);
     cutLine->Draw("same");
+
+    textBin->Draw("same");
+    textChi2->Draw("same");
+
     pad2->cd();
     _hRatio[kinBin][etaBin]->SetLineWidth(2);
     _hRatio[kinBin][etaBin]->SetStats(0);
@@ -802,20 +900,35 @@ void TTemplates::SaveBkgYields()
 {
   _fOutForSave->cd();
 
-  TString strTot=_config.GetYieldsDDTemplateBkgName(_config.TOTAL);
+  //write fake yields computed from fit
+  //which is jets to gamma background
+  TString strTot=_config.GetYieldsDDTemplateFakeName(_config.TOTAL);
   TH1F hTotBkgYield(strTot,strTot,1,_kinBinLims[0],_kinBinLims[_nKinBins]);
-  TString str1D=_config.GetYieldsDDTemplateBkgName(_config.ONEDI);
+  TString str1D=_config.GetYieldsDDTemplateFakeName(_config.ONEDI);
   TH1F h1DBkgYield(str1D,str1D,_nKinBins,_kinBinLims);
-
   hTotBkgYield.SetBinContent(1,_nBkgrYieldsVal[0]);
   hTotBkgYield.SetBinError(1,_nBkgrYieldsErr[0]);
   for (int i=1; i<_nKinBins+1; i++){  
     h1DBkgYield.SetBinContent(i,_nBkgrYieldsVal[i]);
     h1DBkgYield.SetBinError(i,_nBkgrYieldsErr[i]);
   }
-
   hTotBkgYield.Write(strTot); 
-  h1DBkgYield.Write(_config.GetYieldsDDTemplateBkgName(_config.ONEDI)); 
+  h1DBkgYield.Write(str1D); 
+
+  //write true yields computed from fit
+  //which is true gamma background plus signal
+  strTot=_config.GetYieldsDDTemplateTrueName(_config.TOTAL);
+  TH1F hTotSigYield(strTot,strTot,1,_kinBinLims[0],_kinBinLims[_nKinBins]);
+  str1D=_config.GetYieldsDDTemplateTrueName(_config.ONEDI);
+  TH1F h1DSigYield(str1D,str1D,_nKinBins,_kinBinLims);
+  hTotSigYield.SetBinContent(1,_nSignYieldsVal[0]);
+  hTotSigYield.SetBinError(1,_nSignYieldsErr[0]);
+  for (int i=1; i<_nKinBins+1; i++){  
+    h1DSigYield.SetBinContent(i,_nSignYieldsVal[i]);
+    h1DSigYield.SetBinError(i,_nSignYieldsErr[i]);
+  }
+  hTotSigYield.Write(strTot); 
+  h1DSigYield.Write(str1D); 
 }
 
 TCut TTemplates::CutKinBin(int kinBin){

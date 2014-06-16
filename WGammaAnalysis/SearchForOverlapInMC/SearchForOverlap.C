@@ -23,6 +23,8 @@ SearchForOverlap::SearchForOverlap(int channel, bool isDebugMode, string analyze
   _isNoPuReweight=isNoPuReweight;
   _isDebugMode=isDebugMode;
 
+  std::cout<<"_isDegubMode: "<<_isDebugMode<<std::endl;  
+
   stringstream ss(analyzedSampleNames);
   vector <string> names;
   string name;
@@ -119,11 +121,6 @@ void SearchForOverlap::LoopOverInputFiles()
          } 
          TH1F* hEvents = (TH1F*)gDirectory->Get("hEvents");
          _nentries = (double)hEvents->GetBinContent(1);
-         if (_isDebugMode){
-           if (_debugModeNEntries>_nentries){
-              _nentries=_debugModeNEntries*(double)hEvents->GetBinContent(1)/_eventTree.fChain->GetEntries();
-           }
-         }
 
          float csMC=_INPUT->allInputs_[_iSource].cs_[0];
          _lumiWeight=_lumiData*csMC/_nentries;
@@ -134,6 +131,9 @@ void SearchForOverlap::LoopOverInputFiles()
          TString histNameB="h";
          histNameB+=_INPUT->allInputs_[_iSource].sourceName_;
          TString histName;
+
+         histName=histNameB+"_weight";
+         _histWeight[_iSource]=new TH1F(histName,histName,1000,0,100);
 
          histName=histNameB+"_PhoPt";
          _histPhoPt[_iSource]=new TH1F(histName,histName,60,0,60);
@@ -189,6 +189,7 @@ void SearchForOverlap::LoopOverInputFiles()
       PlotTwoHistograms("cZLep2PhodR", _histLep2PhodR[_idZGamma], _histLep2PhodR[_idZJets]);
       PlotTwoHistograms("cZLepLepdR", _histLepLepdR[_idZGamma], _histLepLepdR[_idZJets]);
       PlotTwoHistograms("cZLepLepMassT", _histLepLepMass[_idZGamma], _histLepLepMass[_idZJets]);
+      PlotTwoHistograms("cWeight", _histWeight[_idZGamma], _histWeight[_idZJets]);
     }
 
 }
@@ -255,6 +256,7 @@ void SearchForOverlap::LoopOverTreeEvents()
         _totalWeight = _lumiWeight;
         _totalWeight*= _puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
         _nEvents+=_totalWeight;
+        _histWeight[_iSource]->Fill(_totalWeight);
         int nPhoInEvent=0;
         int nSomeScheme=0;
 
@@ -295,7 +297,7 @@ void SearchForOverlap::LoopOverTreeEvents()
                   nSomeScheme++;
             }   
             for (int imc2=0; imc2<_eventTree.treeLeaf.nMC; imc2++){
-              if (fabs(_eventTree.treeLeaf.mcMomPID->at(imc2))==MU_LEPTON &&
+              if (fabs(_eventTree.treeLeaf.mcPID->at(imc2))==MU_LEPTON &&
                   fabs(_eventTree.treeLeaf.mcMomPID->at(imc2))==Z_BOSON &&
                   fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==Z_BOSON)
                 isZMuonTGC=1;
@@ -359,7 +361,7 @@ void SearchForOverlap::LoopOverTreeEvents()
             if (dphi>2*TMath::Pi())
               dphi=dphi-2*TMath::Pi();  
             deta=  _eventTree.treeLeaf.mcEta->at(ilep1)-_eventTree.treeLeaf.mcEta->at(imc);
-            dR=dphi*dphi-deta*deta;  
+            dR=dphi*dphi+deta*deta;  
             _histLep1PhodR[_iSource]->Fill(dR,_totalWeight);
           }
           if (ilep2>-1){  
@@ -371,7 +373,7 @@ void SearchForOverlap::LoopOverTreeEvents()
             if (dphi>2*TMath::Pi())
               dphi=dphi-2*TMath::Pi();  
             deta=  _eventTree.treeLeaf.mcEta->at(ilep2)-_eventTree.treeLeaf.mcEta->at(imc);
-            dR=dphi*dphi-deta*deta;  
+            dR=dphi*dphi+deta*deta;  
             _histLep2PhodR[_iSource]->Fill(dR,_totalWeight);   
           }
 
@@ -381,7 +383,7 @@ void SearchForOverlap::LoopOverTreeEvents()
             if (dphi>2*TMath::Pi())
               dphi=dphi-2*TMath::Pi();  
             deta=  _eventTree.treeLeaf.mcEta->at(ilep2)-_eventTree.treeLeaf.mcEta->at(ilep1);
-            dR=dphi*dphi-deta*deta;  
+            dR=dphi*dphi+deta*deta;  
             _histLepLepdR[_iSource]->Fill(dR,_totalWeight); 
             // Lep Lep Mass Transversed
             float massT = sqrt(2*_eventTree.treeLeaf.mcEt->at(ilep1)*_eventTree.treeLeaf.mcEt->at(ilep2)*(1-TMath::Cos(dphi))); 

@@ -1,34 +1,6 @@
 {
-  TFile f("../WGammaOutput/MUON/PreliminarySelected/selectedDATA.root");
-  TTree* tr = f.Get("selectedEvents");
-  TCut cutG="phoSigmaIEtaIEta<0.07";
-  TCut cutB="phoEta>-1.442 && phoEta<1.442";
-  TCut cutE="(phoEta>-2.5 && phoEta<-1.566)||(phoEta>1.566 && phoEta<2.5)";
-  tr->SetLineColor(1);
-  tr->SetLineWidth(2);
-  tr->Draw("phoSigmaIEtaIEta",cutG);
-  tr->SetLineColor(7);
-  tr->SetLineStyle(7);
-  tr->SetLineWidth(2);
-  tr->Draw("phoSigmaIEtaIEta",cutG && cutB,"same");
-  TLine* lineB = new TLine(0.011,0,0.011,1000000);
-  lineB->SetLineColor(7);
-  lineB->SetLineWidth(2);
-  lineB->Draw("same");
-  TLine* lineB2 = new TLine(0.005,0,0.005,1000000);
-  lineB2->SetLineColor(7);
-  lineB2->SetLineWidth(2);
-  lineB2->Draw("same");
-  tr->SetLineColor(46);
-  tr->SetLineStyle(7);
-  tr->SetLineWidth(2);
-  tr->Draw("phoSigmaIEtaIEta",cutG && cutE,"same");
-  TLine* lineE = new TLine(0.033,0,0.033,1000000);
-  lineE->SetLineColor(46);
-  lineE->SetLineWidth(2);
-  lineE->Draw("same");
-  TLine* lineE2 = new TLine(0.019,0,0.019,1000000);
-  lineE2->SetLineColor(46);
-  lineE2->SetLineWidth(2);
-  lineE2->Draw("same");
+  gROOT->ProcessLine(".L DrawPhoSigmaIEtaIEtaRanges.C+");
+  gStyle->SetCanvasColor(kWhite); 
+  DrawDataVsSignalMC();
+//  DrawRanges();
 }

@@ -67,7 +67,9 @@ class SearchForOverlap
        TH1F* _histLepLepdR[10];
        TH1F* _histLepLepMass[10];
 
-       const static int _debugModeNEntries=100000;
+       TH1F* _histWeight[10];
+
+       const static int _debugModeNEntries=10000;
 
        TPuReweight* _puWeight;
 //       TString _selectedTreeFileName;

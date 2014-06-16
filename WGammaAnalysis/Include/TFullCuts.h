@@ -7,6 +7,8 @@
 #include "TCut.h"
 //ROOT
 
+#include "../Configuration/TConfiguration.h"
+
 class TFullCuts{
 public:
   TFullCuts();
@@ -26,11 +28,13 @@ public:
   float GetWMtCut();
   TCut RangeMoreLeptonsVeto();
   TCut RangeMetRelatedCut();
+  TCut RangePhoEt();
   TCut RangeForMetCut(int channel, int phoWP, TString phoIsoBase);
   TCut RangeForTemplateMethodCut(int channel, int phoWP, TString phoIsoBase);
   TCut RangeFullCut(int channel, int phoWP, TString phoIsoBase);
 
 private:
+  TConfiguration _config;
   const static float _WMtCut = 50.;//50.;
   const static float _lePhoDeltaRCut = 0.7;//0.7;
 };

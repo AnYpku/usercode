@@ -38,10 +38,11 @@ class TConfiguration
     TString GetYieldsFileName(int channel);
     TString GetYieldsSelectedName(int csMode, int sample, TString sourceName="");
     TString GetYieldsSelectedSignalMCGenName(int csMode);
-    TString GetYieldsDDTemplateBkgName(int csMode);
+    TString GetYieldsDDTemplateFakeName(int csMode);
+    TString GetYieldsDDTemplateTrueName(int csMode);
     TString GetYieldsSignalName(int csMode);
 
-    TString GetDDTemplateBkgFileName(int channel);
+    TString GetDDTemplateFileName(int channel);
 
     TString GetAccFileName(int channel);
     TString GetAccName(int csMode);
@@ -110,7 +111,8 @@ TString _selectedNameBase[5];
 //
 static const TString _yieldsFileName="YieldsAndBackground/yields.root";
 static const TString _yieldsSelectedName="yieldsSelected";
-static const TString _yieldsDDTemplateBkgName="yieldsDDBkg";
+static const TString _yieldsDDTemplateFakeName="yieldsDDFake";
+static const TString _yieldsDDTemplateTrueName="yieldsDDTrue";
 static const TString _yieldsSignalName="yieldsSignal";
 static const TString _yieldsSelectedSignalMCGenName="yieldsSelectedSignalMCGen";
 
@@ -118,7 +120,7 @@ static const TString _yieldsSelectedSignalMCGenName="yieldsSelectedSignalMCGen";
 //////////////////////////////////////////
 //data driven background estimation
 //
-static const TString _DDTemplateBkgFileName="YieldsAndBackground/bkgDDTemplate.root";
+static const TString _DDTemplateFileName="YieldsAndBackground/DDTemplate.root";
 //_yieldsDDTemplateBkgHist are also here
 
 //////////////////////////////////////////

@@ -11,6 +11,7 @@
 #include "TLegend.h"
 #include "TTree.h"
 #include "THStack.h"
+#include "TLatex.h"
 
 #include <vector>
 
@@ -25,10 +26,12 @@ class TPrepareYields
     void SetYieldsDDBkgTemplate();
     void SubtractBackground();
     void CompareFakeBkgDDvsMC();
+    void CompareTrueBkgDDvsMC();
+    void CompareTotalDATAvsDDFakePlusTrue();
     void CompareTotalDATAvsSIGplusBKG();
     void CompareTotalDATAvsMC();
     void CompareSignalDATAvsMC();
-    void CompareStackVsHist(TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
+    void CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
     void PrintYields();
     void StoreYields();
 
@@ -42,6 +45,7 @@ class TPrepareYields
     TAllInputSamples* _INPUT;
     TPhotonCuts _emptyPhoton;
     TCut _cutAdd;
+    TCut _cutWeight;
 
     bool _doLogX;
     bool _doLogY;
@@ -77,9 +81,13 @@ class TPrepareYields
     vector <float> _vecBkgMCFakeGammaYieldTot;
     vector <float> _vecBkgMCFakeGammaYieldTotErr;
 
-    TH1F* _bkgDDFakeGammaYields;
-    float _bkgDDFakeGammaYieldTot;
-    float _bkgDDFakeGammaYieldTotErr;
+    TH1F* _DDFakeGammaYields;
+    float _DDFakeGammaYieldTot;
+    float _DDFakeGammaYieldTotErr;
+
+    TH1F* _DDTrueGammaYields;
+    float _DDTrueGammaYieldTot;
+    float _DDTrueGammaYieldTotErr;
 
 
     TH1F* _signalDataYields;
@@ -91,8 +99,11 @@ class TPrepareYields
 
  //   TLegend* _legend;
 
-    TCanvas* _canvDDvsMC;
-    TCanvas* _canvTotalDATAvsSIGplusBKG;
+    TCanvas* _canvFakeDDvsMC;
+    TCanvas* _canvTrueDDvsMC;
+    TCanvas* _canvTotalDATAvsDDFakePlusTrue;
+    TCanvas* _canvTotalDATAvsSIGplusBKG1;
+    TCanvas* _canvTotalDATAvsSIGplusBKG2;
     TCanvas* _canvSignalDATAvsMC;
     TCanvas* _canvTotalDATAvsMC;
     

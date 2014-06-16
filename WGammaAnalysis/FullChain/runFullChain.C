@@ -30,8 +30,8 @@
   anPars.isDebugMode=0;
   anPars.sampleMode=WGammaSelection::SIGMC;
 
-  anPars.noPreSelection=0;
-  anPars.noExtraSelection=0;
+  anPars.noPreSelection=1;
+  anPars.noExtraSelection=1;
   anPars.noDDBkgComputation=0;
   anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;

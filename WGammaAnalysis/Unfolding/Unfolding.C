@@ -77,37 +77,44 @@ bool Unfolding::TestDifferentMethods()
   
 
   TH1D* unfYieldsRooUnfInv = new TH1D("unfYieldsInv","unfolded yields Inversion",_nBinsGen,_phoPtLimitsGen);
-//  TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
-//  TVectorD errStatInv(_nBinsGen);
-//  TVectorD errSystInv(_nBinsGen);
-//  TVectorD errCovStatVInv(_nBinsGen);
-//  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv);
+  TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
+  TVectorD errStatInv(_nBinsGen);
+  TVectorD errSystInv(_nBinsGen);
+  TVectorD errCovStatVInv(_nBinsGen);
+  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv);
 
   TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",_nBinsGen,_phoPtLimitsGen);
-//  TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
-//  TVectorD errStatDAg(_nBinsGen);
-//  TVectorD errSystDAg(_nBinsGen);
-//  TVectorD errCovStatVDAg(_nBinsGen);
-  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes);
-//  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+  TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
+  TVectorD errStatDAg(_nBinsGen);
+  TVectorD errSystDAg(_nBinsGen);
+  TVectorD errCovStatVDAg(_nBinsGen);
+//  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes);
+  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 //  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 
   std::cout<<std::endl;
-  std::cout<<"   limits;      RooUnf inv;       RooUnf D'Ag"<<std::endl;  
+  std::cout<<"   limits;      RooUnf inv;       RooUnf D'Ag;      histYieldsGen;        Input Yields"<<std::endl;  
 
   std::cout<<std::endl;
   
   for (int i=1; i<=_nBinsGen; i++){
-//    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" GeV: ";
+    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" GeV: ";
       //limits
 
-//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatInv(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystInv(i-1)<<"=";
-//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<unfYieldsRooUnfInv->GetBinError(i)<<";     ";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatInv(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystInv(i-1)<<"=";
+   std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<unfYieldsRooUnfInv->GetBinError(i)<<";     ";
       //inversion
 
-//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatDAg(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystDAg(i-1)<<"=";
-//    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<unfYieldsRooUnfDAg->GetBinError(i)<<";     ";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatDAg(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystDAg(i-1)<<"=";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<unfYieldsRooUnfDAg->GetBinError(i)<<";     ";
       //D'Agostini
+
+    std::cout<<std::setw(5)<<std::setprecision(0)<<_histYieldsGen->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<_histYieldsGen->GetBinError(i)<<";    ";
+      //gen yields
+
+    std::cout<<std::setw(5)<<std::setprecision(0)<<_histYieldsRec->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<_histYieldsRec->GetBinError(i)<<";    ";
+      //gen yields->GetBinError(i)<<";    ";
+      //rec yields
 
     std::cout<<std::endl;
   }

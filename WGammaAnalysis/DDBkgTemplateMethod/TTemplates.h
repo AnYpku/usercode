@@ -30,9 +30,9 @@ class TTemplates
     void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
     void PrintBkgYieldsAndChi2();
     void ComputeBkgYieldOneKinBin(int ikin, bool noPrint=0);
-    void ComputeBkgYieldOne(TH1D* hBkgr, double nBkgrVal, double nBkgrErr, double& nBkgrYieldVal, double& nBkgrYieldErr,int ieta, int ikin, bool noPrint=0);
+    void ComputeYieldOne(TH1D* hBkgr, double nBkgrVal, double nBkgrErr, double& nBkgrYieldVal, double& nBkgrYieldErr,int ieta, int ikin, bool noPrint=0);
 
-    void SetSignalTemplate(TH1D* hSign, TCut cut);
+    void SetSignalTemplate(TH1D* hSign, TCut cut, bool noPrint=0);
     void SetBackgrTemplate(TH1D* hBkgr, TH1D* hLeak, TH1D* hLeakTemp, TCut cut, bool noPrint=0);
 
     void PlotTemplates();
@@ -97,7 +97,11 @@ class TTemplates
 
     double _nBkgrYieldsVal[_nBinsMax];
     double _nBkgrYieldsErr[_nBinsMax];
-
+    double _nSignYieldsVal[_nBinsMax];
+    double _nSignYieldsErr[_nBinsMax];
+    // strictly, bkgr and sign are not background and signal
+    // but bkgr is fake gamma bkgr
+    // and sign is signal plus true gamma bkgr
 
     TFile* _fOutForSave;
 

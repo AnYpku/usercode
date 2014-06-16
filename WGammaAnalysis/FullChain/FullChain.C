@@ -54,11 +54,9 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
 //  anPars.strDDbkgVarSideband="phoSCRChIsoCorr";
   if (anPars.strDDbkgVarFit=="phoSCRChIsoCorr"){
     anPars.nBinsLeftBTot=2;
-    //anPars.maxVarFitBTot=14.0;
-    anPars.maxVarFitBTot=6.0;
+    anPars.maxVarFitBTot=14.0;
     anPars.nBinsLeftETot=2;
-    //anPars.maxVarFitETot=14.0;
-    anPars.maxVarFitETot=6.0;
+    anPars.maxVarFitETot=14.0;
   }
   else if (anPars.strDDbkgVarFit=="phoSigmaIEtaIEta"){
     anPars.nBinsLeftBTot=4;
@@ -89,31 +87,31 @@ void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
     anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
     anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
     anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-/*
+
     if (anPars.strDDbkgVarFit=="phoSCRChIsoCorr"){
       if (anPars.kinBinLims[i]>24){
         anPars.nBinsLeftB[i]=2;
         anPars.nBinsLeftE[i]=2;
       }
-      if (anPars.kinBinLims[i]>36){
+      if (anPars.kinBinLims[i]>34){
         anPars.maxVarFitE[i]=10.5;//20 events in last bin
       }
-      if (anPars.kinBinLims[i]>61){
+      if (anPars.kinBinLims[i]>59){
         anPars.maxVarFitB[i]=10.5;//16 events in last bin
         anPars.maxVarFitE[i]=8.5;//20 events in last bin
       }
-      if (anPars.kinBinLims[i+1]>81){
+      if (anPars.kinBinLims[i]>79){
         anPars.maxVarFitB[i]=12.0;//20 events in last bin
         anPars.maxVarFitE[i]=7.5;//15 events in last bin
       }
-      if (anPars.kinBinLims[i]>201){
+      if (anPars.kinBinLims[i]>199){
         anPars.nBinsLeftB[i]=1;
         anPars.nBinsLeftE[i]=1;
         anPars.maxVarFitB[i]=4.0;//5 events in last bin; may limit at 2.0
         anPars.maxVarFitE[i]=4.0;//4 events in last bin; may limit at 2.0
       }
     }
-*/
+
   }
 }
 

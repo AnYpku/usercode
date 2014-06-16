@@ -164,18 +164,6 @@ void WGammaSelection::LoopOverInputFiles()
            _lumiWeight=1;
          else{
            _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[_inputFileN];
-           if (!_eventTree.treeLeaf.isData && _isDebugMode){
-             float cs;
-             if (_INPUT->allInputs_[iSource].isSharedCS_)
-               cs=_INPUT->allInputs_[iSource].csTotal_;
-             else cs=_INPUT->allInputs_[iSource].cs_[_inputFileN];
-             TH1F* hEvents = (TH1F*)gDirectory->Get("hEvents");
-             double nEvents = (double)hEvents->GetBinContent(1);
-             hEvents=0;
-             nEvents = nEvents/_INPUT->allInputs_[iSource].factor_[_inputFileN];
-             double nDebugEvents=nEvents*_debugModeNEntries/_eventTree.fChain->GetEntries();
-             _lumiWeight=cs*_lumiData/nDebugEvents;
-           }
          }
 
 

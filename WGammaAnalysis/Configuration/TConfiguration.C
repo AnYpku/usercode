@@ -34,7 +34,7 @@ void TConfiguration::Print()
   std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
   std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetFractionsDDTemplateBkgFileName s"<<GetDDTemplateBkgFileName(MUON)<<std::endl;
+  std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON)<<std::endl;
 
 }
 
@@ -124,9 +124,14 @@ TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode)
   return _yieldsSelectedSignalMCGenName+GetCsModeName(csMode);
 }
 
-TString TConfiguration::GetYieldsDDTemplateBkgName(int csMode)
+TString TConfiguration::GetYieldsDDTemplateFakeName(int csMode)
 {
-  return _yieldsDDTemplateBkgName+GetCsModeName(csMode);
+  return _yieldsDDTemplateFakeName+GetCsModeName(csMode);
+}
+
+TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode)
+{
+  return _yieldsDDTemplateTrueName+GetCsModeName(csMode);
 }
 
 TString TConfiguration::GetYieldsSignalName(int csMode)
@@ -134,9 +139,9 @@ TString TConfiguration::GetYieldsSignalName(int csMode)
   return _yieldsSignalName+GetCsModeName(csMode);
 }
 
-TString TConfiguration::GetDDTemplateBkgFileName(int channel)
+TString TConfiguration::GetDDTemplateFileName(int channel)
 {
-  return GetOutputDirName(channel)+_DDTemplateBkgFileName;
+  return GetOutputDirName(channel)+_DDTemplateFileName;
 }
 
 
