@@ -27,6 +27,7 @@ FullChain::~FullChain()
 
 void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TString varKin)
 {
+  anPars.year=2012;//2012, 2011
   anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
   anPars.blind=TConfiguration::BLIND_PRESCALE;
 
@@ -35,9 +36,11 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.configfile="../Configuration/config.txt";
   anPars.isNoPuReweight=0;
   anPars.isDebugMode=0;
+  anPars.noAdjustBinning=0;
   anPars.isMetCutOptimization=0;
   anPars.phoWP=TPhotonCuts::WP_TIGHT;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
-  anPars.strPhoIsoBase="SCR";//"SCR","PF"
+
+  anPars.noPhoPFChIsoCut=0;
 
   anPars.noPreSelection=0;
   anPars.noExtraSelection=0;
@@ -52,18 +55,6 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.strDDbkgVarSideband="phoSigmaIEtaIEta";
 //  anPars.strDDbkgVarFit="phoSigmaIEtaIEta";
 //  anPars.strDDbkgVarSideband="phoSCRChIsoCorr";
-  if (anPars.strDDbkgVarFit=="phoSCRChIsoCorr"){
-    anPars.nBinsLeftBTot=2;
-    anPars.maxVarFitBTot=14.0;
-    anPars.nBinsLeftETot=2;
-    anPars.maxVarFitETot=14.0;
-  }
-  else if (anPars.strDDbkgVarFit=="phoSigmaIEtaIEta"){
-    anPars.nBinsLeftBTot=4;
-    anPars.maxVarFitBTot=0.022;
-    anPars.nBinsLeftETot=4;
-    anPars.maxVarFitETot=0.067;
-  }
 
   if (varKin=="phoEt")
     SetAnalysisKinParameters(anPars);
@@ -74,51 +65,34 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
 
 void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
 {
-  anPars.varKin="phoEt";
+    anPars.varKin="phoEt";
+
+    anPars.nKinBins=2;
+    anPars.kinBinLims=new float[anPars.nKinBins+1];
+    anPars.kinBinLims[0]=10;
+    anPars.kinBinLims[1]=20;
+    anPars.kinBinLims[2]=30;
+
+/*
   anPars.nKinBins=_config.GetNPhoPtBins();
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   _config.GetPhoPtBinsLimits(anPars.kinBinLims);
-  anPars.nBinsLeftB=new int[anPars.nKinBins];
-  anPars.maxVarFitB=new float[anPars.nKinBins];
-  anPars.nBinsLeftE=new int[anPars.nKinBins];
-  anPars.maxVarFitE=new float[anPars.nKinBins];
-  for (int i=0; i<anPars.nKinBins; i++){
-    anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-    anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-    anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-    anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-
-    if (anPars.strDDbkgVarFit=="phoSCRChIsoCorr"){
-      if (anPars.kinBinLims[i]>24){
-        anPars.nBinsLeftB[i]=2;
-        anPars.nBinsLeftE[i]=2;
-      }
-      if (anPars.kinBinLims[i]>34){
-        anPars.maxVarFitE[i]=10.5;//20 events in last bin
-      }
-      if (anPars.kinBinLims[i]>59){
-        anPars.maxVarFitB[i]=10.5;//16 events in last bin
-        anPars.maxVarFitE[i]=8.5;//20 events in last bin
-      }
-      if (anPars.kinBinLims[i]>79){
-        anPars.maxVarFitB[i]=12.0;//20 events in last bin
-        anPars.maxVarFitE[i]=7.5;//15 events in last bin
-      }
-      if (anPars.kinBinLims[i]>199){
-        anPars.nBinsLeftB[i]=1;
-        anPars.nBinsLeftE[i]=1;
-        anPars.maxVarFitB[i]=4.0;//5 events in last bin; may limit at 2.0
-        anPars.maxVarFitE[i]=4.0;//4 events in last bin; may limit at 2.0
-      }
-    }
-
-  }
+*/
 }
 
 void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin)
 {
   if (varKin=="phoSCEta" || varKin=="phoEta"){
     anPars.varKin=varKin;
+/*
+    anPars.nKinBins=3;
+    anPars.kinBinLims=new float[anPars.nKinBins+1];
+    anPars.kinBinLims[0]=-2.5;
+    anPars.kinBinLims[1]=-1.5;
+    anPars.kinBinLims[2]=1.5;
+    anPars.kinBinLims[3]=2.5;
+*/
+/*
     anPars.nKinBins=4;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=-2.5;
@@ -126,17 +100,32 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[2]=0;
     anPars.kinBinLims[3]=1.5;
     anPars.kinBinLims[4]=2.5;
+*/
 
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
+    anPars.nKinBins=20;
+    anPars.kinBinLims=new float[anPars.nKinBins+1];
+    anPars.kinBinLims[0]=-2.5;
+    anPars.kinBinLims[1]=-2.366;
+    anPars.kinBinLims[2]=-2.166;
+    anPars.kinBinLims[3]=-1.966;
+    anPars.kinBinLims[4]=-1.766;
+    anPars.kinBinLims[5]=-1.566;
+    anPars.kinBinLims[6]=-1.4442;
+    anPars.kinBinLims[7]=-1.08315;
+    anPars.kinBinLims[8]=-0.7221;
+    anPars.kinBinLims[9]=-0.36105;
+    anPars.kinBinLims[10]=0;
+    anPars.kinBinLims[11]=0.36105;
+    anPars.kinBinLims[12]=0.7221;
+    anPars.kinBinLims[13]=1.08315;
+    anPars.kinBinLims[14]=1.4442;
+    anPars.kinBinLims[15]=1.566;
+    anPars.kinBinLims[16]=1.766;
+    anPars.kinBinLims[17]=1.966;
+    anPars.kinBinLims[18]=2.166;
+    anPars.kinBinLims[19]=2.366;
+    anPars.kinBinLims[20]=2.5;
+
   }
   if (varKin=="phoPhi"){
     anPars.varKin="phoPhi";
@@ -144,18 +133,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
-
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
   }
 
   if (varKin=="leptonPt"){
@@ -164,18 +141,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=26+10*ib;
-
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
   }
 
   if (varKin=="leptonPhi"){
@@ -184,60 +149,39 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
-
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
   }
 
   if (varKin=="leptonEta"){
     anPars.varKin="leptonEta";
-    anPars.nKinBins=4;
+    anPars.nKinBins=16;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=-2.1;
-    anPars.kinBinLims[1]=-1.5;
-    anPars.kinBinLims[2]=0;
-    anPars.kinBinLims[3]=1.5;
-    anPars.kinBinLims[4]=2.1;
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
+    anPars.kinBinLims[1]=-1.966;
+    anPars.kinBinLims[2]=-1.766;
+    anPars.kinBinLims[3]=-1.566;
+    anPars.kinBinLims[4]=-1.4442;
+    anPars.kinBinLims[5]=-1.08315;
+    anPars.kinBinLims[6]=-0.7221;
+    anPars.kinBinLims[7]=-0.36105;
+    anPars.kinBinLims[8]=0;
+    anPars.kinBinLims[9]=0.36105;
+    anPars.kinBinLims[10]=0.7221;
+    anPars.kinBinLims[11]=1.08315;
+    anPars.kinBinLims[12]=1.4442;
+    anPars.kinBinLims[13]=1.566;
+    anPars.kinBinLims[14]=1.766;
+    anPars.kinBinLims[15]=1.966;
+    anPars.kinBinLims[16]=2.1;
   }
 
   if (varKin=="WMt"){
     anPars.isMetCutOptimization=1;
     anPars.varKin="WMt";
-    anPars.nKinBins=15;
+    anPars.nKinBins=12;
+//    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0+10*ib;
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-        anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-        anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-        anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-        anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
   }
 
   if (varKin=="lePhoDeltaR"){
@@ -246,36 +190,15 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0.7+0.5*ib;
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
   }
 
   if (varKin=="pfMET"){
     anPars.varKin="pfMET";
-    anPars.nKinBins=9;
+    anPars.nKinBins=2;
+//    anPars.nKinBins=9;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=20+10*ib;
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
+      anPars.kinBinLims[ib]=50+10*ib;
   }
 
   if (varKin=="pfMETPhi"){
@@ -284,18 +207,7 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
-
-    anPars.nBinsLeftB=new int[anPars.nKinBins];
-    anPars.maxVarFitB=new float[anPars.nKinBins];
-    anPars.nBinsLeftE=new int[anPars.nKinBins];
-    anPars.maxVarFitE=new float[anPars.nKinBins];
-    for (int i=0; i<anPars.nKinBins; i++){
-      anPars.nBinsLeftB[i]=anPars.nBinsLeftBTot;
-      anPars.maxVarFitB[i]=anPars.maxVarFitBTot;
-      anPars.nBinsLeftE[i]=anPars.nBinsLeftETot;
-      anPars.maxVarFitE[i]=anPars.maxVarFitETot;
-    }
-  }
+ }
 }
 
 void FullChain::RunAnalysis(FullChainParameters anPars)
@@ -322,7 +234,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Extra Selection"<<std::endl;
     WGammaSelection selection;
-    selection.ExtraSelection(anPars.channel, anPars.sampleMode,anPars.phoWP, anPars.strPhoIsoBase);
+    selection.ExtraSelection(anPars.year, anPars.channel, anPars.sampleMode,anPars.phoWP,anPars.noPhoPFChIsoCut);
     std::cout<<"%_%  DONE Extra Selection"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
@@ -331,7 +243,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //compute fake-gamma background by data-driven template method
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO DataDriven bkg"<<std::endl;
-    TTemplates temp(anPars.channel,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.nBinsLeftB, anPars.maxVarFitB, anPars. nBinsLeftE,anPars.maxVarFitE, anPars.nBinsLeftBTot, anPars.maxVarFitBTot, anPars. nBinsLeftETot, anPars.maxVarFitETot, anPars.isMetCutOptimization);
+    TTemplates temp(anPars.year,anPars.channel,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.noAdjustBinning,anPars.noPhoPFChIsoCut, anPars.isMetCutOptimization);
    temp.ComputeBackground();
     std::cout<<"%_%  DONE Extra DataDriven bkg"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
@@ -341,7 +253,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //prepare yields and subtract background
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
-    TPrepareYields yields(anPars.channel, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.isMetCutOptimization, anPars.phoWP, anPars.strPhoIsoBase);
+    TPrepareYields yields(anPars.year, anPars.channel, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims,anPars.isMetCutOptimization, anPars.phoWP);
     yields.PrepareYields();
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
@@ -351,7 +263,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Compute Acceptance and Efficiency"<<std::endl;
-    CalcAccAndEff accAndEff(anPars.channel, anPars.phoWP, anPars.strPhoIsoBase, anPars.configfile, anPars.isNoPuReweight, anPars.isDebugMode);
+    CalcAccAndEff accAndEff(anPars.year, anPars.channel, anPars.phoWP, anPars.configfile, anPars.isNoPuReweight, anPars.isDebugMode);
     accAndEff.LoopOverInputFiles();
     std::cout<<"%_%  DONE Compute Acceptance and Efficiency"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;

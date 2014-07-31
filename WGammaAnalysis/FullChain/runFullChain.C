@@ -11,7 +11,7 @@
 
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
 //  fch.SetDefaultFullChainParameters(anPars,"WMt");
-//  fch.SetDefaultFullChainParameters(anPars,"phoSCEta");
+//  fch.SetDefaultFullChainParameters(anPars,"phoEta");
 //  fch.SetDefaultFullChainParameters(anPars,"phoPhi");
 //  fch.SetDefaultFullChainParameters(anPars,"leptonPt");
 //  fch.SetDefaultFullChainParameters(anPars,"leptonEta");
@@ -23,17 +23,21 @@
   std::cout<<"varFit="<<anPars.strDDbkgVarFit<<", varSideband="<<anPars.strDDbkgVarSideband<<std::endl;
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
-  anPars.phoWP=TPhotonCuts::WP_TIGHT;
-//  anPars.phoWP=TPhotonCuts::WP_MEDIUM;
+  anPars.noAdjustBinning=1;
+  anPars.noPhoPFChIsoCut=1;
+
+//  anPars.phoWP=TPhotonCuts::WP_TIGHT;
+  anPars.phoWP=TPhotonCuts::WP_MEDIUM;
   anPars.blind=TConfiguration::BLIND_PRESCALE;
 
   anPars.isDebugMode=0;
-  anPars.sampleMode=WGammaSelection::SIGMC;
+  anPars.sampleMode=WGammaSelection::ALL;
 
+  anPars.year=2012;
   anPars.noPreSelection=1;
   anPars.noExtraSelection=1;
   anPars.noDDBkgComputation=0;
-  anPars.noPrepareYields=0;
+  anPars.noPrepareYields=1;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
 

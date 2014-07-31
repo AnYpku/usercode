@@ -21,8 +21,8 @@ void TEventTree::GetEntryNeededBranchesOnly(int channel, int sample, Long64_t en
   if (channel==config.ELECTRON || channel==config.BOTH) GetEntryEleSpecific(entry);
   if (sample!=config.DATA){
     GetEntryMCSpecific(entry);
-    if (channel==config.MUON)     b_muGenIndex->GetEntry(entry);
-    if (channel==config.ELECTRON) b_eleGenIndex->GetEntry(entry);
+//    if (channel==config.MUON)     b_muGenIndex->GetEntry(entry);
+//    if (channel==config.ELECTRON) b_eleGenIndex->GetEntry(entry);
   }
 }
 
@@ -45,6 +45,9 @@ void TEventTree::GetEntryCommon(Long64_t entry)
    b_phoEta->GetEntry(entry);
    b_phoPhi->GetEntry(entry);
    b_phoR9->GetEntry(entry);
+   b_phoTrkIsoHollowDR04->GetEntry(entry);
+   b_phoEcalIsoDR04->GetEntry(entry);
+   b_phoHcalIsoDR04->GetEntry(entry);
    b_phoHoverE->GetEntry(entry);
    b_phoHoverE12->GetEntry(entry);
    b_phoEleVeto->GetEntry(entry);
@@ -61,7 +64,9 @@ void TEventTree::GetEntryCommon(Long64_t entry)
    b_phoSCEt->GetEntry(entry);
    b_phoSCEta->GetEntry(entry);
    b_phoSCPhi->GetEntry(entry);
+   b_phohasPixelSeed->GetEntry(entry);
 
+   b_rho2011->GetEntry(entry);
    b_rho2012->GetEntry(entry);
 
    b_nJet->GetEntry(entry);
@@ -70,6 +75,7 @@ void TEventTree::GetEntryCommon(Long64_t entry)
    b_jetPhi->GetEntry(entry);
    b_jetRawPt->GetEntry(entry);
    b_jetRawEn->GetEntry(entry);
+
 }
 
 void TEventTree::GetEntryMuoSpecific(Long64_t entry)
@@ -84,6 +90,7 @@ void TEventTree::GetEntryMuoSpecific(Long64_t entry)
    b_muPFIsoR04_NH->GetEntry(entry);
    b_muPFIsoR04_Pho->GetEntry(entry);
    b_muPFIsoR04_PU->GetEntry(entry);
+   b_muType->GetEntry(entry);
    b_muD0->GetEntry(entry);
    b_muDz->GetEntry(entry);
    b_muNumberOfValidTrkLayers->GetEntry(entry);
@@ -91,6 +98,9 @@ void TEventTree::GetEntryMuoSpecific(Long64_t entry)
    b_muNumberOfValidPixelHits->GetEntry(entry);
    b_muNumberOfValidMuonHits->GetEntry(entry);
    b_muStations->GetEntry(entry);
+   b_muIsoTrk->GetEntry(entry);
+   b_muIsoEcal->GetEntry(entry);
+   b_muIsoHcal->GetEntry(entry);
 }
 
 void TEventTree::GetEntryEleSpecific(Long64_t entry)
@@ -117,6 +127,7 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
 
    b_mcIndex->GetEntry(entry);
    b_mcDecayType->GetEntry(entry);
+   b_mcParentage->GetEntry(entry);
 
    b_nPUInfo->GetEntry(entry);
    b_puTrue->GetEntry(entry);
@@ -128,6 +139,8 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
    b_jetGenJetEta->GetEntry(entry);   
    b_jetGenJetPhi->GetEntry(entry); 
 
+   b_muGenIndex->GetEntry(entry);
+   b_eleGenIndex->GetEntry(entry);
 }
 
 void TEventTree::Init(TTree *tree)
@@ -165,7 +178,7 @@ void TEventTree::Init(TTree *tree)
    treeLeaf.mcMomPhi = 0;
    treeLeaf.mcIndex = 0;
    treeLeaf.mcDecayType = 0;
-//   treeLeaf.mcParentage = 0;
+   treeLeaf.mcParentage = 0;
 //   treeLeaf.mcStatus = 0;
 //   treeLeaf.nPU = 0;
 //   treeLeaf.puBX = 0;
@@ -301,10 +314,10 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.phoEcalIsoDR03 = 0;
 //   treeLeaf.phoHcalIsoDR03 = 0;
 //   treeLeaf.phoHcalIsoDR0312 = 0;
-//   treeLeaf.phoTrkIsoHollowDR04 = 0;
+   treeLeaf.phoTrkIsoHollowDR04 = 0;
 //   treeLeaf.phoCiCdRtoTrk = 0;
-//   treeLeaf.phoEcalIsoDR04 = 0;
-//   treeLeaf.phoHcalIsoDR04 = 0;
+   treeLeaf.phoEcalIsoDR04 = 0;
+   treeLeaf.phoHcalIsoDR04 = 0;
 //   treeLeaf.phoHcalIsoDR0412 = 0;
    treeLeaf.phoHoverE = 0;
    treeLeaf.phoHoverE12 = 0;
@@ -378,7 +391,7 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.phoSCPhiWidth = 0;
 //   treeLeaf.phoSCBrem = 0;
 //   treeLeaf.phoOverlap = 0;
-//   treeLeaf.phohasPixelSeed = 0;
+   treeLeaf.phohasPixelSeed = 0;
 //   treeLeaf.pho_hasConvPf = 0;
 //   treeLeaf.pho_hasSLConvPf = 0;
 //   treeLeaf.pho_pfconvVtxZ = 0;
@@ -460,10 +473,10 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.mucktPhi = 0;
 //   treeLeaf.mucktdxy = 0;
 //   treeLeaf.mucktdz = 0;
-//   treeLeaf.muIsoTrk = 0;
+   treeLeaf.muIsoTrk = 0;
 //   treeLeaf.muIsoCalo = 0;
-//   treeLeaf.muIsoEcal = 0;
-//   treeLeaf.muIsoHcal = 0;
+   treeLeaf.muIsoEcal = 0;
+   treeLeaf.muIsoHcal = 0;
    treeLeaf.muChi2NDF = 0;
 //   treeLeaf.muInnerChi2NDF = 0;
    treeLeaf.muPFIsoR04_CH = 0;
@@ -480,7 +493,7 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.muPFIsoR03_CPart = 0;
 //   treeLeaf.muPFIsoR03_NHHT = 0;
 //   treeLeaf.muPFIsoR03_PhoHT = 0;
-//   treeLeaf.muType = 0;
+   treeLeaf.muType = 0;
    treeLeaf.muD0 = 0;
    treeLeaf.muDz = 0;
 //   treeLeaf.muD0GV = 0;
@@ -726,7 +739,7 @@ void TEventTree::Init(TTree *tree)
    fChain->SetBranchAddress("mcMomPhi", &treeLeaf.mcMomPhi, &b_mcMomPhi);
    fChain->SetBranchAddress("mcIndex", &treeLeaf.mcIndex, &b_mcIndex);
    fChain->SetBranchAddress("mcDecayType", &treeLeaf.mcDecayType, &b_mcDecayType);
-//   fChain->SetBranchAddress("mcParentage", &treeLeaf.mcParentage, &b_mcParentage);
+   fChain->SetBranchAddress("mcParentage", &treeLeaf.mcParentage, &b_mcParentage);
 //   fChain->SetBranchAddress("mcStatus", &treeLeaf.mcStatus, &b_mcStatus);
 //   fChain->SetBranchAddress("genMET", &treeLeaf.genMET, &b_genMET);
 //   fChain->SetBranchAddress("genMETPhi", &treeLeaf.genMETPhi, &b_genMETPhi);
@@ -887,10 +900,10 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("phoEcalIsoDR03", &treeLeaf.phoEcalIsoDR03, &b_phoEcalIsoDR03);
 //   fChain->SetBranchAddress("phoHcalIsoDR03", &treeLeaf.phoHcalIsoDR03, &b_phoHcalIsoDR03);
 //   fChain->SetBranchAddress("phoHcalIsoDR0312", &treeLeaf.phoHcalIsoDR0312, &b_phoHcalIsoDR0312);
-//   fChain->SetBranchAddress("phoTrkIsoHollowDR04", &treeLeaf.phoTrkIsoHollowDR04, &b_phoTrkIsoHollowDR04);
+   fChain->SetBranchAddress("phoTrkIsoHollowDR04", &treeLeaf.phoTrkIsoHollowDR04, &b_phoTrkIsoHollowDR04);
 //   fChain->SetBranchAddress("phoCiCdRtoTrk", &treeLeaf.phoCiCdRtoTrk, &b_phoCiCdRtoTrk);
-//   fChain->SetBranchAddress("phoEcalIsoDR04", &treeLeaf.phoEcalIsoDR04, &b_phoEcalIsoDR04);
-//   fChain->SetBranchAddress("phoHcalIsoDR04", &treeLeaf.phoHcalIsoDR04, &b_phoHcalIsoDR04);
+   fChain->SetBranchAddress("phoEcalIsoDR04", &treeLeaf.phoEcalIsoDR04, &b_phoEcalIsoDR04);
+   fChain->SetBranchAddress("phoHcalIsoDR04", &treeLeaf.phoHcalIsoDR04, &b_phoHcalIsoDR04);
 //   fChain->SetBranchAddress("phoHcalIsoDR0412", &treeLeaf.phoHcalIsoDR0412, &b_phoHcalIsoDR0412);
    fChain->SetBranchAddress("phoHoverE", &treeLeaf.phoHoverE, &b_phoHoverE);
    fChain->SetBranchAddress("phoHoverE12", &treeLeaf.phoHoverE12, &b_phoHoverE12);
@@ -964,7 +977,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("phoSCPhiWidth", &treeLeaf.phoSCPhiWidth, &b_phoSCPhiWidth);
 //   fChain->SetBranchAddress("phoSCBrem", &treeLeaf.phoSCBrem, &b_phoSCBrem);
 //   fChain->SetBranchAddress("phoOverlap", &treeLeaf.phoOverlap, &b_phoOverlap);
-//   fChain->SetBranchAddress("phohasPixelSeed", &treeLeaf.phohasPixelSeed, &b_phohasPixelSeed);
+   fChain->SetBranchAddress("phohasPixelSeed", &treeLeaf.phohasPixelSeed, &b_phohasPixelSeed);
 //   fChain->SetBranchAddress("pho_hasConvPf", &treeLeaf.pho_hasConvPf, &b_pho_hasConvPf);
 //   fChain->SetBranchAddress("pho_hasSLConvPf", &treeLeaf.pho_hasSLConvPf, &b_pho_hasSLConvPf);
 //   fChain->SetBranchAddress("pho_pfconvVtxZ", &treeLeaf.pho_pfconvVtxZ, &b_pho_pfconvVtxZ);
@@ -1047,10 +1060,10 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("mucktPhi", &treeLeaf.mucktPhi, &b_mucktPhi);
 //   fChain->SetBranchAddress("mucktdxy", &treeLeaf.mucktdxy, &b_mucktdxy);
 //   fChain->SetBranchAddress("mucktdz", &treeLeaf.mucktdz, &b_mucktdz);
-//   fChain->SetBranchAddress("muIsoTrk", &treeLeaf.muIsoTrk, &b_muIsoTrk);
+   fChain->SetBranchAddress("muIsoTrk", &treeLeaf.muIsoTrk, &b_muIsoTrk);
 //   fChain->SetBranchAddress("muIsoCalo", &treeLeaf.muIsoCalo, &b_muIsoCalo);
-//   fChain->SetBranchAddress("muIsoEcal", &treeLeaf.muIsoEcal, &b_muIsoEcal);
-//   fChain->SetBranchAddress("muIsoHcal", &treeLeaf.muIsoHcal, &b_muIsoHcal);
+   fChain->SetBranchAddress("muIsoEcal", &treeLeaf.muIsoEcal, &b_muIsoEcal);
+   fChain->SetBranchAddress("muIsoHcal", &treeLeaf.muIsoHcal, &b_muIsoHcal);
    fChain->SetBranchAddress("muChi2NDF", &treeLeaf.muChi2NDF, &b_muChi2NDF);
 //   fChain->SetBranchAddress("muInnerChi2NDF", &treeLeaf.muInnerChi2NDF, &b_muInnerChi2NDF);
    fChain->SetBranchAddress("muPFIsoR04_CH", &treeLeaf.muPFIsoR04_CH, &b_muPFIsoR04_CH);
@@ -1067,7 +1080,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("muPFIsoR03_CPart", &treeLeaf.muPFIsoR03_CPart, &b_muPFIsoR03_CPart);
 //   fChain->SetBranchAddress("muPFIsoR03_NHHT", &treeLeaf.muPFIsoR03_NHHT, &b_muPFIsoR03_NHHT);
 //   fChain->SetBranchAddress("muPFIsoR03_PhoHT", &treeLeaf.muPFIsoR03_PhoHT, &b_muPFIsoR03_PhoHT);
-//   fChain->SetBranchAddress("muType", &treeLeaf.muType, &b_muType);
+   fChain->SetBranchAddress("muType", &treeLeaf.muType, &b_muType);
    fChain->SetBranchAddress("muD0", &treeLeaf.muD0, &b_muD0);
    fChain->SetBranchAddress("muDz", &treeLeaf.muDz, &b_muDz);
 //   fChain->SetBranchAddress("muD0GV", &treeLeaf.muD0GV, &b_muD0GV);
@@ -1124,7 +1137,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("rho25_neu", &treeLeaf.rho25_neu, &b_rho25_neu);
 //   fChain->SetBranchAddress("rho25_muPFiso", &treeLeaf.rho25_muPFiso, &b_rho25_muPFiso);
 //   fChain->SetBranchAddress("rho25_elePFiso", &treeLeaf.rho25_elePFiso, &b_rho25_elePFiso);
-//   fChain->SetBranchAddress("rho2011", &treeLeaf.rho2011, &b_rho2011);
+   fChain->SetBranchAddress("rho2011", &treeLeaf.rho2011, &b_rho2011);
    fChain->SetBranchAddress("rho2012", &treeLeaf.rho2012, &b_rho2012);
 //   fChain->SetBranchAddress("QGTag_MLP", &treeLeaf.QGTag_MLP, &b_QGTag_MLP);
 //   fChain->SetBranchAddress("QGTag_likelihood", &treeLeaf.QGTag_likelihood, &b_QGTag_likelihood);

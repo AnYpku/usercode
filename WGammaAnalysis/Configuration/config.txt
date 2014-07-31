@@ -8,6 +8,9 @@
 ###       next, for SIGMC and BKGMC only: name of sample (e.g. Wg_to_munu)
 ###       next, for SIGMC and BKGMC only: label of the sample for legend (e.g.  W#gamma#rightarrow#mu#nu#gamma)
 ###       next, number - color from TColor.h table (ROOT)
+###         enum EColor { kWhite =0,   kBlack =1,   kGray=920,
+###                kRed   =632, kGreen =416, kBlue=600, kYellow=400, kMagenta=616, kCyan=432,
+###                kOrange=800, kSpring=820, kTeal=840, kAzure =860, kViolet =880, kPink=900 };
 ###       next, for DATA only: may or may not be word "lumiTotal" with lumiTotal value after that
 ###       next, for SIGMC and BKGMC only: may or may not be work "csTotal" with csTotal value after that
 ###         (csTotal is used for luminocity reweight for MC samples for which original file was splitted - actually there are no this kind of files now)
@@ -74,7 +77,7 @@ $ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_DYToLL_MuPhoSkim.root   3503.7
 
 ###################################################################
-$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      440    
+$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      879    
 #418=kGreen+2, same as DY
 #401=kYellow+1
 
@@ -89,7 +92,7 @@ $ BKGMC   MUON   Wg_to_taunu     W#gamma#rightarrow#tau#nu#gamma      401
 #0.3472
 
 ###################################################################
-$ BKGMC  MUON    multibosons      multibosons       9    
+$ BKGMC  MUON    multibosons      multibosons       884    
 
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_WWg_MuPhoSkim.root    1.44
 
@@ -100,19 +103,18 @@ $ BKGMC  MUON    multibosons      multibosons       9
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_WZ_2l2q_MuPhoSkim.root   5.995
 
 ###################################################################
-$ BKGMC  MUON    ttbarg     t#bar{t}#gamma        799    
-#799=kOrange-1
+#$ BKGMC  MUON    ttbarg     t#bar{t}#gamma        807    
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttg_MuPhoSkim.root                 1.444
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttg_MuPhoSkim.root                 1.444
 
 #- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttW_MuPhoSkim.root      0.2149
 
 #- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttZ_MuPhoSkim.root      0.1720
 
 ###################################################################
-$ BKGMC   MUON   ttbarjets     t#bar{t}+jets        44    
+#$ BKGMC   MUON   ttbarjets     t#bar{t}+jets        631    
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttjets_1l_MuPhoSkim.root   99.44
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttjets_1l_MuPhoSkim.root   99.44
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttjets_2l_MuPhoSkim.root   23.83
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/job_summer12_ttjets_2l_MuPhoSkim.root   23.83
 

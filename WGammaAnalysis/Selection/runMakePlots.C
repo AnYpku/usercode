@@ -1,18 +1,29 @@
 {
     //gROOT->ProcessLine(".L makePresentationPlots.C+");
   gROOT->ProcessLine(".x ../Include/rootlogon.C+");
-/*
+
   gROOT->ProcessLine(".L auxSelectionPlots.C+");
   gStyle->SetCanvasColor(0);
     //makePresentationPlots();
+  
+  TSelectionPlots plotter;
+  bool areTrees = plotter.GetTrees(TConfiguration::MUON, TConfiguration::BLIND_PRESCALE, "../Configuration/config.txt");
+  std::cout<<"areTrees="<<areTrees<<std::endl;
+  int year = 2012;
+  int wp = TPhotonCuts::WP_TIGHT;
+  TString strIsoBase="PF";
+  if (areTrees) plotter.SelectionEfficiencyInStages(year,wp,strIsoBase);
+
+//  PlotWithConsequetiveCuts();
 
   //PlotSigVsBkg();
   //PlotDataVsMC("lePhoDeltaR>0.7");
+/*
   string confFile = "../Configuration/config.txt";
   TSelectionPlots plotter;
-  plotter.GetTrees(TInputSample::MUON, confFile);
+  plotter.GetTrees(TConfiguration::MUON, confFile);
   plotter.PrintWeightedNumberOfEvents("lePhoDeltaR>0.7");
-*/
+
 
   string confFile = "../Configuration/config.txt";
 //  string plotVar="phoSCEt";
@@ -55,7 +66,7 @@
   plotter.GetTrees(TConfiguration::MUON,confFile);
   plotter.SetHistograms(plotVar,nBins,binLimits,cut);
   plotter.DrawSpectrumDataVsMC("cWMt","WMt.png",1);
-
+*/
 /*
   string confFile = "../Configuration/config.txt";
   string plotVar="lePhoDeltaR";

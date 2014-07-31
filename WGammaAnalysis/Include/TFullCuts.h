@@ -25,17 +25,19 @@ public:
                     TEventTree::InputTreeLeaves inpTreeLeaf,   
                     int channel, float** lePhoDeltaR, PassedLevels& passed);
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
-  float GetWMtCut();
+  float GetWMtCut(int year);
   TCut RangeMoreLeptonsVeto();
-  TCut RangeMetRelatedCut();
+  TCut RangeMetRelatedCut(int year);
   TCut RangePhoEt();
-  TCut RangeForMetCut(int channel, int phoWP, TString phoIsoBase);
-  TCut RangeForTemplateMethodCut(int channel, int phoWP, TString phoIsoBase);
-  TCut RangeFullCut(int channel, int phoWP, TString phoIsoBase);
+  TCut RangeExtraLeptonPt2011();
+  TCut RangeForMetCut(int year, int channel, int phoWP);
+  TCut RangeForTemplateMethodCut(int year, int channel, int phoWP);
+  TCut RangeFullCut(int year, int channel, int phoWP, bool noPhoPFChIsoCut);
 
 private:
   TConfiguration _config;
-  const static float _WMtCut = 50.;//50.;
+  const static float _WMtCut2012 = 50.;//for 8 TeV
+  const static float _WMtCut2011 = 70.;//from 7 TeV
   const static float _lePhoDeltaRCut = 0.7;//0.7;
 };
 

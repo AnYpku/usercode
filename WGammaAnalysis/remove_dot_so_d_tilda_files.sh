@@ -12,7 +12,7 @@ rm Include/*.so Include/*.d Include/*~ Include/.nfs00*
 
 rm PrepareYields/*.so PrepareYields/*.d PrepareYields/*~ PrepareYields/.nfs00*
 
-rm SearchForOverlapMC/*.so SearchForOverlapMC/*.d SearchForOverlapMC/*~ SearchForOverlapMC/.nfs00*
+rm SearchForOverlapInMC/*.so SearchForOverlapInMC/*.d SearchForOverlapInMC/*~ SearchForOverlapInMC/.nfs00*
 
 rm Selection/*.so Selection/*.d Selection/*~ Selection/.nfs00*
 

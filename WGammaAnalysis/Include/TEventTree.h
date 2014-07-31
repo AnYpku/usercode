@@ -83,7 +83,7 @@ public:
      vector<float>   *mcMomPhi;
      vector<int>     *mcIndex;
      vector<int>     *mcDecayType;
-//   vector<int>     *mcParentage;
+     vector<int>     *mcParentage;
 //   vector<int>     *mcStatus;
 //   Float_t         genMET;
 //   Float_t         genMETPhi;
@@ -244,10 +244,10 @@ public:
 //   vector<float>   *phoEcalIsoDR03;
 //   vector<float>   *phoHcalIsoDR03;
 //   vector<float>   *phoHcalIsoDR0312;
-//   vector<float>   *phoTrkIsoHollowDR04;
+   vector<float>   *phoTrkIsoHollowDR04;
 //   vector<float>   *phoCiCdRtoTrk;
-//   vector<float>   *phoEcalIsoDR04;
-//   vector<float>   *phoHcalIsoDR04;
+   vector<float>   *phoEcalIsoDR04;
+   vector<float>   *phoHcalIsoDR04;
 //   vector<float>   *phoHcalIsoDR0412;
    vector<float>   *phoHoverE;
    vector<float>   *phoHoverE12;
@@ -321,7 +321,7 @@ public:
 //   vector<float>   *phoSCPhiWidth;
 //   vector<float>   *phoSCBrem;
 //   vector<int>     *phoOverlap;
-//   vector<int>     *phohasPixelSeed;
+   vector<int>     *phohasPixelSeed;
 //   vector<int>     *pho_hasConvPf;
 //   vector<int>     *pho_hasSLConvPf;
 //   vector<float>   *pho_pfconvVtxZ;
@@ -404,10 +404,10 @@ public:
 //   vector<float>   *mucktPhi;
 //   vector<float>   *mucktdxy;
 //   vector<float>   *mucktdz;
-//   vector<float>   *muIsoTrk;
+   vector<float>   *muIsoTrk;
 //   vector<float>   *muIsoCalo;
-//   vector<float>   *muIsoEcal;
-//   vector<float>   *muIsoHcal;
+   vector<float>   *muIsoEcal;
+   vector<float>   *muIsoHcal;
    vector<float>   *muChi2NDF;
 //   vector<float>   *muInnerChi2NDF;
    vector<float>   *muPFIsoR04_CH;
@@ -424,7 +424,7 @@ public:
 //   vector<float>   *muPFIsoR03_CPart;
 //   vector<float>   *muPFIsoR03_NHHT;
 //   vector<float>   *muPFIsoR03_PhoHT;
-//   vector<int>     *muType;
+   vector<int>     *muType;
    vector<float>   *muD0;
    vector<float>   *muDz;
 //   vector<float>   *muD0GV;
@@ -481,7 +481,7 @@ public:
 //   Float_t         rho25_neu;
 //   Float_t         rho25_muPFiso;
 //   Float_t         rho25_elePFiso;
-//   Float_t         rho2011;
+   Float_t         rho2011;
    Float_t         rho2012;
 //   Float_t         QGTag_MLP;
 //   Float_t         QGTag_likelihood;

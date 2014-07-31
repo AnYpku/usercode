@@ -1,5 +1,4 @@
 {
-  gROOT->ProcessLine(".x ../Include/rootlogon.C");
 
   //mcDecayType when the mcPID is 24 (W)
   //mcDecayType==1 => Wjetjet (no events here)
@@ -19,7 +18,7 @@
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
 
-  SplitWGammaMC splitter(nameWGammaInput,nameWGammaEle,nameWGammaMuo,nameWGammaTau,nameDir,nameTree); 
+  SplitWGammaMC splitter(nameWGammaInput,nameWGammaEle,nameWGammaMuo,nameWGammaTau,nameDir,nameTree,0); 
   splitter.LoopOverInputTree();
 
 

@@ -39,7 +39,7 @@ $ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433
 #csTotal 36257.2  
 #433=kCyan+1
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wjets_KeepMCbranches.root 36257.2
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wjets_250000Skim.root 36257.2
 
 #value of cross section is preliminary
 
@@ -47,20 +47,20 @@ $ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433
 $   BKGMC    MUON   Wg  W#gamma    634     
 #634=kRed+2
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_KeepMCbranches.root   553.92 
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_250000Skim.root   553.92 
 
 ###################################################################
 $ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
 #418=kGreen+2
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_DYToLL_KeepMCbranches.root   3503.7
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_DYToLL_250000Skim.root   3503.7
 
 ###################################################################
 $ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      440    
 #418=kGreen+2, same as DY
 #401=kYellow+1
 
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Zg_KeepMCbranches.root   159.12
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Zg_250000Skim.root   159.12
 
 
 

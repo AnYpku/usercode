@@ -16,7 +16,13 @@ public:
   TSelectionPlots();
   virtual ~TSelectionPlots();
   bool GetTrees(int channel, int blind, string confFile, string strSources="ALL");
-  bool SetHistograms(TString plotVar, int nBins, float* binLimits, TCut cut="weight");
+  void SelectionEfficiencyInStages(int year, int wp, TString strIsoBase);
+  void SelectionEfficiencyOneStage(int nSources, int* nTot, int* nPass, float* eff, TCut cut, TCut cutExtra, TString strCutDescription="");
+  bool SetHistograms(int blind, TString plotVar, int nBins, float* binLimits, TCut cutWhole="weight", TCut cutCutted="weight");
+  void SetSourceIndex(int iHist);
+  TString StrHistName(TString plotVar, int iHist);
+  void SetHistProperties(TH1F* hist, int iHist, bool isCutted);
+  void HistSubtractions(int ind1, int ind2);
   void ScaleHistogramsToData();
   void DrawSpectrumDataVsMC(TString nameCanvas, TString nameForSave, bool isNoData=0);
   void DrawSpectrumSigVsBkg(TString nameCanvas, TString nameForSave);
@@ -33,6 +39,7 @@ private:
   vector <TString> _sourceLabel;
   vector <TString> _sourceName;
   vector <TH1F*> _hist;
+  vector <TH1F*> _histCutted;
   int _dataIndex;
   int _sigmcIndex;
   int _taunuIndex;
@@ -41,6 +48,7 @@ private:
   int _dyjetsIndex;
   int _ttgIndex;
   int _ttjetsIndex;
+  int _multibosonsIndex;
 
   unsigned int _nSources;
   TLegend* _legend;

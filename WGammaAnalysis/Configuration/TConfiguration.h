@@ -36,11 +36,11 @@ class TConfiguration
     TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight);
 
     TString GetYieldsFileName(int channel);
-    TString GetYieldsSelectedName(int csMode, int sample, TString sourceName="");
-    TString GetYieldsSelectedSignalMCGenName(int csMode);
-    TString GetYieldsDDTemplateFakeName(int csMode);
-    TString GetYieldsDDTemplateTrueName(int csMode);
-    TString GetYieldsSignalName(int csMode);
+    TString GetYieldsSelectedName(int csMode, int etaBin, int sample, TString sourceName="");
+    TString GetYieldsSelectedSignalMCGenName(int csMode, int etaBin);
+    TString GetYieldsDDTemplateFakeName(int csMode, int etaBin);
+    TString GetYieldsDDTemplateTrueName(int csMode, int etaBin);
+    TString GetYieldsSignalName(int csMode, int etaBin=COMMON);
 
     TString GetDDTemplateFileName(int channel);
 
@@ -80,11 +80,11 @@ class TConfiguration
 /////////////////////////////////////////
 //photon Pt binning
 //and other analysis constants
-static const int _nPhoPtBins = 9;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
+static const int _nPhoPtBins = 10;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={10.,15.,20.,25.,30.,35.,40.,60.,80.,200.,600.};
 //static const int _nPhoPtBins = 5;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
-static const float _phoPtMin=15.;
+static const float _phoPtMin=10.;
 static const float _phoPtMax=2000.;
   //minimum value for total CS
 static const float _lePhoDeltaRMin=0.7;

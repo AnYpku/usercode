@@ -1,5 +1,4 @@
 {
-
   gSystem->Load("../RooUnfold/libRooUnfold.so");
 
   gROOT->ProcessLine(".L ../Configuration/TConfiguration.C+");
@@ -20,6 +19,7 @@
   gROOT->ProcessLine(".L ../SearchForOverlapInMC/SearchForOverlap.C+");
 
   gROOT->ProcessLine(".L ../Selection/TSelectedEventsTree.C+");
+
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/WGammaSelection.C+");
 
@@ -40,11 +40,9 @@
   gROOT->ProcessLine(".L ../SkimSplitMerge/TInputOutputTree.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SkimLeptonPhoton.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SplitWGammaMC.C+");
+  gROOT->ProcessLine(".L ../SkimSplitMerge/SkimNEvents.C+");
 
   gStyle->SetPalette(1);
   gStyle->SetPaintTextFormat("0.0f");
   gStyle->SetCanvasColor(kWhite); 
-
-
-
 }

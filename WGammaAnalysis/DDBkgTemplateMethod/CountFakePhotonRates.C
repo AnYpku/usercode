@@ -73,7 +73,7 @@ void CountPhotonSources()
 
   int nSources = vecSamples.size();
   TCut cutWeight="weight";
-  TCut cutTrueGamma="phoGenPID==22";
+  TCut cutTrueGamma="phoGenPID==22 && (phoGenMomPID>=-24 && phoGenMomPID<=24)";
   TCut cutFakeGamma=!cutTrueGamma;
   TCut cutCS="phoEt>15 && phoEt<600 && lePhoDeltaR>0.7";
 

@@ -56,7 +56,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
    outputTree->Branch("mcMomPhi", "vector<float>", &treeLeaf.mcMomPhi);
    outputTree->Branch("mcIndex","vector<int>", &treeLeaf.mcIndex);
    outputTree->Branch("mcDecayType", "vector<int>",&treeLeaf.mcDecayType);
-//   outputTree->Branch("mcParentage", "vector<int>",&treeLeaf.mcParentage);
+   outputTree->Branch("mcParentage", "vector<int>",&treeLeaf.mcParentage);
 //   outputTree->Branch("mcStatus", "vector<int>",&treeLeaf.mcStatus);
 //   outputTree->Branch("genMET", &treeLeaf.genMET, "genMET/F");
 //   outputTree->Branch("genMETPhi", &treeLeaf.genMETPhi, "genMETPhi/F");
@@ -218,10 +218,10 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("phoEcalIsoDR03", "vector<float>",&treeLeaf.phoEcalIsoDR03);
 //   outputTree->Branch("phoHcalIsoDR03", "vector<float>",&treeLeaf.phoHcalIsoDR03);
 //   outputTree->Branch("phoHcalIsoDR0312", "vector<float>",&treeLeaf.phoHcalIsoDR0312);
-//   outputTree->Branch("phoTrkIsoHollowDR04", "vector<float>",&treeLeaf.phoTrkIsoHollowDR04);
+   outputTree->Branch("phoTrkIsoHollowDR04", "vector<float>",&treeLeaf.phoTrkIsoHollowDR04);
 //   outputTree->Branch("phoCiCdRtoTrk", "vector<float>",&treeLeaf.phoCiCdRtoTrk);
-//   outputTree->Branch("phoEcalIsoDR04", "vector<float>",&treeLeaf.phoEcalIsoDR04);
-//   outputTree->Branch("phoHcalIsoDR04", "vector<float>",&treeLeaf.phoHcalIsoDR04);
+   outputTree->Branch("phoEcalIsoDR04", "vector<float>",&treeLeaf.phoEcalIsoDR04);
+   outputTree->Branch("phoHcalIsoDR04", "vector<float>",&treeLeaf.phoHcalIsoDR04);
 //   outputTree->Branch("phoHcalIsoDR0412", "vector<float>",&treeLeaf.phoHcalIsoDR0412);
    outputTree->Branch("phoHoverE", "vector<float>",&treeLeaf.phoHoverE);
    outputTree->Branch("phoHoverE12", "vector<float>",&treeLeaf.phoHoverE12);
@@ -295,7 +295,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("phoSCPhiWidth","vector<float>" ,&treeLeaf.phoSCPhiWidth);
 //   outputTree->Branch("phoSCBrem", "vector<float>",&treeLeaf.phoSCBrem);
 //   outputTree->Branch("phoOverlap", "vector<int>",&treeLeaf.phoOverlap);
-//   outputTree->Branch("phohasPixelSeed", "vector<int>",&treeLeaf.phohasPixelSeed);
+   outputTree->Branch("phohasPixelSeed", "vector<int>",&treeLeaf.phohasPixelSeed);
 //   outputTree->Branch("pho_hasConvPf", "vector<int>",&treeLeaf.pho_hasConvPf);
 //   outputTree->Branch("pho_hasSLConvPf", "vector<int>",&treeLeaf.pho_hasSLConvPf);
 //   outputTree->Branch("pho_pfconvVtxZ", "vector<float>",&treeLeaf.pho_pfconvVtxZ);
@@ -378,10 +378,10 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("mucktPhi", "vector<float>",&treeLeaf.mucktPhi);
 //   outputTree->Branch("mucktdxy", "vector<float>",&treeLeaf.mucktdxy);
 //   outputTree->Branch("mucktdz", "vector<float>",&treeLeaf.mucktdz);
-//   outputTree->Branch("muIsoTrk", "vector<float>",&treeLeaf.muIsoTrk);
+   outputTree->Branch("muIsoTrk", "vector<float>",&treeLeaf.muIsoTrk);
 //   outputTree->Branch("muIsoCalo", "vector<float>",&treeLeaf.muIsoCalo);
-//   outputTree->Branch("muIsoEcal", "vector<float>",&treeLeaf.muIsoEcal);
-//   outputTree->Branch("muIsoHcal", "vector<float>",&treeLeaf.muIsoHcal);
+   outputTree->Branch("muIsoEcal", "vector<float>",&treeLeaf.muIsoEcal);
+   outputTree->Branch("muIsoHcal", "vector<float>",&treeLeaf.muIsoHcal);
    outputTree->Branch("muChi2NDF", "vector<float>",&treeLeaf.muChi2NDF);
 //   outputTree->Branch("muInnerChi2NDF", "vector<float>",&treeLeaf.muInnerChi2NDF);
    outputTree->Branch("muPFIsoR04_CH", "vector<float>",&treeLeaf.muPFIsoR04_CH);
@@ -398,7 +398,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("muPFIsoR03_CPart", "vector<float>",&treeLeaf.muPFIsoR03_CPart);
 //   outputTree->Branch("muPFIsoR03_NHHT", "vector<float>",&treeLeaf.muPFIsoR03_NHHT);
 //   outputTree->Branch("muPFIsoR03_PhoHT", "vector<float>",&treeLeaf.muPFIsoR03_PhoHT);
-//   outputTree->Branch("muType", "vector<int>", &treeLeaf.muType);
+   outputTree->Branch("muType", "vector<int>", &treeLeaf.muType);
    outputTree->Branch("muD0",  "vector<float>",&treeLeaf.muD0);
    outputTree->Branch("muDz",  "vector<float>",&treeLeaf.muDz);
 //   outputTree->Branch("muD0GV", "vector<float>",&treeLeaf.muD0GV);
@@ -428,7 +428,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("rho25_neu", &treeLeaf.rho25_neu, "rho25_neu/F");
 //   outputTree->Branch("rho25_muPFiso", &treeLeaf.rho25_muPFiso, "rho25_muPFiso/F");
 //   outputTree->Branch("rho25_elePFiso", &treeLeaf.rho25_elePFiso, "rho25_elePFiso/F");
-//   outputTree->Branch("rho2011", &treeLeaf.rho2011, "rho2011/F");
+   outputTree->Branch("rho2011", &treeLeaf.rho2011, "rho2011/F");
    outputTree->Branch("rho2012", &treeLeaf.rho2012, "rho2012/F");
 //   outputTree->Branch("QGTag_MLP", &treeLeaf.QGTag_MLP, "QGTag_MLP/F");
 //   outputTree->Branch("QGTag_likelihood", &treeLeaf.QGTag_likelihood, "QGTag_likelihood/F");

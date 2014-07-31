@@ -124,19 +124,19 @@ void WGammaSelection::LoopOverInputFiles()
        TString fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_config.UNBLIND,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
        _fileOut = new TFile(fileOutName,"recreate");
        _outTree = new TTree("selectedEvents","selected Events");
-       _selEvTree.SetOutputTree(_outTree); 
+       _selEvTree.SetAsOutputTree(_outTree); 
 
        if (_sample==_config.DATA){
          //blind "decreasing acceptance factors"
          fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_config.BLIND_DECRACC,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
          _fileOut_blindDecrAcc = new TFile(fileOutName,"recreate");
          _outTree_blindDecrAcc = new TTree("selectedEvents","selected Events");
-         _selEvTree_blindDecrAcc.SetOutputTree(_outTree_blindDecrAcc);
+         _selEvTree_blindDecrAcc.SetAsOutputTree(_outTree_blindDecrAcc);
          //blind data prescale 
          fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_config.BLIND_PRESCALE,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
          _fileOut_blindPrescale = new TFile(fileOutName,"recreate");
          _outTree_blindPrescale = new TTree("selectedEvents","selected Events");
-         _selEvTree_blindPrescale.SetOutputTree(_outTree_blindPrescale); 
+         _selEvTree_blindPrescale.SetAsOutputTree(_outTree_blindPrescale); 
        }
 
        for (_inputFileN=0; _inputFileN< inputFileNMax; _inputFileN++){
@@ -160,11 +160,12 @@ void WGammaSelection::LoopOverInputFiles()
          }  
 
          //determine _lumiWeight
-         if (_eventTree.treeLeaf.isData)
+         if (_sample==_config.DATA)
            _lumiWeight=1;
          else{
            _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[_inputFileN];
          }
+         std::cout<<"_lumiWeight="<<_lumiWeight<<std::endl;
 
 
          _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);         
@@ -394,13 +395,13 @@ void WGammaSelection::PrintErrorMessageMaxNumberOf(int particle)
        std::cout<<std::endl;
 }
 
-void WGammaSelection::ExtraSelection(int channel, int sampleMode, int wp, TString strPhoIsoBase)
-//strPhoBase = "PF" or "SCR"
+void WGammaSelection::ExtraSelection(int year, int channel, int sampleMode, int wp, bool noPhoPFChIsoCut)
 {
   TFullCuts fullCut;
   TConfiguration config;
   TAllInputSamples INPUT(channel,"../Configuration/config.txt");
   _tr=0;
+  _trReduced=0;
   _tr1=0;
   _tr2=0;
   _tr3=0;
@@ -416,19 +417,18 @@ void WGammaSelection::ExtraSelection(int channel, int sampleMode, int wp, TStrin
     else if(sampleMode==NOBKG && sample==config.BKGMC) continue;
 
     if (sample==config.DATA){
-      ExtraSelectionOne(INPUT,i, config, fullCut,channel,wp,strPhoIsoBase,config.BLIND_PRESCALE);
-      ExtraSelectionOne(INPUT,i, config, fullCut,channel,wp,strPhoIsoBase,config.BLIND_DECRACC);
-      ExtraSelectionOne(INPUT,i, config, fullCut,channel,wp,strPhoIsoBase,config.UNBLIND);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,wp,config.BLIND_PRESCALE,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,wp,config.BLIND_DECRACC,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,wp,config.UNBLIND,noPhoPFChIsoCut);
     }
     else{
-      ExtraSelectionOne(INPUT,i, config, fullCut,channel,wp,strPhoIsoBase,config.UNBLIND);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,wp,config.UNBLIND,noPhoPFChIsoCut);
     }
   }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
 
 }
 
-void WGammaSelection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int channel, int wp, TString strPhoIsoBase, int blind)
-//strPhoBase = "PF" or "SCR"
+void WGammaSelection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int wp, int blind, bool noPhoPFChIsoCut)
 {
 
     TString fInName = config.GetSelectedName(config.VERY_PRELIMINARY,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
@@ -441,20 +441,38 @@ void WGammaSelection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TC
     std::cout<<"file "<<fInName<<" was open"<<std::endl;
     _tr = (TTree*)fIn.Get("selectedEvents");
 
-
     TString fOutName1=config.GetSelectedName(config.PRELIMINARY_FOR_MET_CUT,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut1(fOutName1,"recreate");
-    _tr1 = _tr->CopyTree(fullCut.RangeForMetCut(channel,wp, strPhoIsoBase));
+
+    _trReduced = _tr->CopyTree(fullCut.RangeForMetCut(year,channel,wp));
+    _tr1 = new TTree("selectedEvents","selected events, one candidate per event");
+    TSelectedEventsTree selEvTree;
+    selEvTree.SetAsInputTree(_trReduced);
+    selEvTree.SetAsOutputTree(_tr1);
+    long nEntries = _trReduced->GetEntries();
+    long eventCurr=0;
+    long eventPrev=-1;
+    float phoEtCurr=0;
+    float phoEtPrev=-1;
+    for (long ientry=0; ientry<nEntries; ientry++){
+      _trReduced->GetEntry(ientry);
+      eventCurr = selEvTree._event;
+      if (eventCurr==eventPrev) continue;
+      _tr1->Fill();
+    }
+    _trReduced->Write();
+
+
     _tr1->Write();
 
     TString fOutName2=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut2(fOutName2,"recreate");
-    _tr2 = _tr->CopyTree(fullCut.RangeForTemplateMethodCut(channel,wp, strPhoIsoBase));
+    _tr2 = _trReduced->CopyTree(fullCut.RangeForTemplateMethodCut(year,channel,wp));
     _tr2->Write();
 
     TString fOutName3=config.GetSelectedName(config.FULLY,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut3(fOutName3,"recreate");
-    _tr3 = _tr->CopyTree(fullCut.RangeFullCut(channel,wp,strPhoIsoBase));
+    _tr3 = _trReduced->CopyTree(fullCut.RangeFullCut(year,channel,wp,noPhoPFChIsoCut));
     _tr3->Write();
 
 }

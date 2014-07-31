@@ -32,7 +32,7 @@ void TConfiguration::Print()
   std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,UNBLIND,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,UNBLIND,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,BLIND_PRESCALE,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
-  std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON)<<std::endl;
 
@@ -112,31 +112,31 @@ TString TConfiguration::GetYieldsFileName(int channel)
 }
 
 
-TString TConfiguration::GetYieldsSelectedName(int csMode,int sample, TString sourceName)
+TString TConfiguration::GetYieldsSelectedName(int csMode, int etaBin,int sample, TString sourceName)
 {
   TString name = _yieldsSelectedName+GetSampleName(sample);
   if (sample==BKGMC) name+=sourceName;
-  return name+GetCsModeName(csMode);
+  return name+GetCsModeName(csMode)+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode)
+TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode, int etaBin)
 {
-  return _yieldsSelectedSignalMCGenName+GetCsModeName(csMode);
+  return _yieldsSelectedSignalMCGenName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetYieldsDDTemplateFakeName(int csMode)
+TString TConfiguration::GetYieldsDDTemplateFakeName(int csMode, int etaBin)
 {
-  return _yieldsDDTemplateFakeName+GetCsModeName(csMode);
+  return _yieldsDDTemplateFakeName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode)
+TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode, int etaBin)
 {
-  return _yieldsDDTemplateTrueName+GetCsModeName(csMode);
+  return _yieldsDDTemplateTrueName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetYieldsSignalName(int csMode)
+TString TConfiguration::GetYieldsSignalName(int csMode, int etaBin)
 {
-  return _yieldsSignalName+GetCsModeName(csMode);
+  return _yieldsSignalName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
 }
 
 TString TConfiguration::GetDDTemplateFileName(int channel)

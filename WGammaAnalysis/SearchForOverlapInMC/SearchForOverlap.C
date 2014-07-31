@@ -7,7 +7,11 @@
   //this package
 #include "TMath.h" 
 #include "TCanvas.h" 
-  // ROOT class
+#include "TLorentzVector.h" 
+#include "TLegend.h" 
+#include "TCanvas.h" 
+#include "TH1F.h" 
+  //ROOT class
 #include <iostream> 
 #include <iomanip>
 #include <string>
@@ -77,10 +81,8 @@ void SearchForOverlap::LoopOverInputFiles()
        if (!_doAnalizeSample[_iSource])
          continue;
 
-//       _selectedTreeFileName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_INPUT->allInputs_[_iSource].sample_,_INPUT->allInputs_[_iSource].sourceName_,_isDebugMode,_isNoPuReweight);
-
        if(_INPUT->allInputs_[_iSource].sourceName_=="Wg"){ 
-          _hasWGamma=0;
+          _hasWGamma=1;
           _idWGamma=_iSource;
        }
        else if(_INPUT->allInputs_[_iSource].sourceName_=="Wjets_to_lnu"){  
@@ -98,6 +100,8 @@ void SearchForOverlap::LoopOverInputFiles()
        
       std::cout<<"_idZGamma="<<_idZGamma<<", _idZJets="<<_idZJets<<std::endl;
       std::cout<<"_hasZGamma="<<_hasZGamma<<", _hasZJets="<<_hasZJets<<std::endl;
+      std::cout<<"_idWGmma="<<_idWGamma<<", _idWJets="<<_idWJets<<std::endl;
+      std::cout<<"_hasWGamma="<<_hasWGamma<<", _hasWJets="<<_hasWJets<<std::endl;
 
 
        TTree* tree;
@@ -127,43 +131,9 @@ void SearchForOverlap::LoopOverInputFiles()
 
          _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[_iSource].fileNames_[0]);
 
-         _fOut->cd();
-         TString histNameB="h";
-         histNameB+=_INPUT->allInputs_[_iSource].sourceName_;
-         TString histName;
+         _histsSet[_iSource]=0;
 
-         histName=histNameB+"_weight";
-         _histWeight[_iSource]=new TH1F(histName,histName,1000,0,100);
-
-         histName=histNameB+"_PhoPt";
-         _histPhoPt[_iSource]=new TH1F(histName,histName,60,0,60);
-         histName=histNameB+"_PhoEta";
-         _histPhoEta[_iSource]=new TH1F(histName,histName,10,-2.5,2.5);
-         histName=histNameB+"_PhoPhi";
-         _histPhoPhi[_iSource]=new TH1F(histName,histName,18,-1.125*TMath::Pi(),1.125*TMath::Pi());
-
-         histName=histNameB+"_Lep1Pt";
-         _histLep1Pt[_iSource]=new TH1F(histName,histName,20,0,100);
-         histName=histNameB+"_Lep1Eta";
-         _histLep1Eta[_iSource]=new TH1F(histName,histName,10,-2.5,2.5);
-         histName=histNameB+"_Lep1Phi";
-         _histLep1Phi[_iSource]=new TH1F(histName,histName,18,-1.125*TMath::Pi(),1.125*TMath::Pi());
-
-         histName=histNameB+"_Lep2Pt";
-         _histLep2Pt[_iSource]=new TH1F(histName,histName,20,0,100);
-         histName=histNameB+"_Lep2Eta";
-         _histLep2Eta[_iSource]=new TH1F(histName,histName,10,-2.5,2.5);
-         histName=histNameB+"_Lep2Phi";
-         _histLep2Phi[_iSource]=new TH1F(histName,histName,18,-1.125*TMath::Pi(),1.125*TMath::Pi());
-
-         histName=histNameB+"_Lep1PhodR";
-         _histLep1PhodR[_iSource]=new TH1F(histName,histName,30,0,1.5);
-         histName=histNameB+"_Lep2PhodR";
-         _histLep2PhodR[_iSource]=new TH1F(histName,histName,30,0,1.5);
-         histName=histNameB+"_LepLepdR";
-         _histLepLepdR[_iSource]=new TH1F(histName,histName,40,0,20);
-         histName=histNameB+"_LepLepMassTr";
-         _histLepLepMass[_iSource]=new TH1F(histName,histName,12,0,120);
+         SetHists();
            
          LoopOverTreeEvents();
              //method of this class (SearchForOverlap)
@@ -175,42 +145,8 @@ void SearchForOverlap::LoopOverInputFiles()
 
     } //loop over iSource ends
 
-    if (_hasZGamma && _hasZJets){
-      PlotTwoHistograms("cZPhoPt", _histPhoPt[_idZGamma], _histPhoPt[_idZJets]);
-      PlotTwoHistograms("cZPhoEta", _histPhoEta[_idZGamma], _histPhoEta[_idZJets]);
-      PlotTwoHistograms("cZPhoPhi", _histPhoPhi[_idZGamma], _histPhoPhi[_idZJets]);
-      PlotTwoHistograms("cZLep1Pt", _histLep1Pt[_idZGamma], _histLep1Pt[_idZJets]);
-      PlotTwoHistograms("cZLep1Eta", _histLep1Eta[_idZGamma], _histLep1Eta[_idZJets]);
-      PlotTwoHistograms("cZLep1Phi", _histLep1Phi[_idZGamma], _histLep1Phi[_idZJets]);
-      PlotTwoHistograms("cZLep2Pt", _histLep2Pt[_idZGamma], _histLep2Pt[_idZJets]);
-      PlotTwoHistograms("cZLep2Eta", _histLep2Eta[_idZGamma], _histLep2Eta[_idZJets]);
-      PlotTwoHistograms("cZLep2Phi", _histLep2Phi[_idZGamma], _histLep2Phi[_idZJets]);
-      PlotTwoHistograms("cZLep1PhodR", _histLep1PhodR[_idZGamma], _histLep1PhodR[_idZJets]);
-      PlotTwoHistograms("cZLep2PhodR", _histLep2PhodR[_idZGamma], _histLep2PhodR[_idZJets]);
-      PlotTwoHistograms("cZLepLepdR", _histLepLepdR[_idZGamma], _histLepLepdR[_idZJets]);
-      PlotTwoHistograms("cZLepLepMassT", _histLepLepMass[_idZGamma], _histLepLepMass[_idZJets]);
-      PlotTwoHistograms("cWeight", _histWeight[_idZGamma], _histWeight[_idZJets]);
-    }
-
-}
-
-void SearchForOverlap::PlotTwoHistograms(TString canvName, TH1F* hGamma, TH1F* hJets)
-{
-   TCanvas* canv = new TCanvas(canvName,canvName,1200,600);
-   canv->Divide(2,1);
-   hJets->SetLineWidth(2);
-   hGamma->SetLineWidth(2);
-   hJets->SetLineColor(1);
-   hGamma->SetLineColor(2);
-   canv->cd(1);
-   hJets->Draw();
-   hGamma->Draw("same");
-   canv->cd(2);
-   hJets->DrawNormalized();
-   hGamma->DrawNormalized("same");
-   canvName+=".png";
-   canv->SaveAs(canvName);
-}
+    PlotHists();
+}// end of LoopOverInputFiles()
 
 void SearchForOverlap::LoopOverTreeEvents()
 {
@@ -234,191 +170,453 @@ void SearchForOverlap::LoopOverTreeEvents()
      for (int il=0; il<=TAU_LEPTON; il++)
        _nFSR[ib][il]=0;//(W -> (mu,e,tau) -> gamma)
      for (int iq=0; iq<=GLUON; iq++)      
-      _nISR[ib][iq]=0;   //(d,u,s,c,b,t) -> gamma, 
+       _nISR[ib][iq]=0;   //(d,u,s,c,b,t) -> gamma, 
    }
 
    for (int npho=0; npho<91; npho++){
      _nEventsWithGivenNOfPhotons[npho]=0;
      _nEventsWithSomeScheme[npho]=0;
    }
-
-
-   for (Long64_t entry=0; entry<nentries; entry++) 
+   _nthFakePhoton=0;
+   for (_entry=0; _entry<nentries; _entry++){ 
    //loop over events in the tree
-     {
+     _eventTree.GetEntryMCSpecific(_entry);
+     _treeLeaf = _eventTree.treeLeaf;
+     _totalWeight = 1;
+     _totalWeight = _lumiWeight;
+     _totalWeight*= _puWeight->GetPuWeightMc(_treeLeaf.puTrue->at(1));
+     _nEvents+=_totalWeight;
+     _histWeight[_iSource]->Fill(_totalWeight);
+     LoopOverMCParticles();
+   } //end of loop over events in the tree
 
-       bool isZMuonFSR=0;
-       bool isZMuonTGC=0;
+   PrintResults();
 
-        _eventTree.GetEntryMCSpecific(entry);
+}// end of LoopOverTreeEvents()
 
-        _totalWeight = 1;
-        _totalWeight = _lumiWeight;
-        _totalWeight*= _puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
-        _nEvents+=_totalWeight;
-        _histWeight[_iSource]->Fill(_totalWeight);
-        int nPhoInEvent=0;
-        int nSomeScheme=0;
+void SearchForOverlap::LoopOverMCParticles()
+{
+   bool isMuonChannel=0;
+   for (int iMC=0; iMC<_treeLeaf.nMC; iMC++){
+     if (_treeLeaf.mcPID->at(iMC)==24 || _treeLeaf.mcPID->at(iMC)==-24){
+       if (_treeLeaf.mcDecayType->at(iMC)==3)//3 - muon channel 
+         isMuonChannel=1;
+     }
+     if (_treeLeaf.mcPID->at(iMC)==23){
+       if (_treeLeaf.mcDecayType->at(iMC)==3)//3 - muon channel 
+         isMuonChannel=1;
+     }
+   }// end of loop over iMC
+   if (!isMuonChannel) return;
+   
 
-        for (int imc=0; imc<_eventTree.treeLeaf.nMC; imc++){
+   int nPhoInEvent=0;
+   _nSomeScheme=0;
+   bool isZMuonFSR=0;
+   bool isWMuonFSR=0;
+   bool isZMuonTGC=0;
+   bool isWMuonTGC=0;
+   bool isZMuonISR=0;
+   bool isWMuonISR=0;
+   bool hasGammaInAcc=0;
+   bool hasTrueGammaInAcc=0;
+/*
+   for (_imc=0; _imc<_treeLeaf.nMC; _imc++){
+     if (_treeLeaf.mcPID->at(_imc)!=22) continue;
+     _nPhotons+=_totalWeight;
+     if (!nPhoInEvent){
+       _nEventsWithPhotons+=_totalWeight;
+     }
+     nPhoInEvent++;
+     _ilep1=-1;
+     _ilep2=-1;
+     FindLeptonIndexes();
+     ComputeKinematicVariables();
+     if (_ilep1==-1) continue;
+     if (_ilep1>-1 && _dRLep1Pho<0.4) continue;
+     if (_ilep2>-1 && _dRLep2Pho<0.4) continue;
+     if (_ilep1>-1 && _treeLeaf.mcPt->at(_ilep1)<20) continue;
+     if (_ilep2>-1 && _treeLeaf.mcPt->at(_ilep2)<20) continue;
+     if (_treeLeaf.mcEt->at(_imc)<8) continue;
+     _nPhotonsPassedAcc+=_totalWeight;
+     hasGammaInAcc=1;
+     break;
+   }//end of loop over _imc 
+*/
+//   if (!hasGammaInAcc) return;
+   bool isFakePrinted=0;
+   for (int _imc=0; _imc<_treeLeaf.nMC; _imc++){
+     if (_treeLeaf.mcPID->at(_imc)!=22) continue;
+     bool hasTrueGammaInAcc = CheckIfTrueGammaMCparentage();
+     CheckIfFSR(isZMuonFSR,isWMuonFSR); 
+     CheckIfTGC(isZMuonTGC,isWMuonTGC);
+     CheckIfISR(isZMuonISR,isWMuonISR);
+//     if (!(isZMuonFSR||isWMuonFSR||isZMuonTGC||isWMuonTGC||isZMuonISR||isWMuonISR)) continue;
+     if (!hasTrueGammaInAcc){
+       if (_nthFakePhoton<10 && !isFakePrinted){
+/*
+         std::cout<<"nMC="<<_treeLeaf.nMC<<std::endl;
+         std::cout<<"photon mcPID="<<_treeLeaf.mcPID->at(_imc)<<", mcMomPID="<<_treeLeaf.mcMomPID->at(_imc)<<", mcGMomPID="<<_treeLeaf.mcGMomPID->at(_imc)<<std::endl;
+         std::cout<<"photon mcPID="<<_treeLeaf.mcPID->at(imc)<<", mcMomPID="<<_treeLeaf.mcMomPID->at(imc)<<", mcGMomPID="<<_treeLeaf.mcGMomPID->at(imc)<<std::endl;
+         std::cout<<std::setw(10)<<"mcPID";
+         for(int i=0; i<_treeLeaf.nMC; i++)
+           std::cout<<std::setw(7)<<_treeLeaf.mcPID->at(i);
+         std::cout<<std::endl;
+         std::cout<<std::setw(10)<<"mcMomPID";
+         for(int i=0; i<_treeLeaf.nMC; i++)
+           std::cout<<std::setw(7)<<_treeLeaf.mcMomPID->at(i);
+         std::cout<<std::endl;
+         std::cout<<std::setw(10)<<"mcGMomPID";
+         for(int i=0; i<_treeLeaf.nMC; i++)
+           std::cout<<std::setw(7)<<_treeLeaf.mcGMomPID->at(i);
+         std::cout<<std::endl;
+         std::cout<<std::endl;
+        _nthFakePhoton++;
+         isFakePrinted=1;
+*/
+       }
 
-          if (_eventTree.treeLeaf.mcPID->at(imc)!=22) continue;
-          _nPhotons+=_totalWeight;
-          if (!nPhoInEvent){
-            _nEventsWithPhotons+=_totalWeight;
+       continue;
+     }
+//     _nPhotonsPassedTrueGammaCondition+=_totalWeight;
+     _nPhotonsPassedTrueGammaCondition++;
+     FillHists();
+     hasTrueGammaInAcc=1;
+     break;
+   }//end of loop over imc 
+   if (nPhoInEvent<91)
+     _nEventsWithGivenNOfPhotons[nPhoInEvent]+=_totalWeight; 
+   if (_nSomeScheme<91)
+     _nEventsWithSomeScheme[_nSomeScheme]+=_totalWeight; 
+
+   if ((nPhoInEvent==0 && _nEventsWithGivenNOfPhotons[0]<0) ||
+       (_nSomeScheme==0 && _nEventsWithSomeScheme[0]<0)){
+     PrintIfSuspicious();
+   }
+
+}//end of LoopOverMCParticles()
+
+void SearchForOverlap::SetHists()
+{
+  _fOut->cd();
+  TString histNameB="h";
+  histNameB+=_INPUT->allInputs_[_iSource].sourceName_;
+  TString histName;
+
+  histName=histNameB+"_weight";
+  _histWeight[_iSource]=new TH1F(histName,histName,1000,0,100);
+
+  histName=histNameB+"_PhoPt";
+  _histPhoPt[_iSource]=new TH1F(histName,histName,60,0,60);
+  histName=histNameB+"_PhoEta";
+  _histPhoEta[_iSource]=new TH1F(histName,histName,10,-3.6,3.6);
+  histName=histNameB+"_PhoPhi";
+  _histPhoPhi[_iSource]=new TH1F(histName,histName,1,-1.125*TMath::Pi(),1.125*TMath::Pi());
+
+  histName=histNameB+"_Lep1Pt";
+  _histLep1Pt[_iSource]=new TH1F(histName,histName,20,0,100);
+  histName=histNameB+"_Lep1Eta";
+  _histLep1Eta[_iSource]=new TH1F(histName,histName,10,-3.6,3.6);
+  histName=histNameB+"_Lep1Phi";
+  _histLep1Phi[_iSource]=new TH1F(histName,histName,1,-1.125*TMath::Pi(),1.125*TMath::Pi());
+
+  histName=histNameB+"_Lep2Pt";
+  _histLep2Pt[_iSource]=new TH1F(histName,histName,20,0,100);
+  histName=histNameB+"_Lep2Eta";
+  _histLep2Eta[_iSource]=new TH1F(histName,histName,10,-3.6,3.6);
+  histName=histNameB+"_Lep2Phi";
+  _histLep2Phi[_iSource]=new TH1F(histName,histName,1,-1.125*TMath::Pi(),1.125*TMath::Pi());
+
+  histName=histNameB+"_Lep1PhodR";
+  _histLep1PhodR[_iSource]=new TH1F(histName,histName,90,0,4.5);
+  histName=histNameB+"_Lep2PhodR";
+  _histLep2PhodR[_iSource]=new TH1F(histName,histName,90,0,4.5);
+  histName=histNameB+"_LepLepdR";
+  _histLepLepdR[_iSource]=new TH1F(histName,histName,40,0,20);
+  histName=histNameB+"_LepLepMassTr";
+  _histLepLepMassT[_iSource]=new TH1F(histName,histName,12,0,120);
+  histName=histNameB+"_LepLepMassInv";
+  _histLepLepMass[_iSource]=new TH1F(histName,histName,12,0,120);
+
+  _histsSet[_iSource]=1;
+}//end of SetHists()
+
+void SearchForOverlap::PlotHists()
+{
+  std::cout<<"Ready to PlotHists"<<std::endl;
+  if (_hasZGamma && _hasZJets){
+    PlotHistsGammaJetsCompare("Z", _idZGamma, _idZJets);
+  }
+  if (_hasWGamma && _hasWJets){
+    PlotHistsGammaJetsCompare("W", _idWGamma, _idWJets);
+  }
+}//end of PlotHists()
+
+void SearchForOverlap::PlotHistsGammaJetsCompare(TString strZorW, int ind1, int ind2)
+{
+    PlotTwoHistograms(strZorW+TString("_PhoPt"), _histPhoPt[ind1], _histPhoPt[ind2]);
+    PlotTwoHistograms(strZorW+TString("_PhoEta"), _histPhoEta[ind1], _histPhoEta[ind2]);
+    PlotTwoHistograms(strZorW+TString("_PhoPhi"), _histPhoPhi[ind1], _histPhoPhi[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep1Pt"), _histLep1Pt[ind1], _histLep1Pt[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep1Eta"), _histLep1Eta[ind1], _histLep1Eta[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep1Phi"), _histLep1Phi[ind1], _histLep1Phi[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep2Pt"), _histLep2Pt[ind1], _histLep2Pt[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep2Eta"), _histLep2Eta[ind1], _histLep2Eta[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep2Phi"), _histLep2Phi[ind1], _histLep2Phi[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep1PhodR"), _histLep1PhodR[ind1], _histLep1PhodR[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Lep2PhodR"), _histLep2PhodR[ind1], _histLep2PhodR[ind2]);
+    PlotTwoHistograms(strZorW+TString("_LepLepdR"), _histLepLepdR[ind1], _histLepLepdR[ind2]);
+    PlotTwoHistograms(strZorW+TString("_LepLepMassT"), _histLepLepMassT[ind1], _histLepLepMassT[ind2]);
+    PlotTwoHistograms(strZorW+TString("_LepLepMass"), _histLepLepMass[ind1], _histLepLepMass[ind2]);
+    PlotTwoHistograms(strZorW+TString("_Weight"), _histWeight[ind1], _histWeight[ind2]);
+}//end of PlotHistsGammaJetsCompare(TString strZorW, int ind1, int ind2)
+
+void SearchForOverlap::PlotTwoHistograms(TString canvName, TH1F* hGamma, TH1F* hJets)
+{
+   if (hGamma->GetSumOfWeights()==0 && hJets->GetSumOfWeights()==0) 
+     return;
+   TCanvas* canv = new TCanvas(canvName,canvName,1200,600);
+   canv->Divide(2,1);
+   hJets->SetLineWidth(2);
+   hGamma->SetLineWidth(2);
+   hJets->SetLineColor(1);
+   hGamma->SetLineColor(2);
+   canv->cd(1);
+   float maxTotal=0;
+   bool isGammaFirstTotal=0;
+   float maxNormalized=0;
+   bool isGammaFirstNormalized=0;
+   float sumGamma=0;
+   float sumJets=0;
+   //for total histograms
+   hGamma->SetStats(0);
+   hJets->SetStats(0);
+   for (int ib=1; ib<=hJets->GetNbinsX(); ib++){
+     sumGamma+=hGamma->GetBinContent(ib);
+     sumJets+=hJets->GetBinContent(ib);
+     if (hGamma->GetBinContent(ib)>hJets->GetBinContent(ib)){
+       if (hGamma->GetBinContent(ib)>maxTotal){
+         maxTotal=hGamma->GetBinContent(ib);
+         isGammaFirstTotal=1;
+       }
+     }
+     else{
+       if (hJets->GetBinContent(ib)>maxTotal){
+         maxTotal=hJets->GetBinContent(ib);
+         isGammaFirstTotal=0;
+       }
+     }
+   }//end of loop over ib
+   //for normalized histograms
+   for (int ib=1; ib<=hJets->GetNbinsX(); ib++){
+     if ((hGamma->GetBinContent(ib)/sumGamma)>(hJets->GetBinContent(ib)/sumJets)){
+       if ((hGamma->GetBinContent(ib)/sumGamma)>maxNormalized){
+         maxNormalized=hGamma->GetBinContent(ib)/sumGamma;
+         isGammaFirstNormalized=1;
+       }
+     }
+     else{
+       if (hJets->GetBinContent(ib)/sumJets>maxNormalized){
+         maxNormalized=hJets->GetBinContent(ib)/sumJets;
+         isGammaFirstNormalized=0;
+       }
+     }
+   }//end of loop over ib
+
+   TLegend* leg = new TLegend(0.75,0.85,0.95,0.95);
+   leg->AddEntry(hGamma,"hGamma","l");
+   leg->AddEntry(hJets,"hJets","l");
+
+   if (isGammaFirstTotal){
+     hGamma->Draw();
+     hJets->Draw("same");
+   }
+   else{
+     hJets->Draw();
+     hGamma->Draw("same");
+   }
+   canv->cd(2);
+   if (isGammaFirstNormalized){
+     hGamma->DrawNormalized();
+     hJets->DrawNormalized("same");
+   }
+   else{
+     hJets->DrawNormalized();
+     hGamma->DrawNormalized("same");
+   }
+   canvName+=".png";
+   canv->SaveAs(canvName);
+   //hGamma->Print();
+   //hJets->Print();
+}//end of PlotTwoHistograms(TString canvName, TH1F* hGamma, TH1F* hJets)
+
+bool SearchForOverlap::CheckIfTrueGammaMCparentage()
+{
+  if (!(_treeLeaf.mcParentage->at(_imc)&4)){
+//  if ((_treeLeaf.mcParentage->at(_imc) & 0x12)==0x12){
+    _nTrue+=_totalWeight;
+    return 1;
+  }
+  return 0;
+}
+
+void SearchForOverlap::CheckIfFSR(bool& isZMuonFSR, bool& isWMuonFSR)
+{
+   unsigned int ib = fabs(_treeLeaf.mcGMomPID->at(_imc));
+   unsigned int il = fabs(_treeLeaf.mcMomPID->at(_imc));
+   if (fabs(_treeLeaf.mcGMomPID->at(_imc))==Z_BOSON || fabs(_treeLeaf.mcGMomPID->at(_imc))==W_BOSON){ 
+      if (fabs(_treeLeaf.mcMomPID->at(_imc))==E_LEPTON ||
+          fabs(_treeLeaf.mcMomPID->at(_imc))==MU_LEPTON ||
+          fabs(_treeLeaf.mcMomPID->at(_imc))==TAU_LEPTON){
+         _nFSR[ib][ANY_LEPTON]+=_totalWeight;
+         _nFSR[ib][il]+=_totalWeight;
+         _nSomeScheme++;
+         if(((fabs(_treeLeaf.mcGMomPID->at(_imc))==Z_BOSON) &&
+            (fabs(_treeLeaf.mcMomPID->at(_imc))==MU_LEPTON)))
+           isZMuonFSR=1;    
+         if(((fabs(_treeLeaf.mcGMomPID->at(_imc))==W_BOSON) &&
+            (fabs(_treeLeaf.mcMomPID->at(_imc))==MU_LEPTON)))
+           isWMuonFSR=1;           
+      }  //end of  if (fabs(_treeLeaf.mcMomPID->at(_imc))==E_LEPTON      
+   }//end of if (fabs(_treeLeaf.mcGMomPID->at(_imc))==Z_BOSON
+}//end of CheckIfFSR
+
+void SearchForOverlap::CheckIfTGC(bool& isZMuonTGC, bool& isWMuonTGC)
+{
+   if (fabs(_treeLeaf.mcMomPID->at(_imc))==Z_BOSON || fabs(_treeLeaf.mcMomPID->at(_imc))==W_BOSON){
+   unsigned int ib = fabs(_treeLeaf.mcMomPID->at(_imc));
+   if ((fabs(_treeLeaf.mcGMomPID->at(_imc))>=D_QUARK &&
+        fabs(_treeLeaf.mcGMomPID->at(_imc))<=T_QUARK) ||
+          _treeLeaf.mcGMomPID->at(_imc)==GLUON){
+            _nTGC[ib]+=_totalWeight;
+            _nSomeScheme++;
+   }   
+   for (int imc2=0; imc2<_treeLeaf.nMC; imc2++){
+     if (fabs(_treeLeaf.mcPID->at(imc2))==MU_LEPTON &&
+         fabs(_treeLeaf.mcMomPID->at(imc2))==Z_BOSON &&
+         fabs(_treeLeaf.mcMomPID->at(_imc))==Z_BOSON)
+       isZMuonTGC=1;
+     }
+   }
+}//end of CheckIfTGC
+
+void SearchForOverlap::CheckIfISR(bool& isZMuonISR, bool& isWMuonISR)
+{
+   if ((fabs(_treeLeaf.mcMomPID->at(_imc))>=D_QUARK &&
+        fabs(_treeLeaf.mcMomPID->at(_imc))<=T_QUARK) ||
+        _treeLeaf.mcMomPID->at(_imc)==GLUON){
+     unsigned int iq=fabs(_treeLeaf.mcMomPID->at(_imc));
+     bool hasBosonFromTheSameQ=0;
+     unsigned int ib = 0;
+     for (int imc2=0; imc2<_treeLeaf.nMC; imc2++){
+       if (fabs(_treeLeaf.mcPID->at(imc2))==Z_BOSON || fabs(_treeLeaf.mcPID->at(imc2))==W_BOSON){
+         ib = fabs(_treeLeaf.mcPID->at(imc2));
+         if (fabs(_treeLeaf.mcMomPID->at(imc2))==iq){
+           hasBosonFromTheSameQ=1;
+           break;
+         }
+       }
+     }//end of loop over imc2
+     if (hasBosonFromTheSameQ){
+       _nISR[ib][ANY_QUARK]+=_totalWeight;
+       _nISR[ib][iq]+=_totalWeight;
+       _nSomeScheme++;
+     }
+   }//end of if (#smth#>=D_QUARK <...>
+}
+
+void SearchForOverlap::FindLeptonIndexes()
+{
+  //for Z decay
+  for (int imc2=0; imc2<_treeLeaf.nMC; imc2++){
+    if (fabs(_treeLeaf.mcPID->at(imc2))==MU_LEPTON)
+      if (fabs(_treeLeaf.mcMomPID->at(imc2))==Z_BOSON){
+        if (_ilep1==-1) _ilep1=imc2;
+        else if (_treeLeaf.mcPt->at(imc2)<_treeLeaf.mcPt->at(_ilep1)){
+           _ilep2=imc2;
+           continue;
+         }    
+         else{
+           _ilep2=_ilep1;
+           _ilep1=imc2;
+           continue;
           }
-          nPhoInEvent++;
+      }
+  }//end of loop over imc2
+  //for W decay
+  for (int imc2=0; imc2<_treeLeaf.nMC; imc2++){
+    if (fabs(_treeLeaf.mcPID->at(imc2))==MU_LEPTON)
+      if (fabs(_treeLeaf.mcMomPID->at(imc2))==W_BOSON)
+        if (_ilep1==-1) _ilep1=imc2;
+    if (fabs(_treeLeaf.mcPID->at(imc2))==MU_NEUTRINO)
+      if (fabs(_treeLeaf.mcMomPID->at(imc2))==W_BOSON)
+        if (_ilep2==-1) _ilep2=imc2;
+      
+  }//end of loop over imc2
+}//end of FindLeptonIndexes()
 
-          //FSR
-          if (fabs(_eventTree.treeLeaf.mcGMomPID->at(imc))==Z_BOSON || fabs(_eventTree.treeLeaf.mcGMomPID->at(imc))==W_BOSON){ 
-            unsigned int ib = fabs(_eventTree.treeLeaf.mcGMomPID->at(imc));
-            if (fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==E_LEPTON ||
-                fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==MU_LEPTON ||
-                fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==TAU_LEPTON){
-              _nFSR[ib][ANY_LEPTON]+=_totalWeight;
-              unsigned int il = fabs(_eventTree.treeLeaf.mcMomPID->at(imc));
-              _nFSR[ib][il]+=_totalWeight;
-              nSomeScheme++;
-              
-              if(((fabs(_eventTree.treeLeaf.mcGMomPID->at(imc))==Z_BOSON) &&
-                 (fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==MU_LEPTON)))
-                isZMuonFSR=1;            
-  
-            }  //end of  if (fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==E_LEPTON      
-          }//end of if (fabs(_eventTree.treeLeaf.mcGMomPID->at(imc))==Z_BOSON
+void SearchForOverlap::FillHists()
+{
+  _histPhoPt[_iSource]->Fill(_treeLeaf.mcEt->at(_imc),_totalWeight);
+  _histPhoEta[_iSource]->Fill(_treeLeaf.mcEta->at(_imc),_totalWeight);
+  _histPhoPhi[_iSource]->Fill(_treeLeaf.mcPhi->at(_imc),_totalWeight);
+  if (_ilep1>-1){
+    _histLep1Pt[_iSource]->Fill(_treeLeaf.mcPt->at(_ilep1),_totalWeight); 
+    _histLep1Eta[_iSource]->Fill(_treeLeaf.mcEta->at(_ilep1),_totalWeight); 
+    _histLep1Phi[_iSource]->Fill(_treeLeaf.mcPhi->at(_ilep1),_totalWeight); 
+    _histLep1PhodR[_iSource]->Fill(_dRLep1Pho,_totalWeight);
+  }
+  if (_ilep2>-1){
+    _histLep2Pt[_iSource]->Fill(_treeLeaf.mcPt->at(_ilep2),_totalWeight);
+    _histLep2Eta[_iSource]->Fill(_treeLeaf.mcEta->at(_ilep2),_totalWeight); 
+    _histLep2Phi[_iSource]->Fill(_treeLeaf.mcPhi->at(_ilep2),_totalWeight); 
+    _histLep2PhodR[_iSource]->Fill(_dRLep2Pho,_totalWeight);  
+  }
+  if (_ilep1>-1 && _ilep2>-1){
+    _histLepLepdR[_iSource]->Fill(_dRLepLep,_totalWeight); 
+    _histLepLepMassT[_iSource]->Fill(_massTLepLep,_totalWeight); 
+    _histLepLepMass[_iSource]->Fill(_massLepLep,_totalWeight); 
+  }  
+}
 
-          //TGC
-          if (fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==Z_BOSON || fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==W_BOSON){
-            unsigned int ib = fabs(_eventTree.treeLeaf.mcMomPID->at(imc));
-            if ((fabs(_eventTree.treeLeaf.mcGMomPID->at(imc))>=D_QUARK &&
-                fabs(_eventTree.treeLeaf.mcGMomPID->at(imc))<=T_QUARK) ||
-                _eventTree.treeLeaf.mcGMomPID->at(imc)==GLUON){
-                  _nTGC[ib]+=_totalWeight;
-                  nSomeScheme++;
-            }   
-            for (int imc2=0; imc2<_eventTree.treeLeaf.nMC; imc2++){
-              if (fabs(_eventTree.treeLeaf.mcPID->at(imc2))==MU_LEPTON &&
-                  fabs(_eventTree.treeLeaf.mcMomPID->at(imc2))==Z_BOSON &&
-                  fabs(_eventTree.treeLeaf.mcMomPID->at(imc))==Z_BOSON)
-                isZMuonTGC=1;
-            }
-          }
- 
-          //ISR
-          if ((fabs(_eventTree.treeLeaf.mcMomPID->at(imc))>=D_QUARK &&
-              fabs(_eventTree.treeLeaf.mcMomPID->at(imc))<=T_QUARK) ||
-              _eventTree.treeLeaf.mcMomPID->at(imc)==GLUON){
-            unsigned int iq=fabs(_eventTree.treeLeaf.mcMomPID->at(imc));
-            bool hasBosonFromTheSameQ=0;
-            unsigned int ib = 0;
-            for (int imc2=0; imc2<_eventTree.treeLeaf.nMC; imc2++){
-              if (fabs(_eventTree.treeLeaf.mcPID->at(imc2))==Z_BOSON || fabs(_eventTree.treeLeaf.mcPID->at(imc2))==W_BOSON){
-                ib = fabs(_eventTree.treeLeaf.mcPID->at(imc2));
-                if (fabs(_eventTree.treeLeaf.mcMomPID->at(imc2))==iq){
-                  hasBosonFromTheSameQ=1;
-                  break;
-                }
-              }
-            }//end of loop over imc2
-            if (hasBosonFromTheSameQ){
-              _nISR[ib][ANY_QUARK]+=_totalWeight;
-              _nISR[ib][iq]+=_totalWeight;
-              nSomeScheme++;
-            }
-          }//end of if (#smth#>=D_QUARK <...>
+void SearchForOverlap::ComputeKinematicVariables()
+{
+  float dphi, deta;
+  if (_ilep1>-1){
+  // Lep1 Pho dR
+    _dRLep1Pho=DeltaR(_treeLeaf.mcPhi->at(_ilep1),_treeLeaf.mcPhi->at(
+_imc),_treeLeaf.mcEta->at(_ilep1),_treeLeaf.mcEta->at(_imc));  
+  }
+  if (_ilep2>-1){  
+    // Lep2 Pho dR 
+    _dRLep2Pho=DeltaR(_treeLeaf.mcPhi->at(_ilep2),_treeLeaf.mcPhi->at(_imc),_treeLeaf.mcEta->at(_ilep2),_treeLeaf.mcEta->at(_imc));  
+   }
+   if (_ilep1>-1 && _ilep2>-1){ 
+     // Lep Lep dR  
+     _dRLepLep=DeltaR(_treeLeaf.mcPhi->at(_ilep2),_treeLeaf.mcPhi->at(_ilep1),_treeLeaf.mcEta->at(_ilep2),_treeLeaf.mcEta->at(_ilep1));  
+      // Lep Lep Mass Transversed
+      _massTLepLep = sqrt(2*_treeLeaf.mcPt->at(_ilep1)*_treeLeaf.mcPt->at(_ilep2)*(1-TMath::Cos(_treeLeaf.mcPhi->at(_ilep2)-_treeLeaf.mcPhi->at(_ilep1)))); 
+      // Lep Lep Mass Invariant
+      TLorentzVector vLep1;
+      float mass1;
+      if (_treeLeaf.mcPID->at(_ilep1)==MU_LEPTON) mass1=0.1;
+      vLep1.SetPtEtaPhiM(_treeLeaf.mcPt->at(_ilep1),_treeLeaf.mcEta->at(_ilep1),_treeLeaf.mcPhi->at(_ilep1),mass1);
+      TLorentzVector vLep2;
+      float mass2;
+      if (_treeLeaf.mcPID->at(_ilep1)==MU_LEPTON) mass2=0.1;
+      else if (_treeLeaf.mcPID->at(_ilep1)==MU_NEUTRINO) mass2=0.0;
+      vLep2.SetPtEtaPhiM(_treeLeaf.mcPt->at(_ilep2),_treeLeaf.mcEta->at(_ilep2),_treeLeaf.mcPhi->at(_ilep2),mass2);
+      TLorentzVector vLepLepSum=vLep1+vLep2;
+      _massLepLep = vLepLepSum.M();
+    }
+}
 
-          if (!isZMuonFSR && !isZMuonTGC) continue;
-
-          //fill histograms
-          int ilep1=-1;
-          int ilep2=-1;
-          for (int imc2=0; imc2<_eventTree.treeLeaf.nMC; imc2++){
-            if (fabs(_eventTree.treeLeaf.mcPID->at(imc2))==MU_LEPTON)
-              if (fabs(_eventTree.treeLeaf.mcMomPID->at(imc2))==Z_BOSON){
-                if (ilep1==-1) ilep1=imc2;
-                else if (_eventTree.treeLeaf.mcPt->at(imc2)<_eventTree.treeLeaf.mcPt->at(ilep1)){
-                  ilep2=imc2;
-                  continue;
-                }    
-                else{
-                  ilep2=ilep1;
-                  ilep1=imc2;
-                  continue;
-                }
-              }
-          }//end of loop over imc2
-
-          _histPhoPt[_iSource]->Fill(_eventTree.treeLeaf.mcEt->at(imc),_totalWeight);
-          _histPhoEta[_iSource]->Fill(_eventTree.treeLeaf.mcEta->at(imc),_totalWeight);
-          _histPhoPhi[_iSource]->Fill(_eventTree.treeLeaf.mcPhi->at(imc),_totalWeight);
-          float dphi, deta, dR; 
-          if (ilep1>-1){
-            _histLep1Pt[_iSource]->Fill(_eventTree.treeLeaf.mcPt->at(ilep1),_totalWeight); 
-            _histLep1Eta[_iSource]->Fill(_eventTree.treeLeaf.mcEta->at(ilep1),_totalWeight); 
-            _histLep1Phi[_iSource]->Fill(_eventTree.treeLeaf.mcPhi->at(ilep1),_totalWeight); 
-          // Lep1 Pho dR
-            dphi=fabs(_eventTree.treeLeaf.mcPhi->at(ilep1)-_eventTree.treeLeaf.mcPhi->at(imc));  
-            if (dphi>2*TMath::Pi())
-              dphi=dphi-2*TMath::Pi();  
-            deta=  _eventTree.treeLeaf.mcEta->at(ilep1)-_eventTree.treeLeaf.mcEta->at(imc);
-            dR=dphi*dphi+deta*deta;  
-            _histLep1PhodR[_iSource]->Fill(dR,_totalWeight);
-          }
-          if (ilep2>-1){  
-            _histLep2Pt[_iSource]->Fill(_eventTree.treeLeaf.mcPt->at(ilep2),_totalWeight);
-            _histLep2Eta[_iSource]->Fill(_eventTree.treeLeaf.mcEta->at(ilep2),_totalWeight); 
-            _histLep2Phi[_iSource]->Fill(_eventTree.treeLeaf.mcPhi->at(ilep2),_totalWeight); 
-          // Lep2 Pho dR 
-            dphi=fabs(_eventTree.treeLeaf.mcPhi->at(ilep2)-_eventTree.treeLeaf.mcPhi->at(imc));  
-            if (dphi>2*TMath::Pi())
-              dphi=dphi-2*TMath::Pi();  
-            deta=  _eventTree.treeLeaf.mcEta->at(ilep2)-_eventTree.treeLeaf.mcEta->at(imc);
-            dR=dphi*dphi+deta*deta;  
-            _histLep2PhodR[_iSource]->Fill(dR,_totalWeight);   
-          }
-
-          if (ilep1>-1 && ilep2>-1){ 
-          // Lep Lep dR  
-            dphi=fabs(_eventTree.treeLeaf.mcPhi->at(ilep2)-_eventTree.treeLeaf.mcPhi->at(ilep1));  
-            if (dphi>2*TMath::Pi())
-              dphi=dphi-2*TMath::Pi();  
-            deta=  _eventTree.treeLeaf.mcEta->at(ilep2)-_eventTree.treeLeaf.mcEta->at(ilep1);
-            dR=dphi*dphi+deta*deta;  
-            _histLepLepdR[_iSource]->Fill(dR,_totalWeight); 
-            // Lep Lep Mass Transversed
-            float massT = sqrt(2*_eventTree.treeLeaf.mcEt->at(ilep1)*_eventTree.treeLeaf.mcEt->at(ilep2)*(1-TMath::Cos(dphi))); 
-            _histLepLepMass[_iSource]->Fill(massT,_totalWeight); 
-          }
-         
-        }    //end of loop over imc 
-
-        if (nPhoInEvent<91)
-          _nEventsWithGivenNOfPhotons[nPhoInEvent]+=_totalWeight; 
-        if (nSomeScheme<91)
-          _nEventsWithSomeScheme[nSomeScheme]+=_totalWeight; 
-
-        if ((nPhoInEvent==0 && _nEventsWithGivenNOfPhotons[0]<0) ||
-             (nSomeScheme==0 && _nEventsWithSomeScheme[0]<0)){
-          std::cout<<"event "<<entry<<" has no photons or no schemes;"<<std::endl;
-          std::cout<<"mcPIDs:    ";
-          for (int imc3=0; imc3<_eventTree.treeLeaf.nMC; imc3++)
-            std::cout<<std::setw(2)<<_eventTree.treeLeaf.mcPID->at(imc3)<<", ";
-          std::cout<<std::endl;
-          std::cout<<"mcMomPIDs: ";
-          for (int imc3=0; imc3<_eventTree.treeLeaf.nMC; imc3++)
-            std::cout<<std::setw(2)<<_eventTree.treeLeaf.mcMomPID->at(imc3)<<", ";
-          std::cout<<std::endl;
-          std::cout<<"mcGMomPIDs:";
-          for (int imc3=0; imc3<_eventTree.treeLeaf.nMC; imc3++)
-            std::cout<<std::setw(2)<<_eventTree.treeLeaf.mcGMomPID->at(imc3)<<", ";
-          std::cout<<std::endl;
-
-        }
-
-     } //end of loop over events in the tree
-
+void SearchForOverlap::PrintResults()
+{
      std::cout<<"weighted number of events:"<<std::endl;
-     std::cout<<"nTot="<<_nEvents<<", nWithPhotons="<<_nEventsWithPhotons<<", nPhotons="<<_nPhotons<<std::endl;
+     std::cout<<"nTot="<<_nEvents<<", nWithPhotons="<<_nEventsWithPhotons<<", nPhotons="<<_nPhotons<<", nPassedAcc="<<_nPhotonsPassedAcc<<", nTrueGammaInAcc="<<_nPhotonsPassedTrueGammaCondition<<", trueEff=";
+     if (_nPhotonsPassedAcc==0) std::cout<<0<<std::endl;
+     else std::cout<<1.0*_nPhotonsPassedTrueGammaCondition/_nPhotonsPassedAcc<<std::endl;
 /*
      std::cout<<"n of events with diff n of photons:"<<std::endl;
      for (int nphos=0; nphos<91; nphos++){
@@ -449,9 +647,30 @@ void SearchForOverlap::LoopOverTreeEvents()
      std::cout<<"nTGC(Z)="<<100*_nTGC[Z_BOSON]/_nPhotons<<"%"<<std::endl;
      std::cout<<"nFSR(Z)="<<100*_nFSR[Z_BOSON][ANY_LEPTON]/_nPhotons<<"%, e="<<100*_nFSR[Z_BOSON][E_LEPTON]/_nPhotons<<"%, mu="<<100*_nFSR[Z_BOSON][MU_LEPTON]/_nPhotons<<"%, tau="<<100*_nFSR[Z_BOSON][TAU_LEPTON]/_nPhotons<<"%"<<std::endl;
 //     std::cout<<"nISR(Z)="<<100*_nISR[Z_BOSON][ANY_QUARK]/_nPhotons<<"%, d="<<100*_nISR[Z_BOSON][D_QUARK]/_nPhotons<<"%, u="<<100*_nISR[Z_BOSON][U_QUARK]/_nPhotons<<"%, s="<<100*_nISR[Z_BOSON][S_QUARK]/_nPhotons<<"%, c="<<100*_nISR[Z_BOSON][C_QUARK]/_nPhotons<<"%, b="<<100*_nISR[Z_BOSON][B_QUARK]/_nPhotons<<"%, t="<<100*_nISR[Z_BOSON][T_QUARK]/_nPhotons<<"%, gluon="<<100*_nISR[Z_BOSON][GLUON]/_nPhotons<<"%"<<std::endl;
-
-
 }
 
+void SearchForOverlap::PrintIfSuspicious()
+{
+  std::cout<<"event "<<_entry<<" has no photons or no schemes;"<<std::endl;
+  std::cout<<"mcPIDs:    ";
+  for (int imc3=0; imc3<_treeLeaf.nMC; imc3++)
+    std::cout<<std::setw(2)<<_treeLeaf.mcPID->at(imc3)<<", ";
+  std::cout<<std::endl;
+  std::cout<<"mcMomPIDs: ";
+  for (int imc3=0; imc3<_treeLeaf.nMC; imc3++)
+    std::cout<<std::setw(2)<<_treeLeaf.mcMomPID->at(imc3)<<", ";
+  std::cout<<std::endl;
+  std::cout<<"mcGMomPIDs:";
+  for (int imc3=0; imc3<_treeLeaf.nMC; imc3++)
+     std::cout<<std::setw(2)<<_treeLeaf.mcGMomPID->at(imc3)<<", ";
+  std::cout<<std::endl;
+}
 
-
+float SearchForOverlap::DeltaR(float phi1,float phi2,float eta1,float eta2)
+{
+   float dphi = fabs(phi2-phi1);  
+   if (dphi>2*TMath::Pi())
+     dphi=dphi-2*TMath::Pi();  
+   float deta =  fabs(eta2-eta1);
+   return sqrt(dphi*dphi+deta*deta);
+}//end of DeltaR(float phi1,float phi2,float eta1,float eta2)

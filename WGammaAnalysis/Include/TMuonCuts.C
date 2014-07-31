@@ -22,34 +22,39 @@ bool TMuonCuts::HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <flo
   for (int i=0; i<nMu; i++)
     {
       if (i==imu) continue;
-      else if (muPt->at(i)>extraMuPtCut_ && fabs(muEta->at(i))<extraMuEtaCut_) return true;
+      else if (muPt->at(i)>_extraMuPtCut && fabs(muEta->at(i))<_extraMuEtaCut) return true;
     }
   return false;
 }
 
 bool TMuonCuts::PassedKinematics(float muPt, float muEta) 
 {
-  if (muPt<=muPtCut_) return false; 
-  if (fabs(muEta)>=muEtaCut_) return false ;
+  if (muPt<=_muPtCut) return false; 
+  if (fabs(muEta)>=_muEtaCut) return false ;
   return true ; 
 }
-bool TMuonCuts::MuId(float muChi2NDF, float muD0, float muDZ, 
+
+bool TMuonCuts::MuId(int year, float muChi2NDF, float muD0, float muDZ, 
                 int muNumberOfValidMuonHits, int muNumberOfValidTrkHits, 
                 int muNumberOfValidPixelHits, int muNumberOfValidTrkLayers, 
-                int muStations) 
+                int muStations, int muType) 
 {
-  if (muChi2NDF >= muChi2NDFCut_) return false;
-  if (muNumberOfValidMuonHits <= muNOfValidMuonHitsCut_) return false;
-  if (muNumberOfValidTrkHits <= muNOfValidTrkHitsCut_) return false;
-  if (fabs(muD0) >= impactParameterCut_) return false;
+  if (muType != _muType2012) return false;
+  if (muChi2NDF >= _muChi2NDFCut) return false;
+  if (muNumberOfValidMuonHits <= _muNOfValidMuonHitsCut) return false;
+  if (muNumberOfValidTrkHits <= _muNOfValidTrkHitsCut) return false;
+  if ((year==2012) && (fabs(muD0) >= _D0Cut2012)) return false;
+  if ((year==2012) && (fabs(muDZ) >= _DZCut2012)) return false;
+  if ((year==2011) && (fabs(muD0) >= _D0Cut2011)) return false;
+  if ((year==2011) && fabs(muDZ) >= _DZCut2011) return false;
      //it might be muD0GV, muD0 or muDoVtx
-  if (muStations<=muStationsCut_) return false;
-  if (fabs(muDZ) >= longitudinalDistanceCut_) return false;
-  if (muNumberOfValidPixelHits<=muNOfValidPixelHitsCut_) return false;
-  if (muNumberOfValidTrkLayers<=muNOfValidTrkLayersCut_) return false;
+  if (muStations<=_muStationsCut) return false;
+  if (muNumberOfValidPixelHits<=_muNOfValidPixelHitsCut) return false;
+  if (muNumberOfValidTrkLayers<=_muNOfValidTrkLayersCut) return false;
   return true;
 }
-float TMuonCuts::MuIsolation(float muPt, 
+
+float TMuonCuts::MuIsolation2012(float muPt, 
                  float muPFIsoR04_NH, float muPFIsoR04_Pho, 
                  float muPFIsoR04_PU,float muPFIsoR04_CH) {
   if (muPt == 0) return 10000;
@@ -58,17 +63,35 @@ float TMuonCuts::MuIsolation(float muPt,
     isolation=muPFIsoR04_CH/muPt;
   else isolation=(muPFIsoR04_CH+muPFIsoR04_NH
                   +muPFIsoR04_Pho-0.5*muPFIsoR04_PU)/muPt;
-//  if (isolation >= isoTightCut_) return false; 
   return isolation; 
 }
 
-TCut TMuonCuts::RangeId(){
-  return "leptonId";
+//  if ( (muIsoTrk[imu]+muIsoEcal[imu]+muIsoHcal[imu] - rho*TMath::Pi()*0.3*0.3) < 0.1*muPt[imu] ) {
+float TMuonCuts::MuIsolation2011(float muPt, 
+                 float muIsoTrk, float muIsoEcal, 
+                 float muIsoHcal,float rho2011) {
+//  if ( (muIsoTrk[imu]+muIsoEcal[imu]+muIsoHcal[imu] - rho*TMath::Pi()*0.3*0.3) < 0.1*muPt[imu] ) - from Senka's code
+  if (muPt == 0) return 10000;
+  float isolation=(muIsoTrk+muIsoHcal+muIsoEcal-rho2011*TMath::Pi()*0.3*0.3)/muPt;
+  return isolation; 
 }
 
-TCut TMuonCuts::RangeIsolation(){
-  TString strCut="leptonIsolation<";
-  strCut+=isoTightCut_;
+TCut TMuonCuts::RangeId(int year){
+  if (year==2012) return "leptonId2012";
+  if (year==2011) return "leptonId2011";
+  return "leptonId2012";
+}
+
+TCut TMuonCuts::RangeIsolation(int year){
+  TString strCut="";
+  if (year==2012){
+    strCut="leptonIsolation2012<";
+    strCut+=_isoTightCut2012;
+  }
+  else if (year==2011){
+    strCut="leptonIsolation2011<";
+    strCut+=_isoCut2011;
+  }
   TCut cut(strCut);
   return cut;
 }
@@ -79,11 +102,11 @@ TCut TMuonCuts::RangeTriggerMatch(){
   return (cutTrg1||cutTrg2);
 }
 
-TCut TMuonCuts::RangeMuon(bool doIsoCut, bool doIdCut, bool doTrgCut){
+TCut TMuonCuts::RangeMuon(int year, bool doIsoCut, bool doIdCut, bool doTrgCut){
   TCut cut="1";
   if (doTrgCut) cut=cut && RangeTriggerMatch();
-  if (doIdCut)  cut=cut && RangeId();
-  if (doIsoCut) cut=cut && RangeIsolation();
+  if (doIdCut)  cut=cut && RangeId(year);
+  if (doIsoCut) cut=cut && RangeIsolation(year);
   return cut;
 }
 

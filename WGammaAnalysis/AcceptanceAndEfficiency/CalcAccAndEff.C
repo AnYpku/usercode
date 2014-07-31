@@ -27,14 +27,14 @@
 #include <sstream>  
   //standard C++ class
 
-CalcAccAndEff::CalcAccAndEff(int channel, int phoWP, TString phoIsoBase, string configFile, bool isNoPuReweight, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int year, int channel, int phoWP, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
 
   _INPUT = new TAllInputSamples(channel, configFile);
 
+  _year=year;
   _channel=channel;
   _phoWP=phoWP;
-  _phoIsoBase=phoIsoBase;
   _isDebugMode=isDebugMode;
   _isNoPuReweight=isNoPuReweight;
   _photonCorrector = new zgamma::PhosphorCorrectionFunctor((_config.GetPhosphorConstantFileName()) );
@@ -193,7 +193,7 @@ void CalcAccAndEff::LoopOverInputFiles()
      TH1F* hTot = new TH1F("hTot","hTot",1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
      TH1F* h1D = new TH1F("h1D","h1D",_config.GetNPhoPtBins(),_phoPtLimits);
      TCut cutWeight="weight";
-     TCut cut = cutWeight*_fullCuts.RangeFullCut(_channel,_phoWP,_phoIsoBase);
+     TCut cut = cutWeight*_fullCuts.RangeFullCut(_year,_channel,_phoWP,0);
      tr->Draw("phoGenEt>>hTot",cutWeight,"goff");
      tr->Draw("phoGenEt>>h1D",cutWeight,"goff");
      std::cout<<"file for efficiency selection: "<<_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel,_config.UNBLIND, _config.SIGMC)<<std::endl;

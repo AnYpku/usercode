@@ -87,7 +87,7 @@ bool TFullCuts::VeryPreliminaryCut(bool** goodLeptonPhotonPairs,
  bool kinPhotonExists=0;
   for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++){       
     TPhotonCuts emptyPhoton;
-    if (inpTreeLeaf.phoSCEt->at(ipho)>15) passed.phoPtPassed++;
+//    if (inpTreeLeaf.phoSCEt->at(ipho)>15) passed.phoPtPassed++;
     if (emptyPhoton.IsBarrel(inpTreeLeaf.phoSCEta->at(ipho)))
       passed.phoBarrelPassed++;
     if (emptyPhoton.IsEndcap(inpTreeLeaf.phoSCEta->at(ipho)))
@@ -135,19 +135,22 @@ float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2)
   return dR;
 }
 
-float TFullCuts::GetWMtCut()
+float TFullCuts::GetWMtCut(int year)
 {
-  return _WMtCut;
+  if (year==2012) return _WMtCut2012;
+  else if (year==2012) return _WMtCut2011;
+  return _WMtCut2012;
 }
 
 TCut TFullCuts::RangeMoreLeptonsVeto(){
   return "!hasMoreLeptons";
 }
 
-TCut TFullCuts::RangeMetRelatedCut()
+TCut TFullCuts::RangeMetRelatedCut(int year)
 {
   TString cutStr="WMt>";
-  cutStr+=_WMtCut;
+  if (year==2012) cutStr+=_WMtCut2012;
+  else if (year==2011) cutStr+=_WMtCut2011;
   TCut cut(cutStr);
   return cut;
 }
@@ -160,45 +163,53 @@ TCut TFullCuts::RangePhoEt()
   return cut;
 }
 
-TCut TFullCuts::RangeForMetCut(int channel, int phoWP, TString phoIsoBase){
-  TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(phoWP, phoIsoBase, 0, 0);
-  //phoIsoBase = "PF" or "SCR"
-  TCut cutLepton;
-  if (channel==TConfiguration::MUON){
-    TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon();
-  }
-  else if (channel==TConfiguration::ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto();
+TCut TFullCuts::RangeExtraLeptonPt2011()
+{
+  TString cutStr="leptonPt>35";
+  TCut cut(cutStr);
   return cut;
 }
 
-TCut TFullCuts::RangeForTemplateMethodCut(int channel, int phoWP, TString phoIsoBase){
+TCut TFullCuts::RangeForMetCut(int year, int channel, int phoWP){
   TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(phoWP, phoIsoBase, 0, 0);
+  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 1, 0, 0);
+  TCut cutLepton;
+  if (channel==TConfiguration::MUON){
+    TMuonCuts emptyMuon;
+    cutLepton=emptyMuon.RangeMuon(year);
+  }
+  else if (channel==TConfiguration::ELECTRON);
+  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangePhoEt();
+  if (year==2011) cut = cut && RangeExtraLeptonPt2011();
+  return cut;
+}
+
+TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int phoWP){
+  TPhotonCuts emptyPhoton;
+  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 1, 0, 0);
   //no cuts on sigmaIEtaIEta and chIso
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
     TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon();
+    cutLepton=emptyMuon.RangeMuon(year);
   }
   else if (channel==TConfiguration::ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangeMetRelatedCut();
+  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year) && RangePhoEt();
+  if (year==2011) cut = cut && RangeExtraLeptonPt2011();
   return cut;
 }
 
-TCut TFullCuts::RangeFullCut(int channel, int phoWP, TString phoIsoBase)
+TCut TFullCuts::RangeFullCut(int year, int channel, int phoWP, bool noPhoPFChIsoCut)
 {
   TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(phoWP, phoIsoBase);
-  //phoIsoBase = "PF" or "SCR"
+  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, noPhoPFChIsoCut);
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
     TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon();
+    cutLepton=emptyMuon.RangeMuon(year);
   }
   else if (channel==TConfiguration::ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangeMetRelatedCut();
+  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year) && RangePhoEt();
+  if (year==2011) cut = cut && RangeExtraLeptonPt2011();
   return cut;
 }

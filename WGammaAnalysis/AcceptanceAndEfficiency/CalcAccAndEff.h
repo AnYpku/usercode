@@ -20,28 +20,27 @@
 class CalcAccAndEff
   {
      public:
-       CalcAccAndEff (int channel, int phoWP, TString phoIsoBase, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       CalcAccAndEff (int year, int channel, int phoWP, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
 
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
+
+     private:
+
        void    LoopOverTreeEvents();
        bool    AcceptancePassed(bool** accLeptonPhotonPassed);    
        bool    EfficiencyPassed(bool** effLeptonPhotonPassed, float** lePhoDeltaR, float weightPU);
        void    PlotAndSaveOutput();
        bool    CheckMaxNumbersInTree();
-//       void    PrintErrorMessageMaxNumberOf(int particle);
-
-     private:
 
        TFile* _fSelectedVeryPreliminary;
-
+       int _year;
 
        TAllInputSamples* _INPUT;
        TEventTree _eventTree;
 
        int _channel;
        int _phoWP;
-       TString _phoIsoBase;
 
        bool _isDebugMode;
        bool _isNoPuReweight;

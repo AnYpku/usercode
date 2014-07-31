@@ -30,8 +30,8 @@ class WGammaSelection
        void    LoopOverTreeEvents();
        bool    CheckMaxNumbersInTree();
        void    PrintErrorMessageMaxNumberOf(int particle);
-       void    ExtraSelection(int channel, int sampleMode, int wp, TString strPhoIsoBase);
-       void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource,TConfiguration& config, TFullCuts &fullCut, int channel, int wp, TString strPhoIsoBase, int blind);
+       void    ExtraSelection(int year, int channel, int sampleMode, int wp, bool noPhoPFChIsoCut);
+       void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int wp, int blind, bool noPhoPFChIsoCut);
 
        enum {DATA, SIGMC, BKGMC, MC, NOBKG, ALL, NOTSPECIFIED};
 
@@ -54,6 +54,7 @@ class WGammaSelection
 
        TConfiguration _config;
        TTree* _tr;
+       TTree* _trReduced;
        TTree* _tr1;
        TTree* _tr2;
        TTree* _tr3;

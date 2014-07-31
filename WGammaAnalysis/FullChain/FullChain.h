@@ -12,6 +12,7 @@ class FullChain
     virtual ~FullChain();
 
     struct FullChainParameters{
+      int year;
       int channel;
       int blind;
       TString varKin;
@@ -20,24 +21,18 @@ class FullChain
       int sampleMode;
       string analyzedSamples;
       string configfile;
+      bool noAdjustBinning;
       bool isMetCutOptimization;
       bool isNoPuReweight;
       bool isDebugMode;
       int phoWP;
-      TString strPhoIsoBase;
 
       //for template method:
       TString strDDbkgVarFit;
       TString strDDbkgVarSideband;
-      int* nBinsLeftB;
-      float* maxVarFitB;
-      int* nBinsLeftE;
-      float* maxVarFitE;
-      int nBinsLeftBTot;
-      float maxVarFitBTot;
-      int nBinsLeftETot;
-      float maxVarFitETot;
       //end for template method;
+ 
+      bool noPhoPFChIsoCut;
 
       bool noPreSelection;
       bool noExtraSelection;
