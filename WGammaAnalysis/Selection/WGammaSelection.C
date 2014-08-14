@@ -452,27 +452,25 @@ void WGammaSelection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TC
     long nEntries = _trReduced->GetEntries();
     long eventCurr=0;
     long eventPrev=-1;
-    float phoEtCurr=0;
-    float phoEtPrev=-1;
     for (long ientry=0; ientry<nEntries; ientry++){
       _trReduced->GetEntry(ientry);
+      eventPrev=eventCurr;
       eventCurr = selEvTree._event;
       if (eventCurr==eventPrev) continue;
       _tr1->Fill();
     }
     _trReduced->Write();
 
-
     _tr1->Write();
 
     TString fOutName2=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut2(fOutName2,"recreate");
-    _tr2 = _trReduced->CopyTree(fullCut.RangeForTemplateMethodCut(year,channel,wp));
+    _tr2 = _tr1->CopyTree(fullCut.RangeForTemplateMethodCut(year,channel,wp));
     _tr2->Write();
 
     TString fOutName3=config.GetSelectedName(config.FULLY,channel,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut3(fOutName3,"recreate");
-    _tr3 = _trReduced->CopyTree(fullCut.RangeFullCut(year,channel,wp,noPhoPFChIsoCut));
+    _tr3 = _tr1->CopyTree(fullCut.RangeFullCut(year,channel,wp,noPhoPFChIsoCut));
     _tr3->Write();
 
 }

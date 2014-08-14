@@ -221,7 +221,6 @@ void TConfiguration::GetPhoPtBinsLimits(float* lims)
 {
   for (int i=0; i<_nPhoPtBins+1; i++)
     lims[i]=_phoPtBinsLimits[i];
- 
 }
 
 int TConfiguration::FindPhoPtBinByPhoPt(float pt)

@@ -30,6 +30,10 @@ class CalcAccAndEff
        void    LoopOverTreeEvents();
        bool    AcceptancePassed(bool** accLeptonPhotonPassed);    
        bool    EfficiencyPassed(bool** effLeptonPhotonPassed, float** lePhoDeltaR, float weightPU);
+       void    ComputeAcceptance();
+       void    ComputeEfficiency();
+       void    ComputeAccTimesEff();
+       void    PrintAccAndEffSummary();
        void    PlotAndSaveOutput();
        bool    CheckMaxNumbersInTree();
 
@@ -91,11 +95,17 @@ class CalcAccAndEff
        float* _eff1D;
        float* _eff1DErr;
 
+       //Acc times Eff
+       float  _accXeffTot;
+       float  _accXeffTotErr;
+       float* _accXeff1D;
+       float* _accXeff1DErr;
+
        TFullCuts _fullCuts;
        TMathTools _math;
        TPhotonCuts _photonEmpty;
        TMuonCuts _muonEmpty;
- //      TElectronCuts electronEmpty_;
+//     TElectronCuts electronEmpty_;
 
        const static int _debugModeNEntries=100000;
 

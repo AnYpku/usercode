@@ -29,9 +29,7 @@
 
   gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
 
-
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
-
 
   gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
 

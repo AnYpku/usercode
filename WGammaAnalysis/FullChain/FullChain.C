@@ -101,7 +101,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[3]=1.5;
     anPars.kinBinLims[4]=2.5;
 */
-
     anPars.nKinBins=20;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=-2.5;
@@ -125,7 +124,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[18]=2.166;
     anPars.kinBinLims[19]=2.366;
     anPars.kinBinLims[20]=2.5;
-
   }
   if (varKin=="phoPhi"){
     anPars.varKin="phoPhi";
@@ -134,7 +132,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
   }
-
   if (varKin=="leptonPt"){
     anPars.varKin="leptonPt";
     anPars.nKinBins=8;
@@ -142,7 +139,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=26+10*ib;
   }
-
   if (varKin=="leptonPhi"){
     anPars.varKin="leptonPhi";
     anPars.nKinBins=8;
@@ -150,7 +146,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
   }
-
   if (varKin=="leptonEta"){
     anPars.varKin="leptonEta";
     anPars.nKinBins=16;
@@ -173,7 +168,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[15]=1.966;
     anPars.kinBinLims[16]=2.1;
   }
-
   if (varKin=="WMt"){
     anPars.isMetCutOptimization=1;
     anPars.varKin="WMt";
@@ -183,7 +177,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0+10*ib;
   }
-
   if (varKin=="lePhoDeltaR"){
     anPars.varKin="lePhoDeltaR";
     anPars.nKinBins=10;
@@ -191,7 +184,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0.7+0.5*ib;
   }
-
   if (varKin=="pfMET"){
     anPars.varKin="pfMET";
     anPars.nKinBins=2;
@@ -200,7 +192,6 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=50+10*ib;
   }
-
   if (varKin=="pfMETPhi"){
     anPars.varKin="pfMETPhi";
     anPars.nKinBins=8;

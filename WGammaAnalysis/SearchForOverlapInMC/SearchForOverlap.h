@@ -14,21 +14,25 @@ class SearchForOverlap
      //TEventTree - class for input tree
      //TSelectedEventsTree - class for output tree and output root file
      public:
-       SearchForOverlap(int channel, bool isDebugMode=0, string analyzedSampleNames="Wg Wjets_to_lnu Zg DYjets_to_ll", string configFile="../Configuration/configForOverlapSearch.txt", bool isNoPuReweight=0);
+       SearchForOverlap(int channel, int cutType, bool isDebugMode=0, string analyzedSampleNames="Wg Wjets_to_lnu Zg DYjets_to_ll", string configFile="../Configuration/configForOverlapSearch.txt", bool isNoPuReweight=0);
        virtual ~SearchForOverlap();
        void    LoopOverInputFiles();   
+       enum {CUT_PAR, CUT_SOME_KIN_NO_PAR, CUT_KIN_PAR, CUT_KIN_MLL_PAR};
        float DeltaR(float phi1, float phi2, float eta1, float eta2);
 
      private:
-       void LoopOverTreeEvents();
-       void LoopOverMCParticles();
-       bool CheckIfTrueGammaMCparentage();
-       void CheckIfFSR(bool& isZMuonFSR, bool& isWMuonFSR);
-       void CheckIfTGC(bool& isZMuonTGC, bool& isWMuonTGC);
-       void CheckIfISR(bool& isZMuonISR, bool& isWMuonISR);
-       void FindLeptonIndexes();
-       void ComputeKinematicVariables();
-       void FillHists();
+       void LoopOverTreeEvents(int bosonType);
+       void LoopOverMCParticles(int bosonType);
+       bool CheckIfTrueGammaMCparentage(int imc);
+       void CheckIfFSR(int imc, bool& isZMuonFSR, bool& isWMuonFSR);
+       void CheckIfTGC(int imc, bool& isZMuonTGC, bool& isWMuonTGC);
+       void CheckIfISR(int imc, bool& isZMuonISR, bool& isWMuonISR);
+       void FindHighestPtPhotonIndexWithGivenKin(int bosonType, float dRCut, int& ipho, int &ilep1, int &ilep2);
+       void FindLeptonIndexes(int bosonType, int imc, int& ilep1, int& ilep2);
+       void FindLeptonIndexesZ(int imc, int& ilep1, int& ilep2);
+       void FindLeptonIndexesW(int imc, int& ilep1, int& ilep2);
+       void ComputeKinematicVariables(int ipho, int ilep1, int ilep2);
+       void FillHists(int imc, int ilep1, int ilep2);
        void PlotTwoHistograms(TString canvName, TH1F* hGamma, TH1F* hJets);
        void PlotHistsGammaJetsCompare(TString strZorW, int ind1, int ind2);
        void SetHists();
@@ -55,6 +59,7 @@ class SearchForOverlap
        int _idZGamma;
        int _idZJets;
        bool _histsSet[10];
+       int _cutType;
 
        bool _isDebugMode;
        bool _isNoPuReweight;
@@ -69,9 +74,6 @@ class SearchForOverlap
 
        int _iSource;
        long _entry;
-       int _imc;
-       int _ilep1;
-       int _ilep2;
        int _nthFakePhoton;
 
        float _dRLep1Pho;
@@ -95,6 +97,8 @@ class SearchForOverlap
        TH1F* _histLepLepdR[10];
        TH1F* _histLepLepMassT[10];
        TH1F* _histLepLepMass[10];
+
+       TH1F* _histMCparentage[10];
 
        TH1F* _histWeight[10];
 

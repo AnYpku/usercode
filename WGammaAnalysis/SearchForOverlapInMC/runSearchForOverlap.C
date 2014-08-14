@@ -9,7 +9,8 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  SearchForOverlap search(TConfiguration::MUON,0,"Wg Wjets_to_lnu Zg DYjets_to_ll");
+//  SearchForOverlap search(TConfiguration::MUON,SearchForOverlap::CUT_PAR,0,"Zg DYjets_to_ll Wg Wjets_to_lnu");
+  SearchForOverlap search(TConfiguration::MUON,SearchForOverlap::CUT_KIN_MLL_PAR,0,"Zg DYjets_to_ll");
   search.LoopOverInputFiles();
 
   time.Stop("time");

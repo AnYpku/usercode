@@ -569,7 +569,6 @@ void TPrepareYields::CompareSignalDATAvsMC(int ieta)
 void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack, THStack* stack)
 //if isStack then hist2 must be sum of histograms in the stack
 {
-
   canv->Divide(1,2);
   TPad* pad1 = (TPad*)canv->GetPad(1);
   TPad* pad2 = (TPad*)canv->GetPad(2);

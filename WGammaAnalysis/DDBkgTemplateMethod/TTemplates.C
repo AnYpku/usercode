@@ -138,7 +138,7 @@ void TTemplates::ComputeBackgroundOne(int ikin, bool noPrint, bool noPlot)
   for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
     SetThreeHists(ikin, ieta, noPrint);
     std::cout<<std::endl;
-    std::cout<<"Historgams (hTrue, hFake, hLeak):"<<std::endl;
+    std::cout<<"Histograms (hTrue, hFake, hLeak):"<<std::endl;
     PrintOneHistogramBinByBin(_hTrue, ikin, ieta);
     PrintOneHistogramBinByBin(_hFake, ikin, ieta);
     PrintOneHistogramBinByBin(_hLeak, ikin, ieta);
@@ -501,17 +501,14 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   double varMin=0;
   double varMax=0;
   int nBins=0;
-  TH1D* hTrue = 0;
-  TH1D* hFake = 0;
+//  TH1D* hTrue = 0;
+//  TH1D* hFake = 0;
 
 
-  hTrue = _hTrue[kinBin][etaBin];
-  hFake = _hFake[kinBin][etaBin];
 
-
-  nBins = hFake->GetNbinsX();
-  varMin = hFake->GetBinLowEdge(1);
-  varMax = hFake->GetBinLowEdge(nBins)+hFake->GetBinWidth(nBins);
+  nBins = _hFake[kinBin][etaBin]->GetNbinsX();
+  varMin = _hFake[kinBin][etaBin]->GetBinLowEdge(1);
+  varMax = _hFake[kinBin][etaBin]->GetBinLowEdge(nBins)+_hFake[kinBin][etaBin]->GetBinWidth(nBins);
 
   double minVarSideband = 0;
   double maxVarSideband = 100000;
@@ -539,24 +536,6 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
     std::cout<<"weight range: "<<minWeight<<" - "<<maxWeight<<std::endl;
   }
 
-  RooRealVar rooVarFit(_varFit,_labelVarFit, varMin, varMax);
-  RooRealVar rooVarSideband(_varSideband,_varSideband,minVarSideband,maxVarSideband);
-  RooRealVar rooPhoEta("phoSCEta","phoSCEta",minPhoEta,maxPhoEta);
-  RooRealVar rooKin(_varKin,_varKin,minKin,maxKin);
-  RooRealVar rooWeight("weight","weight",minWeight,maxWeight);
-
-  RooArgList argList;
-  argList.add(rooVarFit);
-  RooArgSet argSet;
-  argSet.add(rooVarFit);
-  //create Fake and True PDFs
-  RooDataHist trueDataHist("trueDataHist","true RooDataHist", argList, hTrue);
-  RooHistPdf truePdf("truePdf",_varFit+TString(" of true"), argSet, trueDataHist);
-  RooDataHist fakeDataHist("fakeDataHist", "fake RooDataHist", argList, hFake);
-  RooHistPdf fakePdf("fakePdf",_varFit+TString(" of fake"), argSet, fakeDataHist);
-
-  //load data
-  RooArgSet argSetData(rooVarFit,rooVarSideband,rooPhoEta,rooKin,rooWeight);
 
   TCut sidebandCut = SidebandCut();
   TCut etaCut = CutEtaBin(etaBin);
@@ -573,7 +552,7 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   hName+=StrLabelKin(kinBin);
   hName+=StrLabelEta(etaBin);
   hName+=_iter;
-  _hData[kinBin][etaBin] = (TH1D*)hFake->Clone(hName);
+  _hData[kinBin][etaBin] = (TH1D*)_hFake[kinBin][etaBin]->Clone(hName);
   _hData[kinBin][etaBin]->SetTitle(hName);
   TString varDraw=_varFit;
   varDraw+=">>";
@@ -593,7 +572,6 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   std::cout<<std::endl;
   delete histTemp; 
 
-  RooDataHist dataHist("hist", "data set converted to hist", argList, _hData[kinBin][etaBin]);
   if (!noPrint){
     std::cout<<"data hist TH1D* hist: "<<std::endl;
     _hData[kinBin][etaBin]->Print();
@@ -604,10 +582,14 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
     std::cout<<"leak (true to sideband) hist TH1D* hist: "<<std::endl;
     _hLeak[kinBin][etaBin]->Print();
   }
-//  RooDataSet dataSet("dataSet","dataSet",_treeData,argSetData,cut);
+  //RooDataSet dataSet("dataSet","dataSet",_treeData,argSetData,cut);
 
   //create total pdf
   int nMax = _treeData->GetEntries(cut);
+  int nTrueStart = 0.5*nMax;
+  int nFakeStart = 0.5*nMax;
+
+  RooRealVar rooVarFit(_varFit,_labelVarFit, varMin, varMax);
   if (nMax<=0){
     if (!noPrint) std::cout<<"ATTENTION: No data events for bin "<<kinCut<<", "<<etaCut<<std::endl;
     _nFakeFromFitVal[kinBin][etaBin]=0;
@@ -617,12 +599,30 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
     _plotter[kinBin][etaBin] = new RooPlot(rooVarFit,varMin,varMax,nBins);
     return;
   }
+  RooRealVar rooVarSideband(_varSideband,_varSideband,minVarSideband,maxVarSideband);
+  RooRealVar rooPhoEta("phoEta","phoEta",minPhoEta,maxPhoEta);
+  RooRealVar rooKin(_varKin,_varKin,minKin,maxKin);
+  RooRealVar rooWeight("weight","weight",minWeight,maxWeight);
+  RooArgList argList;
+  argList.add(rooVarFit);
+  RooArgSet argSet;
+  argSet.add(rooVarFit);
+  std::cout<<"Historgams (hTrue, hFake, hLeak):"<<std::endl;
+  PrintOneHistogramBinByBin(_hTrue, kinBin, etaBin);
+  PrintOneHistogramBinByBin(_hFake, kinBin, etaBin);
+  PrintOneHistogramBinByBin(_hLeak, kinBin, etaBin);
+  RooDataHist dataHist("hist", "data set converted to hist", argList, _hData[kinBin][etaBin]);
+  //create Fake and True PDFs
+  RooDataHist trueDataHist("trueDataHist","true RooDataHist", argList, _hTrue[kinBin][etaBin]);
+  RooHistPdf truePdf("truePdf",_varFit+TString(" of true"), argSet, trueDataHist);
+  RooDataHist fakeDataHist("fakeDataHist", "fake RooDataHist", argList, _hFake[kinBin][etaBin]);
+  RooHistPdf fakePdf("fakePdf",_varFit+TString(" of fake"), argSet, fakeDataHist);
 
-  int nTrueStart = nMax/4;
-  int nFakeStart = 3*nMax/4;
+  //load data
+  RooArgSet argSetData(rooVarFit,rooVarSideband,rooPhoEta,rooKin,rooWeight);
   RooRealVar rooNTrue("nTrue","n True",nTrueStart,0,nMax);
   RooExtendPdf eTruePdf("eTrue","extended True",truePdf,rooNTrue);
-  RooRealVar rooNFake("nFake","n Fake  ",nFakeStart,0,nMax);
+  RooRealVar rooNFake("nFake","n Fake",nFakeStart,0,nMax);
   RooExtendPdf eFakePdf("eFake","extended Fake",fakePdf,rooNFake);
   RooAddPdf fullPdf("fitModel","fit model",RooArgList(eTruePdf,eFakePdf));
   //fit
@@ -654,6 +654,7 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   LineColor(kGreen),LineStyle(9));
   fullPdf.plotOn(_plotter[kinBin][etaBin], Components("fakePdf"),Name("fake"),LineColor(kBlue),LineStyle(9));
   fullPdf.paramOn(_plotter[kinBin][etaBin]);
+
 }
 
 void TTemplates::ComputeYieldOneKinBin(int ikin, bool noPrint)
@@ -1099,14 +1100,13 @@ void TTemplates::SaveYields()
     }
     hTotTrueYield.Write(strTot); 
     h1DTrueYield.Write(str1D); 
-
+    if (ieta==_config.COMMON) continue;
     for (int i=0; i<_nKinBins+1; i++){  
       _hTrue[i][ieta]->Write(TString("templateTrue")+StrLabelKin(i)+StrLabelEta(ieta));
       _hFake[i][ieta]->Write(TString("templateFake")+StrLabelKin(i)+StrLabelEta(ieta));
       _hData[i][ieta]->Write(TString("dataToFit")+StrLabelKin(i)+StrLabelEta(ieta));
       _plotter[i][ieta]->Write(TString("plotter")+StrLabelKin(i)+StrLabelEta(ieta));
     }//end of loop over i
-    if (ieta>=_config.ENDCAP) return;
   }//end of loop over ieta
 }
 

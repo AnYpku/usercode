@@ -13,9 +13,6 @@ TMuonCuts::~TMuonCuts()
 {
 }
 
-
-
-
 bool TMuonCuts::HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <float> *muEta) 
 {
   if (nMu<2) return false;

@@ -42,7 +42,8 @@ bool TFullCuts::VeryPreliminaryCut(bool** goodLeptonPhotonPairs,
    if (inpTreeLeaf.nPho < 1) return 0; 
    if (nLe < 1) return 0;
       //these variables are fields of TEventTree
-   if (!inpTreeLeaf.metFilters[6]) return 0;
+//   if (!inpTreeLeaf.metFilters[6]) return 0;
+// we don't need it because we're running Jan22 rereco
       //metFilters - is field of TEventTree
       //[6] - ecalLaserCorrFilter
       //necessary to remove spikes in the photon distributions 
