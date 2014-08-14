@@ -66,18 +66,18 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
 void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
 {
     anPars.varKin="phoEt";
-
+/*
     anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=10;
     anPars.kinBinLims[1]=20;
     anPars.kinBinLims[2]=30;
+*/
 
-/*
   anPars.nKinBins=_config.GetNPhoPtBins();
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   _config.GetPhoPtBinsLimits(anPars.kinBinLims);
-*/
+
 }
 
 void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin)
