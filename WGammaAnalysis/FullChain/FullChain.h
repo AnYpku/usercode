@@ -14,6 +14,7 @@ class FullChain
     struct FullChainParameters{
       int year;
       int channel;
+      int vgamma;
       int blind;
       TString varKin;
       int nKinBins;
@@ -23,6 +24,7 @@ class FullChain
       string configfile;
       bool noAdjustBinning;
       bool isMetCutOptimization;
+      bool doSystTemplateStat;
       bool isNoPuReweight;
       bool isDebugMode;
       int phoWP;
@@ -43,15 +45,17 @@ class FullChain
     };
 
     void SetDefaultFullChainParameters(FullChainParameters& anPars, TString varKin="phoEt");
-    void SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin);
     void SetAnalysisKinParameters(FullChainParameters& anPars);
+
+    void SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin);
 
     void RunAnalysis(FullChainParameters anPars);
 
   private:
     TConfiguration _config;
-//    TAllInputSamples* _INPUT;
-//    float* _phoPtBinLimits;
+    TAllInputSamples* _INPUT;
+    float* _phoPtBinLimits;
+
 };
 
 

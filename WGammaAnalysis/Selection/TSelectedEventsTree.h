@@ -18,26 +18,29 @@ class TSelectedEventsTree
 
     void SetAsOutputTree(TTree* tree);
     void SetAsInputTree(TTree* tree);
-    void SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, int ipho, int ile, float lePhoDeltaR, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector); 
+    void SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, int ipho, int ilep1, int ilep2, float lep1PhoDeltaR, float lep2PhoDeltaR, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector); 
+    bool SetValuesMuId(TEventTree::InputTreeLeaves treeLeaf, int year, int ile);
+    float SetValuesMuIsolation(TEventTree::InputTreeLeaves treeLeaf, int year, int ile);
+
 
   private:
     int _event;
-    int _iMCle;
-    float _leEta;
-    float _lePhi;
-    float _lePt;
-    int _leGenPID;
-    int _leGenParentage;
-    int _leGenMomPID;
-    int _leGenGMomPID;
-    bool _leId2012;
-    bool _leId2011;
-    float _leIsolation2012;
-    float _leIsolation2011;
-    int _leTrg;
-    int _leType;
-    bool _trgMatchIsoMu24eta2p1;//0th bit of muTrg[imu]
-    bool _trgMatchIsoMu24;//1th bit of muTrg[imu]
+    int _iMClep[2];
+    float _lepEta[2];
+    float _lepPhi[2];
+    float _lepPt[2];
+    int _lepGenPID[2];
+    int _lepGenParentage[2];
+    int _lepGenMomPID[2];
+    int _lepGenGMomPID[2];
+    bool _lepId2012[2];
+    bool _lepId2011[2];
+    float _lepIsolation2012[2];
+    float _lepIsolation2011[2];
+    int _lepTrg[2];
+    int _lepType[2];
+    bool _trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
+    bool _trgMatchIsoMu24[2];//1th bit of muTrg[imu]
     bool _hasMoreLeptons;
     int _HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
     int _HLT_IsoMu24_v;//HLT[HLTIndex[19]]
@@ -68,7 +71,7 @@ class TSelectedEventsTree
     float _phoHcalIsoDR04Corr;//for 2011 cuts
     float _phoTrkIsoHollowDR04Corr;//for 2011 cuts
     int _phohasPixelSeed;//for 2011 cuts
-    float _lePhoDeltaR;
+    float _lepPhoDeltaR[2];
     float _WMt;
     float _pfMET;
     float _pfMETPhi;
@@ -85,22 +88,22 @@ class TSelectedEventsTree
     vector <int>* _mcGMomPID;
 
     TBranch* _b_event;
-    TBranch* _b_iMCle;
-    TBranch* _b_leEta;
-    TBranch* _b_lePhi;
-    TBranch* _b_lePt;
-    TBranch* _b_leGenPID;
-    TBranch* _b_leGenParentage;
-    TBranch* _b_leGenMomPID;
-    TBranch* _b_leGenGMomPID;
-    TBranch* _b_leId2012;
-    TBranch* _b_leId2011;
-    TBranch* _b_leIsolation2012;
-    TBranch* _b_leIsolation2011;
-    TBranch* _b_leTrg;
-    TBranch* _b_leType;
-    TBranch* _b_trgMatchIsoMu24eta2p1;//0th bit of muTrg[imu]
-    TBranch* _b_trgMatchIsoMu24;//1th bit of muTrg[imu]
+    TBranch* _b_iMClep[2];
+    TBranch* _b_lepEta[2];
+    TBranch* _b_lepPhi[2];
+    TBranch* _b_lepPt[2];
+    TBranch* _b_lepGenPID[2];
+    TBranch* _b_lepGenParentage[2];
+    TBranch* _b_lepGenMomPID[2];
+    TBranch* _b_lepGenGMomPID[2];
+    TBranch* _b_lepId2012[2];
+    TBranch* _b_lepId2011[2];
+    TBranch* _b_lepIsolation2012[2];
+    TBranch* _b_lepIsolation2011[2];
+    TBranch* _b_lepTrg[2];
+    TBranch* _b_lepType[2];
+    TBranch* _b_trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
+    TBranch* _b_trgMatchIsoMu24[2];//1th bit of muTrg[imu]
     TBranch* _b_hasMoreLeptons;
     TBranch* _b_HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
     TBranch* _b_HLT_IsoMu24_v;//HLT[HLTIndex[19]]
@@ -131,7 +134,7 @@ class TSelectedEventsTree
     TBranch* _b_phoHcalIsoDR04Corr;//for 2011 cuts
     TBranch* _b_phoTrkIsoHollowDR04Corr;//for 2011 cuts
     TBranch* _b_phohasPixelSeed;//for 2011 cuts
-    TBranch* _b_lePhoDeltaR;
+    TBranch* _b_lepPhoDeltaR[2];
     TBranch* _b_WMt;
     TBranch* _b_pfMET;
     TBranch* _b_pfMETPhi;

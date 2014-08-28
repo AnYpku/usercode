@@ -330,8 +330,9 @@ TCut TPhotonCuts::RangePhoton(int year, int wp,
 TCut TPhotonCuts::RangeGenTruePhoton()
 {
   TCut cutGamma="phoGenPID==22";
-  TCut cutMom="phoGenMomPID>=-24 && phoGenMomPID<=24";
-  TCut cut = cutGamma && cutMom;
+//  TCut cutMom="phoGenMomPID>=-24 && phoGenMomPID<=24";
+  TCut cutParentage="phoGenParentage & 4";
+  TCut cut = cutGamma && cutParentage;
   return cut;
 }
 TCut TPhotonCuts::RangeGenFakePhoton()

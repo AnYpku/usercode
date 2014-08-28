@@ -1,34 +1,34 @@
-#include "SplitWGammaMC.h"
+#include "SplitVDecayMC.h"
 #include "../Configuration/TConfiguration.h"
 #include <TString.h>
 #include <TTree.h>
 #include <TH1F.h>
 #include <iostream>
 
-SplitWGammaMC::SplitWGammaMC(TString nameWGammaInput, TString nameWGammaEle, TString nameWGammaMuo, TString nameWGammaTau, TString nameDir, TString nameTree, bool isDebugMode)
+SplitVDecayMC::SplitVDecayMC(TString nameInput, TString nameEle, TString nameMuo, TString nameTau, TString nameDir, TString nameTree, bool isDebugMode)
 {
 
   _isDebugMode=isDebugMode;
   _nameDir=nameDir;
   _nameTree=nameTree;
-  _nameWGammaInput=nameWGammaInput;
-  _nameWGammaEle=nameWGammaEle;
-  _nameWGammaMuo=nameWGammaMuo;
-  _nameWGammaTau=nameWGammaTau;
+  _nameInput=nameInput;
+  _nameEle=nameEle;
+  _nameMuo=nameMuo;
+  _nameTau=nameTau;
 
-  _fileOutEle = new TFile(_nameWGammaEle,"recreate");
+  _fileOutEle = new TFile(_nameEle,"recreate");
   _fileOutEle->mkdir(_nameDir);
   _fileOutEle->cd(_nameDir);
   _outputTreeEle = new TTree(_nameTree,_nameTree);
   _TREE.InitOutputTree(_outputTreeEle);
 
-  _fileOutMuo = new TFile(_nameWGammaMuo,"recreate");
+  _fileOutMuo = new TFile(_nameMuo,"recreate");
   _fileOutMuo->mkdir(_nameDir);
   _fileOutMuo->cd(_nameDir);
   _outputTreeMuo = new TTree(_nameTree,_nameTree);
   _TREE.InitOutputTree(_outputTreeMuo);
 
-  _fileOutTau = new TFile(_nameWGammaTau,"recreate");
+  _fileOutTau = new TFile(_nameTau,"recreate");
   _fileOutTau->mkdir(_nameDir);
   _fileOutTau->cd(_nameDir);
   _outputTreeTau = new TTree(_nameTree,_nameTree);
@@ -36,15 +36,15 @@ SplitWGammaMC::SplitWGammaMC(TString nameWGammaInput, TString nameWGammaEle, TSt
 
 }
 
-SplitWGammaMC::~SplitWGammaMC()
+SplitVDecayMC::~SplitVDecayMC()
 {
   _TREE.fChain = 0;
 }
 
-void SplitWGammaMC::LoopOverInputTree()
+void SplitVDecayMC::LoopOverInputTree()
 {
 
-  TFile f(_nameWGammaInput,"READ");
+  TFile f(_nameInput,"READ");
   f.cd(_nameDir);
   TTree* tree =(TTree*)gDirectory->Get(_nameTree);
   _TREE.Init(tree);
@@ -65,10 +65,12 @@ void SplitWGammaMC::LoopOverInputTree()
 
      _TREE.GetEntryNeededBranchesOnly(config.BOTH,config.SIGMC,entry);
 
-      bool hasW=0;
+      bool hasWorZ=0;
       for (int iMC=0; iMC<_TREE.treeLeaf.nMC; iMC++)
         {
-          if (_TREE.treeLeaf.mcPID->at(iMC)==24 || _TREE.treeLeaf.mcPID->at(iMC)==-24)
+          if (_TREE.treeLeaf.mcPID->at(iMC)==24 ||   //W PDGID
+              _TREE.treeLeaf.mcPID->at(iMC)==-24 ||  //W PDGID
+              _TREE.treeLeaf.mcPID->at(iMC)==23)     //Z PDGID
             {
                 if (_TREE.treeLeaf.mcDecayType->at(iMC)==ID_ELECTRON) 
                   _outputTreeEle->Fill();
@@ -77,7 +79,7 @@ void SplitWGammaMC::LoopOverInputTree()
                 if (_TREE.treeLeaf.mcDecayType->at(iMC)==ID_TAU) 
                   _outputTreeTau->Fill();
 
-              hasW=1;
+              hasWorZ=1;
 
             }
 
@@ -109,4 +111,4 @@ void SplitWGammaMC::LoopOverInputTree()
   hPUTrue->Write();
 
 
-}//SplitWGammaMC::LoopOverInputTree() ends
+}//SplitVDecayMC::LoopOverInputTree() ends

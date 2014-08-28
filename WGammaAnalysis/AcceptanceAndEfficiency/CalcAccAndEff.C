@@ -27,13 +27,14 @@
 #include <sstream>  
   //standard C++ class
 
-CalcAccAndEff::CalcAccAndEff(int year, int channel, int phoWP, string configFile, bool isNoPuReweight, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int year, int channel, int vgamma, int phoWP, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
 
-  _INPUT = new TAllInputSamples(channel, configFile);
+  _INPUT = new TAllInputSamples(channel, vgamma, configFile);
 
   _year=year;
   _channel=channel;
+  _vgamma=vgamma;
   _phoWP=phoWP;
   _isDebugMode=isDebugMode;
   _isNoPuReweight=isNoPuReweight;
@@ -207,7 +208,7 @@ void CalcAccAndEff::ComputeEfficiency()
       if (_nEff1DPassedErr[i]!=0) _nEff1DPrePassedErr[i]=sqrt(_nEff1DPrePassedErr[i]);
     }
 
-    TFile* fVeryPreliminary = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel,_config.UNBLIND, _config.SIGMC));
+    TFile* fVeryPreliminary = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel,_vgamma,_config.UNBLIND, _config.SIGMC));
     TTree* tr = (TTree*)fVeryPreliminary->Get("selectedEvents");
     TH1F* hTot = new TH1F("hTot","hTot",1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
     TH1F* h1D = new TH1F("h1D","h1D",_config.GetNPhoPtBins(),_phoPtLimits);

@@ -98,8 +98,8 @@ void PlotOneComparison(TCanvas* canv, TH1F* hZg, TH1F* hWg, TH1F* hRatio)
 
 void CompareTrueGammaDistributions()
 {
-  TFile fZg("../WGammaOutput/MUON/VeryPreliminarySelected/selectedBKGMC_Zg.root");
-  TFile fWg("../WGammaOutput/MUON/VeryPreliminarySelected/selectedSIGMC.root");
+  TFile fZg("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root");
+  TFile fWg("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
   TTree* trZg = (TTree*)fZg.Get("selectedEvents");
   TTree* trWg = (TTree*)fWg.Get("selectedEvents");
 
@@ -171,8 +171,8 @@ void PrintOneStepOfEfficiency(TString strHead, int nCutB, int nFullB, int nCutE,
 
 void CompareSomePhotonEfficiencies()
 {
-  TFile fZg("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selectedBKGMC_Zg.root");
-  TFile fWg("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selectedSIGMC.root");
+  TFile fZg("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root");
+  TFile fWg("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
   TTree* trZg = (TTree*)fZg.Get("selectedEvents");
   TTree* trWg = (TTree*)fWg.Get("selectedEvents");
   TCut cutB="phoEta>-1.4442 && phoEta<1.4442";

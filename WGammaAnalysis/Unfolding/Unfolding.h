@@ -18,7 +18,7 @@
 class Unfolding
   {
      public:
-       Unfolding (int channel);
+       Unfolding (int channel,int vgamma);
        virtual ~Unfolding();
 
        bool TestDifferentMethods();

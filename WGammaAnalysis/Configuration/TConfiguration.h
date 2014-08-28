@@ -13,6 +13,7 @@ class TConfiguration
     virtual ~TConfiguration();
 
     enum {MUON, ELECTRON, BOTH};//channel
+    enum {W_GAMMA, Z_GAMMA, V_GAMMA};//vg_type
     enum {DATA, SIGMC, BKGMC};//sample
     enum {UNBLIND, BLIND_PRESCALE, BLIND_DECRACC};//blinding type
     enum {BARREL, ENDCAP, COMMON};//eta bin
@@ -23,6 +24,7 @@ class TConfiguration
           PRELIMINARY_FOR_UNFOLDING,
           FULLY};//selection stage
 
+
     void Print();
 
     TString GetOutputDirName(int channel);
@@ -30,19 +32,20 @@ class TConfiguration
     TString GetEtaBinName(int etaBin);
     TString GetCsModeName(int csMode);
     TString GetBlindModeName(int sample, int blindMode);
+    TString GetVgTypeName(int vgamma);
 
-    TString GetSelectedName(int selectionStage, int channel, int blindType, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0);
+    TString GetSelectedName(int selectionStage, int channel, int vgamma, int blindType, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0);
     //strSelectionStage
     TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight);
 
-    TString GetYieldsFileName(int channel);
+    TString GetYieldsFileName(int channel, int vgamma, TString strKin);
     TString GetYieldsSelectedName(int csMode, int etaBin, int sample, TString sourceName="");
     TString GetYieldsSelectedSignalMCGenName(int csMode, int etaBin);
     TString GetYieldsDDTemplateFakeName(int csMode, int etaBin);
     TString GetYieldsDDTemplateTrueName(int csMode, int etaBin);
     TString GetYieldsSignalName(int csMode, int etaBin=COMMON);
 
-    TString GetDDTemplateFileName(int channel);
+    TString GetDDTemplateFileName(int channel, int vgamma, TString strKin);
 
     TString GetAccFileName(int channel);
     TString GetAccName(int csMode);
@@ -109,7 +112,7 @@ TString _selectedNameBase[5];
 //////////////////////////////////////////
 //yields
 //
-static const TString _yieldsFileName="YieldsAndBackground/yields.root";
+static const TString _yieldsFileName="YieldsAndBackground/yields";
 static const TString _yieldsSelectedName="yieldsSelected";
 static const TString _yieldsDDTemplateFakeName="yieldsDDFake";
 static const TString _yieldsDDTemplateTrueName="yieldsDDTrue";
@@ -120,7 +123,7 @@ static const TString _yieldsSelectedSignalMCGenName="yieldsSelectedSignalMCGen";
 //////////////////////////////////////////
 //data driven background estimation
 //
-static const TString _DDTemplateFileName="YieldsAndBackground/DDTemplate.root";
+static const TString _DDTemplateFileName="YieldsAndBackground/DDTemplate";
 //_yieldsDDTemplateBkgHist are also here
 
 //////////////////////////////////////////

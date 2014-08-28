@@ -73,37 +73,48 @@ float TMuonCuts::MuIsolation2011(float muPt,
   return isolation; 
 }
 
-TCut TMuonCuts::RangeId(int year){
-  if (year==2012) return "leptonId2012";
-  if (year==2011) return "leptonId2011";
-  return "leptonId2012";
+TCut TMuonCuts::RangeId(int year, int ilep){
+  TString lepName="lepton";
+  lepName+=ilep;
+  lepName+="Id";
+  lepName+=year;
+  TCut cut(lepName);
+  return cut;
 }
 
-TCut TMuonCuts::RangeIsolation(int year){
-  TString strCut="";
+TCut TMuonCuts::RangeIsolation(int year, int ilep){
+  TString strCut="lepton";
+  strCut+=ilep;
+  strCut+="Isolation";
+  strCut+=year;
+  strCut+="<";
   if (year==2012){
-    strCut="leptonIsolation2012<";
     strCut+=_isoTightCut2012;
   }
   else if (year==2011){
-    strCut="leptonIsolation2011<";
     strCut+=_isoCut2011;
   }
   TCut cut(strCut);
   return cut;
 }
 
-TCut TMuonCuts::RangeTriggerMatch(){
-  TCut cutTrg1="HLT_IsoMu24_v && trgMatchIsoMu24";
-  TCut cutTrg2="HLT_IsoMu24_eta2p1_ && trgMatchIsoMu24eta2p1";
+TCut TMuonCuts::RangeTriggerMatch(int ilep){
+  TString strCut1="HLT_IsoMu24_v && trgMatch";
+  strCut1+=ilep;
+  strCut1+="IsoMu24";
+  TCut cutTrg1(strCut1);
+  TString strCut2="HLT_IsoMu24_eta2p1_ && trgMatch";
+  strCut2+=ilep;
+  strCut2+="IsoMu24eta2p1";
+  TCut cutTrg2(strCut2);
   return (cutTrg1||cutTrg2);
 }
 
-TCut TMuonCuts::RangeMuon(int year, bool doIsoCut, bool doIdCut, bool doTrgCut){
+TCut TMuonCuts::RangeMuon(int year, int ilep, bool doIsoCut, bool doIdCut, bool doTrgCut){
   TCut cut="1";
-  if (doTrgCut) cut=cut && RangeTriggerMatch();
-  if (doIdCut)  cut=cut && RangeId(year);
-  if (doIsoCut) cut=cut && RangeIsolation(year);
+  if (doTrgCut) cut=cut && RangeTriggerMatch(ilep);
+  if (doIdCut)  cut=cut && RangeId(year,ilep);
+  if (doIsoCut) cut=cut && RangeIsolation(year,ilep);
   return cut;
 }
 

@@ -18,7 +18,7 @@
 class TPrepareYields
 {
   public:
-    TPrepareYields(int year,int channel, int blind, TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization=0, int phoWP=TPhotonCuts::WP_TIGHT);
+    TPrepareYields(int year,int channel, int vgamma, int blind, TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization=0, int phoWP=TPhotonCuts::WP_TIGHT);
     virtual ~TPrepareYields();
     void PrepareYields();
     void SetYields();
@@ -43,6 +43,7 @@ class TPrepareYields
   private:
     TConfiguration _config;
     int _channel;
+    int _vgamma;
     int _blind;
     bool _isMetCutOptimization;
     TAllInputSamples* _INPUT;

@@ -1,14 +1,14 @@
-#ifndef SplitWGammaMC_h
-#define SplitWGammaMC_h
+#ifndef SplitVDecayMC_h
+#define SplitVDecayMC_h
 
 #include "TInputOutputTree.h"
 #include <TString.h>
 #include <TFile.h>
 
-class SplitWGammaMC{
+class SplitVDecayMC{
 public :
-   SplitWGammaMC(TString nameWGammaInput, TString nameWGammaEle, TString nameWGammaMuo, TString nameWGammaTau, TString nameDir, TString nameTree, bool isDebugMode=0);
-   virtual ~SplitWGammaMC();
+   SplitVDecayMC(TString nameInput, TString nameEle, TString nameMuo, TString nameTau, TString nameDir, TString nameTree, bool isDebugMode=0);
+   virtual ~SplitVDecayMC();
    void LoopOverInputTree();
      //the main function which is called from outside
    enum {ID_ELECTRON=2, ID_MUON=3, ID_TAU=4};
@@ -23,10 +23,10 @@ private :
    TTree    *_outputTreeEle; //output Trees
    TTree    *_outputTreeMuo; //output Trees
    TTree    *_outputTreeTau; //output Trees
-   TString _nameWGammaInput;
-   TString _nameWGammaEle; 
-   TString _nameWGammaMuo; 
-   TString _nameWGammaTau; 
+   TString _nameInput;
+   TString _nameEle; 
+   TString _nameMuo; 
+   TString _nameTau; 
    TString _nameDir;
    TString _nameTree;
 

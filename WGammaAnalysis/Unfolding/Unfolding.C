@@ -42,10 +42,10 @@
 #include <sstream>  
   //standard C++ class
 
-Unfolding::Unfolding(int channel)
+Unfolding::Unfolding(int channel,int vgamma)
 {
   _channel=channel; 
-  _fIn = new TFile(_config.GetSelectedName(_config.FULLY,_channel,_config.UNBLIND,_config.SIGMC));  
+  _fIn = new TFile(_config.GetSelectedName(_config.FULLY,_channel,vgamma,_config.UNBLIND,_config.SIGMC));  
 
   _fOut = new TFile("fOut.root","recreate");
 

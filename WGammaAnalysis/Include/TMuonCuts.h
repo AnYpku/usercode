@@ -28,10 +28,10 @@ class TMuonCuts
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
         //year: 2012 - 8 TeV ID, 2011 - repeat ID from 7 TeV
 
-       TCut RangeId(int year);
-       TCut RangeIsolation(int year);
-       TCut RangeTriggerMatch();
-       TCut RangeMuon(int year, bool doIsoCut=1, bool doIdCut=1, bool doTrgCut=1);
+       TCut RangeId(int year, int ilep);
+       TCut RangeIsolation(int year, int ilep);
+       TCut RangeTriggerMatch(int ilep);
+       TCut RangeMuon(int year, int ilep, bool doIsoCut=1, bool doIdCut=1, bool doTrgCut=1);
 
      private:
 

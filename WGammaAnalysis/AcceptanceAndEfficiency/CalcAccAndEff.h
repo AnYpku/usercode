@@ -20,7 +20,7 @@
 class CalcAccAndEff
   {
      public:
-       CalcAccAndEff (int year, int channel, int phoWP, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       CalcAccAndEff (int year, int channel, int vgamma, int phoWP, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
 
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
@@ -44,6 +44,7 @@ class CalcAccAndEff
        TEventTree _eventTree;
 
        int _channel;
+       int _vgamma;
        int _phoWP;
 
        bool _isDebugMode;

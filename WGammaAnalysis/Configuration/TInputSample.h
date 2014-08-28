@@ -21,6 +21,7 @@ class TInputSample
 //    enum {DATA, SIGMC, BKGMC};
 
     int channel_;
+    int vgamma_;
     int sample_;
     int nFiles_;
     TString sourceName_;

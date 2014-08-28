@@ -15,6 +15,8 @@
 #include "TCut.h"
 //ROOT
 
+#include <vector>
+
 TFullCuts::TFullCuts()
 {
 }
@@ -23,14 +25,15 @@ TFullCuts::~TFullCuts()
 {
 }
 
-bool TFullCuts::VeryPreliminaryCut(bool** goodLeptonPhotonPairs, 
-                    TEventTree::InputTreeLeaves inpTreeLeaf,   
-                    int channel, float** lePhoDeltaR, PassedLevels& passed)
+bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,   
+                    int channel, int vgamma, 
+                    int& nCands, Candidate* cands,
+                    PassedLevels& passed)
 {
 
   // This function is called from LoopOverEvents.
-  // returns 1 if entry is accepted.
-  // returns 0 otherwise.
+  // returns 1 if entry is accepted (has at least one candidate)
+  // returns 0 otherwise (has no candidates)
 
    bool kinPhoton[inpTreeLeaf.nPho];
 
@@ -49,41 +52,27 @@ bool TFullCuts::VeryPreliminaryCut(bool** goodLeptonPhotonPairs,
       //necessary to remove spikes in the photon distributions 
       //for Jul13 rereco
 
-   bool goodLeptonPhotonPairsExist=0;
+   bool kinLepton1[nLe];
+   bool kinLepton1Exists=0;
+   bool kinLepton2[nLe];
+   bool kinLepton2Exists=0;
 
-   for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++)
-     for (int ile=0; ile<nLe; ile++) 
-       goodLeptonPhotonPairs[ile][ipho]=0;   
-
-   bool kinLepton[nLe];
-   bool kinLeptonExists=0;
-   for (int ile=0; ile<nLe; ile++){        
+   TMuonCuts emptyMuon;
+   for (int ilep1=0; ilep1<nLe; ilep1++){        
      if (channel==TConfiguration::MUON){
-       TMuonCuts emptyMuon;
-       if (inpTreeLeaf.muPt->at(ile)>26)  passed.leptonPtPassed++;
-       if (fabs(inpTreeLeaf.muEta->at(ile))<2.1)    passed.leptonEtaPassed++;
-       if (emptyMuon.PassedKinematics(inpTreeLeaf.muPt->at(ile),inpTreeLeaf.muEta->at(ile))){ 
-         kinLeptonExists=1;
-         kinLepton[ile]=1; 
+       kinLepton1[ilep1] = CheckMuon(ilep1, inpTreeLeaf, emptyMuon, passed);
+     }
+     else if (channel==TConfiguration::ELECTRON);
+     if (kinLepton1[ilep1]) kinLepton1Exists=1;
+     for (int ilep2=0; ilep2<nLe; ilep2++){  
+       if (ilep1==ilep2) continue;      
+       if (channel==TConfiguration::MUON){
+         kinLepton2[ilep2] = CheckMuon(ilep2, inpTreeLeaf, emptyMuon, passed);
        }
-       else
-         kinLepton[ile]=0;
-     }
-     else if (channel==TConfiguration::ELECTRON){
-       //TElectronCuts functions are empty now;
-       //they are included here for the future
-       TElectronCuts electron(inpTreeLeaf.elePt->at(ile));
-//            if (electron.Passed()) 
-//              {
-//                if (!electron.MoreElectronsVeto()) return 0;  
-//                kinLeptonPassed=1;        
-//              } 
-     }
-   } //end of loop over ile
-
-//   if (!kinLeptonExists) return 0;
-     //skip loop over photons if no leptons passed kinematics
-
+       else if (channel==TConfiguration::ELECTRON);
+       if (kinLepton2[ilep2]) kinLepton2Exists=1;
+     } //end of loop over ilep2
+   } //end of loop over ilep1
 
  bool kinPhotonExists=0;
   for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++){       
@@ -100,30 +89,74 @@ bool TFullCuts::VeryPreliminaryCut(bool** goodLeptonPhotonPairs,
     else kinPhoton[ipho]=0;
   } //end of loop over ipho 
 
-  if (!kinLeptonExists) return 0;
   if (!kinPhotonExists) return 0;
+  if (!kinLepton1Exists) return 0;
+  if (!kinLepton2Exists && vgamma==_config.Z_GAMMA) return 0;
      //skip checking lepton-photon matching if no good photons found
 
-    //check matching between lepton and photon
-  for (int ile=0; ile<nLe; ile++) {
-    for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++){
-      if (channel==TConfiguration::MUON)
-        lePhoDeltaR[ile][ipho]=DeltaR(inpTreeLeaf.muPhi->at(ile),inpTreeLeaf.muEta->at(ile),inpTreeLeaf.phoPhi->at(ipho),inpTreeLeaf.phoEta->at(ipho));
-      else if (channel==TConfiguration::ELECTRON)
-        lePhoDeltaR[ile][ipho]=0; //DeltaR(inpTreeLeaf.elePhi[ile],inpTreeLeaf.eleEta[ile],inpTreeLeaf.phoPhi[ipho],inpTreeLeaf.phoEta[ipho]);
+  int icand=0;
+  //check matching between lepton and photon
+  for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++){  
+    for (int ilep1=0; ilep1<nLe; ilep1++) {
+      float dR1;
+      if (channel==TConfiguration::MUON){
+        dR1=DeltaR(inpTreeLeaf.muPhi->at(ilep1),inpTreeLeaf.muEta->at(ilep1),inpTreeLeaf.phoPhi->at(ipho),inpTreeLeaf.phoEta->at(ipho));
+      }
+      else if (channel==TConfiguration::ELECTRON);
+      if (vgamma==_config.W_GAMMA){
+        if (kinPhoton[ipho] && kinLepton1[ilep1] && 
+             (dR1>_lePhoDeltaRCut)){
+          passed.dRPassed++;
+          cands[icand].ipho=ipho; 
+          cands[icand].ilep1=ilep1; cands[icand].ilep2=-1;
+          cands[icand].dRlep1pho=dR1; cands[icand].dRlep2pho=-1;
+          icand++; 
+        }
+      }//end of if (vgamma==_config.W_GAMMA)    
+ 
+      else if (vgamma==_config.Z_GAMMA){
+        for (int ilep2=0; ilep2<nLe; ilep2++) {
+          if (ilep1==ilep2) continue;
+          float dR2;
 
-      if (kinPhoton[ipho] && kinLepton[ile] && 
-          (lePhoDeltaR[ile][ipho]>_lePhoDeltaRCut)){
-        passed.dRPassed++;
-        goodLeptonPhotonPairs[ile][ipho]=1;
-        goodLeptonPhotonPairsExist=1;  
-      }                
-    }//end of loop over ipho    
-  }//end of loop over ile     
+          if (channel==TConfiguration::MUON){
+            dR2=DeltaR(inpTreeLeaf.muPhi->at(ilep2),inpTreeLeaf.muEta->at(ilep2),inpTreeLeaf.phoPhi->at(ipho),inpTreeLeaf.phoEta->at(ipho));
+          }
+          else if (channel==TConfiguration::ELECTRON);
+          if (kinPhoton[ipho] && kinLepton1[ilep1] && kinLepton2[ilep2] && 
+             (dR1>_lePhoDeltaRCut) && (dR2>_lePhoDeltaRCut)){
+            passed.dRPassed++;
+            cands[icand].ipho=ipho; 
+            if (dR1<dR2){
+              cands[icand].ilep1=ilep1; cands[icand].ilep2=ilep2;
+              cands[icand].dRlep1pho=dR1; cands[icand].dRlep2pho=dR2;
+            }
+            else{
+              cands[icand].ilep1=ilep2; cands[icand].ilep2=ilep1;
+              cands[icand].dRlep1pho=dR2; cands[icand].dRlep2pho=dR1;
+            }
+            icand++;
+          }//end of if (kinPhoton[ipho] && kinLepton1[ilep1] ...
+        }//end of loop over ilep2        
+      }//end of  else if (vgamma==_config.Z_GAMMA) 
 
-  return goodLeptonPhotonPairsExist;
-}//end of TFullCuts::Cut
+    }//end of loop over ilep1    
+  }//end of loop over ipho   
+  nCands=icand;
+  return (icand);
 
+}//end of TFullCuts::VeryPreliminaryCut
+
+bool TFullCuts::CheckMuon(int ilep, TEventTree::InputTreeLeaves& inpTreeLeaf, TMuonCuts& emptyMuon, PassedLevels& passed)
+{
+   if (inpTreeLeaf.muPt->at(ilep)>26)  passed.leptonPtPassed++;
+   if (fabs(inpTreeLeaf.muEta->at(ilep))<2.1)    passed.leptonEtaPassed++;
+   if (emptyMuon.PassedKinematics(inpTreeLeaf.muPt->at(ilep),inpTreeLeaf.muEta->at(ilep))){ 
+     return 1;
+   }
+   else return 0;
+   return 0;
+}
 
 float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 
 { 
@@ -166,51 +199,64 @@ TCut TFullCuts::RangePhoEt()
 
 TCut TFullCuts::RangeExtraLeptonPt2011()
 {
-  TString cutStr="leptonPt>35";
+  TString cutStr="lepton1Pt>35";
   TCut cut(cutStr);
   return cut;
 }
 
-TCut TFullCuts::RangeForMetCut(int year, int channel, int phoWP){
+TCut TFullCuts::RangeForMetCut(int year, int channel, int vgamma, int phoWP){
   TPhotonCuts emptyPhoton;
   TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 1, 0, 0);
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
     TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon(year);
+    cutLepton=emptyMuon.RangeMuon(year,1);//1st muon
+    if (vgamma==_config.Z_GAMMA)
+      cutLepton = cutLepton && emptyMuon.RangeMuon(year,2);//2nd muon
   }
   else if (channel==TConfiguration::ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangePhoEt();
+  TCut cut = cutPhoton && cutLepton && RangePhoEt();
+  if (vgamma==_config.W_GAMMA) cut = cut && RangeMoreLeptonsVeto();
   if (year==2011) cut = cut && RangeExtraLeptonPt2011();
   return cut;
 }
 
-TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int phoWP){
+TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP){
   TPhotonCuts emptyPhoton;
   TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 1, 0, 0);
   //no cuts on sigmaIEtaIEta and chIso
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
     TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon(year);
+    cutLepton=emptyMuon.RangeMuon(year,1);//1st muon
+    if (vgamma==_config.Z_GAMMA)
+      cutLepton = cutLepton && emptyMuon.RangeMuon(year,2);//2nd muon
   }
   else if (channel==TConfiguration::ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year) && RangePhoEt();
-  if (year==2011) cut = cut && RangeExtraLeptonPt2011();
+  TCut cut = cutPhoton && cutLepton && RangePhoEt();
+  if (vgamma==_config.W_GAMMA) 
+    cut = cut && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year);
+  if (year==2011) 
+    cut = cut && RangeExtraLeptonPt2011();
   return cut;
 }
 
-TCut TFullCuts::RangeFullCut(int year, int channel, int phoWP, bool noPhoPFChIsoCut)
+TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP, bool noPhoPFChIsoCut)
 {
   TPhotonCuts emptyPhoton;
   TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, noPhoPFChIsoCut);
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
     TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon(year);
+    cutLepton=emptyMuon.RangeMuon(year,1);//1st muon
+    if (vgamma==_config.Z_GAMMA)
+      cutLepton = cutLepton && emptyMuon.RangeMuon(year,2);//2nd muon
   }
   else if (channel==TConfiguration::ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year) && RangePhoEt();
-  if (year==2011) cut = cut && RangeExtraLeptonPt2011();
+  TCut cut = cutPhoton && cutLepton && RangePhoEt();
+  if (vgamma==_config.W_GAMMA) 
+    cut = cut && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year);
+  if (year==2011) 
+    cut = cut && RangeExtraLeptonPt2011();
   return cut;
 }

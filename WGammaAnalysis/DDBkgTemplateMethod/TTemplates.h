@@ -8,6 +8,7 @@
 #include "TCut.h"
 #include "TString.h"
 #include "RooPlot.h"
+#include "TRandom.h"
 
 #include <vector>
 
@@ -18,7 +19,7 @@
 class TTemplates
 {
   public:
-    TTemplates(int year, int channel, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, bool noAdjustBinning=0, bool noPhoPFChIsoCut=0, bool isMetCutOptimization=0);
+    TTemplates(int year, int channel, int vgamma, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, bool noAdjustBinning=0, bool noPhoPFChIsoCut=0, bool isMetCutOptimization=0, bool doSystTemplateStat=0);
     virtual ~TTemplates();
 
     enum {NO_CLOSURE_TEST=0, CLOSURE_TEST_1, CLOSURE_TEST_2, CLOSURE_TEST_3};
@@ -28,6 +29,7 @@ class TTemplates
     void AdjustFitBinning(int kinBin, int etaBin, bool noPrint, bool noPlot);
     bool IsNewChi2ToNDFBetter(float newChi2, float oldChi2);
     void SetThreeHists(int kinBin, int etaBin, bool noPrint=0);
+    void RandomizeTemplates(int ikin, int ieta);
     void DeleteThreeHists(int kinBin, int etaBin);
 
     void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
@@ -60,8 +62,10 @@ class TTemplates
     TConfiguration _config;
     TPhotonCuts _photon;
     int _year;
+    int _vgamma;
     int _channel;
     int _blind;
+    bool _doSystTemplateStat;
     bool _isMetCutOptimization;
     bool _noAdjustBinning;
     bool _noPhoPFChIsoCut;
@@ -93,6 +97,10 @@ class TTemplates
     TString _varSideband;
     TString _labelVarFit;
 
+    TRandom _random;
+
+    TH1D* _hTrueReference[_nBinsMax][3];
+    TH1D* _hFakeReference[_nBinsMax][3];
     TH1D* _hTrue[_nBinsMax][3];
     TH1D* _hFake[_nBinsMax][3];
     TH1D* _hLeak[_nBinsMax][3];
@@ -101,10 +109,16 @@ class TTemplates
     TH1D* _hRatio[_nBinsMax][3];
     RooPlot* _plotter[_nBinsMax][3];
     double _chi2ToNDF[_nBinsMax][3];
+
     double _nFakeFromFitVal[_nBinsMax][3];
     double _nFakeFromFitErr[_nBinsMax][3];
     double _nTrueFromFitVal[_nBinsMax][3];
     double _nTrueFromFitErr[_nBinsMax][3];
+
+    const static int _nToys=100;
+    //double _nFakeFromFitToyVal[_nBinsMax][3][_nToys];
+    //double _nTrueFromFitToyVal[_nBinsMax][3][_nToys];
+
     int _nBinsLeft[_nBinsMax][3];
 
     double _nFakeYieldsVal[_nBinsMax][3];
@@ -133,9 +147,9 @@ class TTemplates
 };
 
 const static int   _nOfnBinsLeft=5;
-const static float _nBinsLeftVariants[_nOfnBinsLeft]={4,2,8,5,1};
+const static float _nBinsLeftVariants[_nOfnBinsLeft]={2,4,8,5,1};
 const static int   _nOfnRightLimits=5;
-const static float _nPhoSCRChIsoRightLimits[_nOfnRightLimits]={14,12,10,8,6};
+const static float _nPhoSCRChIsoRightLimits[_nOfnRightLimits]={10,12,14,8,6};
 
 //const static int   _nOfnBinsLeft=1;
 //const static float _nBinsLeftVariants[_nOfnBinsLeft]={4};

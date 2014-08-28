@@ -20,15 +20,16 @@
 #include "TLine.h"
 #include "TLatex.h"
 
-TPrepareYields::TPrepareYields(int year,int channel,int blind,TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization, int phoWP)
+TPrepareYields::TPrepareYields(int year,int channel,int vgamma,int blind,TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization, int phoWP)
 {
   _channel=channel;
+  _vgamma=vgamma;
   _blind=blind;
   _isMetCutOptimization=isMetCutOptimization;
   _cutAdd="1";
   if (isMetCutOptimization)
     _cutAdd=_emptyPhoton.RangePhoton(year, phoWP, 1);
-  _INPUT=new TAllInputSamples(_channel,"../Configuration/config.txt");
+  _INPUT=new TAllInputSamples(_channel,_vgamma,"../Configuration/config.txt");
   _fOut=0;
   for (int ieta=_config.BARREL; ieta<=_config.COMMON; ieta++){
     _dataYields[ieta]=0;
@@ -101,7 +102,7 @@ void TPrepareYields::PrepareYields()
 void TPrepareYields::SetYields()
 {
   TString fOutName;
-  fOutName = _config.GetYieldsFileName(_channel);
+  fOutName = _config.GetYieldsFileName(_channel,_vgamma,_varKin);
   _fOut = new TFile(fOutName,"recreate");
   for (int i=0; i<_INPUT->nSources_; i++){
     for (int ieta=_config.BARREL; ieta<=_config.COMMON; ieta++) 
@@ -128,7 +129,7 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
 
   int selStage=_config.FULLY;
   if (_isMetCutOptimization) selStage=_config.PRELIMINARY_FOR_MET_CUT;
-  TString fInName = _config.GetSelectedName(selStage,_channel,_blind,sample,strSourceName);
+  TString fInName = _config.GetSelectedName(selStage,_channel,_vgamma,_blind,sample,strSourceName);
   TFile fIn(fInName);
   if (!fIn.IsOpen()){
     std::cout<<"file "<<fInName<<" is not open"<<std::endl;
@@ -222,9 +223,9 @@ void TPrepareYields::SetTotalYield(TTree* tr, TCut cut, float& val, float& err)
 
 void TPrepareYields::SetYieldsDDBkgTemplate(int ieta)
 {
-  TFile* fDDBkgTemplate= new TFile(_config.GetDDTemplateFileName(_channel));
+  TFile* fDDBkgTemplate= new TFile(_config.GetDDTemplateFileName(_channel,_vgamma,_varKin));
   if (!fDDBkgTemplate->IsOpen()){
-    std::cout<<"file "<<_config.GetDDTemplateFileName(_channel)<<" is not open"<<std::endl;
+    std::cout<<"file "<<_config.GetDDTemplateFileName(_channel,_vgamma,_varKin)<<" is not open"<<std::endl;
     return;
   }
   _fOut->cd();
@@ -314,11 +315,19 @@ void TPrepareYields::CompareFakeBkgDDvsMC(int ieta)
   hSum->Reset();
   
   for (int i=0; i<_vecBkgMCFakeGammaYields[ieta].size(); i++){
-        if (_INPUT->allInputs_[i+2].sourceName_=="Wg_to_taunu") 
+        if (_INPUT->allInputs_[i+2].sourceName_=="Wg_to_taunu")
+          continue;
+        if (_INPUT->allInputs_[i+2].sourceName_=="Wg_to_munu")
+          continue;
+        if (_INPUT->allInputs_[i+2].sourceName_=="Wg")
           continue;
         if (_INPUT->allInputs_[i+2].sourceName_=="ttbarg") 
           continue;
-        if (_INPUT->allInputs_[i+2].sourceName_=="Zg") 
+        if (_INPUT->allInputs_[i+2].sourceName_=="Zg_to_tautau")
+          continue;
+        if (_INPUT->allInputs_[i+2].sourceName_=="Zg_to_mumu")
+          continue;
+        if (_INPUT->allInputs_[i+2].sourceName_=="Zg")
           continue;
         int color = _INPUT->allInputs_[i+2].color_;
         _vecBkgMCFakeGammaYields[ieta][i]->SetLineColor(color);

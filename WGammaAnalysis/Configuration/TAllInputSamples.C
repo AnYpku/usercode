@@ -12,9 +12,9 @@ TAllInputSamples::TAllInputSamples()
 {
 }
 
-TAllInputSamples::TAllInputSamples(int channel, string configFile)
+TAllInputSamples::TAllInputSamples(int channel, int vgamma, string configFile)
 {
-   ReadConfig(channel,configFile);
+   ReadConfig(channel,vgamma,configFile);
    for (int i=0; i<nSources_; i++) {
   //   allInputs_[i].GetFileSelectedNames();
      allInputs_[i].CalcLuminocities();
@@ -26,7 +26,7 @@ TAllInputSamples::~TAllInputSamples()
 {
 }
 
-void TAllInputSamples::ReadConfig(int channel, string configFile)
+void TAllInputSamples::ReadConfig(int channel, int vgamma, string configFile)
 {
   std::cout<<"configfile: "<<configFile.c_str()<<std::endl;
   ifstream ifs;
@@ -40,41 +40,45 @@ void TAllInputSamples::ReadConfig(int channel, string configFile)
       getline(ifs,line);
       if (line[0] == '#') continue;
       if (line[0] == '$') 
-        isSampleNeeded = ReadSampleGeneralInfo(channel, line);
+        isSampleNeeded = ReadSampleGeneralInfo(channel, vgamma,line);
       if (line[0] == '-' && isSampleNeeded) 
         ReadFileSpecificInfo(line);
     } //while (!ifs.eof())
 }
 
-bool TAllInputSamples::ReadSampleGeneralInfo(int channel, string line)
+bool TAllInputSamples::ReadSampleGeneralInfo(int channel, int vgamma, string line)
 {
    stringstream ss(line);
    string chr;
    ss >> chr;
    string sampleType;
    ss >> sampleType;
+   string vgammaName;
+   ss >> vgammaName;
    string channelName;
-//   if (sampleType=="BKGMC") {
-  //   allInputs_.push_back(TInputSample());
-    // nSources_++;
-//     allInputs_.back().sample_=TInputSample::BKGMC;
- //    allInputs_.back().channel_=ChannelNumber(channelName);
-   //} //if (sampleType=="BKGMC")
-   //else if (sampleType=="DATA" || sampleType=="SIGMC") {
-     ss >> channelName;
-     if (ChannelNumber(channelName)==channel){           
-       allInputs_.push_back(TInputSample());
-       nSources_++;
-       allInputs_.back().sample_=SampleNumber(sampleType);
-       allInputs_.back().channel_=ChannelNumber(channelName);
-     } //if (ChannelNumber(channelName)==channel)
-     else return 0;        
-   //}// else if (sampleType=="DATA" || sampleType=="SIGMC")
-   //else return 0;
+   ss >> channelName;
+   if (ChannelNumber(channelName)==channel &&
+       (VGammaNumber(vgammaName)==vgamma || VGammaNumber(vgammaName)==TConfiguration::V_GAMMA)){           
+     allInputs_.push_back(TInputSample());
+     nSources_++;
+     allInputs_.back().sample_=SampleNumber(sampleType);
+     allInputs_.back().vgamma_=VGammaNumber(vgammaName);
+     allInputs_.back().channel_=ChannelNumber(channelName);
+   } //if (ChannelNumber(channelName)==channel)
+   else return 0;        
 
    if (sampleType=="DATA"){
      allInputs_.back().sourceName_=sampleType;
-     allInputs_.back().sourceLatexLabel_=sampleType+string(", ")+channelName;
+     string sData;
+     if (channel==TConfiguration::MUON && vgamma==TConfiguration::W_GAMMA)
+       sData="SingleMu";
+     if (channel==TConfiguration::MUON && vgamma==TConfiguration::Z_GAMMA)
+       sData="DoubleMu";
+     if (channel==TConfiguration::ELECTRON && vgamma==TConfiguration::W_GAMMA)
+       sData="SingleEle";
+     if (channel==TConfiguration::ELECTRON && vgamma==TConfiguration::Z_GAMMA)
+       sData="DoubleEle";
+     allInputs_.back().sourceLatexLabel_=sampleType+string(", ")+sData;
    }
    else ss >> allInputs_.back().sourceName_ >> allInputs_.back().sourceLatexLabel_;
    ss >> allInputs_.back().color_;
@@ -140,6 +144,17 @@ int TAllInputSamples::SampleNumber (string sampleStr)
     return TConfiguration::SIGMC;
   else if (sampleStr=="BKGMC") 
     return TConfiguration::BKGMC;
+  return -1;
+}
+
+int TAllInputSamples::VGammaNumber (string vgammaStr)
+{
+  if (vgammaStr=="WGAMMA")  
+    return TConfiguration::W_GAMMA;
+  else if (vgammaStr=="ZGAMMA") 
+    return TConfiguration::Z_GAMMA;
+  else if (vgammaStr=="VGAMMA") 
+    return TConfiguration::V_GAMMA;
   return -1;
 }
 

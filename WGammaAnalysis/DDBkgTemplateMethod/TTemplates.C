@@ -33,7 +33,7 @@
 
 using namespace RooFit ;
 
-TTemplates::TTemplates(int year, int channel, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, bool noAdjustBinning, bool noPhoPFChIsoCut, bool isMetCutOptimization)
+TTemplates::TTemplates(int year, int channel, int vgamma, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, bool noAdjustBinning, bool noPhoPFChIsoCut, bool isMetCutOptimization, bool doSystTemplateStat)
 {
 
  // _isClosureTest=CLOSURE_TEST_3;
@@ -43,13 +43,13 @@ TTemplates::TTemplates(int year, int channel, int blind, int phoWP, TString varF
 
   _year=year;
   _channel=channel;
+  _vgamma=vgamma;
   _blind=blind;
   _iter=0;
   //if (blind == _config.BLIND_PRESCALE) _blind=_config.UNBLIND;
   _blind=_config.UNBLIND;
   _phoWP=phoWP;
-  _INPUT = new TAllInputSamples(_channel,"../Configuration/config.txt");
-  _fOutForSave = new TFile(_config.GetDDTemplateFileName(_channel),"recreate");
+  _INPUT = new TAllInputSamples(_channel,_vgamma,"../Configuration/config.txt");
   _varFit=varFit;
   _varSideband=varSideband;
   if (_varFit=="phoSigmaIEtaIEta") _labelVarFit="#sigma_{i#etai#eta}";
@@ -61,16 +61,18 @@ TTemplates::TTemplates(int year, int channel, int blind, int phoWP, TString varF
   for (int i=0; i<=nKinBins; i++){
     _kinBinLims[i]=kinBinLims[i];
   }
+  _fOutForSave = new TFile(_config.GetDDTemplateFileName(_channel,_vgamma,_varKin),"recreate");
   _isMetCutOptimization=isMetCutOptimization;
   if (_isMetCutOptimization) _selectionStage=_config.PRELIMINARY_FOR_MET_CUT;
   else _selectionStage=_config.PRELIMINARY_FOR_TEMPLATE_METHOD;
 
+  _doSystTemplateStat=doSystTemplateStat;
   _noAdjustBinning=noAdjustBinning;
   _noPhoPFChIsoCut=noPhoPFChIsoCut;
 
-  _fSign = new TFile(_config.GetSelectedName(_selectionStage,_channel,_blind,_config.SIGMC));
-  if (!_isClosureTest) _fData = new TFile(_config.GetSelectedName(_selectionStage,_channel,_blind,_config.DATA));
-  if (_isClosureTest) _fData = new TFile(_config.GetSelectedName(_selectionStage,_channel,_blind,_config.BKGMC,"Wjets_to_lnu"));
+  _fSign = new TFile(_config.GetSelectedName(_selectionStage,_channel,_vgamma,_blind,_config.SIGMC));
+  if (!_isClosureTest) _fData = new TFile(_config.GetSelectedName(_selectionStage,_channel,_vgamma,_blind,_config.DATA));
+  if (_isClosureTest) _fData = new TFile(_config.GetSelectedName(_selectionStage,_channel,_vgamma,_blind,_config.BKGMC,"Wjets_to_lnu"));
   _treeSign = (TTree *)_fSign->Get("selectedEvents");
   _treeData = (TTree *)_fData->Get("selectedEvents");
   for (unsigned int i=0; i<_INPUT->allInputs_.size(); i++){
@@ -81,7 +83,7 @@ TTemplates::TTemplates(int year, int channel, int blind, int phoWP, TString varF
     //if (sourceName=="Wjets_to_lnu" || sourceName=="DYjets_to_ll" || sourceName=="ttbarjets") 
     //  continue;
     std::cout<<"bkg source Name_="<<_INPUT->allInputs_[i].sourceName_<<std::endl;
-    _vecFBkg.push_back(new TFile(_config.GetSelectedName(_selectionStage,_channel,_blind,_config.BKGMC,sourceName)));
+    _vecFBkg.push_back(new TFile(_config.GetSelectedName(_selectionStage,_channel,_vgamma,_blind,_config.BKGMC,sourceName)));
     _vecTreeBkg.push_back((TTree*)_vecFBkg.back()->Get("selectedEvents"));
     _vecBkgNames.push_back(sourceName);
     _vecBkgColors.push_back(_INPUT->allInputs_[i].color_);
@@ -118,14 +120,12 @@ TTemplates::~TTemplates()
 
 void TTemplates::ComputeBackground(bool noPrint, bool noPlot)
 {
-
   for (int ikin=0; ikin<=_nKinBins; ikin++){
     ComputeBackgroundOne(ikin,noPrint,noPlot);
   }
   if (!noPlot) PlotTemplates();
   PrintYieldsAndChi2();
   SaveYields();
-
 }
 
 void TTemplates::ComputeBackgroundOne(int ikin, bool noPrint, bool noPlot)
@@ -137,16 +137,52 @@ void TTemplates::ComputeBackgroundOne(int ikin, bool noPrint, bool noPlot)
   }
   for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
     SetThreeHists(ikin, ieta, noPrint);
-    std::cout<<std::endl;
-    std::cout<<"Histograms (hTrue, hFake, hLeak):"<<std::endl;
-    PrintOneHistogramBinByBin(_hTrue, ikin, ieta);
-    PrintOneHistogramBinByBin(_hFake, ikin, ieta);
-    PrintOneHistogramBinByBin(_hLeak, ikin, ieta);
-    std::cout<<std::endl;
-    FitOne(ikin,ieta,noPrint,noPlot);  
+    if (!noPrint){
+//      std::cout<<std::endl;
+//      std::cout<<"Histograms (hTrue, hFake, hLeak):"<<std::endl;
+//      PrintOneHistogramBinByBin(_hTrue, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hFake, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hLeak, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hTrueReference, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hFakeReference, ikin, ieta);
+//      std::cout<<std::endl;
+    }
+
+    if (!_doSystTemplateStat){
+      FitOne(ikin,ieta,noPrint,noPlot);
+    } 
+    else if(_doSystTemplateStat){
+      float sumT=0;
+      float sumSquaredT=0;
+      float sumF=0;
+      float sumSquaredF=0;
+      for (int it=0; it<_nToys; it++){
+        RandomizeTemplates(ikin, ieta);
+//      std::cout<<std::endl;
+//      std::cout<<"it="<<it<<", Histograms (hTrue, hFake, hLeak, hTrueReference, hFakeReference):"<<std::endl;
+//      PrintOneHistogramBinByBin(_hTrue, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hFake, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hLeak, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hTrueReference, ikin, ieta);
+//      PrintOneHistogramBinByBin(_hFakeReference, ikin, ieta);
+//      std::cout<<std::endl;
+//        FitOne(ikin,ieta,1,1);
+        FitOne(ikin,ieta,noPrint,noPlot);
+        sumT+=_nTrueFromFitVal[ikin][ieta];
+        sumSquaredT+=_nTrueFromFitVal[ikin][ieta]*_nTrueFromFitVal[ikin][ieta];
+        sumF+=_nFakeFromFitVal[ikin][ieta];
+        sumSquaredF+=_nFakeFromFitVal[ikin][ieta]*_nFakeFromFitVal[ikin][ieta];
+        std::cout<<"it="<<it<<", nT="<<_nTrueFromFitVal[ikin][ieta]<<", sumT="<<sumT<<", nF="<<_nFakeFromFitVal[ikin][ieta]<<", sumF="<<sumF<<std::endl;
+      }
+      _nTrueFromFitVal[ikin][ieta]=sumT/_nToys;
+      _nFakeFromFitVal[ikin][ieta]=sumF/_nToys;
+      _nTrueFromFitErr[ikin][ieta]=sqrt((sumSquaredT-sumT*sumT/_nToys)/_nToys);
+      _nFakeFromFitErr[ikin][ieta]=sqrt((sumSquaredF-sumF*sumF/_nToys)/_nToys);
+    }//end of else 
     if (_noAdjustBinning) continue;
     if (_chi2ToNDF[ikin][ieta]<2 && _chi2ToNDF[ikin][ieta]>0.5);
     else AdjustFitBinning(ikin,ieta,noPrint,noPlot);
+
   }//end of loop over ieta
   ComputeYieldOneKinBin(ikin,noPrint);
   if (!noPrint){
@@ -165,7 +201,7 @@ void TTemplates::AdjustFitBinning(int ikin, int ieta, bool noPrint, bool noPlot)
   int nOfnRightLimits=1;//if _varFit="phoSigmaIEtaIEta" - right limit is strictly known
   bool fitDone=0;//flag determining whether parameters giving good chi2/ndf were found
   if (_varFit=="phoSCRChIsoCorr") nOfnRightLimits=_nOfnRightLimits;
-  int iter=0;
+//  int iter=0;
   for (int iLimit=0; iLimit<nOfnRightLimits; iLimit++){
     //loop over different number of left bins
     if (fitDone) break;
@@ -326,10 +362,18 @@ void TTemplates::SetThreeHists(int kinBin, int etaBin, bool noPrint){
   name.ReplaceAll("_Fake","_Leak");
   _hLeak[kinBin][etaBin] = new TH1D(name,name,nFitBins,fitBinLims);
   _hLeak[kinBin][etaBin]->Sumw2();
+  name.ReplaceAll("_Leak","_Data");
+  _hData[kinBin][etaBin] = new TH1D(name,name,nFitBins,fitBinLims);
+  _hData[kinBin][etaBin]->Sumw2();
   TH1D* hLeakTemp = new TH1D("leakTemp","leakTemp",nFitBins,fitBinLims);
   hLeakTemp->Sumw2();
   SetFakeTemplate(_hFake[kinBin][etaBin], _hLeak[kinBin][etaBin], hLeakTemp, cut, noPrint);
   delete hLeakTemp;
+
+  _hFakeReference[kinBin][etaBin] = (TH1D*)_hFake[kinBin][etaBin]->Clone(_hFake[kinBin][etaBin]->GetName()+TString("_Ref"));
+  _hFakeReference[kinBin][etaBin]->SetTitle(_hFakeReference[kinBin][etaBin]->GetName());
+  _hTrueReference[kinBin][etaBin] = (TH1D*)_hTrue[kinBin][etaBin]->Clone(_hTrue[kinBin][etaBin]->GetName()+TString("_Ref"));
+  _hTrueReference[kinBin][etaBin]->SetTitle(_hTrueReference[kinBin][etaBin]->GetName());
 
   if (!noPrint)     std::cout<<std::endl;
 }
@@ -439,7 +483,22 @@ void TTemplates::SetFakeTemplate(TH1D* hFake, TH1D* hLeak, TH1D* hLeakTemp, TCut
     std::cout<<"fake Fake = ";
     std::cout<<hFake->GetSumOfWeights()<<std::endl;
   }
+}
 
+void TTemplates::RandomizeTemplates(int ikin, int ieta)
+{
+  for (int ib=1; ib<_hTrueReference[ikin][ieta]->GetNbinsX(); ib++){
+    float mean = _hTrueReference[ikin][ieta]->GetBinContent(ib);
+    float sigma = _hTrueReference[ikin][ieta]->GetBinError(ib);
+    _hTrue[ikin][ieta]->SetBinContent(ib,_random.Gaus(mean,sigma));
+    _hTrue[ikin][ieta]->SetBinError(ib,sigma);
+  }
+  for (int ib=1; ib<_hFakeReference[ikin][ieta]->GetNbinsX(); ib++){
+    float mean = _hFakeReference[ikin][ieta]->GetBinContent(ib);
+    float sigma = _hFakeReference[ikin][ieta]->GetBinError(ib);
+    _hFake[ikin][ieta]->SetBinContent(ib,_random.Gaus(mean,sigma));
+    _hFake[ikin][ieta]->SetBinError(ib,sigma);
+  }
 }
 
 void TTemplates::DeleteThreeHists(int kinBin, int etaBin){
@@ -548,15 +607,11 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   }
   TCut cut = kinCut && etaCut && sidebandVarNonimalCut;
 	
-  TString hName="hDataToFit";
-  hName+=StrLabelKin(kinBin);
-  hName+=StrLabelEta(etaBin);
-  hName+=_iter;
-  _hData[kinBin][etaBin] = (TH1D*)_hFake[kinBin][etaBin]->Clone(hName);
-  _hData[kinBin][etaBin]->SetTitle(hName);
+//  _hData[kinBin][etaBin] = (TH1D*)_hFake[kinBin][etaBin]->Clone(hName);
+//  _hData[kinBin][etaBin]->SetTitle(hName);
   TString varDraw=_varFit;
   varDraw+=">>";
-  varDraw+=hName;
+  varDraw+= _hData[kinBin][etaBin]->GetName();
 
   _treeData->Draw(varDraw,cut*_cutWeight,"goff");
 
@@ -607,10 +662,15 @@ void TTemplates::FitOne(int kinBin, int etaBin, bool noPrint, bool noPlot)
   argList.add(rooVarFit);
   RooArgSet argSet;
   argSet.add(rooVarFit);
-  std::cout<<"Historgams (hTrue, hFake, hLeak):"<<std::endl;
-  PrintOneHistogramBinByBin(_hTrue, kinBin, etaBin);
-  PrintOneHistogramBinByBin(_hFake, kinBin, etaBin);
-  PrintOneHistogramBinByBin(_hLeak, kinBin, etaBin);
+  if (!noPrint){
+    std::cout<<"Histograms (hTrue, hTrueReference, hFake, hFakeReference, hLeak, hData):"<<std::endl;
+    PrintOneHistogramBinByBin(_hTrue, kinBin, etaBin);
+    PrintOneHistogramBinByBin(_hTrueReference, kinBin, etaBin);
+    PrintOneHistogramBinByBin(_hFake, kinBin, etaBin);
+    PrintOneHistogramBinByBin(_hFakeReference, kinBin, etaBin);
+    PrintOneHistogramBinByBin(_hLeak, kinBin, etaBin);
+    PrintOneHistogramBinByBin(_hData, kinBin, etaBin);
+  }
   RooDataHist dataHist("hist", "data set converted to hist", argList, _hData[kinBin][etaBin]);
   //create Fake and True PDFs
   RooDataHist trueDataHist("trueDataHist","true RooDataHist", argList, _hTrue[kinBin][etaBin]);
@@ -759,7 +819,7 @@ void TTemplates::ComputeYieldOne(TH1D* hTemplate, double nValFromFit, double nEr
 float TTemplates::EffPhoChIsoCorr(int ikin, int ieta, bool isTrue)
 {
   TCut cutEta = CutEtaBin(ieta);
-  TCut cutKin = CutKinBin(ieta);
+  TCut cutKin = CutKinBin(ikin);
   TCut cutPhoSigmaIEtaIEta = _photon.RangeSigmaIEtaIEta(_year,_phoWP);
   TCut cutPhoSCRChIso = _photon.RangePhoSCRChIsoCorr();
   TCut cutPhoChIso = _photon.RangeOneIsolation(_year,_phoWP,_photon.ISO_CHorTRK);
@@ -810,6 +870,8 @@ void TTemplates::PrintYieldsAndChi2()
   PrintHistogramsBinByBin(_hTrue);
   PrintHistogramsBinByBin(_hFake);
   PrintHistogramsBinByBin(_hLeak);
+  PrintHistogramsBinByBin(_hTrueReference);
+  PrintHistogramsBinByBin(_hFakeReference);
   std::cout<<std::endl;
 
   std::cout<<"Chi2/NDF for different bins: "<<std::endl;
@@ -912,7 +974,8 @@ void TTemplates::PrintHistogramsBinByBin(TH1D* hist[_nBinsMax][3]){
 }
 
 void TTemplates::PrintOneHistogramBinByBin(TH1D* hist[_nBinsMax][3], int ikin, int ieta){
-  std::cout<<StrLabelEta(ieta)<<StrLabelKin(ikin)<<": ";
+  std::cout<<hist[ikin][ieta]->GetTitle()<<": ";
+//  std::cout<<StrLabelEta(ieta)<<StrLabelKin(ikin)<<": ";
   float sum=0;
   std::cout<<std::setprecision(0)<<std::fixed;
   for (int ifit=1; ifit<=hist[ikin][ieta]->GetNbinsX(); ifit++){

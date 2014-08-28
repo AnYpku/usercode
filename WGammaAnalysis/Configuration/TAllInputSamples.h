@@ -9,15 +9,16 @@ class TAllInputSamples
 {
   public:
     TAllInputSamples();
-    TAllInputSamples(int channel, string configFile);
+    TAllInputSamples(int channel, int vgamma, string configFile);
     virtual ~TAllInputSamples();
 
-    void ReadConfig(int channel, string configFile);
-    bool ReadSampleGeneralInfo(int channel, string line);
+    void ReadConfig(int channel, int vgamma, string configFile);
+    bool ReadSampleGeneralInfo(int channel, int vgamma, string line);
     void ReadFileSpecificInfo(string line);
 
     int ChannelNumber (string channelStr);
     int SampleNumber  (string sampleStr);
+    int VGammaNumber  (string vgammaStr);
 
     void CalcLumiWeights();
 

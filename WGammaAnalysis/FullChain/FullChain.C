@@ -4,11 +4,11 @@
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
 #include "../Configuration/TConfiguration.h"
-#include "../Selection/WGammaSelection.h"
+#include "../Selection/Selection.h"
 #include "../DDBkgTemplateMethod/TTemplates.h"
 #include "../PrepareYields/TPrepareYields.h"
-#include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
-#include "../CrossSection/CalcCrossSection.h"
+//#include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
+//#include "../CrossSection/CalcCrossSection.h"
 
 #include <iostream>
 
@@ -29,15 +29,17 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
 {
   anPars.year=2012;//2012, 2011
   anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
+  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
   anPars.blind=TConfiguration::BLIND_PRESCALE;
 
-  anPars.sampleMode=WGammaSelection::ALL;
+  anPars.sampleMode=Selection::ALL;
   anPars.analyzedSamples="";
   anPars.configfile="../Configuration/config.txt";
   anPars.isNoPuReweight=0;
   anPars.isDebugMode=0;
   anPars.noAdjustBinning=0;
   anPars.isMetCutOptimization=0;
+  anPars.doSystTemplateStat=0;
   anPars.phoWP=TPhotonCuts::WP_TIGHT;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
 
   anPars.noPhoPFChIsoCut=0;
@@ -66,13 +68,14 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
 void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
 {
     anPars.varKin="phoEt";
-/*
-    anPars.nKinBins=2;
-    anPars.kinBinLims=new float[anPars.nKinBins+1];
-    anPars.kinBinLims[0]=10;
-    anPars.kinBinLims[1]=20;
-    anPars.kinBinLims[2]=30;
-*/
+
+//    anPars.nKinBins=3;
+//    anPars.kinBinLims=new float[anPars.nKinBins+1];
+//    anPars.kinBinLims[0]=15;
+//    anPars.kinBinLims[1]=20;
+//    anPars.kinBinLims[2]=25;
+//    anPars.kinBinLims[3]=30;
+
 
   anPars.nKinBins=_config.GetNPhoPtBins();
   anPars.kinBinLims=new float[anPars.nKinBins+1];
@@ -84,23 +87,23 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
 {
   if (varKin=="phoSCEta" || varKin=="phoEta"){
     anPars.varKin=varKin;
-/*
-    anPars.nKinBins=3;
-    anPars.kinBinLims=new float[anPars.nKinBins+1];
-    anPars.kinBinLims[0]=-2.5;
-    anPars.kinBinLims[1]=-1.5;
-    anPars.kinBinLims[2]=1.5;
-    anPars.kinBinLims[3]=2.5;
-*/
-/*
-    anPars.nKinBins=4;
-    anPars.kinBinLims=new float[anPars.nKinBins+1];
-    anPars.kinBinLims[0]=-2.5;
-    anPars.kinBinLims[1]=-1.5;
-    anPars.kinBinLims[2]=0;
-    anPars.kinBinLims[3]=1.5;
-    anPars.kinBinLims[4]=2.5;
-*/
+
+//    anPars.nKinBins=3;
+//    anPars.kinBinLims=new float[anPars.nKinBins+1];
+//    anPars.kinBinLims[0]=-2.5;
+//    anPars.kinBinLims[1]=-1.5;
+//    anPars.kinBinLims[2]=1.5;
+//    anPars.kinBinLims[3]=2.5;
+
+
+//    anPars.nKinBins=4;
+//    anPars.kinBinLims=new float[anPars.nKinBins+1];
+//    anPars.kinBinLims[0]=-2.5;
+//    anPars.kinBinLims[1]=-1.5;
+//    anPars.kinBinLims[2]=0;
+//    anPars.kinBinLims[3]=1.5;
+//    anPars.kinBinLims[4]=2.5;
+
     anPars.nKinBins=20;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=-2.5;
@@ -126,28 +129,28 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[20]=2.5;
   }
   if (varKin=="phoPhi"){
-    anPars.varKin="phoPhi";
+    anPars.varKin=varKin;
     anPars.nKinBins=8;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
   }
-  if (varKin=="leptonPt"){
-    anPars.varKin="leptonPt";
+  if (varKin=="lepton1Pt" || varKin=="lepton2Pt"){
+    anPars.varKin=varKin;
     anPars.nKinBins=8;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=26+10*ib;
   }
-  if (varKin=="leptonPhi"){
-    anPars.varKin="leptonPhi";
+  if (varKin=="lepton1Phi" || varKin=="lepton2Phi"){
+    anPars.varKin=varKin;
     anPars.nKinBins=8;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
   }
-  if (varKin=="leptonEta"){
-    anPars.varKin="leptonEta";
+  if (varKin=="lepton1Eta" || varKin=="lepton2Eta"){
+    anPars.varKin=varKin;
     anPars.nKinBins=16;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     anPars.kinBinLims[0]=-2.1;
@@ -170,15 +173,15 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
   }
   if (varKin=="WMt"){
     anPars.isMetCutOptimization=1;
-    anPars.varKin="WMt";
+    anPars.varKin=varKin;
     anPars.nKinBins=12;
 //    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0+10*ib;
   }
-  if (varKin=="lePhoDeltaR"){
-    anPars.varKin="lePhoDeltaR";
+  if (varKin=="lep1PhoDeltaR" || varKin=="lep2PhoDeltaR"){
+    anPars.varKin=varKin;
     anPars.nKinBins=10;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
@@ -208,12 +211,12 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //very preliminary selection
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Preliminary Selection"<<std::endl;
-    if (anPars.sampleMode!=WGammaSelection::NOTSPECIFIED){
-      WGammaSelection selection(anPars.channel,anPars.sampleMode,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
+    if (anPars.sampleMode!=Selection::NOTSPECIFIED){
+      Selection selection(anPars.channel,anPars.vgamma,anPars.sampleMode,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
       selection.LoopOverInputFiles();
     }
     else{
-      WGammaSelection selection(anPars.channel,anPars.analyzedSamples,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
+      Selection selection(anPars.channel,anPars.vgamma,anPars.analyzedSamples,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
       selection.LoopOverInputFiles();
     }
     std::cout<<"%_%  DONE Preliminary Selection"<<std::endl;
@@ -224,8 +227,8 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //extra selection
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Extra Selection"<<std::endl;
-    WGammaSelection selection;
-    selection.ExtraSelection(anPars.year, anPars.channel, anPars.sampleMode,anPars.phoWP,anPars.noPhoPFChIsoCut);
+    Selection selection;
+    selection.ExtraSelection(anPars.year, anPars.channel,anPars.vgamma, anPars.sampleMode,anPars.phoWP,anPars.noPhoPFChIsoCut);
     std::cout<<"%_%  DONE Extra Selection"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
@@ -234,7 +237,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //compute fake-gamma background by data-driven template method
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO DataDriven bkg"<<std::endl;
-    TTemplates temp(anPars.year,anPars.channel,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.noAdjustBinning,anPars.noPhoPFChIsoCut, anPars.isMetCutOptimization);
+    TTemplates temp(anPars.year,anPars.channel,anPars.vgamma,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.noAdjustBinning,anPars.noPhoPFChIsoCut, anPars.isMetCutOptimization,anPars.doSystTemplateStat);
    temp.ComputeBackground();
     std::cout<<"%_%  DONE Extra DataDriven bkg"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
@@ -244,12 +247,12 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //prepare yields and subtract background
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
-    TPrepareYields yields(anPars.year, anPars.channel, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims,anPars.isMetCutOptimization, anPars.phoWP);
+    TPrepareYields yields(anPars.year, anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims,anPars.isMetCutOptimization, anPars.phoWP);
     yields.PrepareYields();
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
-
+/*
   if (!anPars.noCalcAccAndEff){
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
@@ -269,4 +272,6 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%_%  DONE Compute Cross Section"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
+*/
 }
+

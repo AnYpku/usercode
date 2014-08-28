@@ -29,12 +29,12 @@ void TConfiguration::Print()
   std::cout<<"GetSampleName s: "<<GetSampleName(DATA)<<", "<<GetSampleName(SIGMC)<<", "<<GetSampleName(BKGMC)<<std::endl;
   std::cout<<"GetEtaBinName s: "<<GetEtaBinName(BARREL)<<", "<<GetEtaBinName(ENDCAP)<<", "<<GetEtaBinName(COMMON)<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,UNBLIND,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,UNBLIND,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,BLIND_PRESCALE,BKGMC,"[sourceName]")<<std::endl;
+  std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,W_GAMMA,UNBLIND,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,Z_GAMMA,UNBLIND,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,Z_GAMMA,BLIND_PRESCALE,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON)<<", "<<GetYieldsFileName(ELECTRON)<<std::endl;
+  std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON,W_GAMMA,"phoEt")<<", "<<GetYieldsFileName(ELECTRON,W_GAMMA,"WMt")<<std::endl;
   std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON)<<std::endl;
+  std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON,W_GAMMA,"WMt")<<std::endl;
 
 }
 
@@ -78,10 +78,20 @@ TString TConfiguration::GetBlindModeName(int sample, int blindMode)
   return "UNKNOWN_BLIND_MODE";
 }
 
-TString TConfiguration::GetSelectedName(int selectionStage, int channel, int blindType, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight)
+TString TConfiguration::GetVgTypeName(int vgamma)
+{
+  if (vgamma==W_GAMMA) return "WGamma";
+  else if (vgamma==Z_GAMMA) return "ZGamma";
+  else if (vgamma==V_GAMMA) return "VGamma";
+  return "UNKNOWN_VGAMMA";
+}
+
+TString TConfiguration::GetSelectedName(int selectionStage, int channel, int vgamma, int blindType, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight)
 {
   TString name = GetOutputDirName(channel); 
   name+=_selectedNameBase[selectionStage];
+  name+="_";
+  name+=GetVgTypeName(vgamma);
   if (sample==DATA){
     name+="_";
     name+=GetBlindModeName(sample,blindType);
@@ -106,9 +116,9 @@ TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight
   return name;
 }
 
-TString TConfiguration::GetYieldsFileName(int channel)
+TString TConfiguration::GetYieldsFileName(int channel, int vgamma, TString strKin)
 {
-  return GetOutputDirName(channel)+_yieldsFileName;
+  return GetOutputDirName(channel)+_yieldsFileName+TString("_")+GetVgTypeName(vgamma)+TString("_")+strKin+TString("_.root");
 }
 
 
@@ -139,9 +149,9 @@ TString TConfiguration::GetYieldsSignalName(int csMode, int etaBin)
   return _yieldsSignalName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
 }
 
-TString TConfiguration::GetDDTemplateFileName(int channel)
+TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, TString strKin)
 {
-  return GetOutputDirName(channel)+_DDTemplateFileName;
+  return GetOutputDirName(channel)+_DDTemplateFileName+TString("_")+GetVgTypeName(vgamma)+TString("_")+strKin+TString("_.root");
 }
 
 
@@ -165,33 +175,33 @@ TString TConfiguration::GetEffName(int csMode)
   return _effName+GetCsModeName(csMode);
 }
 
-/*
 
-TString TConfiguration::GetUnfoldingFileName(int channel)
-{
-  return GetOutputDirName(channel)+unfoldingFileName_;
-}
 
-TString TConfiguration::GetMatrUnfo1DName()
-{
-  return matrUnfo1DName_;
-}
+//TString TConfiguration::GetUnfoldingFileName(int channel)
+//{
+//  return GetOutputDirName(channel)+unfoldingFileName_;
+//}
 
-TString TConfiguration::GetMatrMigr1DName()
-{
-  return matrMigr1DName_;
-}
+//TString TConfiguration::GetMatrUnfo1DName()
+//{
+//  return matrUnfo1DName_;
+//}
 
-TString TConfiguration::GetYieldsRec1DName()
-{
-  return yieldsRec1DName_;
-}
+//TString TConfiguration::GetMatrMigr1DName()
+//{
+//  return matrMigr1DName_;
+//}
 
-TString TConfiguration::GetYieldsGen1DName()
-{
-  return yieldsGen1DName_;
-}
-*/
+//TString TConfiguration::GetYieldsRec1DName()
+//{
+//  return yieldsRec1DName_;
+//}
+
+//TString TConfiguration::GetYieldsGen1DName()
+//{
+//  return yieldsGen1DName_;
+//}
+
 TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
 {
   return certifiedConstantsDir_+photonScaleFactorsFileNamePt15to20GeV_;
@@ -262,7 +272,7 @@ int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed)
   return GetNPhoPtBins()+1;
 }
 
-void TConfiguration::GetPhoPtUnfBinsLimits(float* lims,bool isOverflowUsed)
+void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed)
 {
   lims[0]=0.0;
   for (int i=0; i<_nPhoPtBins+2; i++)

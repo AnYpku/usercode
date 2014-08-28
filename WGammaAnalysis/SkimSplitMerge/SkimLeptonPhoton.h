@@ -8,7 +8,7 @@
 
 class SkimLeptonPhoton{
 public :
-   SkimLeptonPhoton(int channel, int sample, TString inputFileName, TString nameDir, TString nameTree, TString outDir);
+   SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool doOverlapRemoval, bool isDebugMode=0, TString outDir="./", TString nameDir="ggNtuplizer", TString nameTree="EventTree");
    virtual ~SkimLeptonPhoton();
    void LoopOverInputTree();
      //the main function which is called from outside
@@ -16,21 +16,23 @@ public :
      //tree [0] is input tree;
      //trees [1]-[4] are output trees
 private :
-   TInputOutputTree TREE_;
-   TConfiguration config_;
-   int channel_;
-   int sample_;
-   TFile    *fileOutMu_; //output Files
-   TFile    *fileOutEle_; //output Files
-   TTree    *outputTreeMu_; //output Trees
-   TTree    *outputTreeEle_; //output Trees
-   TH1F     *hskimMu_;
-   TH1F     *hskimEle_;
-   TString  inputFileName_; 
-   TString  skimmedFileNameMu_; 
-   TString  skimmedFileNameEle_;
-   TString  nameDir_;
-   TString  nameTree_;
+   TInputOutputTree _TREE;
+   TConfiguration _config;
+   int _channel;
+   int _sample;
+   bool _doOverlapRemoval;
+   bool _isDebugMode;
+   TFile    *_fileOutMu; //output Files
+   TFile    *_fileOutEle; //output Files
+   TTree    *_outputTreeMu; //output Trees
+   TTree    *_outputTreeEle; //output Trees
+   TH1F     *_hskimMu;
+   TH1F     *_hskimEle;
+   TString  _inputFileName; 
+   TString  _skimmedFileNameMu; 
+   TString  _skimmedFileNameEle;
+   TString  _nameDir;
+   TString  _nameTree;
 
 };
 
