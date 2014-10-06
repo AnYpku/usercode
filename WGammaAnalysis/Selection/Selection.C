@@ -1,0 +1,524 @@
+#include "Selection.h" 
+  //this class
+#include "../Include/TMetTools.h" 
+#include "../Include/TMuonCuts.h" 
+#include "../Include/TElectronCuts.h" 
+#include "../Include/TPhotonCuts.h" 
+#include "../Include/TFullCuts.h" 
+#include "../Include/TPuReweight.h" 
+#include "../Configuration/TConfiguration.h" 
+#include "../Configuration/TInputSample.h"
+#include "../Configuration/TAllInputSamples.h"
+  //this package
+#include "../Include/PhosphorCorrectorFunctor.hh"
+  //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
+  //currently in this package
+#include "TMath.h"
+#include "TRandom.h"  
+  // ROOT class
+#include <iostream> 
+#include <string>
+#include <sstream>  
+  //standard C++ class
+
+Selection::Selection()
+{
+}
+
+Selection::Selection(int channel, int vgamma, int sampleMode, string configFile, bool isNoPuReweight, bool isDebugMode)
+{
+
+  _INPUT = new TAllInputSamples(channel, vgamma,configFile);
+  _vgamma=vgamma;
+  _channel=channel;
+  _isNoPuReweight=isNoPuReweight;
+  _isDebugMode=isDebugMode;
+  _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
+    //field of this class, Selection
+
+  _sampleMode=sampleMode;
+  if (_sampleMode==NOTSPECIFIED){
+    std::cout<<"ERROR in Selection::Selection: _sampleMode is NONSPECIFIED"<<std::endl;
+    return;
+  }
+  else if (_sampleMode>NOTSPECIFIED){
+    std::cout<<"ERROR in Selection::Selection: wrong _sampleMode "<<std::endl;
+    return;    
+  }
+  for (int i=0; i<_INPUT->nSources_; i++)
+    {
+      _doAnalizeSample.push_back(1);      
+    } 
+
+}
+
+Selection::Selection(int channel, int vgamma, string analyzedSampleNames, string configFile, bool isNoPuReweight, bool isDebugMode)
+{
+
+  _INPUT = new TAllInputSamples(channel, vgamma, configFile);
+
+  _channel=channel;
+  _vgamma=vgamma;
+  _isNoPuReweight=isNoPuReweight;
+  _isDebugMode=isDebugMode;
+  _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
+    //field of this class, Selection
+
+  _sampleMode=NOTSPECIFIED;
+  stringstream ss(analyzedSampleNames);
+  vector <string> names;
+  string name;
+  while (ss >> name) 
+    names.push_back(name);
+  int nNames = names.size();
+
+  std::cout<<"1 - will do, 0 - will not do"<<std::endl;
+  for (int i=0; i<_INPUT->nSources_; i++)
+    {
+      _doAnalizeSample.push_back(0);  
+      for (int j=0; j<nNames; j++)
+        {
+          if (names[j]==_INPUT->allInputs_[i].sourceName_)
+            _doAnalizeSample.back()=1; 
+        }
+      std::cout<<_INPUT->allInputs_[i].sourceName_<<": "<<_doAnalizeSample[i]<<std::endl;
+    }  
+  if ((int)_doAnalizeSample.size()!=_INPUT->nSources_)
+    std::cout<<"ERROR in Selection::Selection: wrong _doAnalizeSample.size()"<<std::endl;
+
+}
+
+Selection::~Selection()
+{
+   _eventTree.fChain = 0;
+     //field of TEventTree 
+   //delete _photonCorrector;
+}
+
+void Selection::LoopOverInputFiles()
+{
+
+  int nSources = _INPUT->nSources_; 
+  //if (_isDebugMode && nSources>3)
+  //  nSources = 3;
+
+  for (int iSource=0; iSource<nSources; iSource++)
+    {
+//       std::cout<<_INPUT->allInputs_[iSource].sourceName_<<": "<<_doAnalizeSample[iSource]<<std::endl;
+       if (!_doAnalizeSample[iSource])
+         continue;
+
+       _sample = _INPUT->allInputs_[iSource].sample_;
+       if (_sample==TConfiguration::DATA){
+           _lumiData=_INPUT->allInputs_[iSource].lumiTotal_;
+           if (_sampleMode==ALL || _sampleMode==DATA || _sampleMode==NOBKG || _sampleMode==NOTSPECIFIED);
+           else continue;
+       }
+       if (_sample==TConfiguration::SIGMC)
+           if (_sampleMode==ALL || _sampleMode==SIGMC || _sampleMode==MC || _sampleMode==NOBKG || _sampleMode==NOTSPECIFIED);
+           else continue;
+       if (_sample==TConfiguration::BKGMC)
+           if (_sampleMode==ALL || _sampleMode==BKGMC || _sampleMode==MC || _sampleMode==NOTSPECIFIED);
+           else continue;
+       std::cout<<"_sample="<<_sample<<std::endl;
+       std::cout<<"_sampleMode="<<_sampleMode<<std::endl;
+//       _selectedTreeFileName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_blind,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+       TTree* tree;
+       int inputFileNMax = _INPUT->allInputs_[iSource].nFiles_;
+
+//       fileOutName = _selectedTreeFileName;
+       TString fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.UNBLIND,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+       _fileOut = new TFile(fileOutName,"recreate");
+       _outTree = new TTree("selectedEvents","selected Events");
+       _selEvTree.SetAsOutputTree(_outTree); 
+
+       if (_sample==_config.DATA){
+         //blind "decreasing acceptance factors"
+         fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.BLIND_DECRACC,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+         _fileOut_blindDecrAcc = new TFile(fileOutName,"recreate");
+         _outTree_blindDecrAcc = new TTree("selectedEvents","selected Events");
+         _selEvTree_blindDecrAcc.SetAsOutputTree(_outTree_blindDecrAcc);
+         //blind data prescale 
+         fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.BLIND_PRESCALE,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+         _fileOut_blindPrescale = new TFile(fileOutName,"recreate");
+         _outTree_blindPrescale = new TTree("selectedEvents","selected Events");
+         _selEvTree_blindPrescale.SetAsOutputTree(_outTree_blindPrescale); 
+       }
+
+       for (_inputFileN=0; _inputFileN< inputFileNMax; _inputFileN++){
+
+         TFile f(_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);
+         if (f.IsOpen()) 
+           std::cout<<std::endl<<"processing file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<std::endl;
+         else{
+            std::cout<<"ERROR detected in Selection::LoopOverInputFiles: file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<" was not found"<<std::endl;
+            return;
+         } 
+         f.cd("ggNtuplizer");
+         tree = (TTree*)gDirectory->Get("EventTree");
+         if (tree){
+           _eventTree.Init(tree);
+           //if (_sample!=TConfiguration::DATA) SetMCSpecificAddresses();
+         }   
+         else{
+           std::cout<<"ERROR detected in Selection::LoopOverInputFiles: tree in the file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<" does not exist"<<std::endl;
+           return;
+         }  
+
+         //determine _lumiWeight
+         if (_sample==_config.DATA)
+           _lumiWeight=1;
+         else{
+           _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[_inputFileN];
+         }
+         std::cout<<"_lumiWeight="<<_lumiWeight<<std::endl;
+
+
+         _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);         
+         LoopOverTreeEvents();
+             //method of this class (Selection)
+         _eventTree.fChain=0;
+             //field of TEventTree
+         delete _puWeight;
+       }//loop over _inputFileN ends
+      std::cout<<"the output will be saved to "<<_fileOut->GetName()<<std::endl<<std::endl;
+      _fileOut->cd();
+      _outTree->Write();
+      _fileOut->Close();
+      //delete outTree;
+      _outTree = 0;
+      if (_sample==_config.DATA){
+        _fileOut_blindDecrAcc->cd();
+        _outTree_blindDecrAcc->Write();
+        _fileOut_blindDecrAcc->Close();
+        _outTree_blindDecrAcc = 0;
+        _fileOut_blindPrescale->cd();
+        _outTree_blindPrescale->Write();
+        _fileOut_blindPrescale->Close();
+        _outTree_blindPrescale = 0;
+      }
+
+    } //loop over iSource ends
+
+}
+
+
+void Selection::LoopOverTreeEvents()
+{
+   if (_eventTree.fChain == 0) return;
+   Long64_t nentries = _eventTree.fChain->GetEntries();
+   if (_isDebugMode) 
+     {
+       if (_eventTree.fChain->GetEntries()<_debugModeNEntries) nentries=_eventTree.fChain->GetEntries();
+       else nentries=_debugModeNEntries;
+     }
+
+   float nTotal=0;
+   float nPassed=0;
+
+   _passed.leptonPtPassed=0;
+   _passed.leptonEtaPassed=0;
+   _passed.phoPtPassed=0;
+   _passed.phoBarrelPassed=0;
+   _passed.phoEndcapPassed=0;
+   _passed.leptonPtPassed=0;
+   _passed.dRPassed=0;
+
+   //goodLeptonPhotonPairs(two-dimentional array of bool-s)
+   //memory allocation for some variables: 
+   int nLeptonMax;
+   if (_channel==TConfiguration::MUON) nLeptonMax=_eventTree.kMaxnMu;
+   else if (_channel==TConfiguration::ELECTRON) nLeptonMax=_eventTree.kMaxnEle;
+     //kMaxnMu - field of TEventTree
+   else{
+       std::cout<<"Error detected in Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
+       return;
+   }
+
+   float* WMt = new float[nLeptonMax];
+
+//   float** lePhoDeltaR = new float*[nLeptonMax];
+//   for (int ile=0; ile<nLeptonMax; ile++)
+//     lePhoDeltaR[ile]=new float[_eventTree.kMaxnPho];
+   
+   int nCands=_eventTree.kMaxnPho*nLeptonMax;
+   TFullCuts::Candidate cands[nCands];
+
+   CheckMaxNumbersInTree();
+
+
+   TPhotonCuts emptyPhoton;
+   for (Long64_t entry=0; entry<nentries; entry++) 
+   //loop over events in the tree
+     {
+
+        _eventTree.GetEntryNeededBranchesOnly(_channel,_sample,entry);
+        if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(entry);
+          //method of TEventTree class
+        if (_channel==TConfiguration::MUON) _nLe=_eventTree.treeLeaf.nMu;
+        else if (_channel==TConfiguration::ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
+        else{
+             std::cout<<"Error detected in  Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
+             return;
+        }
+        _totalWeight = _lumiWeight;
+        if (!_eventTree.treeLeaf.isData && !_isNoPuReweight)
+          _totalWeight*=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+        nTotal+=_totalWeight;
+
+
+        TFullCuts fullCuts;
+        bool selPassed = fullCuts.VeryPreliminaryCut(_eventTree.treeLeaf,
+          _channel,_vgamma,nCands,cands,_passed);
+        
+        if (!selPassed) continue;
+        for (int icand=0; icand<nCands; icand++){
+            nPassed+=_totalWeight;
+            float puWeightVal=1;
+            float puTrueVal=1;
+            if (_sample!=TConfiguration::DATA){
+              puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+              puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
+            }//end of if (_sample!=TConfiguration::DATA)            
+            _selEvTree.SetValues(_channel, _sample, 
+               _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
+               cands[icand].dRlep1pho, cands[icand].dRlep2pho,_inputFileN, 
+               _totalWeight, puWeightVal, puTrueVal,
+               _photonCorrector);
+            _outTree->Fill();
+            if (_sample==_config.DATA){
+              bool ifBeforeThreshold = (_eventTree.treeLeaf.phoEt->at(cands[icand].ipho) <= _config.GetPhoPtBlindThreshold());
+              if (ifBeforeThreshold){
+                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
+                   _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
+                   cands[icand].dRlep1pho, cands[icand].dRlep2pho, _inputFileN, 
+                   _totalWeight, puWeightVal, puTrueVal,
+                   _photonCorrector);
+                _outTree_blindDecrAcc->Fill(); 
+              }
+              else if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
+                _totalWeight*=_config.GetBlindPrescale();
+                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
+                   _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
+                   cands[icand].dRlep1pho, cands[icand].dRlep2pho, _inputFileN, 
+                   _totalWeight, puWeightVal, puTrueVal,
+                   _photonCorrector);
+                _outTree_blindDecrAcc->Fill(); 
+                _totalWeight/=_config.GetBlindPrescale();
+              }
+              if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
+                _selEvTree_blindPrescale.SetValues(_channel, _sample, 
+                   _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
+                   cands[icand].dRlep1pho, cands[icand].dRlep2pho, _inputFileN, 
+                   _totalWeight, puWeightVal, puTrueVal,
+                   _photonCorrector);
+                _outTree_blindPrescale->Fill();
+              }
+            }//if (_sample==_config.DATA)
+        }
+/*
+        for (int ile=0; ile<_nLe; ile++){
+          for (int ipho=0; ipho<_eventTree.treeLeaf.nPho; ipho++){
+            if (!goodLeptonPhotonPairs[ile][ipho]) continue;
+            nPassed+=_totalWeight;
+            float puWeightVal=1;
+            float puTrueVal=1;
+            if (_sample!=TConfiguration::DATA){
+              puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+              puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
+            }//end of if (_sample!=TConfiguration::DATA)            
+            _selEvTree.SetValues(_channel, _sample, 
+               _eventTree.treeLeaf,  ipho, ile, 
+               lePhoDeltaR[ile][ipho], _inputFileN, 
+               _totalWeight, puWeightVal, puTrueVal,
+               _photonCorrector);
+            _outTree->Fill();
+            if (_sample==_config.DATA){
+              bool ifBeforeThreshold = (_eventTree.treeLeaf.phoEt->at(ipho) <= _config.GetPhoPtBlindThreshold());
+              if (ifBeforeThreshold){
+                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
+                   _eventTree.treeLeaf,  ipho, ile, 
+                   lePhoDeltaR[ile][ipho], _inputFileN, 
+                   _totalWeight, puWeightVal, puTrueVal,
+                   _photonCorrector);
+                _outTree_blindDecrAcc->Fill(); 
+              }
+              else if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
+                _totalWeight*=_config.GetBlindPrescale();
+                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
+                   _eventTree.treeLeaf,  ipho, ile, 
+                   lePhoDeltaR[ile][ipho], _inputFileN, 
+                   _totalWeight, puWeightVal, puTrueVal,
+                   _photonCorrector);
+                _outTree_blindDecrAcc->Fill(); 
+                _totalWeight/=_config.GetBlindPrescale();
+              }
+              if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
+                _selEvTree_blindPrescale.SetValues(_channel, _sample, 
+                   _eventTree.treeLeaf,  ipho, ile, 
+                   lePhoDeltaR[ile][ipho], _inputFileN, 
+                   _totalWeight, puWeightVal, puTrueVal,
+                   _photonCorrector);
+                _outTree_blindPrescale->Fill();
+              }
+            }//if (_sample==_config.DATA)
+          }// "for (int ipho=0; ipho<treeLeaf.nPho; ipho++)"
+        }  // "for (int ile=0; ile<_nLe; ile++)"
+*/
+     } //end of loop over events in the tree
+
+  //memory release:
+
+ 
+  delete WMt;
+ 
+  std::cout<<"Summary:"<<std::endl;
+  std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<std::endl;
+  std::cout<<"leptonPt="<<_passed.leptonPtPassed<<", leptonEta="<<_passed.leptonEtaPassed<<", ptoPt="<<_passed.phoPtPassed<<", phoBarrel="<<_passed.phoBarrelPassed<<", phoEndcap="<<_passed.phoEndcapPassed<<", dR="<<_passed.dRPassed<<std::endl;
+
+}
+
+bool Selection::CheckMaxNumbersInTree()
+{
+   if ((_channel=TConfiguration::MUON) 
+       && (_eventTree.fChain->GetMaximum("nMu")>_eventTree.kMaxnMu))
+     //kMaxnMu - field of TEventTree
+     {
+       PrintErrorMessageMaxNumberOf(_MUON);
+          //methof of this class (Selection)
+       return 0;
+     }
+   if (_channel==TConfiguration::ELECTRON 
+       && _eventTree.fChain->GetMaximum("nEle")>_eventTree.kMaxnEle)
+     {
+       PrintErrorMessageMaxNumberOf(_ELECTRON);
+          //methof of this class (Selection)
+       return 0;
+     }
+   if (_eventTree.fChain->GetMaximum("nPho")>_eventTree.kMaxnPho)
+     {
+       PrintErrorMessageMaxNumberOf(_PHOTON);
+          //methof of this class (Selection)
+       return 0;
+     }
+//   if (fChain->GetMaximum("nJet")>kMaxnJet)
+//     {
+//       PrintErrorMessageMaxNumberOf(_JET);
+//          //methof of this class (Selection)
+//       return 0;
+//     }
+//   if (fChain->GetMaximum("nLowPtJet")>kMaxnLowPtJet)
+//     {
+//       PrintErrorMessageMaxNumberOf(LOWPT_JET);
+//          //methof of this class (Selection)
+//       return 0;
+//     }
+//   if (!treeLeaf.isData && fChain->GetMaximum("nMC")>kMaxnMC)
+//     {
+//       PrintErrorMessageMaxNumberOf(_MC);
+//          //methof of this class (Selection)
+//       return 0;
+//     }
+   return 1;
+}
+
+void Selection::PrintErrorMessageMaxNumberOf(int particle)
+{
+       std::cout<<std::endl;
+       std::cout<<"Error detected in Selection::PrintErrorMessageMaxNumberOf:"<<std::endl;
+       if (particle==_MUON)
+         std::cout<<"maximum number of muons in the file nMu="<<_eventTree.fChain->GetMaximum("nMu")<<", when kMaxnMu="<<_eventTree.kMaxnMu<<" only"<<std::endl;
+       else if (particle==_ELECTRON)
+         std::cout<<"maximum number of electrons in the file nEle="<<_eventTree.fChain->GetMaximum("nEle")<<", when kMaxnEle="<<_eventTree.kMaxnEle<<" only"<<std::endl;
+       else if (particle==_PHOTON)
+         std::cout<<"maximum number of photons in the file nPho="<<_eventTree.fChain->GetMaximum("nPho")<<", when kMaxnPho="<<_eventTree.kMaxnPho<<" only"<<std::endl;
+//       else if (particle==_JET)
+//         std::cout<<"maximum number of jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnJet="<<kMaxnJet<<" only"<<std::endl;
+//      else if (particle==LOWPT_JET)
+//         std::cout<<"maximum number of low Pt jets in the file nJet="<<fChain->GetMaximum("nJet")<<", when kMaxnLowPtJet="<<kMaxnLowPtJet<<" only"<<std::endl;
+//      else if (particle==_MC)
+//         std::cout<<"maximum number of mc particles in the file nMC="<<fChain->GetMaximum("nMC")<<", when kMaxnMC="<<kMaxnMC<<" only"<<std::endl;
+       std::cout<<"please, go to TEventTree.h to increase this number up to proper value"<<std::endl;
+       std::cout<<std::endl;
+}
+
+void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode, int wp, bool noPhoPFChIsoCut)
+{
+  TFullCuts fullCut;
+  TConfiguration config;
+  TAllInputSamples INPUT(channel,vgamma,"../Configuration/config.txt");
+  _tr=0;
+  _trReduced=0;
+  _tr1=0;
+  _tr2=0;
+  _tr3=0;
+
+  for (int i=0; i<INPUT.nSources_; i++){
+
+    int sample=INPUT.allInputs_[i].sample_;
+    if(sampleMode==ALL);
+    else if(sampleMode==DATA && sample!=config.DATA) continue;
+    else if(sampleMode==SIGMC && sample!=config.SIGMC) continue;
+    else if(sampleMode==BKGMC && sample!=config.BKGMC) continue;
+    else if(sampleMode==MC && sample==config.DATA) continue;
+    else if(sampleMode==NOBKG && sample==config.BKGMC) continue;
+
+    if (sample==config.DATA){
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.BLIND_PRESCALE,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.BLIND_DECRACC,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.UNBLIND,noPhoPFChIsoCut);
+    }
+    else{
+      ExtraSelectionOne(INPUT,i,config,fullCut,year,channel,vgamma,wp,config.UNBLIND,noPhoPFChIsoCut);
+    }
+  }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
+
+}
+
+void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind, bool noPhoPFChIsoCut)
+{
+
+    TString fInName = config.GetSelectedName(config.VERY_PRELIMINARY,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+
+    TFile fIn(fInName);
+    if (!fIn.IsOpen()){
+      std::cout<<"file "<<fInName<<" can't be open"<<std::endl;
+      return;
+    }
+    std::cout<<"file "<<fInName<<" was open"<<std::endl;
+    _tr = (TTree*)fIn.Get("selectedEvents");
+
+    TString fOutName1=config.GetSelectedName(config.PRELIMINARY_FOR_MET_CUT,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+    TFile fOut1(fOutName1,"recreate");
+
+    _trReduced = _tr->CopyTree(fullCut.RangeForMetCut(year,channel,vgamma,wp));
+    _tr1 = new TTree("selectedEvents","selected events, one candidate per event");
+    TSelectedEventsTree selEvTree;
+    selEvTree.SetAsInputTree(_trReduced);
+    selEvTree.SetAsOutputTree(_tr1);
+    long nEntries = _trReduced->GetEntries();
+    long eventCurr=0;
+    long eventPrev=-1;
+    for (long ientry=0; ientry<nEntries; ientry++){
+      _trReduced->GetEntry(ientry);
+      eventPrev=eventCurr;
+      eventCurr = selEvTree._event;
+      if (eventCurr==eventPrev) continue;
+      _tr1->Fill();
+    }
+    _trReduced->Write();
+
+    _tr1->Write();
+
+    TString fOutName2=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+    TFile fOut2(fOutName2,"recreate");
+    _tr2 = _tr1->CopyTree(fullCut.RangeForTemplateMethodCut(year,channel,vgamma,wp));
+    _tr2->Write();
+
+    TString fOutName3=config.GetSelectedName(config.FULLY,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+    TFile fOut3(fOutName3,"recreate");
+    _tr3 = _tr1->CopyTree(fullCut.RangeFullCut(year,channel,vgamma,wp,noPhoPFChIsoCut));
+    _tr3->Write();
+
+}
+
