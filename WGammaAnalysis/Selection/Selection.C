@@ -105,6 +105,13 @@ void Selection::LoopOverInputFiles()
   for (int iSource=0; iSource<nSources; iSource++)
     {
 //       std::cout<<_INPUT->allInputs_[iSource].sourceName_<<": "<<_doAnalizeSample[iSource]<<std::endl;
+
+       if (_sample==TConfiguration::BKGMC && 
+             (_INPUT->allInputs_[iSource].sourceName_=="DYjets_to_ll" ||
+              _INPUT->allInputs_[iSource].sourceName_=="Wjets_to_lnu"))
+         _isVJets=1;
+       else _isVJets=0;
+
        if (!_doAnalizeSample[iSource])
          continue;
 
@@ -122,6 +129,7 @@ void Selection::LoopOverInputFiles()
            else continue;
        std::cout<<"_sample="<<_sample<<std::endl;
        std::cout<<"_sampleMode="<<_sampleMode<<std::endl;
+       std::cout<<"_isVJets="<<_isVJets<<std::endl;
 //       _selectedTreeFileName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_blind,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
        TTree* tree;
        int inputFileNMax = _INPUT->allInputs_[iSource].nFiles_;
@@ -269,7 +277,7 @@ void Selection::LoopOverTreeEvents()
 
         TFullCuts fullCuts;
         bool selPassed = fullCuts.VeryPreliminaryCut(_eventTree.treeLeaf,
-          _channel,_vgamma,nCands,cands,_passed);
+          _channel,_vgamma,_isVJets,nCands,cands,_passed);
         
         if (!selPassed) continue;
         for (int icand=0; icand<nCands; icand++){
@@ -521,4 +529,3 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
     _tr3->Write();
 
 }
-

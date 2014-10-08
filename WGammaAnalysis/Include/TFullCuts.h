@@ -32,11 +32,13 @@ public:
   };
 
   bool VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,   
-                    int channel, int vgamma,
+                    int channel, int vgamma, bool isVJets,
                     int& nCands, Candidate* cands,
                     PassedLevels& passed);
 
   bool CheckMuon(int ilep, TEventTree::InputTreeLeaves& inpTreeLeaf, TMuonCuts& emptyMuon, PassedLevels& passed);
+
+  bool IsOverlapVJetsVGamma(int ipho, TEventTree::InputTreeLeaves& inpTreeLeaf);
 
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut(int year);

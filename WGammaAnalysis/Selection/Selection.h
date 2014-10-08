@@ -65,6 +65,7 @@ class Selection
        //int _blind;//_config.UNBLIND, _config.BLIND_PRESCALE, _config.BLIND_DECRACC
        int _sample; //_config.DATA, _config.SIGMC, _config.BKGMC
        int _vgamma;
+       bool _isVJets;
 
        bool _isDebugMode;
        bool _isNoPuReweight;

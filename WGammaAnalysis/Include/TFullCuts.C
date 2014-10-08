@@ -26,7 +26,7 @@ TFullCuts::~TFullCuts()
 }
 
 bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,   
-                    int channel, int vgamma, 
+                    int channel, int vgamma, bool isVJets,
                     int& nCands, Candidate* cands,
                     PassedLevels& passed)
 {
@@ -75,7 +75,8 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
    } //end of loop over ilep1
 
  bool kinPhotonExists=0;
-  for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++){       
+  for (int ipho=0; ipho<inpTreeLeaf.nPho; ipho++){   
+    if (isVJets && IsOverlapVJetsVGamma(ipho, inpTreeLeaf)) continue;   
     TPhotonCuts emptyPhoton;
 //    if (inpTreeLeaf.phoSCEt->at(ipho)>15) passed.phoPtPassed++;
     if (emptyPhoton.IsBarrel(inpTreeLeaf.phoSCEta->at(ipho)))
@@ -156,6 +157,32 @@ bool TFullCuts::CheckMuon(int ilep, TEventTree::InputTreeLeaves& inpTreeLeaf, TM
    }
    else return 0;
    return 0;
+}
+
+bool TFullCuts::IsOverlapVJetsVGamma(int ipho, TEventTree::InputTreeLeaves& inpTreeLeaf)
+{
+  // from Sachiko's code (Zgg, 
+  // https://github.com/sachikot/Zgg/blob/master/analyze.cc#L317-343)
+  bool pho_matched = false;
+  float dr_min = 1000.;
+  float dr;
+  for (int genPho = 0; genPho < inpTreeLeaf.nMC; ++genPho){
+    if( (*inpTreeLeaf.mcPID)[genPho] != 22 ) continue;
+    if( ((*inpTreeLeaf.mcParentage)[genPho]& 4) == 4) continue;
+    if( (*inpTreeLeaf.mcPt)[genPho] < 10 ) continue;
+    // CALCULATE DR
+    float deta = (*inpTreeLeaf.phoEta)[ipho] - (*inpTreeLeaf.mcEta)[genPho];
+    float dphi = acos(cos((*inpTreeLeaf.phoPhi)[ipho] - (*inpTreeLeaf.mcPhi)[genPho]));
+    dr = sqrt(deta*deta + dphi*dphi);
+    if(dr < dr_min) dr_min = dr;
+    if(dr < 0.2) {
+      pho_matched = true;
+      break;
+    }
+  } // loop over for gen-photon
+//  deltaR->Fill(dr_min);
+//  if(pho_matched) continue; // yes! I removed overlapping reco-photon!!
+  if(pho_matched) return 1;
 }
 
 float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 
