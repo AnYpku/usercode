@@ -11,7 +11,7 @@ class TPhotonCuts
     virtual ~TPhotonCuts();
 
 
-    bool PassedKinematics(float phoPt, float phoEta);
+    bool PassedKinematics(float phoPt, float phoEta, bool& ifPassedPt, bool& ifPassedEta);
 
      //see https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonID2012
      //for reference
@@ -68,7 +68,7 @@ class TPhotonCuts
 
   private:
 
-    const static float _phoPtCut = 10.0;
+    const static float _phoPtCut = 15.0;
       //WP - working point
       //nWP - total number of working points
       //0 - loose  (90% for barrel, 85% for endcap) 

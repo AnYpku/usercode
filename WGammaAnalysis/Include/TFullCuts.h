@@ -10,18 +10,25 @@
 #include "../Configuration/TConfiguration.h"
 #include "TEventTree.h"
 #include "TMuonCuts.h"
+#include "TPhotonCuts.h"
 
 class TFullCuts{
 public:
   TFullCuts();
   virtual ~TFullCuts();
   struct PassedLevels{
+    long triggerPassed;
+    long goodVertexPassed;
+    long phoPtPassed;
+    long phoEtaPassed;
+    long vgvjOverlapPassed;
     long leptonPtPassed;
     long leptonEtaPassed;
-    long phoPtPassed;
-    long phoBarrelPassed;
-    long phoEndcapPassed;
     long dRPassed;
+    long evAfterKinCuts;
+
+//    long phoBarrelPassed;
+//    long phoEndcapPassed;
   };
   struct Candidate{
     int ipho;
@@ -36,9 +43,6 @@ public:
                     int& nCands, Candidate* cands,
                     PassedLevels& passed);
 
-  bool CheckMuon(int ilep, TEventTree::InputTreeLeaves& inpTreeLeaf, TMuonCuts& emptyMuon, PassedLevels& passed);
-
-  bool IsOverlapVJetsVGamma(int ipho, TEventTree::InputTreeLeaves& inpTreeLeaf);
 
   float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut(int year);
@@ -53,6 +57,21 @@ public:
 
 private:
   TConfiguration _config;
+  TMuonCuts _emptyMuon;
+  TPhotonCuts _emptyPhoton;
+
+  TEventTree::InputTreeLeaves _inpTreeLeaf;
+  PassedLevels _passed;
+  Candidate* _cands;
+  bool* _kinPhoton;
+  bool* _kinLepton1;
+  bool* _kinLepton2;
+  void CheckDRandProceed(int vgamma, bool isVJets, int& icand,
+                    bool& hasEventAfterPass, bool& hasOverlap,
+                    float dR1, float dR2, int ipho, int ilep1, int ilep2);
+  bool IsOverlapVJetsVGamma(int ipho);
+  
+
   const static float _WMtCut2012 = 50.;//for 8 TeV
   const static float _WMtCut2011 = 70.;//from 7 TeV
   const static float _lePhoDeltaRCut = 0.7;//0.7;

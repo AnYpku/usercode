@@ -7,7 +7,7 @@
 #include "../Selection/Selection.h"
 #include "../DDBkgTemplateMethod/TTemplates.h"
 #include "../PrepareYields/TPrepareYields.h"
-//#include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
+#include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
 //#include "../CrossSection/CalcCrossSection.h"
 
 #include <iostream>
@@ -36,7 +36,7 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.analyzedSamples="";
   anPars.configfile="../Configuration/config.txt";
   anPars.isNoPuReweight=0;
-  anPars.isDebugMode=0;
+  anPars.isDebugMode=1;
   anPars.noAdjustBinning=0;
   anPars.isMetCutOptimization=0;
   anPars.doSystTemplateStat=0;
@@ -174,11 +174,20 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
   if (varKin=="WMt"){
     anPars.isMetCutOptimization=1;
     anPars.varKin=varKin;
-    anPars.nKinBins=12;
+    anPars.nKinBins=14;
 //    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=0+10*ib;
+      anPars.kinBinLims[ib]=50+5*ib;
+  }
+  if (varKin=="Mleplep"){
+    anPars.isMetCutOptimization=0;
+    anPars.varKin=varKin;
+    anPars.nKinBins=30;
+//    anPars.nKinBins=2;
+    anPars.kinBinLims=new float[anPars.nKinBins+1];
+    for (int ib=0; ib<anPars.nKinBins+1; ib++)
+      anPars.kinBinLims[ib]=50+2*ib;
   }
   if (varKin=="lep1PhoDeltaR" || varKin=="lep2PhoDeltaR"){
     anPars.varKin=varKin;
@@ -212,11 +221,11 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Preliminary Selection"<<std::endl;
     if (anPars.sampleMode!=Selection::NOTSPECIFIED){
-      Selection selection(anPars.channel,anPars.vgamma,anPars.sampleMode,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
+      Selection selection(anPars.channel,anPars.vgamma,anPars.sampleMode,anPars.blind,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
       selection.LoopOverInputFiles();
     }
     else{
-      Selection selection(anPars.channel,anPars.vgamma,anPars.analyzedSamples,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
+      Selection selection(anPars.channel,anPars.vgamma,anPars.analyzedSamples,anPars.blind,anPars.configfile,anPars.isNoPuReweight,anPars.isDebugMode);
       selection.LoopOverInputFiles();
     }
     std::cout<<"%_%  DONE Preliminary Selection"<<std::endl;
@@ -247,22 +256,22 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //prepare yields and subtract background
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
-    TPrepareYields yields(anPars.year, anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims,anPars.isMetCutOptimization, anPars.phoWP);
+    TPrepareYields yields(anPars.year, anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims,anPars.isMetCutOptimization, anPars.phoWP, anPars.noDDBkgComputation);
     yields.PrepareYields();
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
-/*
+
   if (!anPars.noCalcAccAndEff){
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Compute Acceptance and Efficiency"<<std::endl;
-    CalcAccAndEff accAndEff(anPars.year, anPars.channel, anPars.phoWP, anPars.configfile, anPars.isNoPuReweight, anPars.isDebugMode);
+    CalcAccAndEff accAndEff(anPars.year, anPars.channel, anPars.vgamma, anPars.phoWP, anPars.configfile, anPars.isNoPuReweight, anPars.isDebugMode);
     accAndEff.LoopOverInputFiles();
     std::cout<<"%_%  DONE Compute Acceptance and Efficiency"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
-
+/*
   if (!anPars.noCalcCrossSection){
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;

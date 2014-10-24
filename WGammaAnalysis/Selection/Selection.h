@@ -23,8 +23,8 @@ class Selection
      //TSelectedEventsTree - class for output tree and output root file
      public:
        Selection ();
-       Selection (int channel, int vgamma, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
-       Selection(int channel, int vgamma, string analyzedSampleNames,  string configFile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       Selection (int channel, int vgamma, int sampleMode = ALL, int blind = TConfiguration::BLIND_PRESCALE, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       Selection(int channel, int vgamma, string analyzedSampleNames,  int blind = TConfiguration::BLIND_PRESCALE, string configFile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
        virtual ~Selection();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
@@ -33,7 +33,8 @@ class Selection
        void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int wp, bool noPhoPFChIsoCut);
        void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind, bool noPhoPFChIsoCut);
 
-       enum {DATA, SIGMC, BKGMC, MC, NOBKG, ALL, NOTSPECIFIED};
+       enum {DATA, SIGMC, BKGMC, MC, NOBKG, ALL, NOTSPECIFIED};//sampleMode
+       TString StrSampleMode(int sampleMode);
 
 
      private:
@@ -42,14 +43,8 @@ class Selection
        TEventTree _eventTree;
 
        TSelectedEventsTree _selEvTree;
-       TSelectedEventsTree _selEvTree_blindDecrAcc;
-       TSelectedEventsTree _selEvTree_blindPrescale;
        TTree* _outTree;
-       TTree* _outTree_blindDecrAcc;
-       TTree* _outTree_blindPrescale;
        TFile* _fileOut;
-       TFile* _fileOut_blindDecrAcc;
-       TFile* _fileOut_blindPrescale;
        TRandom _rnd;
 
        TConfiguration _config;
@@ -65,6 +60,7 @@ class Selection
        //int _blind;//_config.UNBLIND, _config.BLIND_PRESCALE, _config.BLIND_DECRACC
        int _sample; //_config.DATA, _config.SIGMC, _config.BKGMC
        int _vgamma;
+       int _blind;
        bool _isVJets;
 
        bool _isDebugMode;

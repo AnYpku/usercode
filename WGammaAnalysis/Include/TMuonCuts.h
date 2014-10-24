@@ -11,7 +11,7 @@ class TMuonCuts
        TMuonCuts ();
        virtual ~TMuonCuts();
        bool HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <float> *muEta);
-       bool PassedKinematics(float muPt, float muEta);
+       bool PassedKinematics(float muPt, float muEta, bool& ifPassedPt, bool& ifPassedEta);
        float MuIsolation2012(float muPt, 
                  float muPFIsoR04_NH, float muPFIsoR04_Pho, 
                  float muPFIsoR04_PU,float muPFIsoR04_CH);
@@ -30,11 +30,12 @@ class TMuonCuts
 
        TCut RangeId(int year, int ilep);
        TCut RangeIsolation(int year, int ilep);
-       TCut RangeTriggerMatch(int ilep);
-       TCut RangeMuon(int year, int ilep, bool doIsoCut=1, bool doIdCut=1, bool doTrgCut=1);
+       TCut RangeTriggerMatch(int vgamma, int ilep);
+       TCut RangeTriggerOne(TString strHLT, TString strMuTrg);
+       TCut RangeMuon(int year, int vgamma, int ilep, bool doIsoCut=1, bool doIdCut=1, bool doTrgCut=1);
 
      private:
-
+       TConfiguration _config;
        const static float _muPtCut=26.;
        const static float _extraMuPtCut=10.;
        const static float _muEtaCut=2.1;

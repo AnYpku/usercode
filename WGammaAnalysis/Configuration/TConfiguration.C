@@ -22,6 +22,50 @@ TConfiguration::~TConfiguration()
 {
 }
 
+TString TConfiguration::StrChannel(int channel){
+  if (channel==MUON) return "MUON";
+  if (channel==ELECTRON) return "ELECTRON";
+  if (channel==BOTH) return "BOTH";
+}
+ 
+TString TConfiguration::StrVgType(int vg_type){
+  if (vg_type==W_GAMMA) return "W_GAMMA";
+  if (vg_type==Z_GAMMA) return "Z_GAMMA";
+  if (vg_type==V_GAMMA) return "V_GAMMA";
+} 
+
+TString TConfiguration::StrSample(int sample){
+  if (sample==DATA) return "DATA";
+  if (sample==SIGMC) return "SIGMC";
+  if (sample==BKGMC) return "BKGMC";
+}
+ 
+TString TConfiguration::StrBlindType(int blind){
+  if (blind==UNBLIND) return "UNBLIND";
+  if (blind==BLIND_PRESCALE) return "BLIND_PRESCALE";
+  if (blind==BLIND_DECRACC) return "BLIND_DECRACC";
+}
+
+TString TConfiguration::StrEtaBin(int etaBin){
+  if (etaBin==BARREL) return "BARREL";
+  if (etaBin==ENDCAP) return "ENDCAP";
+  if (etaBin==COMMON) return "COMMON";
+}
+
+TString TConfiguration::StrCsMode(int csMode){
+  if (csMode==TOTAL) return "TOTAL"; 
+  if (csMode==ONEDI) return "ONEDI"; 
+  if (csMode==TWODI) return "TWODI"; 
+}
+
+TString TConfiguration::StrSelectionStage(int sel){
+  if (sel==VERY_PRELIMINARY) return "VERY_PRELIMINARY"; 
+  if (sel==PRELIMINARY_FOR_MET_CUT) return "PRELIMINARY_FOR_MET_CUT"; 
+  if (sel==PRELIMINARY_FOR_TEMPLATE_METHOD) return "PRELIMINARY_FOR_TEMPLATE_METHOD"; 
+  if (sel==PRELIMINARY_FOR_UNFOLDING) return "PRELIMINARY_FOR_UNFOLDING"; 
+  if (sel==FULLY) return "FULLY"; 
+}
+
 void TConfiguration::Print()
 {
 

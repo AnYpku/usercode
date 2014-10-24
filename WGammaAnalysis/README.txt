@@ -21,12 +21,12 @@ to run splitter, one should go to
 
 $ cd SkimSplitMerge
 
-in file runSplitWGamma.C, type nameWGammaInput (original WGamma ggNtuple)
+in file runSplitVGamma.C, type nameVGammaInput (original WGamma ggNtuple)
 nameWGammaEle/Muo/Tau - names of three output files including intended dir where they are wanted to be saved
 nameDir and nameTree don't need to be changed
 
 then run
-$ root -l runSplitWGamma.C
+$ root -l runSplitVGamma.C
 
 do to skimming of data and MC files SkimLeptonPhoton can be used
 skimming can be done for muon, electron analysis or for both at the same time 
@@ -48,15 +48,15 @@ which sets the parameters to the default values and it can be use to run the who
 Hovewer in practical purposes it's frequently needed to run only some parts of analysis or run Selection in debugMode or look at the WMt rather than phoPt yields etc.
 
 The FullChain runs the analysis in the following order:
-2.1) with class WGammaSelection (in Selection directory)
-     Preliminary Selection (can be excluded with anPars.noPreSelection=1)
-     Extra Selection (anPars.noExtraSelection)
+2.1) with class Selection (in Selection directory)
+     Preliminary Selection (can be skipped with anPars.noPreSelection=1)
+     Extra Selection (can be skipped with anPars.noExtraSelection)
 2.2) with class TTemplates (in DDBkgTemplateMethod directory)
-     Data Driven Background Estimation (jets to gamma only) (anPars.noDDBkgComputation)
+     Data Driven Background Estimation (jets to gamma only) (can be skipped with anPars.noDDBkgComputation)
 2.3) with class PrepareYields
      Prepare Yields (anPars.noPrepareYields)
 2.4) with class CalcAccAndEff (AcceptanceAndEfficiency directory)
-     Calculation of efficiency and acceptance (anPars.noCalcAccAndEff)
+     Calculation of efficiency and acceptance (can be skipped with anPars.noCalcAccAndEff)
 2.5) with class CalcCrossSection (CrossSection directory)
      Calculation of CrossSection
      Unfolding constants are computed on the fly in CalcCrossSection
@@ -65,11 +65,11 @@ The FullChain runs the analysis in the following order:
 2.1) Selection
 - performs event selection cuts
 - selection is performed in two steps:
-  WGammaSelection::LoopOverTree() - does VeryPreliminary selection, only kinematic cuts are applied (phoEta, muPt, muEta, dR(pho,mu))
+  Selection::LoopOverTree() - does VeryPreliminary selection, only kinematic cuts are applied (phoEta, muPt, muEta, dR(pho,mu))
     it stores the preselected trees in WGammaOutput/MUON/VeryPreliminarySelected/
     one root file for each MC source (ttjets to 1l and to 2l are combined to be 1 source; WWg, WW, WZ are also combined to  1 source)
     and three root files for data: UNblind; blindPRESCALE; blindDECRACC (now blindDECRACC is blind combined method)
-  WGammaSelection::ExtraSelection() - with TTree::CopyTree() does Preliminary for template method selection, Preliminary for WMt cut optimization and Fully selection 
+  Selection::ExtraSelection() - with TTree::CopyTree() does Preliminary for template method selection, Preliminary for WMt cut optimization and Fully selection 
     for each preselected tree prepares 3 trees and store them to:
     WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/
     WGammaOutput/MUON/PreliminaryForMetCutSelected/

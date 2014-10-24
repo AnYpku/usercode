@@ -15,8 +15,8 @@ class TSelectionPlots {
 public:
   TSelectionPlots();
   virtual ~TSelectionPlots();
-  bool GetTrees(int channel, int blind, string confFile, string strSources="ALL");
-  void SelectionEfficiencyInStages(int year, int wp, TString strIsoBase);
+  bool GetTrees(int channel, int vgamma, int blind, string confFile, string strSources="ALL");
+  void SelectionEfficiencyInStages(int year, int vgamma, int wp, TString strIsoBase);
   void SelectionEfficiencyOneStage(int nSources, int* nTot, int* nPass, float* eff, TCut cut, TCut cutExtra, TString strCutDescription="");
   bool SetHistograms(int blind, TString plotVar, int nBins, float* binLimits, TCut cutWhole="weight", TCut cutCutted="weight");
   void SetSourceIndex(int iHist);

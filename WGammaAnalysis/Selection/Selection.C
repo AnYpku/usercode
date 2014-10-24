@@ -25,12 +25,13 @@ Selection::Selection()
 {
 }
 
-Selection::Selection(int channel, int vgamma, int sampleMode, string configFile, bool isNoPuReweight, bool isDebugMode)
+Selection::Selection(int channel, int vgamma, int sampleMode, int blind, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
 
   _INPUT = new TAllInputSamples(channel, vgamma,configFile);
   _vgamma=vgamma;
   _channel=channel;
+  _blind=blind; 
   _isNoPuReweight=isNoPuReweight;
   _isDebugMode=isDebugMode;
   _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
@@ -38,7 +39,7 @@ Selection::Selection(int channel, int vgamma, int sampleMode, string configFile,
 
   _sampleMode=sampleMode;
   if (_sampleMode==NOTSPECIFIED){
-    std::cout<<"ERROR in Selection::Selection: _sampleMode is NONSPECIFIED"<<std::endl;
+    std::cout<<"ERROR in Selection::Selection: _sampleMode is NOTSPECIFIED"<<std::endl;
     return;
   }
   else if (_sampleMode>NOTSPECIFIED){
@@ -49,21 +50,18 @@ Selection::Selection(int channel, int vgamma, int sampleMode, string configFile,
     {
       _doAnalizeSample.push_back(1);      
     } 
-
 }
 
-Selection::Selection(int channel, int vgamma, string analyzedSampleNames, string configFile, bool isNoPuReweight, bool isDebugMode)
+Selection::Selection(int channel, int vgamma, string analyzedSampleNames, int blind, string configFile, bool isNoPuReweight, bool isDebugMode)
 {
-
   _INPUT = new TAllInputSamples(channel, vgamma, configFile);
-
   _channel=channel;
   _vgamma=vgamma;
+  _blind=blind;
   _isNoPuReweight=isNoPuReweight;
   _isDebugMode=isDebugMode;
   _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
     //field of this class, Selection
-
   _sampleMode=NOTSPECIFIED;
   stringstream ss(analyzedSampleNames);
   vector <string> names;
@@ -71,7 +69,6 @@ Selection::Selection(int channel, int vgamma, string analyzedSampleNames, string
   while (ss >> name) 
     names.push_back(name);
   int nNames = names.size();
-
   std::cout<<"1 - will do, 0 - will not do"<<std::endl;
   for (int i=0; i<_INPUT->nSources_; i++)
     {
@@ -85,7 +82,6 @@ Selection::Selection(int channel, int vgamma, string analyzedSampleNames, string
     }  
   if ((int)_doAnalizeSample.size()!=_INPUT->nSources_)
     std::cout<<"ERROR in Selection::Selection: wrong _doAnalizeSample.size()"<<std::endl;
-
 }
 
 Selection::~Selection()
@@ -95,63 +91,70 @@ Selection::~Selection()
    //delete _photonCorrector;
 }
 
+TString Selection::StrSampleMode(int sampleMode)
+{
+  if (sampleMode==DATA) return "DATA";
+  if (sampleMode==SIGMC) return "SIGMC";
+  if (sampleMode==BKGMC) return "BKGMC";
+  if (sampleMode==MC) return "MC";
+  if (sampleMode==NOBKG) return "NOBKG";
+  if (sampleMode==ALL) return "ALL";
+  if (sampleMode==NOTSPECIFIED) return "NOTSPECIFIED";
+  return "sampleMode="+TString(sampleMode)+"is unknown";
+}
+
 void Selection::LoopOverInputFiles()
 {
-
   int nSources = _INPUT->nSources_; 
-  //if (_isDebugMode && nSources>3)
-  //  nSources = 3;
-
   for (int iSource=0; iSource<nSources; iSource++)
     {
-//       std::cout<<_INPUT->allInputs_[iSource].sourceName_<<": "<<_doAnalizeSample[iSource]<<std::endl;
-
-       if (_sample==TConfiguration::BKGMC && 
-             (_INPUT->allInputs_[iSource].sourceName_=="DYjets_to_ll" ||
-              _INPUT->allInputs_[iSource].sourceName_=="Wjets_to_lnu"))
+       //sources are data, sigmc, DYjets, multibosons etc.
+       //each source may consist of several input files
+       if (_INPUT->allInputs_[iSource].sourceName_=="DYjets_to_ll" ||
+              _INPUT->allInputs_[iSource].sourceName_=="Wjets_to_lnu")
          _isVJets=1;
        else _isVJets=0;
-
        if (!_doAnalizeSample[iSource])
          continue;
-
        _sample = _INPUT->allInputs_[iSource].sample_;
-       if (_sample==TConfiguration::DATA){
+       if (_sample==_config.DATA){
            _lumiData=_INPUT->allInputs_[iSource].lumiTotal_;
            if (_sampleMode==ALL || _sampleMode==DATA || _sampleMode==NOBKG || _sampleMode==NOTSPECIFIED);
            else continue;
        }
-       if (_sample==TConfiguration::SIGMC)
+       if (_sample==_config.SIGMC){
            if (_sampleMode==ALL || _sampleMode==SIGMC || _sampleMode==MC || _sampleMode==NOBKG || _sampleMode==NOTSPECIFIED);
            else continue;
-       if (_sample==TConfiguration::BKGMC)
+       }
+       if (_sample==_config.BKGMC){
            if (_sampleMode==ALL || _sampleMode==BKGMC || _sampleMode==MC || _sampleMode==NOTSPECIFIED);
            else continue;
-       std::cout<<"_sample="<<_sample<<std::endl;
-       std::cout<<"_sampleMode="<<_sampleMode<<std::endl;
-       std::cout<<"_isVJets="<<_isVJets<<std::endl;
-//       _selectedTreeFileName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_blind,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+       }
+       std::cout<<"_channel="<<_channel<<"("<<_config.StrChannel(_channel)<<")";
+       std::cout<<", _vgamma="<<_vgamma<<"("<<_config.StrVgType(_vgamma)<<")"<<std::endl;
+       std::cout<<"_sample="<<_sample<<"("<<_config.StrSample(_sample)<<")";
+       std::cout<<", _sampleMode="<<_sampleMode<<"("<<StrSampleMode(_sampleMode)<<")"<<std::endl;
+       std::cout<<"sourceName="<<_INPUT->allInputs_[iSource].sourceName_<<", _isVJets="<<_isVJets<<std::endl;
        TTree* tree;
        int inputFileNMax = _INPUT->allInputs_[iSource].nFiles_;
-
-//       fileOutName = _selectedTreeFileName;
-       TString fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.UNBLIND,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+       TString fileOutName;
+       if (_sample==TConfiguration::DATA) 
+         fileOutName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_blind,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
+       else
+         fileOutName=_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.UNBLIND,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
        _fileOut = new TFile(fileOutName,"recreate");
        _outTree = new TTree("selectedEvents","selected Events");
-       _selEvTree.SetAsOutputTree(_outTree); 
+       _selEvTree.SetAsOutputTree(_outTree);
 
-       if (_sample==_config.DATA){
-         //blind "decreasing acceptance factors"
-         fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.BLIND_DECRACC,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
-         _fileOut_blindDecrAcc = new TFile(fileOutName,"recreate");
-         _outTree_blindDecrAcc = new TTree("selectedEvents","selected Events");
-         _selEvTree_blindDecrAcc.SetAsOutputTree(_outTree_blindDecrAcc);
-         //blind data prescale 
-         fileOutName = _config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.BLIND_PRESCALE,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_,_isDebugMode,_isNoPuReweight);
-         _fileOut_blindPrescale = new TFile(fileOutName,"recreate");
-         _outTree_blindPrescale = new TTree("selectedEvents","selected Events");
-         _selEvTree_blindPrescale.SetAsOutputTree(_outTree_blindPrescale); 
-       }
+       _passed.triggerPassed=0;
+       _passed.goodVertexPassed=0;
+       _passed.leptonPtPassed=0;
+       _passed.leptonEtaPassed=0;
+       _passed.evAfterKinCuts=0;
+       _passed.vgvjOverlapPassed=0;
+       _passed.phoPtPassed=0;
+       _passed.phoEtaPassed=0;
+       _passed.dRPassed=0;
 
        for (_inputFileN=0; _inputFileN< inputFileNMax; _inputFileN++){
 
@@ -166,48 +169,30 @@ void Selection::LoopOverInputFiles()
          tree = (TTree*)gDirectory->Get("EventTree");
          if (tree){
            _eventTree.Init(tree);
-           //if (_sample!=TConfiguration::DATA) SetMCSpecificAddresses();
+           //if (_sample!=_config.DATA) SetMCSpecificAddresses();
          }   
          else{
            std::cout<<"ERROR detected in Selection::LoopOverInputFiles: tree in the file "<<_INPUT->allInputs_[iSource].fileNames_[_inputFileN]<<" does not exist"<<std::endl;
            return;
          }  
-
          //determine _lumiWeight
-         if (_sample==_config.DATA)
-           _lumiWeight=1;
-         else{
-           _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[_inputFileN];
-         }
+         if (_sample==_config.DATA) _lumiWeight=1;
+         else _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[_inputFileN];
          std::cout<<"_lumiWeight="<<_lumiWeight<<std::endl;
+         _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);      
 
+         LoopOverTreeEvents();//method of this class (Selection)
 
-         _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[iSource].fileNames_[_inputFileN]);         
-         LoopOverTreeEvents();
-             //method of this class (Selection)
-         _eventTree.fChain=0;
-             //field of TEventTree
+         _eventTree.fChain=0;//field of TEventTree
          delete _puWeight;
        }//loop over _inputFileN ends
-      std::cout<<"the output will be saved to "<<_fileOut->GetName()<<std::endl<<std::endl;
+       std::cout<<"the output will be saved to "<<_fileOut->GetName()<<std::endl<<std::endl;
       _fileOut->cd();
       _outTree->Write();
       _fileOut->Close();
       //delete outTree;
       _outTree = 0;
-      if (_sample==_config.DATA){
-        _fileOut_blindDecrAcc->cd();
-        _outTree_blindDecrAcc->Write();
-        _fileOut_blindDecrAcc->Close();
-        _outTree_blindDecrAcc = 0;
-        _fileOut_blindPrescale->cd();
-        _outTree_blindPrescale->Write();
-        _fileOut_blindPrescale->Close();
-        _outTree_blindPrescale = 0;
-      }
-
     } //loop over iSource ends
-
 }
 
 
@@ -221,174 +206,86 @@ void Selection::LoopOverTreeEvents()
        else nentries=_debugModeNEntries;
      }
 
-   float nTotal=0;
-   float nPassed=0;
-
-   _passed.leptonPtPassed=0;
-   _passed.leptonEtaPassed=0;
-   _passed.phoPtPassed=0;
-   _passed.phoBarrelPassed=0;
-   _passed.phoEndcapPassed=0;
-   _passed.leptonPtPassed=0;
-   _passed.dRPassed=0;
+   int nTotal=0;
+   int nPassed=0;
+   int nBlind=0;
+   float nTotalW=0;//weighted
+   float nPassedW=0;//weighted
+   float nBlindW=0;
 
    //goodLeptonPhotonPairs(two-dimentional array of bool-s)
    //memory allocation for some variables: 
    int nLeptonMax;
-   if (_channel==TConfiguration::MUON) nLeptonMax=_eventTree.kMaxnMu;
-   else if (_channel==TConfiguration::ELECTRON) nLeptonMax=_eventTree.kMaxnEle;
+   if (_channel==_config.MUON) nLeptonMax=_eventTree.kMaxnMu;
+   else if (_channel==_config.ELECTRON) nLeptonMax=_eventTree.kMaxnEle;
      //kMaxnMu - field of TEventTree
    else{
        std::cout<<"Error detected in Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
        return;
    }
 
-   float* WMt = new float[nLeptonMax];
-
-//   float** lePhoDeltaR = new float*[nLeptonMax];
-//   for (int ile=0; ile<nLeptonMax; ile++)
-//     lePhoDeltaR[ile]=new float[_eventTree.kMaxnPho];
-   
    int nCands=_eventTree.kMaxnPho*nLeptonMax;
    TFullCuts::Candidate cands[nCands];
 
    CheckMaxNumbersInTree();
 
-
    TPhotonCuts emptyPhoton;
-   for (Long64_t entry=0; entry<nentries; entry++) 
+   for (Long64_t ientry=0; ientry<nentries; ientry++){
    //loop over events in the tree
-     {
+     _eventTree.GetEntryNeededBranchesOnly(_channel,_sample,ientry);
 
-        _eventTree.GetEntryNeededBranchesOnly(_channel,_sample,entry);
-        if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(entry);
-          //method of TEventTree class
-        if (_channel==TConfiguration::MUON) _nLe=_eventTree.treeLeaf.nMu;
-        else if (_channel==TConfiguration::ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
-        else{
-             std::cout<<"Error detected in  Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
-             return;
-        }
-        _totalWeight = _lumiWeight;
-        if (!_eventTree.treeLeaf.isData && !_isNoPuReweight)
-          _totalWeight*=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
-        nTotal+=_totalWeight;
+     if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(ientry);
+     //method of TEventTree class
+     if (_channel==_config.MUON) _nLe=_eventTree.treeLeaf.nMu;
+     else if (_channel==_config.ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
+     else{
+       std::cout<<"Error detected in  Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
+       return;
+     }
 
+     _totalWeight = _lumiWeight;
+     if (!_eventTree.treeLeaf.isData && !_isNoPuReweight)
+       _totalWeight*=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+     nTotalW+=_totalWeight;
+     nTotal+=1;
 
-        TFullCuts fullCuts;
-        bool selPassed = fullCuts.VeryPreliminaryCut(_eventTree.treeLeaf,
-          _channel,_vgamma,_isVJets,nCands,cands,_passed);
-        
-        if (!selPassed) continue;
-        for (int icand=0; icand<nCands; icand++){
-            nPassed+=_totalWeight;
-            float puWeightVal=1;
-            float puTrueVal=1;
-            if (_sample!=TConfiguration::DATA){
-              puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
-              puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
-            }//end of if (_sample!=TConfiguration::DATA)            
-            _selEvTree.SetValues(_channel, _sample, 
-               _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
-               cands[icand].dRlep1pho, cands[icand].dRlep2pho,_inputFileN, 
-               _totalWeight, puWeightVal, puTrueVal,
-               _photonCorrector);
-            _outTree->Fill();
-            if (_sample==_config.DATA){
-              bool ifBeforeThreshold = (_eventTree.treeLeaf.phoEt->at(cands[icand].ipho) <= _config.GetPhoPtBlindThreshold());
-              if (ifBeforeThreshold){
-                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
-                   _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
-                   cands[icand].dRlep1pho, cands[icand].dRlep2pho, _inputFileN, 
-                   _totalWeight, puWeightVal, puTrueVal,
-                   _photonCorrector);
-                _outTree_blindDecrAcc->Fill(); 
-              }
-              else if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
-                _totalWeight*=_config.GetBlindPrescale();
-                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
-                   _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
-                   cands[icand].dRlep1pho, cands[icand].dRlep2pho, _inputFileN, 
-                   _totalWeight, puWeightVal, puTrueVal,
-                   _photonCorrector);
-                _outTree_blindDecrAcc->Fill(); 
-                _totalWeight/=_config.GetBlindPrescale();
-              }
-              if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
-                _selEvTree_blindPrescale.SetValues(_channel, _sample, 
-                   _eventTree.treeLeaf,  cands[icand].ipho, cands[icand].ilep1, cands[icand].ilep2, 
-                   cands[icand].dRlep1pho, cands[icand].dRlep2pho, _inputFileN, 
-                   _totalWeight, puWeightVal, puTrueVal,
-                   _photonCorrector);
-                _outTree_blindPrescale->Fill();
-              }
-            }//if (_sample==_config.DATA)
-        }
-/*
-        for (int ile=0; ile<_nLe; ile++){
-          for (int ipho=0; ipho<_eventTree.treeLeaf.nPho; ipho++){
-            if (!goodLeptonPhotonPairs[ile][ipho]) continue;
-            nPassed+=_totalWeight;
-            float puWeightVal=1;
-            float puTrueVal=1;
-            if (_sample!=TConfiguration::DATA){
-              puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
-              puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
-            }//end of if (_sample!=TConfiguration::DATA)            
-            _selEvTree.SetValues(_channel, _sample, 
-               _eventTree.treeLeaf,  ipho, ile, 
-               lePhoDeltaR[ile][ipho], _inputFileN, 
-               _totalWeight, puWeightVal, puTrueVal,
-               _photonCorrector);
-            _outTree->Fill();
-            if (_sample==_config.DATA){
-              bool ifBeforeThreshold = (_eventTree.treeLeaf.phoEt->at(ipho) <= _config.GetPhoPtBlindThreshold());
-              if (ifBeforeThreshold){
-                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
-                   _eventTree.treeLeaf,  ipho, ile, 
-                   lePhoDeltaR[ile][ipho], _inputFileN, 
-                   _totalWeight, puWeightVal, puTrueVal,
-                   _photonCorrector);
-                _outTree_blindDecrAcc->Fill(); 
-              }
-              else if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
-                _totalWeight*=_config.GetBlindPrescale();
-                _selEvTree_blindDecrAcc.SetValues(_channel, _sample, 
-                   _eventTree.treeLeaf,  ipho, ile, 
-                   lePhoDeltaR[ile][ipho], _inputFileN, 
-                   _totalWeight, puWeightVal, puTrueVal,
-                   _photonCorrector);
-                _outTree_blindDecrAcc->Fill(); 
-                _totalWeight/=_config.GetBlindPrescale();
-              }
-              if (_rnd.Uniform() < 1./_config.GetBlindPrescale()){
-                _selEvTree_blindPrescale.SetValues(_channel, _sample, 
-                   _eventTree.treeLeaf,  ipho, ile, 
-                   lePhoDeltaR[ile][ipho], _inputFileN, 
-                   _totalWeight, puWeightVal, puTrueVal,
-                   _photonCorrector);
-                _outTree_blindPrescale->Fill();
-              }
-            }//if (_sample==_config.DATA)
-          }// "for (int ipho=0; ipho<treeLeaf.nPho; ipho++)"
-        }  // "for (int ile=0; ile<_nLe; ile++)"
-*/
-     } //end of loop over events in the tree
+     if (_sample==_config.DATA && _blind==_config.BLIND_PRESCALE && (_eventTree.treeLeaf.event % _config.GetBlindPrescale() != 0)) continue;
+     nBlind+=1;
+     nBlindW+=_totalWeight;
+       //added blinding prescaling into the beginning
+     TFullCuts fullCuts;
+     bool selPassed = fullCuts.VeryPreliminaryCut(_eventTree.treeLeaf,
+       _channel,_vgamma,_isVJets,nCands,cands,_passed);        
+     if (!selPassed) continue;
+     for (int icand=0; icand<nCands; icand++){
+       nPassedW+=_totalWeight;
+       nPassed+=1;
+       float puWeightVal=1;
+       float puTrueVal=1;
+       if (_sample!=_config.DATA){
+         puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
+         puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
+       }//end of if (_sample!=_config.DATA)            
+       _selEvTree.SetValues(_channel, _sample, _eventTree.treeLeaf,  cands[icand],_inputFileN, 
+               _totalWeight, puWeightVal, puTrueVal, _photonCorrector);
+       _outTree->Fill();
+     }//end of loop over icand
 
-  //memory release:
+  } //end of loop over ientry in the tree
 
- 
-  delete WMt;
- 
   std::cout<<"Summary:"<<std::endl;
-  std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<std::endl;
-  std::cout<<"leptonPt="<<_passed.leptonPtPassed<<", leptonEta="<<_passed.leptonEtaPassed<<", ptoPt="<<_passed.phoPtPassed<<", phoBarrel="<<_passed.phoBarrelPassed<<", phoEndcap="<<_passed.phoEndcapPassed<<", dR="<<_passed.dRPassed<<std::endl;
+  std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<", nBlind="<<nBlind<<std::endl;
+  std::cout<<"Weighted:"<<"nTotal="<<nTotalW<<", nPassed="<<nPassedW<<", eff="<<(float)nPassedW/nTotalW<<", nBlind="<<nBlindW<<std::endl;
+  std::cout<<"goodVertexPassed="<<_passed.goodVertexPassed<<", triggerPassed="<<_passed.triggerPassed<<", phoPt="<<_passed.phoPtPassed<<", phoEta="<<_passed.phoEtaPassed<<", vgvjOverlapPassed="<<_passed.vgvjOverlapPassed<<std::endl;
+  std::cout<<"leptonPt="<<_passed.leptonPtPassed<<", leptonEta="<<_passed.leptonEtaPassed<<", dR="<<_passed.dRPassed<<std::endl;
+  std::cout<<"evAfterKinCuts="<<_passed.evAfterKinCuts<<", evAfterKinCutsOverlap="<<_passed.evAfterKinCutsOverlap<<std::endl;
+  std::cout<<"nBlind="<<nBlind<<std::endl;
 
 }
 
 bool Selection::CheckMaxNumbersInTree()
 {
-   if ((_channel=TConfiguration::MUON) 
+   if ((_channel=_config.MUON) 
        && (_eventTree.fChain->GetMaximum("nMu")>_eventTree.kMaxnMu))
      //kMaxnMu - field of TEventTree
      {
@@ -396,7 +293,7 @@ bool Selection::CheckMaxNumbersInTree()
           //methof of this class (Selection)
        return 0;
      }
-   if (_channel==TConfiguration::ELECTRON 
+   if (_channel==_config.ELECTRON 
        && _eventTree.fChain->GetMaximum("nEle")>_eventTree.kMaxnEle)
      {
        PrintErrorMessageMaxNumberOf(_ELECTRON);
@@ -472,9 +369,7 @@ void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode
     else if(sampleMode==NOBKG && sample==config.BKGMC) continue;
 
     if (sample==config.DATA){
-      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.BLIND_PRESCALE,noPhoPFChIsoCut);
-      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.BLIND_DECRACC,noPhoPFChIsoCut);
-      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.UNBLIND,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,_blind,noPhoPFChIsoCut);
     }
     else{
       ExtraSelectionOne(INPUT,i,config,fullCut,year,channel,vgamma,wp,config.UNBLIND,noPhoPFChIsoCut);
@@ -493,29 +388,14 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
       std::cout<<"file "<<fInName<<" can't be open"<<std::endl;
       return;
     }
+
     std::cout<<"file "<<fInName<<" was open"<<std::endl;
     _tr = (TTree*)fIn.Get("selectedEvents");
 
     TString fOutName1=config.GetSelectedName(config.PRELIMINARY_FOR_MET_CUT,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut1(fOutName1,"recreate");
 
-    _trReduced = _tr->CopyTree(fullCut.RangeForMetCut(year,channel,vgamma,wp));
-    _tr1 = new TTree("selectedEvents","selected events, one candidate per event");
-    TSelectedEventsTree selEvTree;
-    selEvTree.SetAsInputTree(_trReduced);
-    selEvTree.SetAsOutputTree(_tr1);
-    long nEntries = _trReduced->GetEntries();
-    long eventCurr=0;
-    long eventPrev=-1;
-    for (long ientry=0; ientry<nEntries; ientry++){
-      _trReduced->GetEntry(ientry);
-      eventPrev=eventCurr;
-      eventCurr = selEvTree._event;
-      if (eventCurr==eventPrev) continue;
-      _tr1->Fill();
-    }
-    _trReduced->Write();
-
+    _tr1 = _tr->CopyTree(fullCut.RangeForMetCut(year,channel,vgamma,wp));
     _tr1->Write();
 
     TString fOutName2=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
@@ -525,7 +405,30 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
 
     TString fOutName3=config.GetSelectedName(config.FULLY,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
     TFile fOut3(fOutName3,"recreate");
-    _tr3 = _tr1->CopyTree(fullCut.RangeFullCut(year,channel,vgamma,wp,noPhoPFChIsoCut));
+    _tr3 = new TTree("selectedEvents","selected events, one candidate per event");
+    _trReduced = _tr1->CopyTree(fullCut.RangeFullCut(year,channel,vgamma,wp,noPhoPFChIsoCut));
+    std::cout<<std::endl;
+    std::cout<<"full Selection cut:      "<<fullCut.RangeFullCut(year,channel,vgamma,wp,noPhoPFChIsoCut).GetTitle()<<std::endl;
+    std::cout<<std::endl;
+    TSelectedEventsTree selEvTree;
+    selEvTree.SetAsInputTree(_trReduced);
+    selEvTree.SetAsOutputTree(_tr3);
+    long nEntries = _trReduced->GetEntries();
+    long eventCurr=0;
+    long eventPrev=-1;
+    for (long ientry=0; ientry<nEntries; ientry++){
+      _trReduced->GetEntry(ientry);
+      eventPrev=eventCurr;
+      eventCurr = selEvTree._event;
+      if (eventCurr==eventPrev) continue;
+      _tr3->Fill();
+    }
+    if (INPUT.allInputs_[iSource].sample_==_config.DATA && blind==_config.UNBLIND);
+    else{
+      std::cout<<"before hardest photon selection: "<<_trReduced->GetEntries()<<std::endl;
+      std::cout<<"after  hardest photon selection: "<<_tr3->GetEntries()<<std::endl;
+    }
+    _trReduced->Write();
     _tr3->Write();
 
 }

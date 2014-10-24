@@ -7,12 +7,13 @@
     //makePresentationPlots();
   
   TSelectionPlots plotter;
-  bool areTrees = plotter.GetTrees(TConfiguration::MUON, TConfiguration::BLIND_PRESCALE, "../Configuration/config.txt");
+  bool areTrees = plotter.GetTrees(TConfiguration::MUON, TConfiguration::W_GAMMA, TConfiguration::BLIND_PRESCALE, "../Configuration/config.txt");
   std::cout<<"areTrees="<<areTrees<<std::endl;
   int year = 2012;
-  int wp = TPhotonCuts::WP_TIGHT;
+  int vgamma = TConfiguration::W_GAMMA;
+  int wp = TPhotonCuts::WP_MEDIUM;
   TString strIsoBase="PF";
-  if (areTrees) plotter.SelectionEfficiencyInStages(year,wp,strIsoBase);
+  if (areTrees) plotter.SelectionEfficiencyInStages(year,vgamma,wp,strIsoBase);
 
 //  PlotWithConsequetiveCuts();
 

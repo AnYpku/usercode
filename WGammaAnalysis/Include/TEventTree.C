@@ -19,11 +19,8 @@ void TEventTree::GetEntryNeededBranchesOnly(int channel, int sample, Long64_t en
   GetEntryCommon(entry);
   if (channel==config.MUON || channel==config.BOTH) GetEntryMuoSpecific(entry);
   if (channel==config.ELECTRON || channel==config.BOTH) GetEntryEleSpecific(entry);
-  if (sample!=config.DATA){
-    GetEntryMCSpecific(entry);
-//    if (channel==config.MUON)     b_muGenIndex->GetEntry(entry);
-//    if (channel==config.ELECTRON) b_eleGenIndex->GetEntry(entry);
-  }
+  if (sample==config.DATA) GetEntryDataSpecific(entry);
+  else GetEntryMCSpecific(entry);
 }
 
 void TEventTree::GetEntryCommon(Long64_t entry)
@@ -61,6 +58,7 @@ void TEventTree::GetEntryCommon(Long64_t entry)
    b_phoSCRChIso04->GetEntry(entry);
    b_phoSCRPhoIso04->GetEntry(entry);
    b_phoSCRNeuIso04->GetEntry(entry);
+
    b_phoSCEt->GetEntry(entry);
    b_phoSCEta->GetEntry(entry);
    b_phoSCPhi->GetEntry(entry);
@@ -107,6 +105,33 @@ void TEventTree::GetEntryEleSpecific(Long64_t entry)
 {
    b_nEle->GetEntry(entry);
    b_elePt->GetEntry(entry);
+   b_elePhi->GetEntry(entry);
+   b_eleEta->GetEntry(entry);
+   b_eleSCEta->GetEntry(entry);
+   b_eledEtaAtVtx->GetEntry(entry);
+   b_eledPhiAtVtx->GetEntry(entry);
+   b_eleSigmaIEtaIEta->GetEntry(entry);
+   b_eleHoverE->GetEntry(entry);
+   b_eleHoverE12->GetEntry(entry);
+   b_elePin->GetEntry(entry);
+   b_eleD0Vtx->GetEntry(entry);
+   b_eleDzVtx->GetEntry(entry);
+   b_eleEcalEn->GetEntry(entry);
+   b_eleConvVtxFit->GetEntry(entry);
+   b_eleMissHits->GetEntry(entry);
+   b_elePFChIso03->GetEntry(entry);
+   b_elePFPhoIso03->GetEntry(entry);
+   b_elePFNeuIso03->GetEntry(entry);
+}
+
+void TEventTree::GetEntryDataSpecific(Long64_t entry)
+{
+   b_phoRandConeChIso->GetEntry(entry);   //!
+   b_phoRandConePhoIso->GetEntry(entry);   //!
+   b_phoRandConeNeuIso->GetEntry(entry);   //!
+   b_phoRandConeChIso04->GetEntry(entry);   //!
+   b_phoRandConePhoIso04->GetEntry(entry);   //!
+   b_phoRandConeNeuIso04->GetEntry(entry);   //!
 }
 
 void TEventTree::GetEntryMCSpecific(Long64_t entry)
@@ -193,18 +218,18 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.eleCharge = 0;
 //   treeLeaf.eleChargeConsistent = 0;
 //   treeLeaf.eleEn = 0;
-//   treeLeaf.eleEcalEn = 0;
+   treeLeaf.eleEcalEn = 0;
 //   treeLeaf.eleSCRawEn = 0;
 //   treeLeaf.eleSCEn = 0;
 //   treeLeaf.eleESEn = 0;
    treeLeaf.elePt = 0;
-//   treeLeaf.eleEta = 0;
-//   treeLeaf.elePhi = 0;
+   treeLeaf.eleEta = 0;
+   treeLeaf.elePhi = 0;
 //   treeLeaf.eleR9 = 0;
 //   treeLeaf.eleEtaVtx = 0;
 //   treeLeaf.elePhiVtx = 0;
 //   treeLeaf.eleEtVtx = 0;
-//   treeLeaf.eleSCEta = 0;
+   treeLeaf.eleSCEta = 0;
 //   treeLeaf.eleSCPhi = 0;
 //   treeLeaf.eleSCEtaWidth = 0;
 //   treeLeaf.eleSCPhiWidth = 0;
@@ -215,18 +240,18 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.eleDz = 0;
 //   treeLeaf.eleD0GV = 0;
 //   treeLeaf.eleDzGV = 0;
-//   treeLeaf.eleD0Vtx = 0;
-//   treeLeaf.eleDzVtx = 0;
-//   treeLeaf.eleHoverE = 0;
-//   treeLeaf.eleHoverE12 = 0;
+   treeLeaf.eleD0Vtx = 0;
+   treeLeaf.eleDzVtx = 0;
+   treeLeaf.eleHoverE = 0;
+   treeLeaf.eleHoverE12 = 0;
 //   treeLeaf.eleEoverP = 0;
-//   treeLeaf.elePin = 0;
+   treeLeaf.elePin = 0;
 //   treeLeaf.elePout = 0;
 //   treeLeaf.eleTrkMomErr = 0;
 //   treeLeaf.eleBrem = 0;
-//   treeLeaf.eledEtaAtVtx = 0;
-//   treeLeaf.eledPhiAtVtx = 0;
-//   treeLeaf.eleSigmaIEtaIEta = 0;
+   treeLeaf.eledEtaAtVtx = 0;
+   treeLeaf.eledPhiAtVtx = 0;
+   treeLeaf.eleSigmaIEtaIEta = 0;
 //   treeLeaf.eleSigmaIEtaIPhi = 0;
 //   treeLeaf.eleSigmaIPhiIPhi = 0;
 //   treeLeaf.eleEmax = 0;
@@ -272,17 +297,17 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.eleModIsoTrk = 0;
 //   treeLeaf.eleModIsoEcal = 0;
 //   treeLeaf.eleModIsoHcal = 0;
-//   treeLeaf.eleMissHits = 0;
+   treeLeaf.eleMissHits = 0;
 //   treeLeaf.eleConvDist = 0;
 //   treeLeaf.eleConvDcot = 0;
-//   treeLeaf.eleConvVtxFit = 0;
+   treeLeaf.eleConvVtxFit = 0;
 //   treeLeaf.eleIP3D = 0;
 //   treeLeaf.eleIP3DErr = 0;
 //   treeLeaf.eleIDMVANonTrig = 0;
 //   treeLeaf.eleIDMVATrig = 0;
-//   treeLeaf.elePFChIso03 = 0;
-//   treeLeaf.elePFPhoIso03 = 0;
-//   treeLeaf.elePFNeuIso03 = 0;
+   treeLeaf.elePFChIso03 = 0;
+   treeLeaf.elePFPhoIso03 = 0;
+   treeLeaf.elePFNeuIso03 = 0;
 //   treeLeaf.elePFChIso04 = 0;
 //   treeLeaf.elePFPhoIso04 = 0;
 //   treeLeaf.elePFNeuIso04 = 0;
@@ -363,12 +388,12 @@ void TEventTree::Init(TTree *tree)
    treeLeaf.phoSCRChIso04 = 0;
    treeLeaf.phoSCRPhoIso04 = 0;
    treeLeaf.phoSCRNeuIso04 = 0;
-//   treeLeaf.phoRandConeChIso = 0;
-//   treeLeaf.phoRandConePhoIso = 0;
-//   treeLeaf.phoRandConeNeuIso = 0;
-//   treeLeaf.phoRandConeChIso04 = 0;
-//   treeLeaf.phoRandConePhoIso04 = 0;
-//   treeLeaf.phoRandConeNeuIso04 = 0;
+   treeLeaf.phoRandConeChIso = 0;
+   treeLeaf.phoRandConePhoIso = 0;
+   treeLeaf.phoRandConeNeuIso = 0;
+   treeLeaf.phoRandConeChIso04 = 0;
+   treeLeaf.phoRandConePhoIso04 = 0;
+   treeLeaf.phoRandConeNeuIso04 = 0;
 //   treeLeaf.phoRegrE = 0;
 //   treeLeaf.phoRegrEerr = 0;
 //   treeLeaf.phoSeedTime = 0;
@@ -778,18 +803,18 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("eleCharge", &treeLeaf.eleCharge, &b_eleCharge);
 //   fChain->SetBranchAddress("eleChargeConsistent", &treeLeaf.eleChargeConsistent, &b_eleChargeConsistent);
 //   fChain->SetBranchAddress("eleEn", &treeLeaf.eleEn, &b_eleEn);
-//   fChain->SetBranchAddress("eleEcalEn", &treeLeaf.eleEcalEn, &b_eleEcalEn);
+   fChain->SetBranchAddress("eleEcalEn", &treeLeaf.eleEcalEn, &b_eleEcalEn);
 //   fChain->SetBranchAddress("eleSCRawEn", &treeLeaf.eleSCRawEn, &b_eleSCRawEn);
 //   fChain->SetBranchAddress("eleSCEn", &treeLeaf.eleSCEn, &b_eleSCEn);
 //   fChain->SetBranchAddress("eleESEn", &treeLeaf.eleESEn, &b_eleESEn);
    fChain->SetBranchAddress("elePt", &treeLeaf.elePt, &b_elePt);
-//   fChain->SetBranchAddress("eleEta", &treeLeaf.eleEta, &b_eleEta);
+   fChain->SetBranchAddress("eleEta", &treeLeaf.eleEta, &b_eleEta);
 //   fChain->SetBranchAddress("elePhi", &treeLeaf.elePhi, &b_elePhi);
 //   fChain->SetBranchAddress("eleR9", &treeLeaf.eleR9, &b_eleR9);
 //   fChain->SetBranchAddress("eleEtaVtx", &treeLeaf.eleEtaVtx, &b_eleEtaVtx);
 //   fChain->SetBranchAddress("elePhiVtx", &treeLeaf.elePhiVtx, &b_elePhiVtx);
 //   fChain->SetBranchAddress("eleEtVtx", &treeLeaf.eleEtVtx, &b_eleEtVtx);
-//   fChain->SetBranchAddress("eleSCEta", &treeLeaf.eleSCEta, &b_eleSCEta);
+   fChain->SetBranchAddress("eleSCEta", &treeLeaf.eleSCEta, &b_eleSCEta);
 //   fChain->SetBranchAddress("eleSCPhi", &treeLeaf.eleSCPhi, &b_eleSCPhi);
 //   fChain->SetBranchAddress("eleSCEtaWidth", &treeLeaf.eleSCEtaWidth, &b_eleSCEtaWidth);
 //   fChain->SetBranchAddress("eleSCPhiWidth", &treeLeaf.eleSCPhiWidth, &b_eleSCPhiWidth);
@@ -800,18 +825,18 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("eleDz", &treeLeaf.eleDz, &b_eleDz);
 //   fChain->SetBranchAddress("eleD0GV", &treeLeaf.eleD0GV, &b_eleD0GV);
 //   fChain->SetBranchAddress("eleDzGV", &treeLeaf.eleDzGV, &b_eleDzGV);
-//   fChain->SetBranchAddress("eleD0Vtx", &treeLeaf.eleD0Vtx, &b_eleD0Vtx);
-//   fChain->SetBranchAddress("eleDzVtx", &treeLeaf.eleDzVtx, &b_eleDzVtx);
-//   fChain->SetBranchAddress("eleHoverE", &treeLeaf.eleHoverE, &b_eleHoverE);
-//   fChain->SetBranchAddress("eleHoverE12", &treeLeaf.eleHoverE12, &b_eleHoverE12);
+   fChain->SetBranchAddress("eleD0Vtx", &treeLeaf.eleD0Vtx, &b_eleD0Vtx);
+   fChain->SetBranchAddress("eleDzVtx", &treeLeaf.eleDzVtx, &b_eleDzVtx);
+   fChain->SetBranchAddress("eleHoverE", &treeLeaf.eleHoverE, &b_eleHoverE);
+   fChain->SetBranchAddress("eleHoverE12", &treeLeaf.eleHoverE12, &b_eleHoverE12);
 //   fChain->SetBranchAddress("eleEoverP", &treeLeaf.eleEoverP, &b_eleEoverP);
-//   fChain->SetBranchAddress("elePin", &treeLeaf.elePin, &b_elePin);
+   fChain->SetBranchAddress("elePin", &treeLeaf.elePin, &b_elePin);
 //   fChain->SetBranchAddress("elePout", &treeLeaf.elePout, &b_elePout);
 //   fChain->SetBranchAddress("eleTrkMomErr", &treeLeaf.eleTrkMomErr, &b_eleTrkMomErr);
 //   fChain->SetBranchAddress("eleBrem", &treeLeaf.eleBrem, &b_eleBrem);
-//   fChain->SetBranchAddress("eledEtaAtVtx", &treeLeaf.eledEtaAtVtx, &b_eledEtaAtVtx);
-//   fChain->SetBranchAddress("eledPhiAtVtx", &treeLeaf.eledPhiAtVtx, &b_eledPhiAtVtx);
-//   fChain->SetBranchAddress("eleSigmaIEtaIEta", &treeLeaf.eleSigmaIEtaIEta, &b_eleSigmaIEtaIEta);
+   fChain->SetBranchAddress("eledEtaAtVtx", &treeLeaf.eledEtaAtVtx, &b_eledEtaAtVtx);
+   fChain->SetBranchAddress("eledPhiAtVtx", &treeLeaf.eledPhiAtVtx, &b_eledPhiAtVtx);
+   fChain->SetBranchAddress("eleSigmaIEtaIEta", &treeLeaf.eleSigmaIEtaIEta, &b_eleSigmaIEtaIEta);
 //   fChain->SetBranchAddress("eleSigmaIEtaIPhi", &treeLeaf.eleSigmaIEtaIPhi, &b_eleSigmaIEtaIPhi);
 //   fChain->SetBranchAddress("eleSigmaIPhiIPhi", &treeLeaf.eleSigmaIPhiIPhi, &b_eleSigmaIPhiIPhi);
 //   fChain->SetBranchAddress("eleEmax", &treeLeaf.eleEmax, &b_eleEmax);
@@ -857,17 +882,17 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("eleModIsoTrk", &treeLeaf.eleModIsoTrk, &b_eleModIsoTrk);
 //   fChain->SetBranchAddress("eleModIsoEcal", &treeLeaf.eleModIsoEcal, &b_eleModIsoEcal);
 //   fChain->SetBranchAddress("eleModIsoHcal", &treeLeaf.eleModIsoHcal, &b_eleModIsoHcal);
-//   fChain->SetBranchAddress("eleMissHits", &treeLeaf.eleMissHits, &b_eleMissHits);
+   fChain->SetBranchAddress("eleMissHits", &treeLeaf.eleMissHits, &b_eleMissHits);
 //   fChain->SetBranchAddress("eleConvDist", &treeLeaf.eleConvDist, &b_eleConvDist);
 //   fChain->SetBranchAddress("eleConvDcot", &treeLeaf.eleConvDcot, &b_eleConvDcot);
-//   fChain->SetBranchAddress("eleConvVtxFit", &treeLeaf.eleConvVtxFit, &b_eleConvVtxFit);
+   fChain->SetBranchAddress("eleConvVtxFit", &treeLeaf.eleConvVtxFit, &b_eleConvVtxFit);
 //   fChain->SetBranchAddress("eleIP3D", &treeLeaf.eleIP3D, &b_eleIP3D);
 //   fChain->SetBranchAddress("eleIP3DErr", &treeLeaf.eleIP3DErr, &b_eleIP3DErr);
 //   fChain->SetBranchAddress("eleIDMVANonTrig", &treeLeaf.eleIDMVANonTrig, &b_eleIDMVANonTrig);
 //   fChain->SetBranchAddress("eleIDMVATrig", &treeLeaf.eleIDMVATrig, &b_eleIDMVATrig);
-//   fChain->SetBranchAddress("elePFChIso03", &treeLeaf.elePFChIso03, &b_elePFChIso03);
-//   fChain->SetBranchAddress("elePFPhoIso03", &treeLeaf.elePFPhoIso03, &b_elePFPhoIso03);
-//   fChain->SetBranchAddress("elePFNeuIso03", &treeLeaf.elePFNeuIso03, &b_elePFNeuIso03);
+   fChain->SetBranchAddress("elePFChIso03", &treeLeaf.elePFChIso03, &b_elePFChIso03);
+   fChain->SetBranchAddress("elePFPhoIso03", &treeLeaf.elePFPhoIso03, &b_elePFPhoIso03);
+   fChain->SetBranchAddress("elePFNeuIso03", &treeLeaf.elePFNeuIso03, &b_elePFNeuIso03);
 //   fChain->SetBranchAddress("elePFChIso04", &treeLeaf.elePFChIso04, &b_elePFChIso04);
 //   fChain->SetBranchAddress("elePFPhoIso04", &treeLeaf.elePFPhoIso04, &b_elePFPhoIso04);
 //   fChain->SetBranchAddress("elePFNeuIso04", &treeLeaf.elePFNeuIso04, &b_elePFNeuIso04);
@@ -949,12 +974,12 @@ void TEventTree::Init(TTree *tree)
    fChain->SetBranchAddress("phoSCRChIso04", &treeLeaf.phoSCRChIso04, &b_phoSCRChIso04);
    fChain->SetBranchAddress("phoSCRPhoIso04", &treeLeaf.phoSCRPhoIso04, &b_phoSCRPhoIso04);
    fChain->SetBranchAddress("phoSCRNeuIso04", &treeLeaf.phoSCRNeuIso04, &b_phoSCRNeuIso04);
-//   fChain->SetBranchAddress("phoRandConeChIso", &treeLeaf.phoRandConeChIso, &b_phoRandConeChIso);
-//   fChain->SetBranchAddress("phoRandConePhoIso", &treeLeaf.phoRandConePhoIso, &b_phoRandConePhoIso);
-//   fChain->SetBranchAddress("phoRandConeNeuIso", &treeLeaf.phoRandConeNeuIso, &b_phoRandConeNeuIso);
-//   fChain->SetBranchAddress("phoRandConeChIso04", &treeLeaf.phoRandConeChIso04, &b_phoRandConeChIso04);
-//   fChain->SetBranchAddress("phoRandConePhoIso04", &treeLeaf.phoRandConePhoIso04, &b_phoRandConePhoIso04);
-//   fChain->SetBranchAddress("phoRandConeNeuIso04", &treeLeaf.phoRandConeNeuIso04, &b_phoRandConeNeuIso04);
+   fChain->SetBranchAddress("phoRandConeChIso", &treeLeaf.phoRandConeChIso, &b_phoRandConeChIso);
+   fChain->SetBranchAddress("phoRandConePhoIso", &treeLeaf.phoRandConePhoIso, &b_phoRandConePhoIso);
+   fChain->SetBranchAddress("phoRandConeNeuIso", &treeLeaf.phoRandConeNeuIso, &b_phoRandConeNeuIso);
+   fChain->SetBranchAddress("phoRandConeChIso04", &treeLeaf.phoRandConeChIso04, &b_phoRandConeChIso04);
+   fChain->SetBranchAddress("phoRandConePhoIso04", &treeLeaf.phoRandConePhoIso04, &b_phoRandConePhoIso04);
+   fChain->SetBranchAddress("phoRandConeNeuIso04", &treeLeaf.phoRandConeNeuIso04, &b_phoRandConeNeuIso04);
 //   fChain->SetBranchAddress("phoRegrE", &treeLeaf.phoRegrE, &b_phoRegrE);
 //   fChain->SetBranchAddress("phoRegrEerr", &treeLeaf.phoRegrEerr, &b_phoRegrEerr);
 //   fChain->SetBranchAddress("phoSeedTime", &treeLeaf.phoSeedTime, &b_phoSeedTime);

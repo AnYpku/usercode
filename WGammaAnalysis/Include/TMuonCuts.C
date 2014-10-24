@@ -24,11 +24,12 @@ bool TMuonCuts::HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <flo
   return false;
 }
 
-bool TMuonCuts::PassedKinematics(float muPt, float muEta) 
+bool TMuonCuts::PassedKinematics(float muPt, float muEta, bool& ifPassedPt, bool& ifPassedEta) 
 {
-  if (muPt<=_muPtCut) return false; 
-  if (fabs(muEta)>=_muEtaCut) return false ;
-  return true ; 
+  ifPassedPt=true; ifPassedEta=true;
+  if (muPt<=_muPtCut) ifPassedPt=false; 
+  if (fabs(muEta)>=_muEtaCut) ifPassedEta=false;
+  return (ifPassedPt && ifPassedEta); 
 }
 
 bool TMuonCuts::MuId(int year, float muChi2NDF, float muD0, float muDZ, 
@@ -98,21 +99,36 @@ TCut TMuonCuts::RangeIsolation(int year, int ilep){
   return cut;
 }
 
-TCut TMuonCuts::RangeTriggerMatch(int ilep){
-  TString strCut1="HLT_IsoMu24_v && trgMatch";
-  strCut1+=ilep;
-  strCut1+="IsoMu24";
-  TCut cutTrg1(strCut1);
-  TString strCut2="HLT_IsoMu24_eta2p1_ && trgMatch";
-  strCut2+=ilep;
-  strCut2+="IsoMu24eta2p1";
-  TCut cutTrg2(strCut2);
-  return (cutTrg1||cutTrg2);
+TCut TMuonCuts::RangeTriggerMatch(int vgamma, int ilep){
+  TString strLep="";
+  strLep+=ilep;
+  TCut cutTrg="1";
+  if (vgamma==_config.W_GAMMA){
+    TString strHLT1="HLT_IsoMu24_eta2p1_"; 
+    TString strMuTrg1=TString("trgMatch")+strLep+TString("IsoMu24eta2p1");
+    TString strHLT2="HLT_IsoMu24_v"; 
+    TString strMuTrg2=TString("trgMatch")+strLep+TString("IsoMu24");
+    cutTrg=RangeTriggerOne(strHLT1,strMuTrg1) || 
+           RangeTriggerOne(strHLT2,strMuTrg2);
+  }
+  else if (vgamma==_config.Z_GAMMA){
+    TString strHLT="HLT_Mu22_Mu8_v"; 
+    TString strMuTrg=TString("trgMatch")+strLep+TString("Mu22Mu8");
+    cutTrg=RangeTriggerOne(strHLT,strMuTrg);
+  }
+  return (cutTrg);
 }
 
-TCut TMuonCuts::RangeMuon(int year, int ilep, bool doIsoCut, bool doIdCut, bool doTrgCut){
+TCut TMuonCuts::RangeTriggerOne(TString strHLT, TString strMuTrg){
+  TCut cutHLT(strHLT);
+  TCut cutMuTrg(strMuTrg);
+  TCut cutTrg(cutHLT && cutMuTrg);
+  return cutTrg;
+}
+
+TCut TMuonCuts::RangeMuon(int year, int vgamma, int ilep, bool doIsoCut, bool doIdCut, bool doTrgCut){
   TCut cut="1";
-  if (doTrgCut) cut=cut && RangeTriggerMatch(ilep);
+  if (doTrgCut) cut=cut && RangeTriggerMatch(vgamma,ilep);
   if (doIdCut)  cut=cut && RangeId(year,ilep);
   if (doIsoCut) cut=cut && RangeIsolation(year,ilep);
   return cut;

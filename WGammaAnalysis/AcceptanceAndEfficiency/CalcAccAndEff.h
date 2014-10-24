@@ -29,7 +29,6 @@ class CalcAccAndEff
 
        void    LoopOverTreeEvents();
        bool    AcceptancePassed(bool** accLeptonPhotonPassed);    
-       bool    EfficiencyPassed(bool** effLeptonPhotonPassed, float** lePhoDeltaR, float weightPU);
        void    ComputeAcceptance();
        void    ComputeEfficiency();
        void    ComputeAccTimesEff();

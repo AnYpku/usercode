@@ -21,16 +21,17 @@
 
   gROOT->ProcessLine(".L ../Selection/TSelectedEventsTree.C+");
 
-//  gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
+  gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/Selection.C+");
 
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
+//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesRandCone.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
 
   gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
 
-//  gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
+  gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
 //  gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
 

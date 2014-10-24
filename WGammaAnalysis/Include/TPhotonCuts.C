@@ -19,11 +19,12 @@ TPhotonCuts::~TPhotonCuts()
 {
 }
 
-bool TPhotonCuts::PassedKinematics(float phoPt, float phoEta)
+bool TPhotonCuts::PassedKinematics(float phoPt, float phoEta, bool& ifPassedPt, bool& ifPassedEta)
 {
-  if (phoPt<_phoPtCut) return false;
-  if (!IsBarrel(phoEta) && !IsEndcap(phoEta)) return false;
-  return true;
+  ifPassedPt=true; ifPassedEta=true;
+  if (phoPt<_phoPtCut) ifPassedPt=false;
+  if (!IsBarrel(phoEta) && !IsEndcap(phoEta)) ifPassedEta=false;
+  return (ifPassedPt && ifPassedEta);
 }
 
 float TPhotonCuts::EffAreaCharged(float eta)
@@ -159,15 +160,15 @@ float TPhotonCuts::GetOneIsolationCutE(int year, int wp, int isoType, float phoE
 
 TCut TPhotonCuts::RangeBarrel()
 {
-  TString str="phoEta<1.4442 && phoEta>-1.4442";
+  TString str="phoSCEta<1.4442 && phoSCEta>-1.4442";
   TCut cut(str);
   return cut;
 }
 
 TCut TPhotonCuts::RangeEndcap()
 {
-  TString str1 = "phoEta > 1.566 && phoEta < 2.5";
-  TString str2 = "phoEta <-1.566 && phoEta >-2.5";
+  TString str1 = "phoSCEta > 1.566 && phoSCEta < 2.5";
+  TString str2 = "phoSCEta <-1.566 && phoSCEta >-2.5";
   TCut cut1(str1);
   TCut cut2(str2);
   TCut cut = cut1 || cut2;
@@ -316,7 +317,7 @@ TCut TPhotonCuts::RangePhoton(int year, int wp,
   if (year==2011) cut = cut && RangePhoHasPixelSeed();
   if (doChOrTrkIsoCut){
     if (!noPhoPFChIsoCut) cut = cut && RangeOneIsolation(year,wp,ISO_CHorTRK);
-    cut = cut && RangePhoSCRChIsoCorr();
+//    cut = cut && RangePhoSCRChIsoCorr();
   }
   if (doNeuOrHcalIsoCut){
     cut = cut && RangeOneIsolation(year,wp,ISO_NEUorHCAL);

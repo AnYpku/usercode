@@ -422,6 +422,9 @@ void TTemplates::SetFakeTemplate(TH1D* hFake, TH1D* hLeak, TH1D* hLeakTemp, TCut
     _treeData->Draw("weight>>hist",(cut && cutFake)*_cutWeight,"goff");
   else
     _treeData->Draw("weight>>hist",cut*_cutWeight,"goff");
+  if (!noPrint) std::cout<<"_treeData->GetEntries(cut*_cutWeights)="<<_treeData->GetEntries(cut*_cutWeight)<<std::endl;
+  if (!noPrint) std::cout<<"_treeData->GetEntries(cut)="<<_treeData->GetEntries(cut)<<std::endl;
+  if (!noPrint) std::cout<<"_treeData->GetEntries(_cutWeights)="<<_treeData->GetEntries(_cutWeight)<<std::endl;
   std::cout<<std::endl;
   std::cout<<"Backgr Template, mean weight =";
   std::cout<<std::fixed;
@@ -543,7 +546,7 @@ TCut TTemplates::SidebandVarNominalCut(){
   if (_varSideband=="phoSigmaIEtaIEta") 
     cut=_photon.RangeSigmaIEtaIEta(_year,_phoWP);
   else if (_varSideband=="phoSCRChIsoCorr")
-    cut=_photon.RangePhoSCRChIsoCorr();
+    cut=_photon.RangeOneIsolation(_year,_phoWP,_photon.ISO_CHorTRK);
   return cut;
 }
 
@@ -821,9 +824,8 @@ float TTemplates::EffPhoChIsoCorr(int ikin, int ieta, bool isTrue)
   TCut cutEta = CutEtaBin(ieta);
   TCut cutKin = CutKinBin(ikin);
   TCut cutPhoSigmaIEtaIEta = _photon.RangeSigmaIEtaIEta(_year,_phoWP);
-  TCut cutPhoSCRChIso = _photon.RangePhoSCRChIsoCorr();
   TCut cutPhoChIso = _photon.RangeOneIsolation(_year,_phoWP,_photon.ISO_CHorTRK);
-  TCut cutDen = cutEta && cutKin && cutPhoSigmaIEtaIEta && cutPhoSCRChIso;
+  TCut cutDen = cutEta && cutKin && cutPhoSigmaIEtaIEta;
   TCut cutNom = cutDen && cutPhoChIso;
   if (isTrue){
     float den = _treeSign->GetEntries(cutDen);

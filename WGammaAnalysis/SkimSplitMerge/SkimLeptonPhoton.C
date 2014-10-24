@@ -4,13 +4,12 @@
 #include <TH1F.h>
 #include <iostream>
 
-SkimLeptonPhoton::SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool doOverlapRemoval, bool isDebugMode, TString outDir, TString nameDir, TString nameTree)
+SkimLeptonPhoton::SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool isDebugMode, TString outDir, TString nameDir, TString nameTree)
 {
 
   _sample=sample;
   _channel=channel;  
 
-  _doOverlapRemoval=doOverlapRemoval;
   _isDebugMode=isDebugMode;
 
   _nameDir=nameDir;

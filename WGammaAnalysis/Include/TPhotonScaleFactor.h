@@ -38,34 +38,34 @@ class TPhotonScaleFactor
 
 
   private:
-    float scaleFactorExceptElectronVeto_;
-    float scaleFactorExceptElectronVetoErr_;
-    float scaleFactorElectronVeto_;
-    float scaleFactorElectronVetoErr_;
-    float scaleFactor_;
-    float scaleFactorErr_;
+    float _scaleFactorExceptElectronVeto;
+    float _scaleFactorExceptElectronVetoErr;
+    float _scaleFactorElectronVeto;
+    float _scaleFactorElectronVetoErr;
+    float _scaleFactor;
+    float _scaleFactorErr;
 
-    TPhotonCuts emptyPhoton_;
+    TPhotonCuts _emptyPhoton;
 
-    TFile* fSFPt15to20_;
-    TFile* fSFPt20toInf_;
-    TH1D*  hSFPt15to20Loose_Barrel1_;
-    TH1D*  hSFPt15to20Loose_Endcap1_;
-    TH1D*  hSFPt15to20Medium_Barrel1_;
-    TH1D*  hSFPt15to20Medium_Endcap1_;
-    TH1D*  hSFPt15to20Tight_Barrel1_;
-    TH1D*  hSFPt15to20Tight_Endcap1_;
-    TH1D*  hSFPt20toInfLoose_Barrel1_;
-    TH1D*  hSFPt20toInfLoose_Endcap1_;
-    TH1D*  hSFPt20toInfMedium_Barrel1_;
-    TH1D*  hSFPt20toInfMedium_Endcap1_;
-    TH1D*  hSFPt20toInfTight_Barrel1_;
-    TH1D*  hSFPt20toInfTight_Endcap1_;
-    TH1D*  hSFPt20toInfLoose_Barrel2_;
-    TH1D*  hSFPt20toInfLoose_Endcap2_;
-    TH1D*  hSFPt20toInfMedium_Barrel2_;
-    TH1D*  hSFPt20toInfMedium_Endcap2_;
-    TH1D*  hSFPt20toInfTight_Barrel2_;
-    TH1D*  hSFPt20toInfTight_Endcap2_;
+    TFile* _fSFPt15to20;
+    TFile* _fSFPt20toInf;
+    TH1D*  _hSFPt15to20Loose_Barrel1;
+    TH1D*  _hSFPt15to20Loose_Endcap1;
+    TH1D*  _hSFPt15to20Medium_Barrel1;
+    TH1D*  _hSFPt15to20Medium_Endcap1;
+    TH1D*  _hSFPt15to20Tight_Barrel1;
+    TH1D*  _hSFPt15to20Tight_Endcap1;
+    TH1D*  _hSFPt20toInfLoose_Barrel1;
+    TH1D*  _hSFPt20toInfLoose_Endcap1;
+    TH1D*  _hSFPt20toInfMedium_Barrel1;
+    TH1D*  _hSFPt20toInfMedium_Endcap1;
+    TH1D*  _hSFPt20toInfTight_Barrel1;
+    TH1D*  _hSFPt20toInfTight_Endcap1;
+    TH1D*  _hSFPt20toInfLoose_Barrel2;
+    TH1D*  _hSFPt20toInfLoose_Endcap2;
+    TH1D*  _hSFPt20toInfMedium_Barrel2;
+    TH1D*  _hSFPt20toInfMedium_Endcap2;
+    TH1D*  _hSFPt20toInfTight_Barrel2;
+    TH1D*  _hSFPt20toInfTight_Endcap2;
 };
 #endif //TPhotonScaleFactor_h

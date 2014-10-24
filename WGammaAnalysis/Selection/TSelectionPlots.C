@@ -37,7 +37,7 @@ TSelectionPlots::~TSelectionPlots()
 {
 }
 
-bool TSelectionPlots::GetTrees(int channel, int blind, string confFile, string strSources)
+bool TSelectionPlots::GetTrees(int channel, int vgamma, int blind, string confFile, string strSources)
 {
 
   stringstream ss(strSources);
@@ -47,14 +47,16 @@ bool TSelectionPlots::GetTrees(int channel, int blind, string confFile, string s
     names.push_back(name);
   int nNames = names.size();
 
-  TAllInputSamples INPUT(channel, confFile);
+  TAllInputSamples INPUT(channel, vgamma, confFile);
   TConfiguration config;
 
   _nSources = 0;
   for (int iSource=0; iSource<INPUT.nSources_; iSource++){
-    TString fileName = (TString)(config.GetSelectedName(config.VERY_PRELIMINARY, channel, blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_)) ;
+    TString fileName = (TString)(config.GetSelectedName(config.VERY_PRELIMINARY, channel, vgamma, blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_)) ;
 //      TString fileName = (TString)(config.GetSelectedName(config.FULLY, channel, blind, INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_)) ;
     bool doThisSource=0;
+
+    if (INPUT.allInputs_[iSource].sample_!=TConfiguration::DATA) continue;
 
     for (int j=0; j<nNames; j++){
       if (names[j]==INPUT.allInputs_[iSource].sourceName_)
@@ -99,7 +101,7 @@ bool TSelectionPlots::GetTrees(int channel, int blind, string confFile, string s
   return 1;
 }
 
-void TSelectionPlots::SelectionEfficiencyInStages(int year, int wp, TString strIsoBase)
+void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, TString strIsoBase)
 {
 
   TMuonCuts muon;
@@ -114,13 +116,22 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int wp, TString strI
   TCut cutExtra[nCuts];
   TString strDescr[nCuts];
 
-  TCut cut="phoEt>15";
-  cutExtra[0]="!hasMoreLeptons";         strDescr[0]="veto on extra muons";
-  cutExtra[1]=muon.RangeTriggerMatch();  strDescr[1]="muon trigger match";
-  cutExtra[2]=muon.RangeId(year);        strDescr[2]="muon ID";
-  cutExtra[3]=muon.RangeIsolation(year); strDescr[3]="muon isolation";
-//  if (year==2011) cutExtra[4]="leptonPt>35"; else cutExtra[4]="1";
-  cutExtra[4]="leptonPt>35";
+  TCut cut="1";
+
+  if (vgamma==_config.W_GAMMA){
+    cutExtra[0]="!hasMoreLeptons";                 strDescr[0]="veto on extra muons";
+    cutExtra[1]=muon.RangeTriggerMatch(vgamma,1);  strDescr[1]="muon trigger match";
+    cutExtra[2]=muon.RangeId(year,1);              strDescr[2]="muon ID";
+    cutExtra[3]=muon.RangeIsolation(year,1);       strDescr[3]="muon isolation";
+  }
+  else if (vgamma==_config.Z_GAMMA){
+    cutExtra[0]="1";                 strDescr[0]="no veto on extra muons";
+    cutExtra[1]=muon.RangeTriggerMatch(vgamma,1)&&muon.RangeTriggerMatch(vgamma,2);  strDescr[1]="muon trigger match";
+    cutExtra[2]=muon.RangeId(year,1)&&muon.RangeId(year,2);                          strDescr[2]="muon ID";
+    cutExtra[3]=muon.RangeIsolation(year,1)&&muon.RangeIsolation(year,2);            strDescr[3]="muon isolation";
+  }
+
+  if (year==2011) cutExtra[4]="leptonPt>35"; else cutExtra[4]="1";
 
 
   cutExtra[5]=photon.RangeSigmaIEtaIEta(year, wp);

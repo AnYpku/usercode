@@ -1,5 +1,5 @@
-#ifndef TTemplates_h
-#define TTemplates_h
+#ifndef TTemplatesRandCone_h
+#define TTemplatesRandCone_h
 
 #include "TFile.h"
 #include "TTree.h"
@@ -16,21 +16,18 @@
 #include "../Configuration/TAllInputSamples.h"
 #include "../Include/TPhotonCuts.h"
 
-class TTemplates
+class TTemplatesRandCone
 {
   public:
-    TTemplates(int year, int channel, int vgamma, int blind, int phoWP, TString varFit, TString varSideband, TString varKin, int nKinBins, float* kinBinLims, bool noAdjustBinning=0, bool noPhoPFChIsoCut=0, bool isMetCutOptimization=0, bool doSystTemplateStat=0);
-    virtual ~TTemplates();
+    TTemplatesRandCone(int channel, int vgamma, int phoWP, TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization);
+    virtual ~TTemplatesRandCone();
 
-    enum {NO_CLOSURE_TEST=0, CLOSURE_TEST_1, CLOSURE_TEST_2, CLOSURE_TEST_3};
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
     void ComputeBackgroundOne(int ikin, bool noPrint=0, bool noPlot=0);
-    void AdjustFitBinning(int kinBin, int etaBin, bool noPrint, bool noPlot);
-    bool IsNewChi2ToNDFBetter(float newChi2, float oldChi2);
-    void SetThreeHists(int kinBin, int etaBin, bool noPrint=0);
+    void SetHists(int kinBin, int etaBin, bool noPrint=0);
     void RandomizeTemplates(int ikin, int ieta);
-    void DeleteThreeHists(int kinBin, int etaBin);
+    void DeleteHists(int kinBin, int etaBin);
 
     void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
     void PrintYieldsAndChi2();
@@ -61,49 +58,26 @@ class TTemplates
   private:
     TConfiguration _config;
     TPhotonCuts _photon;
-    int _year;
     int _vgamma;
     int _channel;
-    int _blind;
-    bool _doSystTemplateStat;
     bool _isMetCutOptimization;
-    bool _noAdjustBinning;
-    bool _noPhoPFChIsoCut;
     int _selectionStage;
 
-    int _isClosureTest;
     TCut _cutWeight;
 
     int _phoWP;
     TAllInputSamples* _INPUT;
-    TFile* _fSign;
     TFile* _fData;
-    vector <TFile*> _vecFBkg;
-//    TFile* fOut_;
-
-    TTree* _treeSign;
     TTree* _treeData;
-    vector <TTree*> _vecTreeBkg;
-    vector <TString> _vecBkgNames;
-    vector <int> _vecBkgColors;
 
     TString _varKin;
     int _nKinBins;
     float* _kinBinLims;
 
-    int _iter;
-
-    TString _varFit;
-    TString _varSideband;
-    TString _labelVarFit;
-
     TRandom _random;
 
-    TH1D* _hTrueReference[_nBinsMax][3];
-    TH1D* _hFakeReference[_nBinsMax][3];
     TH1D* _hTrue[_nBinsMax][3];
     TH1D* _hFake[_nBinsMax][3];
-    TH1D* _hLeak[_nBinsMax][3];
     TH1D* _hData[_nBinsMax][3];
     TH1D* _hSumm[_nBinsMax][3];
     TH1D* _hRatio[_nBinsMax][3];
@@ -119,7 +93,7 @@ class TTemplates
     //double _nFakeFromFitToyVal[_nBinsMax][3][_nToys];
     //double _nTrueFromFitToyVal[_nBinsMax][3][_nToys];
 
-    int _nBinsLeft[_nBinsMax][3];
+    int _nFitBins[_nBinsMax][3];
 
     double _nFakeYieldsVal[_nBinsMax][3];
     double _nFakeYieldsErr[_nBinsMax][3];
@@ -131,30 +105,9 @@ class TTemplates
 
     TFile* _fOutForSave;
 
-//    vector <double> chi2Barrel_;
-//    vector <double> chi2Endcap_;
-//    vector <double> FakeFractionBarrel_;
-//    vector <double> FakeFractionEndcap_;
-//    vector <double> FakeFractionBarrelErr_;
-//    vector <double> FakeFractionEndcapErr_;
-    float _minVarFit[3]; //sIEtaIEtaBarrelMin_ = 0.007;
     float _maxVarFit[_nBinsMax][3];
 
-    //TTree** trData_;
-    //TTree** trSignal_;
-    //TTree** trFake_;
-    //TTree** trLeakage_;
 };
 
-const static int   _nOfnBinsLeft=5;
-const static float _nBinsLeftVariants[_nOfnBinsLeft]={4,2,8,5,1};
-const static int   _nOfnRightLimits=5;
-const static float _nPhoSCRChIsoRightLimits[_nOfnRightLimits]={20,12,14,8,6};
 
-//const static int   _nOfnBinsLeft=1;
-//const static float _nBinsLeftVariants[_nOfnBinsLeft]={4};
-//const static int   _nOfnRightLimits=1;
-//const static float _nPhoSCRChIsoRightLimits[_nOfnRightLimits]={6};
-
-
-#endif //TTemplates_h
+#endif //TTemplatesRandCone_h

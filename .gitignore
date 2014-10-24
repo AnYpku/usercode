@@ -5,3 +5,7 @@
 *.hh~
 *.cc~
 *.sh~
+*.png
+*.log
+*.png~
+*.log~

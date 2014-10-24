@@ -8,7 +8,7 @@
 
 class SkimLeptonPhoton{
 public :
-   SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool doOverlapRemoval, bool isDebugMode=0, TString outDir="./", TString nameDir="ggNtuplizer", TString nameTree="EventTree");
+   SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool isDebugMode=0, TString outDir="./", TString nameDir="ggNtuplizer", TString nameTree="EventTree");
    virtual ~SkimLeptonPhoton();
    void LoopOverInputTree();
      //the main function which is called from outside
@@ -20,7 +20,6 @@ private :
    TConfiguration _config;
    int _channel;
    int _sample;
-   bool _doOverlapRemoval;
    bool _isDebugMode;
    TFile    *_fileOutMu; //output Files
    TFile    *_fileOutEle; //output Files

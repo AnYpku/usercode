@@ -6,6 +6,7 @@
 #include "TString.h" //ROOT class
 
 #include "../Include/TEventTree.h" //class of this package
+#include "../Include/TFullCuts.h" //class of this package
 #include "../Include/PhosphorCorrectorFunctor.hh"
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
   //currently in this package
@@ -18,12 +19,14 @@ class TSelectedEventsTree
 
     void SetAsOutputTree(TTree* tree);
     void SetAsInputTree(TTree* tree);
-    void SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, int ipho, int ilep1, int ilep2, float lep1PhoDeltaR, float lep2PhoDeltaR, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector); 
+    void SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, TFullCuts::Candidate cand, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector); 
     bool SetValuesMuId(TEventTree::InputTreeLeaves treeLeaf, int year, int ile);
     float SetValuesMuIsolation(TEventTree::InputTreeLeaves treeLeaf, int year, int ile);
 
 
   private:
+    TConfiguration _config;
+
     int _event;
     int _iMClep[2];
     float _lepEta[2];
@@ -41,9 +44,11 @@ class TSelectedEventsTree
     int _lepType[2];
     bool _trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
     bool _trgMatchIsoMu24[2];//1th bit of muTrg[imu]
+    bool _trgMatchMu22Mu8[2];//5th(?) bit of muTrg[imu]
     bool _hasMoreLeptons;
     int _HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
     int _HLT_IsoMu24_v;//HLT[HLTIndex[19]]
+    int _HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
     int _iMCpho;
     int _phoEleVeto;
     float _phoEta;
@@ -63,18 +68,24 @@ class TSelectedEventsTree
     float _phoSigmaIEtaIEta;
     float _phoPFChIsoCorr;
     float _phoSCRChIsoCorr;
+    float _phoRandConeChIsoCorr;
     float _phoPFNeuIsoCorr;
     float _phoSCRNeuIsoCorr;
+    float _phoRandConeNeuIsoCorr;
     float _phoPFPhoIsoCorr;
     float _phoSCRPhoIsoCorr;
+    float _phoRandConePhoIsoCorr;
     float _phoEcalIsoDR04Corr;//for 2011 cuts
     float _phoHcalIsoDR04Corr;//for 2011 cuts
     float _phoTrkIsoHollowDR04Corr;//for 2011 cuts
     int _phohasPixelSeed;//for 2011 cuts
     float _lepPhoDeltaR[2];
     float _WMt;
+    float _Mleplep;//relevant for Z_GAMMA only
     float _pfMET;
     float _pfMETPhi;
+    float _pfMET_notSmeared;
+    float _pfMETPhi_notSmeared;
     float _rho2011;//for 2011 cuts
     float _rho2012;
     int _run;
@@ -104,9 +115,11 @@ class TSelectedEventsTree
     TBranch* _b_lepType[2];
     TBranch* _b_trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
     TBranch* _b_trgMatchIsoMu24[2];//1th bit of muTrg[imu]
+    TBranch* _b_trgMatchMu22Mu8[2];//5th (?) bit of muTrg[imu]
     TBranch* _b_hasMoreLeptons;
     TBranch* _b_HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
     TBranch* _b_HLT_IsoMu24_v;//HLT[HLTIndex[19]]
+    TBranch* _b_HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
     TBranch* _b_iMCpho;
     TBranch* _b_phoEleVeto;
     TBranch* _b_phoEta;
@@ -126,18 +139,24 @@ class TSelectedEventsTree
     TBranch* _b_phoSigmaIEtaIEta;
     TBranch* _b_phoPFChIsoCorr;
     TBranch* _b_phoSCRChIsoCorr;
+    TBranch* _b_phoRandConeChIsoCorr;
     TBranch* _b_phoPFNeuIsoCorr;
     TBranch* _b_phoSCRNeuIsoCorr;
+    TBranch* _b_phoRandConeNeuIsoCorr;
     TBranch* _b_phoPFPhoIsoCorr;
     TBranch* _b_phoSCRPhoIsoCorr;
+    TBranch* _b_phoRandConePhoIsoCorr;
     TBranch* _b_phoEcalIsoDR04Corr;//for 2011 cuts
     TBranch* _b_phoHcalIsoDR04Corr;//for 2011 cuts
     TBranch* _b_phoTrkIsoHollowDR04Corr;//for 2011 cuts
     TBranch* _b_phohasPixelSeed;//for 2011 cuts
     TBranch* _b_lepPhoDeltaR[2];
     TBranch* _b_WMt;
+    TBranch* _b_Mleplep;
     TBranch* _b_pfMET;
     TBranch* _b_pfMETPhi;
+    TBranch* _b_pfMET_notSmeared;
+    TBranch* _b_pfMETPhi_notSmeared;
     TBranch* _b_rho2011;//for 2011 cuts
     TBranch* _b_rho2012;
     TBranch* _b_run;
