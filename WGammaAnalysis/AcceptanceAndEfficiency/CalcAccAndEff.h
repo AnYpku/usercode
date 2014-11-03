@@ -11,8 +11,8 @@
 #include "../Include/TElectronCuts.h"
 #include "../Include/TFullCuts.h"
   //this package
-#include "../Include/PhosphorCorrectorFunctor.hh"
-  //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
+  //from git
 #include "TTree.h" 
 #include "TMath.h" 
   //ROOT package

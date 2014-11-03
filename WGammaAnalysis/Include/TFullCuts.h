@@ -5,6 +5,10 @@
 #include "TCut.h"
 //ROOT
 
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
+  //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
+  //currently in this package
+
 #include <vector>
 
 #include "../Configuration/TConfiguration.h"
@@ -38,7 +42,8 @@ public:
     float dRlep2pho;    
   };
 
-  bool VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,   
+  bool VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector,   
                     int channel, int vgamma, bool isVJets,
                     int& nCands, Candidate* cands,
                     PassedLevels& passed);
@@ -69,7 +74,7 @@ private:
   void CheckDRandProceed(int vgamma, bool isVJets, int& icand,
                     bool& hasEventAfterPass, bool& hasOverlap,
                     float dR1, float dR2, int ipho, int ilep1, int ilep2);
-  bool IsOverlapVJetsVGamma(int ipho);
+  bool IsOverlapVJetsVGamma(int channel);
   
 
   const static float _WMtCut2012 = 50.;//for 8 TeV

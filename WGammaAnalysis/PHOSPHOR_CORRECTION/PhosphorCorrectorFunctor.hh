@@ -20,7 +20,7 @@ namespace zgamma{
   public:
     PhosphorCorrectionFunctor();
     PhosphorCorrectionFunctor(const char* filename);
-    //PhosphorCorrectionFunctor(const char* filename, bool R9Cat);//Bool just used to overload constructor and allow R9 categories inplementation
+    PhosphorCorrectionFunctor(const char* filename, bool R9Cat);//Bool just used to overload constructor and allow R9 categories inplementation
     ~PhosphorCorrectionFunctor();
     //~PhosphorCorrectionFunctor(){};//do nothing
     
@@ -83,7 +83,7 @@ namespace zgamma{
     map < string, double > ErrMap;
     map < int, int > CatMap;
     ifstream MapFile;
-    const char* filename_;
+    const char* _filename;
 
     //Private Methods
     std::string CreateMapKey(int Year, int DataType, int DetType, int CorrType, int PtBin);;// Creates key in inclusive R9 categories
@@ -96,7 +96,7 @@ namespace zgamma{
     
     bool MapCat();
     bool CreateMap();
-    //bool CreateMap(bool R9Cat);//Bool just used to overload method and allow R9 categories inplementation
+    bool CreateMap(bool R9Cat);//Bool just used to overload method and allow R9 categories inplementation
     
   };
 

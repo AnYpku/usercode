@@ -29,39 +29,49 @@ bool TPhotonCuts::PassedKinematics(float phoPt, float phoEta, bool& ifPassedPt, 
 
 float TPhotonCuts::EffAreaCharged(float eta)
 {
-  if (fabs(eta)<1.0)   return 0.012;
-  if (fabs(eta)<1.479) return 0.010;
-  if (fabs(eta)<2.0)   return 0.014;
-  if (fabs(eta)<2.2)   return 0.012;
-  if (fabs(eta)<2.3)   return 0.016;
-  if (fabs(eta)<2.4)   return 0.020;
-                       return 0.012;
+  float EA=0;
+  if (fabs(eta)<1.0)        EA=0.012;
+  else if (fabs(eta)<1.479) EA=0.010;
+  else if (fabs(eta)<2.0)   EA=0.014;
+  else if (fabs(eta)<2.2)   EA=0.012;
+  else if (fabs(eta)<2.3)   EA=0.016;
+  else if (fabs(eta)<2.4)   EA=0.020;
+  else                      EA=0.012;
+//  std::cout<<"EffAreaCharged: eta="<<eta<<", EA="<<EA<<std::endl;
+  return EA;
 }
 
 float TPhotonCuts::EffAreaNeutral(float eta)
 {
-  if (fabs(eta)<1.0)   return 0.030;
-  if (fabs(eta)<1.479) return 0.057;
-  if (fabs(eta)<2.0)   return 0.039;
-  if (fabs(eta)<2.2)   return 0.015;
-  if (fabs(eta)<2.3)   return 0.024;
-  if (fabs(eta)<2.4)   return 0.039;
-                       return 0.072;
+  float EA=0;
+  if (fabs(eta)<1.0)        EA=0.030;
+  else if (fabs(eta)<1.479) EA=0.057;
+  else if (fabs(eta)<2.0)   EA=0.039;
+  else if (fabs(eta)<2.2)   EA=0.015;
+  else if (fabs(eta)<2.3)   EA=0.024;
+  else if (fabs(eta)<2.4)   EA=0.039;
+  else                      EA=0.072;
+//  std::cout<<"EffAreaNeutral: eta="<<eta<<", EA="<<EA<<std::endl;
+  return EA;
 }
 float TPhotonCuts::EffAreaPhotons(float eta)
 {
-  if (fabs(eta)<1.0)   return 0.148;
-  if (fabs(eta)<1.479) return 0.130;
-  if (fabs(eta)<2.0)   return 0.112;
-  if (fabs(eta)<2.2)   return 0.216;
-  if (fabs(eta)<2.3)   return 0.262;
-  if (fabs(eta)<2.4)   return 0.260;
-                       return 0.266;
+  float EA=0;
+  if (fabs(eta)<1.0)        EA=0.148;
+  else if (fabs(eta)<1.479) EA=0.130;
+  else if (fabs(eta)<2.0)   EA=0.112;
+  else if (fabs(eta)<2.2)   EA=0.216;
+  else if (fabs(eta)<2.3)   EA=0.262;
+  else if (fabs(eta)<2.4)   EA=0.260;
+  else                      EA=0.266;
+//  std::cout<<"EffAreaPhotons: eta="<<eta<<", EA="<<EA<<std::endl;
+  return EA;
 }
 
 
 float TPhotonCuts::IsoCorr(float iso, float rho, float EA)
 {
+//  std::cout<<"iso-rho*EA="<<iso<<"-"<<rho<<"*"<<EA<<"="<<iso-rho*EA<<std::endl;
   if (iso-rho*EA>0.0) return iso-rho*EA;
   return 0.0;
 }
@@ -221,6 +231,7 @@ TCut TPhotonCuts::SidebandSigmaIEtaIEta()
 
 TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
 {
+ // if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
   if (year==2011 && isoType==ISO_CHorTRK) strIso="phoTrkIsoHollowDR04Corr";
   if (year==2012 && isoType==ISO_CHorTRK) strIso="phoPFChIsoCorr";
@@ -248,13 +259,13 @@ TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
   TCut cutB = RangeBarrel();
   TCut cutE = RangeEndcap();
   TString cutIsoBStr = strIso;
-  cutIsoBStr+=" <= ";
+  cutIsoBStr+=" < ";
   cutIsoBStr+=cutABarrel;
   cutIsoBStr+=" + phoEt*";
   cutIsoBStr+=cutBBarrel;
   TCut cutIsoB(cutIsoBStr); 
   TString cutIsoEStr = strIso;
-  cutIsoEStr+=" <= ";
+  cutIsoEStr+=" < ";
   cutIsoEStr+=cutAEndcap;
   cutIsoEStr+=" + phoEt*";
   cutIsoEStr+=cutBEndcap;
@@ -330,11 +341,12 @@ TCut TPhotonCuts::RangePhoton(int year, int wp,
 
 TCut TPhotonCuts::RangeGenTruePhoton()
 {
-  TCut cutGamma="phoGenPID==22";
+//  TCut cutGamma="phoGenPID==22";
 //  TCut cutMom="phoGenMomPID>=-24 && phoGenMomPID<=24";
-  TCut cutParentage="phoGenParentage & 4";
-  TCut cut = cutGamma && cutParentage;
-  return cut;
+//  TCut cutParentage="phoGenParentage & 4";
+//  TCut cut = cutGamma && cutMom;
+//  return cut;
+  return "1";
 }
 TCut TPhotonCuts::RangeGenFakePhoton()
 {

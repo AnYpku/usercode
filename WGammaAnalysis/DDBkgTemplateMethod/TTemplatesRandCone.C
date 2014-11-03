@@ -56,35 +56,81 @@ TTemplatesRandCone::TTemplatesRandCone(int channel, int vgamma, int phoWP, TStri
   _fData = new TFile(_config.GetSelectedName(_selectionStage,_channel,_vgamma,_config.UNBLIND,_config.DATA));
   _treeData = (TTree *)_fData->Get("selectedEvents");
 
+  _fSign = new TFile(_config.GetSelectedName(_selectionStage,_channel,_vgamma,_config.UNBLIND,_config.SIGMC));
+  _treeSign = (TTree *)_fSign->Get("selectedEvents");
+
   //set # of bins histograms for fitting 
-  for (int ikin=0; ikin<_nKinBins+1; ikin++){
+  for (int ikin=0; ikin<=_nKinBins; ikin++){
     for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
       _nFitBins[ikin][ieta] = 20;
-      _maxVarFit[ikin][ieta] = 20;
-      if (varKin=="phoEt" && kinBinLims[ikin]>60){
-        _nFitBins[ikin][ieta] = 10;
-        _maxVarFit[ikin][ieta] = 16;
+      _maxVarFit[ikin][ieta] = 20.0;
+      if (ikin==0) continue;//0 is for Total yield
+      std::cout<<"ikin="<<ikin<<", ieta="<<ieta<<", "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<", "<<CutKinBin(ikin).GetTitle()<<", "<<CutEtaBin(ieta).GetTitle()<<", kinBinLims[ikin-1]="<<kinBinLims[ikin-1]<<", kinBinLims[ikin]="<<kinBinLims[ikin]<<std::endl;
+      //then introduce special binning for low statistics bins
+    }//end of ieta loop
+    if (varKin=="phoEt" && _vgamma==_config.W_GAMMA && _channel==_config.MUON){
+      if (kinBinLims[ikin-1]>74){
+        _nFitBins[ikin][_config.ENDCAP] = 10;
+        _maxVarFit[ikin][_config.ENDCAP] = 16.0;
+      }
+      if (kinBinLims[ikin-1]>94){
+        _nFitBins[ikin][_config.ENDCAP] = 8;
+        _maxVarFit[ikin][_config.ENDCAP] = 12.0;
       }
     }
-  }
+    if (varKin=="phoEt" && _vgamma==_config.Z_GAMMA && _channel==_config.MUON){ 
+      if (kinBinLims[ikin-1]>24){
+        _nFitBins[ikin][_config.BARREL] = 16;
+        _maxVarFit[ikin][_config.BARREL] = 16.0;
+        _nFitBins[ikin][_config.ENDCAP] = 16;
+        _maxVarFit[ikin][_config.ENDCAP] = 16.0;
+      }
+      if (kinBinLims[ikin-1]>34){
+        _nFitBins[ikin][_config.BARREL] = 8;
+        _maxVarFit[ikin][_config.BARREL] = 10.0;
+        _nFitBins[ikin][_config.ENDCAP] = 10;
+        _maxVarFit[ikin][_config.ENDCAP] = 14.0;
+      }
+      if (kinBinLims[ikin-1]>54){
+        _nFitBins[ikin][_config.BARREL] = 10;
+        _maxVarFit[ikin][_config.BARREL] = 12.0;
+        _nFitBins[ikin][_config.ENDCAP] = 5;
+        _maxVarFit[ikin][_config.ENDCAP] = 10.0;
+      }
+      if (kinBinLims[ikin-1]>74){
+        _nFitBins[ikin][_config.BARREL] = 8;
+        _maxVarFit[ikin][_config.BARREL] = 12.0;
+        _nFitBins[ikin][_config.ENDCAP] = 4;
+        _maxVarFit[ikin][_config.ENDCAP] = 10.0;
+      }
+      if (kinBinLims[ikin-1]>94){
+        _nFitBins[ikin][_config.BARREL] = 5;
+        _maxVarFit[ikin][_config.BARREL] = 10.0;
+        _nFitBins[ikin][_config.ENDCAP] = 4;
+        _maxVarFit[ikin][_config.ENDCAP] = 10.0;
+      }
+    }//end of if (varKin=="phoEt")
+  }//end of ikin loop
 
 }
 
 TTemplatesRandCone::~TTemplatesRandCone()
 {
+//  if (_fOutForSave->IsOpen()) _fOutForSave->Close();
 }
 
 void TTemplatesRandCone::ComputeBackground(bool noPrint, bool noPlot)
 {
   for (int ikin=0; ikin<=_nKinBins; ikin++){
-    ComputeBackgroundOne(ikin,noPrint,noPlot);
+  //for (int ikin=0; ikin<=1; ikin++){
+    ComputeBackgroundOne(ikin,noPrint);
   }
   if (!noPlot) PlotTemplates();
   PrintYieldsAndChi2();
   SaveYields();
 }
 
-void TTemplatesRandCone::ComputeBackgroundOne(int ikin, bool noPrint, bool noPlot)
+void TTemplatesRandCone::ComputeBackgroundOne(int ikin, bool noPrint)
 {
   if (!noPrint){
     std::cout<<std::endl;
@@ -93,6 +139,7 @@ void TTemplatesRandCone::ComputeBackgroundOne(int ikin, bool noPrint, bool noPlo
   }
   for (int ieta=_config.BARREL; ieta<=_config.ENDCAP; ieta++){
     SetHists(ikin, ieta, noPrint);
+    FitOne(ikin, ieta, noPrint);
   }//end of loop over ieta
   ComputeYieldOneKinBin(ikin,noPrint);
   if (!noPrint){
@@ -113,13 +160,13 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   TCut cutSignal=SidebandVarNominalCut();
 
   TCut cutEta = CutEtaBin(ieta);
-  TCut cutKin = Cutikin(ikin);
+  TCut cutKin = CutKinBin(ikin);
   TCut cut;
 
   int nFitBins=_nFitBins[ikin][ieta];
-  double max=_maxVarFit[_nBinsMax][3];
+  double max=_maxVarFit[ikin][ieta];
   double unit = max/nFitBins;
-  double min=0-unit;
+  double min=0.0001-unit;
   nFitBins++;
   // one bin [-unit,0] is reserved for events for which Iso==0 
 
@@ -127,6 +174,7 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
 
   if (!noPrint){
     std::cout<<std::endl;
+    std::cout<<"min="<<min<<", max="<<max<<", unit="<<unit<<", nFitBins="<<nFitBins<<std::endl;
     std::cout<<"bin lims:";
   }
   for (int i=0; i<=nFitBins; i++){
@@ -137,8 +185,8 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
 
   //_kinBinLims[ikin] is upper limit
   //_kinBinLims[ikin-1] is lower limit
-  if (_varKin=="phoEt" && (_kinBinLims[ikin]>79 && _kinBinLims[ikin-1]>59))
-    cutKin="phoEt>60";
+//  if (_varKin=="phoEt" && (_kinBinLims[ikin]>79 && _kinBinLims[ikin-1]>59))
+//    cutKin="phoEt>60";
 
   name+="_True"; 
   cut = cutEta && cutKin && cutSignal;;
@@ -150,22 +198,23 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
     std::cout<<"sign template cut=(cutEta && cutKin && cutSignal)*cutWeight="<<cut.GetTitle()<<std::endl;
   }
 
+
   _fOutForSave->cd();
   _hTrue[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hTrue[ikin][ieta]->Sumw2();
-  SetTrueTemplate(_hTrue[ikin][ieta],cut,noPrint);
+  SetTemplate(1,_hTrue[ikin][ieta],cut,noPrint);
+  // "1" for true gamma template
 
   name.ReplaceAll("_True","_Fake");
   cut = cutEta && cutKin && cutSideband;
   if (!noPrint) std::cout<<"Fake template cut="<<cut.GetTitle()<<std::endl;
-
   _hFake[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hFake[ikin][ieta]->Sumw2();
   name.ReplaceAll("_Fake","_Data");
   _hData[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hData[ikin][ieta]->Sumw2();
-
-  SetFakeTemplate(_hFake[ikin][ieta], _hLeak[ikin][ieta], hLeakTemp, cut, noPrint);
+  SetTemplate(0,_hFake[ikin][ieta], cut, noPrint);
+  // "0" for fake gamma template
 
   _hFakeReference[ikin][ieta] = (TH1D*)_hFake[ikin][ieta]->Clone(_hFake[ikin][ieta]->GetName()+TString("_Ref"));
   _hFakeReference[ikin][ieta]->SetTitle(_hFakeReference[ikin][ieta]->GetName());
@@ -175,41 +224,24 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   if (!noPrint)     std::cout<<std::endl;
 }
 
-void TTemplatesRandCone::SetTrueTemplate(TH1D* hTrue, TCut cut, bool noPrint)
+void TTemplatesRandCone::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint)
 {
-  TString name=hTrue->GetName();
-  _treeData->Draw(("phoRandConeChIsoCorr>>")+name,cut*_cutWeight,"goff");
+  TString name=hTemplate->GetName();
+  if (isTrueGamma) _treeData->Draw(("phoRandConeChIsoCorr>>")+name,cut*_cutWeight,"goff");
+  else _treeData->Draw(("phoSCRChIsoCorr>>")+name,cut*_cutWeight,"goff");
 
-  TH1F* histTemp = new TH1F("hist","hist",1,_treeData->GetMinimum("weight"),_treeData->GetMaximum("weight"));
-  histTemp->Sumw2();
-  _treeData->Draw("weight>>hist",cut,"goff");
+  TH1F* histTempr = new TH1F("hist","hist",1,0,2000);
+  histTempr->Sumw2();
+  _treeData->Draw("phoEt>>hist",cut*_cutWeight,"goff");
   std::cout<<std::endl;
   std::cout<<std::fixed;
-  std::cout<<"True Template, mean weight =";
-  std::cout<<std::setprecision(2)<<histTemp->GetMean()<<"+-";
-  std::cout<<std::setprecision(2)<<histTemp->GetRMS()<<"; ";
+  std::cout<<hTemplate->GetTitle()<<" Template, mean weight =";
+  std::cout<<std::setprecision(2)<<histTempr->GetMean()<<"+-";
+  std::cout<<std::setprecision(2)<<histTempr->GetRMS()<<"; ";
+  std::cout<<"_treeData->GetEntries(cut*_cutWeight)="<<_treeData->GetEntries(cut*_cutWeight);
   std::cout<<std::endl;
   std::cout<<std::endl;
-  delete histTemp;
-
-}
-
-void TTemplatesRandCone::SetFakeTemplate(TH1D* hFake, TCut cut, bool noPrint)
-{
-  TString name=hTrue->GetName();
-  _treeData->Draw(("phoSCRChIsoCorr>>")+name,cut*_cutWeight,"goff");
-
-  TH1F* histTemp = new TH1F("hist","hist",1,_treeData->GetMinimum("weight"),_treeData->GetMaximum("weight"));
-  histTemp->Sumw2();
-  _treeData->Draw("weight>>hist",cut,"goff");
-  std::cout<<std::endl;
-  std::cout<<std::fixed;
-  std::cout<<"True Template, mean weight =";
-  std::cout<<std::setprecision(2)<<histTemp->GetMean()<<"+-";
-  std::cout<<std::setprecision(2)<<histTemp->GetRMS()<<"; ";
-  std::cout<<std::endl;
-  std::cout<<std::endl;
-  delete histTemp;
+  delete histTempr;
 }
 
 void TTemplatesRandCone::RandomizeTemplates(int ikin, int ieta)
@@ -228,7 +260,7 @@ void TTemplatesRandCone::RandomizeTemplates(int ikin, int ieta)
   }
 }
 
-void TTemplatesRandCone::DeleteThreeHists(int ikin, int ieta){
+void TTemplatesRandCone::DeleteHists(int ikin, int ieta){
 
   delete _hTrue[ikin][ieta];
   delete _hFake[ikin][ieta]; 
@@ -286,8 +318,8 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   minPhoEta = _treeData->GetMinimum("phoSCEta");
   maxKin = _treeData->GetMaximum(_varKin);
   minKin = _treeData->GetMinimum(_varKin);
-  maxWeight = _treeSign->GetMaximum("weight");
-  minWeight = _treeSign->GetMinimum("weight");
+  maxWeight = _treeData->GetMaximum("weight");
+  minWeight = _treeData->GetMinimum("weight");
   if (!noPrint){
     std::cout<<"sideband (phoSigmaIEtaIEta) range: "<<minVarSideband<<" - "<<maxVarSideband<<std::endl;
     std::cout<<"phoSCEta range: "<<minPhoEta<<" - "<<maxPhoEta<<std::endl;
@@ -303,12 +335,11 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   if (!noPrint){
     std::cout<<"etaCut="<<etaCut.GetTitle()<<std::endl;
     std::cout<<"kinCut="<<kinCut.GetTitle()<<std::endl;
-    std::cout<<"sidebandVarNominalCut="<<sidebandVarNonimalCut.GetTitle()<<std::endl;
+    std::cout<<"sidebandVarNominalCut="<<sidebandVarNominalCut.GetTitle()<<std::endl;
   }
   TCut cut = kinCut && etaCut && sidebandVarNominalCut;
 	
-  TString varDraw=_varFit;
-  varDraw+=">>";
+  TString varDraw="phoSCRChIsoCorr>>";
   varDraw+= _hData[ikin][ieta]->GetName();
 
   _treeData->Draw(varDraw,cut*_cutWeight,"goff");
@@ -340,7 +371,7 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   int nTrueStart = 0.5*nMax;
   int nFakeStart = 0.5*nMax;
 
-  RooRealVar rooVarFit(_varFit,_labelVarFit, varMin, varMax);
+  RooRealVar rooVarFit("phoSCRChIsoCorr","pho I_ch", varMin, varMax);
   if (nMax<=0){
     if (!noPrint) std::cout<<"ATTENTION: No data events for bin "<<kinCut<<", "<<etaCut<<std::endl;
     _nFakeFromFitVal[ikin][ieta]=0;
@@ -350,7 +381,7 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
     _plotter[ikin][ieta] = new RooPlot(rooVarFit,varMin,varMax,nBins);
     return;
   }
-  RooRealVar rooVarSideband(_varSideband,_varSideband,minVarSideband,maxVarSideband);
+  RooRealVar rooVarSideband("phoSigmaIEtaIEta","phoSigmaIEtaIEta",minVarSideband,maxVarSideband);
   RooRealVar rooPhoEta("phoEta","phoEta",minPhoEta,maxPhoEta);
   RooRealVar rooKin(_varKin,_varKin,minKin,maxKin);
   RooRealVar rooWeight("weight","weight",minWeight,maxWeight);
@@ -369,9 +400,9 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   RooDataHist dataHist("hist", "data set converted to hist", argList, _hData[ikin][ieta]);
   //create Fake and True PDFs
   RooDataHist trueDataHist("trueDataHist","true RooDataHist", argList, _hTrue[ikin][ieta]);
-  RooHistPdf truePdf("truePdf",_varFit+TString(" of true"), argSet, trueDataHist);
+  RooHistPdf truePdf("truePdf","phoRandConeChIsoCorr of true", argSet, trueDataHist);
   RooDataHist fakeDataHist("fakeDataHist", "fake RooDataHist", argList, _hFake[ikin][ieta]);
-  RooHistPdf fakePdf("fakePdf",_varFit+TString(" of fake"), argSet, fakeDataHist);
+  RooHistPdf fakePdf("fakePdf","phoSCRChIsoCorr of fake", argSet, fakeDataHist);
 
   //load data
   RooArgSet argSetData(rooVarFit,rooVarSideband,rooPhoEta,rooKin,rooWeight);
@@ -412,24 +443,53 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
 void TTemplatesRandCone::ComputeYieldOneKinBin(int ikin, bool noPrint)
 {
 
-  _nFakeYieldsVal[ikin][_config.BARREL]=_nFakeFromFitVal[ikin][_config.BARREL];
-  _nFakeYieldsErr[ikin][_config.BARREL]=_nFakeFromFitErr[ikin][_config.BARREL];
-  _nFakeYieldsVal[ikin][_config.ENDCAP]=_nFakeFromFitVal[ikin][_config.ENDCAP];
-  _nFakeYieldsErr[ikin][_config.ENDCAP]=_nFakeFromFitErr[ikin][_config.ENDCAP];
-  _nFakeYieldsVal[ikin][_config.COMMON]=_nFakeYieldsVal[ikin][_config.BARREL]+_nFakeYieldsVal[ikin][_config.ENDCAP];
-  _nFakeYieldsErr[ikin][_config.COMMON]=sqrt(_nFakeYieldsVal[ikin][_config.BARREL]*_nFakeYieldsVal[ikin][_config.BARREL]+_nFakeYieldsVal[ikin][_config.ENDCAP]*_nFakeYieldsVal[ikin][_config.ENDCAP]);
+  int nTotalFake[2];
+  int nPassedFake[2];
+  nTotalFake[_config.BARREL] = _treeData->GetEntries(SidebandCut()&&_photon.RangeBarrel()&&CutKinBin(ikin));
+  nPassedFake[_config.BARREL] = _treeData->GetEntries(SidebandCut()&&_photon.RangeBarrel()&&CutKinBin(ikin)&&_photon.RangeOneIsolation(2012,_phoWP,_photon.ISO_CHorTRK));
+  nTotalFake[_config.ENDCAP] = _treeData->GetEntries(SidebandCut()&&_photon.RangeEndcap()&&CutKinBin(ikin));
+  nPassedFake[_config.ENDCAP] = _treeData->GetEntries(SidebandCut()&&_photon.RangeEndcap()&&CutKinBin(ikin)&&_photon.RangeOneIsolation(2012,_phoWP,_photon.ISO_CHorTRK));
+  float effFake[2];
+  effFake[_config.BARREL]=1.0*nPassedFake[_config.BARREL]/nTotalFake[_config.BARREL];
+  effFake[_config.ENDCAP]=1.0*nPassedFake[_config.ENDCAP]/nTotalFake[_config.ENDCAP];
 
-  _nTrueYieldsVal[ikin][_config.BARREL]=_nTrueFromFitVal[ikin][_config.BARREL];
-  _nTrueYieldsErr[ikin][_config.BARREL]=_nTrueFromFitErr[ikin][_config.BARREL];
-  _nTrueYieldsVal[ikin][_config.ENDCAP]=_nTrueFromFitVal[ikin][_config.ENDCAP];
-  _nTrueYieldsErr[ikin][_config.ENDCAP]=_nTrueFromFitErr[ikin][_config.ENDCAP];
+  _nFakeYieldsVal[ikin][_config.BARREL]=_nFakeFromFitVal[ikin][_config.BARREL]*effFake[_config.BARREL];
+  _nFakeYieldsErr[ikin][_config.BARREL]=_nFakeFromFitErr[ikin][_config.BARREL]*effFake[_config.BARREL];
+  _nFakeYieldsVal[ikin][_config.ENDCAP]=_nFakeFromFitVal[ikin][_config.ENDCAP]*effFake[_config.ENDCAP];
+  _nFakeYieldsErr[ikin][_config.ENDCAP]=_nFakeFromFitErr[ikin][_config.ENDCAP]*effFake[_config.ENDCAP];
+
+  _nFakeYieldsVal[ikin][_config.COMMON]=_nFakeYieldsVal[ikin][_config.BARREL]+_nFakeYieldsVal[ikin][_config.ENDCAP];
+  _nFakeYieldsErr[ikin][_config.COMMON]=sqrt(_nFakeYieldsErr[ikin][_config.BARREL]*_nFakeYieldsErr[ikin][_config.BARREL]+_nFakeYieldsErr[ikin][_config.ENDCAP]*_nFakeYieldsErr[ikin][_config.ENDCAP]);
+
+  int nTotalTrue[2];
+  int nPassedTrue[2];
+  nTotalTrue[_config.BARREL] = _treeSign->GetEntries(_photon.RangeSigmaIEtaIEta(2012,_phoWP)&&_photon.RangeBarrel()&&CutKinBin(ikin));
+  nPassedTrue[_config.BARREL] = _treeSign->GetEntries(_photon.RangeSigmaIEtaIEta(2012,_phoWP)&&_photon.RangeBarrel()&&CutKinBin(ikin)&&_photon.RangeOneIsolation(2012,_phoWP,_photon.ISO_CHorTRK));
+  nTotalTrue[_config.ENDCAP] = _treeSign->GetEntries(_photon.RangeSigmaIEtaIEta(2012,_phoWP)&&_photon.RangeEndcap()&&CutKinBin(ikin));
+  nPassedTrue[_config.ENDCAP] = _treeSign->GetEntries(_photon.RangeSigmaIEtaIEta(2012,_phoWP)&&_photon.RangeEndcap()&&CutKinBin(ikin)&&_photon.RangeOneIsolation(2012,_phoWP,_photon.ISO_CHorTRK));
+  float effTrue[2];
+  effTrue[_config.BARREL]=1.0*nPassedTrue[_config.BARREL]/nTotalTrue[_config.BARREL];
+  effTrue[_config.ENDCAP]=1.0*nPassedTrue[_config.ENDCAP]/nTotalTrue[_config.ENDCAP];
+
+  _nTrueYieldsVal[ikin][_config.BARREL]=_nTrueFromFitVal[ikin][_config.BARREL]*effTrue[_config.BARREL];
+  _nTrueYieldsErr[ikin][_config.BARREL]=_nTrueFromFitErr[ikin][_config.BARREL]*effTrue[_config.BARREL];
+  _nTrueYieldsVal[ikin][_config.ENDCAP]=_nTrueFromFitVal[ikin][_config.ENDCAP]*effTrue[_config.ENDCAP];
+  _nTrueYieldsErr[ikin][_config.ENDCAP]=_nTrueFromFitErr[ikin][_config.ENDCAP]*effTrue[_config.ENDCAP];
+
   _nTrueYieldsVal[ikin][_config.COMMON]=_nTrueYieldsVal[ikin][_config.BARREL]+_nTrueYieldsVal[ikin][_config.ENDCAP];
-  _nTrueYieldsErr[ikin][_config.COMMON]=sqrt(_nTrueYieldsVal[ikin][_config.BARREL]*_nTrueYieldsVal[ikin][_config.BARREL]+_nTrueYieldsVal[ikin][_config.ENDCAP]*_nTrueYieldsVal[ikin][_config.ENDCAP]);
+  _nTrueYieldsErr[ikin][_config.COMMON]=sqrt(_nTrueYieldsErr[ikin][_config.BARREL]*_nTrueYieldsErr[ikin][_config.BARREL]+_nTrueYieldsErr[ikin][_config.ENDCAP]*_nTrueYieldsErr[ikin][_config.ENDCAP]);
 
   if (!noPrint){
-    std::cout<<"Yields in "<<StrKinLabel(ikin)<<": "<<std::endl
+    std::cout<<"Yields in "<<StrLabelKin(ikin)<<": "<<std::endl;
     for (int ieta=_config.BARREL; ieta<=_config.COMMON; ieta++){
-      std::cout<<StrEtaLabel(ieta)<<": nTrue="<<_nTrueYieldsVal[ikin][ieta]<<"+-"<<_nTrueYieldsErr[ikin][ieta]<<"; nFake="<<_nFakeYieldsVal[ikin][ieta]<<"+-"<<_nFakeYieldsErr[ikin][ieta]<<std::endl       
+      std::cout<<setprecision(2)<<std::endl;
+      std::cout<<StrLabelEta(ieta)<<": "<<std::endl;
+      if (ieta!=_config.COMMON){
+        std::cout<<"fromFit*eff=nTrue="<<_nTrueFromFitVal[ikin][ieta]<<"+-"<<_nTrueFromFitErr[ikin][ieta]<<"*"<<effTrue[ieta]<<"="<<_nTrueYieldsVal[ikin][ieta]<<"+-"<<_nTrueYieldsErr[ikin][ieta]<<";"<<std::endl;
+        std::cout<<"fromFit*eff=nFake="<<_nFakeFromFitVal[ikin][ieta]<<"+-"<<_nFakeFromFitErr[ikin][ieta]<<"*"<<effFake[ieta]<<"="<<_nFakeYieldsVal[ikin][ieta]<<"+-"<<_nFakeYieldsErr[ikin][ieta]<<";"<<std::endl;   
+        std::cout<<"_hData="<<_hData[ikin][ieta]->GetSumOfWeights()<<"; true+fake="<<_nTrueYieldsVal[ikin][ieta]+_nFakeYieldsVal[ikin][ieta]<<std::endl;
+      }
+      //std::cout<<"_hData="<<_hData[ikin][ieta]->GetSumOfWeights()<<"; true+fake="<<_nTrueYieldsVal[ikin][ieta]+_nFakeYieldsVal[ikin][ieta]<<std::endl;//", _hSumm="<<_hSumm[ikin][ieta]->GetSumOfWeights()<<std::endl;  
     }  
   }
 }
@@ -626,10 +686,10 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
     _hSumm[ikin][ieta]->SetLineStyle(3);
     _hSumm[ikin][ieta]->Draw("HIST same");  
 
-    double valCut = ValueCutNominalVarFit(ieta);
-    TLine* cutLine = new TLine(valCut,0,valCut,_hSumm[ikin][ieta]->GetMaximum());
-    cutLine->SetLineWidth(3);
-    cutLine->Draw("same");
+ //   double valCut = ValueCutNominalVarFit(ieta);
+ //   TLine* cutLine = new TLine(valCut,0,valCut,_hSumm[ikin][ieta]->GetMaximum());
+ //   cutLine->SetLineWidth(3);
+ //   cutLine->Draw("same");
 
     textBin->Draw("same");
     textChi2->Draw("same");
@@ -641,7 +701,7 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
     _hRatio[ikin][ieta]->GetXaxis()->SetLabelSize(0.1);
     _hRatio[ikin][ieta]->GetXaxis()->SetTitleOffset(1.0);
     _hRatio[ikin][ieta]->GetXaxis()->SetTitleSize(0.12);
-    _hRatio[ikin][ieta]->SetTitle(TString("; ")+_labelVarFit+TString(" ;"));
+    _hRatio[ikin][ieta]->SetTitle(TString("; pho I_ch ;"));
     _hRatio[ikin][ieta]->Draw();
     int nBins = _hRatio[ikin][ieta]->GetNbinsX();
     TLine* line = new TLine(_hRatio[ikin][ieta]->GetBinLowEdge(1),1,_hRatio[ikin][ieta]->GetBinLowEdge(nBins)+_hRatio[ikin][ieta]->GetBinWidth(nBins),1);
@@ -662,7 +722,7 @@ TCut TTemplatesRandCone::SidebandCut()
 {
   TCut cutSidebandB="phoSigmaIEtaIEta>0.011 && phoSigmaIEtaIEta<0.014";  
   TCut cutSidebandE="phoSigmaIEtaIEta>0.033 && phoSigmaIEtaIEta<0.044";
-  return ( (_photon.IsBarrel()&&cutSidebandB)||(_photon.IsEndcap()&&cutSidebandE) ); 
+  return ( (_photon.RangeBarrel()&&cutSidebandB)||(_photon.RangeEndcap()&&cutSidebandE) ); 
 }
 
 TCut TTemplatesRandCone::SidebandVarNominalCut()
@@ -714,7 +774,7 @@ void TTemplatesRandCone::SaveYields()
   }//end of loop over ieta
 }
 
-TCut TTemplatesRandCone::Cutikin(int ikin){
+TCut TTemplatesRandCone::CutKinBin(int ikin){
 
   if (ikin<0 || ikin>_nKinBins){
     TCut cut("0");
@@ -754,16 +814,4 @@ TCut TTemplatesRandCone::CutEtaBin(int ieta){
   else
     cut="0";
   return cut;
-}
-
-double TTemplatesRandCone::ValueCutNominalVarFit(int ieta){
-  if (_varFit=="phoSigmaIEtaIEta"){
-    if (ieta==_config.BARREL) return _photon.GetPhoSigmaIEtaIEtaCutB(2012,_phoWP);
-    else if (ieta==_config.ENDCAP) return _photon.GetPhoSigmaIEtaIEtaCutE(2012,_phoWP);
-    else return 1;
-  }
-  if (_varFit=="phoSCRChIsoCorr"){
-    return _photon.GetPhoSCRChIsoCorrCut();
-  }
-  return 100000;
 }

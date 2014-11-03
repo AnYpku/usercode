@@ -4,9 +4,7 @@
 #include "../Include/TMuonCuts.h" //this package
 #include "../Include/TFullCuts.h" //this package
 #include "../Include/TMetTools.h" //this package
-#include "../Include/PhosphorCorrectorFunctor.hh"
-  //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
-  //currently in this package
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
 #include "TTree.h" //ROOT class
 #include "TFile.h" //ROOT class
 #include "TString.h" //ROOT class
@@ -272,13 +270,14 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
   _phoEta=treeLeaf.phoEta->at(cand.ipho);
   _phoPhi=treeLeaf.phoPhi->at(cand.ipho);
   _phoEtNoPhosphor=treeLeaf.phoEt->at(cand.ipho);
+  _phoEt=treeLeaf.phoEt->at(cand.ipho);//no phosphor
 
-  if (treeLeaf.isData)
-       _phoEt = photonCorrector->GetCorrEtData(treeLeaf.phoR9->at(cand.ipho), 2012, treeLeaf.phoEt->at(cand.ipho), treeLeaf.phoEta->at(cand.ipho));
+//  if (treeLeaf.isData)
+//       _phoEt = photonCorrector->GetCorrEtData(treeLeaf.phoR9->at(cand.ipho), 2012, treeLeaf.phoEt->at(cand.ipho), treeLeaf.phoEta->at(cand.ipho));
        //Phosphor correction needs to be applied for the photon Et only, 
        //not for SC Et
-  else if (_iMCpho >= 0) 
-    _phoEt = photonCorrector->GetCorrEtMC(treeLeaf.phoR9->at(cand.ipho), 2012, treeLeaf.phoEt->at(cand.ipho), treeLeaf.phoEta->at(cand.ipho), treeLeaf.mcE->at(_iMCpho));
+//  else if (_iMCpho >= 0) 
+//    _phoEt = photonCorrector->GetCorrEtMC(treeLeaf.phoR9->at(cand.ipho), 2012, treeLeaf.phoEt->at(cand.ipho), treeLeaf.phoEta->at(cand.ipho), treeLeaf.mcE->at(_iMCpho));
 
   _phoSCEta=treeLeaf.phoSCEta->at(cand.ipho);
   _phoSCPhi=treeLeaf.phoSCPhi->at(cand.ipho);
@@ -290,12 +289,30 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
 
   TPhotonCuts emptyPhoton;
   //photon isolation corrections 2012
+//  std::cout<<"event="<<_event<<", ipho="<<cand.ipho<<std::endl;
+
+//  std::cout<<"phoPFChIso Correction starts"<<std::endl;
+//  std::cout<<"iso="<<treeLeaf.phoPFChIso->at(cand.ipho)<<", rho2012="<<treeLeaf.rho2012<<", eta="<<treeLeaf.phoSCEta->at(cand.ipho)<<std::endl;
   _phoPFChIsoCorr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoPFChIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
-  _phoSCRChIsoCorr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoSCRChIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+//  std::cout<<"isoCorr="<<_phoPFChIsoCorr<<std::endl;
+//  std::cout<<"phoPFChIso Correction ends"<<std::endl;
+
+//  std::cout<<"phoPFNeuIso Correction starts"<<std::endl;
+//  std::cout<<"iso="<<treeLeaf.phoPFNeuIso->at(cand.ipho)<<", rho2012="<<treeLeaf.rho2012<<", eta="<<treeLeaf.phoSCEta->at(cand.ipho)<<std::endl;
   _phoPFNeuIsoCorr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoPFNeuIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
-  _phoSCRNeuIsoCorr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoSCRNeuIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+//  std::cout<<"isoCorr="<<_phoPFNeuIsoCorr<<std::endl;
+//  std::cout<<"phoPFNeuIso Correction ends"<<std::endl;
+
+//  std::cout<<"phoPFPhoIso Correction starts"<<std::endl;
+//  std::cout<<"iso="<<treeLeaf.phoPFPhoIso->at(cand.ipho)<<", rho2012="<<treeLeaf.rho2012<<", eta="<<treeLeaf.phoSCEta->at(cand.ipho)<<std::endl;
   _phoPFPhoIsoCorr=emptyPhoton.GetPhoPhoIsoCorr(treeLeaf.phoPFPhoIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+//  std::cout<<"isoCorr="<<_phoPFPhoIsoCorr<<std::endl;
+//  std::cout<<"phoPFPhoIso Correction ends"<<std::endl;
+
+  _phoSCRChIsoCorr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoSCRChIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+  _phoSCRNeuIsoCorr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoSCRNeuIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
   _phoSCRPhoIsoCorr=emptyPhoton.GetPhoPhoIsoCorr(treeLeaf.phoSCRPhoIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+
   if (sample==_config.DATA) {
     _phoRandConeChIsoCorr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoRandConeChIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
     _phoRandConeNeuIsoCorr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoRandConeNeuIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));

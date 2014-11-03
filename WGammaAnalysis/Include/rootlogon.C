@@ -6,7 +6,8 @@
   gROOT->ProcessLine(".L ../Configuration/TInputSample.C+");
   gROOT->ProcessLine(".L ../Configuration/TAllInputSamples.C+");
 
-  gROOT->ProcessLine(".L ../Include/PhosphorCorrectorFunctor.cc+");
+  gROOT->ProcessLine(".L ../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.cc+");
+
   gROOT->ProcessLine(".L ../Include/TMathTools.C+");
   gROOT->ProcessLine(".L ../Include/TEventTree.C+");
   gROOT->ProcessLine(".L ../Include/TPhotonCuts.C+");
@@ -25,7 +26,7 @@
   gROOT->ProcessLine(".L ../Selection/Selection.C+");
 
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
-//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesRandCone.C+");
+  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesRandCone.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
 

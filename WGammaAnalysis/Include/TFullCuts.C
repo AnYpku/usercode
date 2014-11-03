@@ -7,7 +7,7 @@
 #include "../Configuration/TInputSample.h"
   //this package
 
-#include "PhosphorCorrectorFunctor.hh"
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
   //currently in this package
 
@@ -26,11 +26,13 @@ TFullCuts::~TFullCuts()
 {
 }
 
-bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,   
+bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,  
+                    zgamma::PhosphorCorrectionFunctor* photonCorrector, 
                     int channel, int vgamma, bool isVJets,
                     int& nCands, Candidate* cands,
                     PassedLevels& passed)
 {
+//  std::cout<<"channel="<<_config.StrChannel(channel)<<std::endl;
 
   // This function is called from LoopOverEvents.
   // returns 1 if entry is accepted (has at least one candidate)
@@ -40,28 +42,31 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
    _cands=cands;
    _passed=passed;
 
+//  std::cout<<"vgamma="<<_config.StrVgType(vgamma)<<std::endl;
+
    _kinPhoton=new bool[inpTreeLeaf.nPho];
 
    int nLe=0;
    if (channel==TConfiguration::MUON) nLe=inpTreeLeaf.nMu;
    else if (channel==TConfiguration::ELECTRON) nLe=inpTreeLeaf.nEle;
-
    if (channel==TConfiguration::MUON && vgamma==TConfiguration::W_GAMMA)
-     if (!inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[18]] && !inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[19]])
+     if ((!inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[18]]) && (!inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[19]]))
      //_HLT_IsoMu24_eta2p1_, _HLT_IsoMu24_v
-       return 0;
+       { passed=_passed;  return 0;}
    if (channel==TConfiguration::ELECTRON && vgamma==TConfiguration::W_GAMMA);
    if (channel==TConfiguration::MUON && vgamma==TConfiguration::Z_GAMMA);
      if (!inpTreeLeaf.HLT[inpTreeLeaf.HLTIndex[21]])
      //_HLT_Mu22_Mu8_v
-       return 0;
+       { passed=_passed;  return 0;}
    if (channel==TConfiguration::ELECTRON && vgamma==TConfiguration::Z_GAMMA);
+
    _passed.triggerPassed++;
 
-   if ((inpTreeLeaf.IsVtxGood)==-1) return 0;
+   if ((inpTreeLeaf.IsVtxGood)==-1){ passed=_passed; return 0;}
    _passed.goodVertexPassed++;
-   if (inpTreeLeaf.nPho < 1) return 0; 
-   if (nLe < 1) return 0;
+   if (inpTreeLeaf.nPho < 1){ passed=_passed;  return 0;}
+   if (nLe < 1) { passed=_passed;  return 0;}
+
       //these variables are fields of TEventTree
 //   if (!inpTreeLeaf.metFilters[6]) return 0;
 // we don't need it because we're running Jan22 rereco
@@ -69,6 +74,8 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
       //[6] - ecalLaserCorrFilter
       //necessary to remove spikes in the photon distributions 
       //for Jul13 rereco
+   if (isVJets && IsOverlapVJetsVGamma(channel)) { passed=_passed;  return 0;}
+      _passed.vgvjOverlapPassed++;
 
    _kinLepton1=new bool[nLe];
    bool kinLepton1Exists=0;
@@ -86,14 +93,15 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
   bool ifPassedPt=0;
   bool ifPassedEta=0;
   for (int ipho=0; ipho<_inpTreeLeaf.nPho; ipho++){   
-    _kinPhoton[ipho]=_emptyPhoton.PassedKinematics(_inpTreeLeaf.phoEt->at(ipho),_inpTreeLeaf.phoSCEta->at(ipho),ifPassedPt,ifPassedEta);
-    if (ifPassedPt) _passed.phoPtPassed++; else continue;
-    if (ifPassedEta) _passed.phoEtaPassed++; else continue;
 
-    if (isVJets && IsOverlapVJetsVGamma(ipho)) return 0;
-    _passed.vgvjOverlapPassed++;
+    for (int ilep1=0; ilep1<nLe; ilep1++){ 
 
-    for (int ilep1=0; ilep1<nLe; ilep1++){    
+      //double phoEtCorr = photonCorrector->GetCorrEtData(_inpTreeLeaf.phoR9->at(ipho), 2012, _inpTreeLeaf.phoEt->at(ipho), _inpTreeLeaf.phoEta->at(ipho));
+
+      _kinPhoton[ipho]=_emptyPhoton.PassedKinematics(_inpTreeLeaf.phoEt->at(ipho),_inpTreeLeaf.phoSCEta->at(ipho),ifPassedPt,ifPassedEta);
+      if (ifPassedPt) _passed.phoPtPassed++; else continue;
+      if (ifPassedEta) _passed.phoEtaPassed++; else continue;
+   
       if (channel==TConfiguration::MUON){
         _kinLepton1[ilep1] = _emptyMuon.PassedKinematics(_inpTreeLeaf.muPt->at(ilep1),_inpTreeLeaf.muEta->at(ilep1),ifPassedPt,ifPassedEta);
         if (ifPassedPt) _passed.leptonPtPassed++; else continue;
@@ -140,6 +148,7 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
   nCands=icand;
   passed=_passed;
   return (icand);
+//  return 1;
 }//end of TFullCuts::VeryPreliminaryCut
 
 void TFullCuts::CheckDRandProceed(int vgamma, bool isVJets, int& icand,
@@ -154,12 +163,7 @@ void TFullCuts::CheckDRandProceed(int vgamma, bool isVJets, int& icand,
   //all the rest - if (passCond)
   _passed.dRPassed++;
   if (!hasEventAfterPass) _passed.evAfterKinCuts++;
-  hasEventAfterPass=1;
-//  if (isVJets && IsOverlapVJetsVGamma(ipho)){
-//    if (!hasOverlap) _passed.evAfterKinCutsOverlap++;
-//    hasOverlap=1;
-//    return;
-//  }  
+  hasEventAfterPass=1; 
   _cands[icand].ipho=ipho; 
   if (vgamma==_config.W_GAMMA || dR1<dR2){
     _cands[icand].ilep1=ilep1; _cands[icand].ilep2=ilep2;
@@ -172,37 +176,27 @@ void TFullCuts::CheckDRandProceed(int vgamma, bool isVJets, int& icand,
   icand++;
 }
 
-bool TFullCuts::IsOverlapVJetsVGamma(int ipho)
+bool TFullCuts::IsOverlapVJetsVGamma(int channel)
 {
-  // from Sachiko's code (Zgg, 
-  // https://github.com/sachikot/Zgg/blob/master/analyze.cc#L317-343)
+  bool isOverlap=0;
+  float drmin=1000;
 
-  bool pho_matched = false;
+  for (int imc1 = 0; imc1 < _inpTreeLeaf.nMC; ++imc1){
+    if( _inpTreeLeaf.mcPID->at(imc1) != 22 ) continue;
+    if( (_inpTreeLeaf.mcParentage->at(imc1) & 4) == 4) continue;
+    if( _inpTreeLeaf.mcPt->at(imc1) < 10 ) continue;
+    for (int imc2 = 0; imc2 < _inpTreeLeaf.nMC; ++imc2){
+          if( channel==_config.MUON)
+            if (fabs(_inpTreeLeaf.mcPID->at(imc2)) != 13) continue;
+          if( channel==_config.ELECTRON)
+            if (fabs(_inpTreeLeaf.mcPID->at(imc2)) != 11) continue;
+          float dr = DeltaR(_inpTreeLeaf.mcPhi->at(imc1),_inpTreeLeaf.mcEta->at(imc1),_inpTreeLeaf.mcPhi->at(imc2),_inpTreeLeaf.mcEta->at(imc2));
+          if (dr<drmin) drmin=dr;
+    }//end of loop over imc2
+  }//end of loop over imc1
+  if (drmin>0.4 && drmin<1000) isOverlap=1;
 
-  float dr_min = 1000.;
-  float dr;
-
-  for (int genPho = 0; genPho < _inpTreeLeaf.nMC; ++genPho){
-
-    if( _inpTreeLeaf.mcPID->at(genPho) != 22 ) continue;
-    if( (_inpTreeLeaf.mcParentage->at(genPho) & 4) == 4) continue;
-    if( _inpTreeLeaf.mcPt->at(genPho) < 10 ) continue;
-    // CALCULATE DR
-//    float deta = _inpTreeLeaf.phoEta->at(ipho) - _inpTreeLeaf.mcEta->at(genPho);
-//    float dphi = fabs(_inpTreeLeaf.phoPhi->at(ipho) - _inpTreeLeaf.mcPhi->at(genPho));
-//    if (dphi>=2*TMath::Pi()) std::cout<<"dphi="<<dphi<<std::endl;
-    dr = DeltaR(_inpTreeLeaf.phoPhi->at(ipho),_inpTreeLeaf.phoEta->at(ipho),_inpTreeLeaf.mcPhi->at(genPho),_inpTreeLeaf.mcEta->at(genPho));
-    if(dr < dr_min) dr_min = dr;
-    if(dr < 0.2) {
-      pho_matched = true;
-      break;
-    }
-
-  } // loop over for gen-photon
-  //  deltaR->Fill(dr_min);
-  //  if(pho_matched) continue; // yes! I removed overlapping reco-photon!!
-
-  return pho_matched;
+  return isOverlap;
 }
 
 float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 

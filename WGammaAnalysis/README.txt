@@ -166,8 +166,6 @@ c) Include
 
 -- rootlogon.C - load all classes in the package. Does not load root macros which are not classes (e.g. "aux" files).  
 
--- PhosphorCorrectorFunctor.hh/.cc - class PhosphorCorrectionFunctor. Calculated corrected photon Et and En for data and MC. With minor modifications, was copied from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
-
 -- TEventTree.h/.C - class TEventTree. The whole structure of input tree, data and MC. Variables, branches, SetBranchAddress(es), GetEntr(ies) etc. Constants of maximum possible nMu, nPho, nHLT etc in the input tree are listed here. If some tree has larger number - it has to be modified here.
 
 -- TPhotonCuts, TElectronCuts, TMuonCuts - lists proper cuts and has cut functions. Contains kinematic, ID, isolation cuts, second lepton veto. TElectronCuts is empty now, before actual work on electrons started.
@@ -208,3 +206,6 @@ into the file
 Improvement may be achieved here if to do loop over directory names
 in the current directory
 
+##############################
+h)PHOSPHOR_CORRECTION
+-- PhosphorCorrectorFunctor.hh/.cc - class PhosphorCorrectionFunctor. Calculated corrected photon Et and En for data and MC. With minor modifications, was cloned from https://github.com/cmorgoth/PHOSPHOR_CORRECTION/

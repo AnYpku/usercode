@@ -54,32 +54,33 @@ void CountPhotonSources()
   TConfiguration config;
   vector <int> vecSamples;
   vector <TString> vecNames;
-//  vecSamples.push_back(config.SIGMC);
-//  vecNames.push_back("Wg_to_munu");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("Wg_to_taunu");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("Wjets_to_lnu");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("Zg");
   vecSamples.push_back(config.SIGMC);
-  vecNames.push_back("Zg_to_mumu");
+  vecNames.push_back("Wg_to_munu");
   vecSamples.push_back(config.BKGMC);
-  vecNames.push_back("Zg_to_tautau");
+  vecNames.push_back("Wg_to_taunu");
+  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("Wjets_to_lnu");
+  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("Zg");
+//  vecSamples.push_back(config.SIGMC);
+//  vecNames.push_back("Zg_to_mumu");
+//  vecSamples.push_back(config.BKGMC);
+//  vecNames.push_back("Zg_to_tautau");
   vecSamples.push_back(config.BKGMC);
   vecNames.push_back("DYjets_to_ll");
 //  vecSamples.push_back(config.BKGMC);
 //  vecNames.push_back("ttbarg");
 //  vecSamples.push_back(config.BKGMC);
 //  vecNames.push_back("ttbarjets");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("multibosons");
+  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("multibosons");
 
   int nSources = vecSamples.size();
-  TCut cutWeight="weight";
+  TCut cutWeight="weight/20";
   TCut cutTrueGamma="phoGenPID==22 && (phoGenMomPID>=-24 && phoGenMomPID<=24)";
   TCut cutFakeGamma=!cutTrueGamma;
-  TCut cutCS="phoEt>15 && phoEt<600 && lep1PhoDeltaR>0.7 && lep2PhoDeltaR>0.7";
+  TCut cutCS="1";
+ // TCut cutCS="phoEt>15 && phoEt<600 && lep1PhoDeltaR>0.7 && lep2PhoDeltaR>0.7";
 
 
   std::cout<<std::setw(15)<<"sample";
@@ -94,7 +95,7 @@ void CountPhotonSources()
 
 //    TString fileName = config.GetSelectedName(config.VERY_PRELIMINARY, config.MUON, vecSamples[iSource], vecNames[iSource]);
 
-    TString fileName = config.GetSelectedName(config.FULLY, config.MUON, config.Z_GAMMA, config.UNBLIND, vecSamples[iSource], vecNames[iSource]);
+    TString fileName = config.GetSelectedName(config.FULLY, config.MUON, config.W_GAMMA, config.UNBLIND, vecSamples[iSource], vecNames[iSource]);
 
     TFile f(fileName);
     if (!f.IsOpen()){
@@ -141,24 +142,24 @@ void CountFakePhotonRates()
   TConfiguration config;
   vector <int> vecSamples;
   vector <TString> vecNames;
-//  vecSamples.push_back(config.SIGMC);
-//  vecNames.push_back("Wg_to_munu");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("Wg_to_taunu");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("Wjets_to_lnu");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("Zg");
+  vecSamples.push_back(config.SIGMC);
+  vecNames.push_back("Wg_to_munu");
+  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("Wg_to_taunu");
+  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("Wjets_to_lnu");
+  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("Zg");
 //  vecSamples.push_back(config.BKGMC);
   vecSamples.push_back(config.BKGMC);
   vecNames.push_back("DYjets_to_ll");
-  vecSamples.push_back(config.SIGMC);
-  vecNames.push_back("Zg_to_mumu");
+//  vecSamples.push_back(config.SIGMC);
+//  vecNames.push_back("Zg_to_mumu");
+//  vecSamples.push_back(config.BKGMC);
+//  vecNames.push_back("Zg_to_tautau");
+//  vecSamples.push_back(config.BKGMC);
+  vecNames.push_back("multibosons");
   vecSamples.push_back(config.BKGMC);
-  vecNames.push_back("Zg_to_tautau");
-//  vecSamples.push_back(config.BKGMC);
-//  vecNames.push_back("multibosons");
-//  vecSamples.push_back(config.BKGMC);
 //  vecNames.push_back("ttbarg");
 //  vecSamples.push_back(config.BKGMC);
 //  vecNames.push_back("ttbarjets");

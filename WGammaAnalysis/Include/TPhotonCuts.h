@@ -108,6 +108,7 @@ class TPhotonCuts
                            {{2.3,0.000,1.2,0.000,0.5,0.000}, //changed
                             {2.9,0.040,1.5,0.040,1.5,0.040}, //neutral
                           {10000,0.000,1.0,0.005,1.0,0.005}};//photon
+
     const static float _phoIsoCut2011[3][2]=
                            {{2.0,0.0010}, //trk (changed)
                             {2.2,0.0025}, //Hcal (neutral)

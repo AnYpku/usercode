@@ -9,9 +9,10 @@
   FullChain fch;
   FullChain::FullChainParameters anPars;
 
-  fch.SetDefaultFullChainParameters(anPars,"phoEt");
+//  fch.SetDefaultFullChainParameters(anPars,"phoEt");
+//  fch.SetDefaultFullChainParameters(anPars,"phoEtNoPhosphor");
 //  fch.SetDefaultFullChainParameters(anPars,"Mleplep");
-//  fch.SetDefaultFullChainParameters(anPars,"WMt");
+  fch.SetDefaultFullChainParameters(anPars,"WMt");
 //  fch.SetDefaultFullChainParameters(anPars,"phoEta");
 //  fch.SetDefaultFullChainParameters(anPars,"phoPhi");
 //  fch.SetDefaultFullChainParameters(anPars,"lepton1Pt");
@@ -28,19 +29,19 @@
   anPars.noPhoPFChIsoCut=0;
 
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
-  anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
+  anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
+  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
   anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
-//  anPars.analyzedSamples="DYjets_to_ll"; anPars.sampleMode=Selection::NOTSPECIFIED; 
+//  anPars.analyzedSamples="Zg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
 
   anPars.year=2012;
-  anPars.noPreSelection=0;
+  anPars.noPreSelection=1;
   anPars.noExtraSelection=0;
-  anPars.noDDBkgComputation=1;
-  anPars.noPrepareYields=1;
+  anPars.noDDBkgComputation=0;
+  anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
 

@@ -7,9 +7,7 @@
 
 #include "../Include/TEventTree.h" //class of this package
 #include "../Include/TFullCuts.h" //class of this package
-#include "../Include/PhosphorCorrectorFunctor.hh"
-  //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
-  //currently in this package
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
 
 class TSelectedEventsTree
 {

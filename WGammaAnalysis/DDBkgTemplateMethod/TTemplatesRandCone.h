@@ -24,7 +24,12 @@ class TTemplatesRandCone
 
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
-    void ComputeBackgroundOne(int ikin, bool noPrint=0, bool noPlot=0);
+
+
+  private:
+
+    //methods
+    void ComputeBackgroundOne(int ikin, bool noPrint=0);
     void SetHists(int kinBin, int etaBin, bool noPrint=0);
     void RandomizeTemplates(int ikin, int ieta);
     void DeleteHists(int kinBin, int etaBin);
@@ -38,8 +43,7 @@ class TTemplatesRandCone
     void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
     float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
 
-    void SetTrueTemplate(TH1D* hTrue, TCut cut, bool noPrint=0);
-    void SetFakeTemplate(TH1D* hFake, TH1D* hLeak, TH1D* hLeakTemp, TCut cut, bool noPrint=0);
+    void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0);
 
     void PlotTemplates();
     void PlotOneTemplate(int kinBin, int etaBin);
@@ -53,9 +57,8 @@ class TTemplatesRandCone
     TString StrLabelEta(int etaBin);
     TString StrLabelKin(int kinBin);
 
-    double ValueCutNominalVarFit(int etaBin);
+    //fields
 
-  private:
     TConfiguration _config;
     TPhotonCuts _photon;
     int _vgamma;
@@ -69,6 +72,8 @@ class TTemplatesRandCone
     TAllInputSamples* _INPUT;
     TFile* _fData;
     TTree* _treeData;
+    TFile* _fSign;
+    TTree* _treeSign;
 
     TString _varKin;
     int _nKinBins;
@@ -78,6 +83,8 @@ class TTemplatesRandCone
 
     TH1D* _hTrue[_nBinsMax][3];
     TH1D* _hFake[_nBinsMax][3];
+    TH1D* _hTrueReference[_nBinsMax][3];
+    TH1D* _hFakeReference[_nBinsMax][3];
     TH1D* _hData[_nBinsMax][3];
     TH1D* _hSumm[_nBinsMax][3];
     TH1D* _hRatio[_nBinsMax][3];

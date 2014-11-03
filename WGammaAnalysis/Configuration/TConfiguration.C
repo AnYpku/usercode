@@ -248,22 +248,22 @@ TString TConfiguration::GetEffName(int csMode)
 
 TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
 {
-  return certifiedConstantsDir_+photonScaleFactorsFileNamePt15to20GeV_;
+  return _certifiedConstantsDir+_photonScaleFactorsFileNamePt15to20GeV;
 }
 
 TString TConfiguration::GetPhotonScaleFactorsFileNamePt20toInfGeV()
 {
-  return certifiedConstantsDir_+photonScaleFactorsFileNamePt20toInfGeV_;
+  return _certifiedConstantsDir+_photonScaleFactorsFileNamePt20toInfGeV;
 }
 
 TString TConfiguration::GetPileupDataFileName()
 {
-  return certifiedConstantsDir_+pileupDataFileName_;
+  return _certifiedConstantsDir+_pileupDataFileName;
 }
 
 TString TConfiguration::GetPhosphorConstantFileName()
 {
-  return (certifiedConstantsDir_+phosphorConstantsFile_);
+  return (_phosphorConstantsFile);
 }
 
 int TConfiguration::GetNPhoPtBins()

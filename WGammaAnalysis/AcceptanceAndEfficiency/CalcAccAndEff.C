@@ -11,9 +11,8 @@
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
   //this package
-#include "../Include/PhosphorCorrectorFunctor.hh"
-  //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
-  //currently in this package
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
+  //taken from git
 #include "TMath.h" 
 #include "TH1F.h" 
 #include "TVectorF.h" 

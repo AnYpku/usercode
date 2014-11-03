@@ -6,6 +6,7 @@
 #include "../Configuration/TConfiguration.h"
 #include "../Selection/Selection.h"
 #include "../DDBkgTemplateMethod/TTemplates.h"
+#include "../DDBkgTemplateMethod/TTemplatesRandCone.h"
 #include "../PrepareYields/TPrepareYields.h"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
 //#include "../CrossSection/CalcCrossSection.h"
@@ -68,7 +69,11 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
 void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
 {
     anPars.varKin="phoEt";
-
+//    anPars.nKinBins=26;
+//    anPars.nKinBins=2;
+//    anPars.kinBinLims=new float[anPars.nKinBins+1];
+//    for (int ib=0; ib<anPars.nKinBins+1; ib++)
+//      anPars.kinBinLims[ib]=15+2.5*ib;
 //    anPars.nKinBins=3;
 //    anPars.kinBinLims=new float[anPars.nKinBins+1];
 //    anPars.kinBinLims[0]=15;
@@ -85,6 +90,21 @@ void FullChain::SetAnalysisKinParameters(FullChainParameters& anPars)
 
 void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin)
 {
+  if (varKin=="phoEtNoPhosphor"){
+    anPars.varKin="phoEtNoPhosphor";
+
+  anPars.nKinBins=_config.GetNPhoPtBins();
+  anPars.kinBinLims=new float[anPars.nKinBins+1];
+  _config.GetPhoPtBinsLimits(anPars.kinBinLims);
+
+//    anPars.nKinBins=26;
+//    anPars.nKinBins=2;
+//    anPars.kinBinLims=new float[anPars.nKinBins+1];
+//    for (int ib=0; ib<anPars.nKinBins+1; ib++)
+//      anPars.kinBinLims[ib]=15+2.5*ib;
+
+  }
+
   if (varKin=="phoSCEta" || varKin=="phoEta"){
     anPars.varKin=varKin;
 
@@ -172,13 +192,13 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[16]=2.1;
   }
   if (varKin=="WMt"){
-    anPars.isMetCutOptimization=1;
+//    anPars.isMetCutOptimization=1;
     anPars.varKin=varKin;
-    anPars.nKinBins=14;
+    anPars.nKinBins=9;
 //    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=50+5*ib;
+      anPars.kinBinLims[ib]=50+7*ib;
   }
   if (varKin=="Mleplep"){
     anPars.isMetCutOptimization=0;
@@ -237,7 +257,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Extra Selection"<<std::endl;
     Selection selection;
-    selection.ExtraSelection(anPars.year, anPars.channel,anPars.vgamma, anPars.sampleMode,anPars.phoWP,anPars.noPhoPFChIsoCut);
+    selection.ExtraSelection(anPars.year, anPars.channel,anPars.vgamma, anPars.sampleMode,anPars.blind,anPars.phoWP,anPars.noPhoPFChIsoCut);
     std::cout<<"%_%  DONE Extra Selection"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
@@ -246,7 +266,8 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //compute fake-gamma background by data-driven template method
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO DataDriven bkg"<<std::endl;
-    TTemplates temp(anPars.year,anPars.channel,anPars.vgamma,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.noAdjustBinning,anPars.noPhoPFChIsoCut, anPars.isMetCutOptimization,anPars.doSystTemplateStat);
+//    TTemplates temp(anPars.year,anPars.channel,anPars.vgamma,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.noAdjustBinning,anPars.noPhoPFChIsoCut, anPars.isMetCutOptimization,anPars.doSystTemplateStat);
+   TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.isMetCutOptimization);
    temp.ComputeBackground();
     std::cout<<"%_%  DONE Extra DataDriven bkg"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;

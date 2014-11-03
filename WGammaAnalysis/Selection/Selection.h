@@ -10,7 +10,8 @@
 #include "../Include/TPuReweight.h" 
 #include "../Configuration/TAllInputSamples.h"
   //this package
-#include "../Include/PhosphorCorrectorFunctor.hh"
+//#include "../Include/PhosphorCorrectorFunctor.hh"
+#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
   //taken from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CPena/src/PHOSPHOR_Corr_v2/
   //currently in this package
 #include "TTree.h" 
@@ -30,7 +31,7 @@ class Selection
        void    LoopOverTreeEvents();
        bool    CheckMaxNumbersInTree();
        void    PrintErrorMessageMaxNumberOf(int particle);
-       void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int wp, bool noPhoPFChIsoCut);
+       void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int blind,int wp, bool noPhoPFChIsoCut);
        void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind, bool noPhoPFChIsoCut);
 
        enum {DATA, SIGMC, BKGMC, MC, NOBKG, ALL, NOTSPECIFIED};//sampleMode
@@ -75,7 +76,7 @@ class Selection
        int _nLe;
        int _inputFileN;
 
-       const static int _debugModeNEntries=100000;
+       const static int _debugModeNEntries=10000;
     
        TFullCuts::PassedLevels _passed;
 

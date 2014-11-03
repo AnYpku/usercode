@@ -67,7 +67,7 @@ TPrepareYields::TPrepareYields(int year,int channel,int vgamma,int blind,TString
 //  if (_kinBinLims[0]==0) _doLogX=1;
 //  else if (_kinBinLims[nKinBins]/_kinBinLims[0]>10) _doLogX=1;
 //  else _doLogX=0;
-  if (_varKin=="phoEt" || _varKin=="phoSCEt"){
+  if (_varKin=="phoEt" || _varKin=="phoSCEt" || _varKin=="phoEtNoPhosphor"){
     _doLogX=1;
     _doLogY=1;
   }
@@ -97,7 +97,7 @@ void TPrepareYields::PrepareYields()
     if (!_noDDBkgComputation) CompareSignalDATAvsMC(ieta);
   }
   if (!_noDDBkgComputation) StoreYields();
-  if (!_noDDBkgComputation) PrintYields();
+  PrintYields();
 }
 
 void TPrepareYields::SetYields()
@@ -116,10 +116,8 @@ void TPrepareYields::SetYields()
 void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
 {
   TString yieldsHistName;
-
   int sample = _INPUT->allInputs_[iSource].sample_;
   TString strSourceName = _INPUT->allInputs_[iSource].sourceName_;
-
   _cutWeight="weight";
   if (_blind==_config.BLIND_PRESCALE && sample!=_config.DATA){
     TString strCutWeight="weight";
@@ -127,7 +125,6 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
     strCutWeight+=1.0/_config.GetBlindPrescale();
     _cutWeight=strCutWeight;
   }
-
   int selStage=_config.FULLY;
   if (_isMetCutOptimization) selStage=_config.PRELIMINARY_FOR_MET_CUT;
   TString fInName = _config.GetSelectedName(selStage,_channel,_vgamma,_blind,sample,strSourceName);
@@ -136,6 +133,7 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
     std::cout<<"file "<<fInName<<" is not open"<<std::endl;
     return;
   }
+
   _fOut->cd();
   TTree* tr = (TTree*)fIn.Get("selectedEvents");
   TString yieldsName  = (_config.GetYieldsSelectedName(_config.ONEDI,ieta,_INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_));
@@ -144,31 +142,69 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
 
   _fOut->cd();
   if (_INPUT->allInputs_[iSource].sample_==TConfiguration::DATA){
-    _dataYields[ieta] = new TH1F(yieldsName,yieldsName,
-                _nKinBins,_kinBinLims);
+    SetYieldsDATA(tr,yieldsName,iSource,ieta);
+  }
+  else if (_INPUT->allInputs_[iSource].sample_==TConfiguration::SIGMC){
+    SetYieldsSIGMC(tr,yieldsName,yieldsGenName,iSource,ieta);
+  }
+  else if (_INPUT->allInputs_[iSource].sample_==TConfiguration::BKGMC){
+
+    SetYieldsBKGMC_all(tr,yieldsName,iSource,ieta);
+
+    if (_INPUT->allInputs_[iSource].sourceName_!="Wjets_to_lnu" &&
+        _INPUT->allInputs_[iSource].sourceName_!="DYjets_to_ll" &&
+        _INPUT->allInputs_[iSource].sourceName_!="ttbarjets"){
+
+       SetYieldsBKGMC_true(tr,yieldsName,iSource,ieta);
+    }
+    if (_INPUT->allInputs_[iSource].sourceName_=="Wjets_to_lnu" ||
+        _INPUT->allInputs_[iSource].sourceName_=="DYjets_to_ll" ||
+        _INPUT->allInputs_[iSource].sourceName_=="ttbarjets" ||
+        _INPUT->allInputs_[iSource].sourceName_=="multibosons"){
+
+       SetYieldsBKGMC_fake(tr,yieldsName,iSource,ieta);
+    }
+
+  }//else if sample_==TConfiguration::BKGMC
+}
+
+void TPrepareYields::SetYieldsDATA(TTree* tr, TString yieldsName, int iSource, int ieta)
+{
+    _dataYields[ieta] = new TH1F(yieldsName,yieldsName,_nKinBins,_kinBinLims);
     _dataYields[ieta]->Sumw2();
+    if (ieta==_config.COMMON) _strDATAName=_INPUT->allInputs_[iSource].sourceName_;
+    if (ieta==_config.COMMON) _strDATALabel=_INPUT->allInputs_[iSource].sourceLatexLabel_;
+    if (ieta==_config.COMMON) _colorDATA=_INPUT->allInputs_[iSource].color_;
     tr->Draw(_varKin+TString(">>")+yieldsName,(_cutAdd && CutEta(ieta))*_cutWeight,"goff");
     std::cout<<"set _dataYieldTot: "<<std::endl;
     SetTotalYield(tr, _cutAdd && CutEta(ieta) && _cutKin, _dataYieldTot[ieta], _dataYieldTotErr[ieta]);
-  }
-  else if (_INPUT->allInputs_[iSource].sample_==TConfiguration::SIGMC){
-    _sigMCYields[ieta] = new TH1F(yieldsName,yieldsName,
-                _nKinBins,_kinBinLims);
+}
+
+void TPrepareYields::SetYieldsSIGMC(TTree* tr, TString yieldsName, TString yieldsGenName, int iSource, int ieta)
+{
+    _sigMCYields[ieta] = new TH1F(yieldsName,yieldsName,_nKinBins,_kinBinLims);
     _sigMCYields[ieta]->Sumw2();
     tr->Draw(_varKin+TString(">>")+yieldsName,(_cutAdd && CutEta(ieta))*_cutWeight,"goff");
-    _sigMCGenYields[ieta] = new TH1F(yieldsGenName,yieldsGenName,
-                _nKinBins,_kinBinLims);
+    _sigMCGenYields[ieta] = new TH1F(yieldsGenName,yieldsGenName,_nKinBins,_kinBinLims);
     _sigMCGenYields[ieta]->Sumw2();
+    if (ieta==_config.COMMON) _strSIGMCName=_INPUT->allInputs_[iSource].sourceName_;
+    if (ieta==_config.COMMON) _strSIGMCLabel=_INPUT->allInputs_[iSource].sourceLatexLabel_;
+    if (ieta==_config.COMMON) _colorSIGMC=_INPUT->allInputs_[iSource].color_;
     tr->Draw(TString("phoGenEt>>")+yieldsGenName,(_cutAdd && CutEta(ieta))*_cutWeight,"goff");
     std::cout<<"set _sigMCYieldTot: "<<std::endl;
     SetTotalYield(tr, (_cutAdd && CutEta(ieta) && _cutKin), _sigMCYieldTot[ieta], _sigMCYieldTotErr[ieta]);
     std::cout<<"set _sigMCGenYieldTot: "<<std::endl;
     SetTotalYield(tr, (_cutAdd && CutEta(ieta) && _cutKin), _sigMCGenYieldTot[ieta], _sigMCGenYieldTotErr[ieta]);
-  }
-  else if (_INPUT->allInputs_[iSource].sample_==TConfiguration::BKGMC){
-    _vecBkgMCYields[ieta].push_back( new TH1F(yieldsName,yieldsName,
-                _nKinBins,_kinBinLims));
+}
+
+void TPrepareYields::SetYieldsBKGMC_all(TTree* tr, TString yieldsName, int iSource, int ieta)
+{
+    _vecBkgMCYields[ieta].push_back( new TH1F(yieldsName,yieldsName,_nKinBins,_kinBinLims));
     _vecBkgMCYields[ieta].back()->Sumw2();
+    if (ieta==_config.COMMON) _vecStrBkgMCNames.push_back(_INPUT->allInputs_[iSource].sourceName_);
+    if (ieta==_config.COMMON) _vecStrBkgLabels.push_back(_INPUT->allInputs_[iSource].sourceLatexLabel_);
+    if (ieta==_config.COMMON) _colorsBkg.push_back(_INPUT->allInputs_[iSource].color_);
+    if (ieta==_config.COMMON) std::cout<<"iSource="<<iSource<<", source name="<<_vecStrBkgMCNames.back()<<std::endl;
     TCut cut = _cutAdd;
     tr->Draw(_varKin+TString(">>")+yieldsName,(cut && CutEta(ieta))*_cutWeight,"goff");
     float val;
@@ -177,33 +213,36 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
     SetTotalYield(tr, cut && CutEta(ieta) && _cutKin, val, err);
     _vecBkgMCYieldTot[ieta].push_back(val);
     _vecBkgMCYieldTotErr[ieta].push_back(err);
+}
 
-    _vecBkgMCTrueGammaYields[ieta].push_back( new TH1F(yieldsName+TString("true"),yieldsName+TString("true"),
-                _nKinBins,_kinBinLims));
+void TPrepareYields::SetYieldsBKGMC_true(TTree* tr, TString yieldsName, int iSource, int ieta){
+    _vecBkgMCTrueGammaYields[ieta].push_back( new TH1F(yieldsName+TString("true"),yieldsName+TString("true"),_nKinBins,_kinBinLims));
     _vecBkgMCTrueGammaYields[ieta].back()->Sumw2();
-    if (_INPUT->allInputs_[iSource].sourceName_!="Wjets_to_lnu" &&
-        _INPUT->allInputs_[iSource].sourceName_!="DYjets_to_ll" &&
-        _INPUT->allInputs_[iSource].sourceName_!="ttbarjets"){
-      tr->Draw(_varKin+TString(">>")+yieldsName+TString("true"),_cutWeight*(_emptyPhoton.RangeGenTruePhoton()&&CutEta(ieta)&&_cutAdd),"goff");
- 
-      std::cout<<"set _vecBkgMCTrueGammaYieldTot: #"<<iSource<<std::endl;
-      SetTotalYield(tr,_emptyPhoton.RangeGenTruePhoton() && CutEta(ieta)&& _cutAdd  && _cutKin, val, err);
-      _vecBkgMCTrueGammaYieldTot[ieta].push_back(val);
-      _vecBkgMCTrueGammaYieldTotErr[ieta].push_back(err);    
-    }
-    else{
-      _vecBkgMCTrueGammaYieldTot[ieta].push_back(0);
-      _vecBkgMCTrueGammaYieldTotErr[ieta].push_back(0);
-    }
-    _vecBkgMCFakeGammaYields[ieta].push_back( new TH1F(yieldsName+TString("fake"),yieldsName+TString("fake"),
-                _nKinBins,_kinBinLims));
+    if (ieta==_config.COMMON) _vecStrBkgMCTrueNames.push_back(_INPUT->allInputs_[iSource].sourceName_);
+    if (ieta==_config.COMMON) _vecStrBkgTrueLabels.push_back(_INPUT->allInputs_[iSource].sourceLatexLabel_);
+    if (ieta==_config.COMMON) _colorsBkgTrue.push_back(_INPUT->allInputs_[iSource].color_);
+    if (ieta==_config.COMMON) std::cout<<"iSource="<<iSource<<", source name="<<_vecStrBkgMCTrueNames.back()<<std::endl;
+    tr->Draw(_varKin+TString(">>")+yieldsName+TString("true"),_cutWeight*(_emptyPhoton.RangeGenTruePhoton()&&CutEta(ieta)&&_cutAdd),"goff");
+    std::cout<<"set _vecBkgMCTrueGammaYieldTot: #"<<iSource<<std::endl;
+    float val, err;
+    SetTotalYield(tr,_emptyPhoton.RangeGenTruePhoton() && CutEta(ieta)&& _cutAdd  && _cutKin, val, err);
+    _vecBkgMCTrueGammaYieldTot[ieta].push_back(val);
+    _vecBkgMCTrueGammaYieldTotErr[ieta].push_back(err);    
+}
+
+void TPrepareYields::SetYieldsBKGMC_fake(TTree* tr, TString yieldsName, int iSource, int ieta){
+    _vecBkgMCFakeGammaYields[ieta].push_back( new TH1F(yieldsName+TString("fake"),yieldsName+TString("fake"),_nKinBins,_kinBinLims));
     _vecBkgMCFakeGammaYields[ieta].back()->Sumw2();
+    if (ieta==_config.COMMON) _vecStrBkgMCFakeNames.push_back(_INPUT->allInputs_[iSource].sourceName_);
+    if (ieta==_config.COMMON) _vecStrBkgFakeLabels.push_back(_INPUT->allInputs_[iSource].sourceLatexLabel_);
+    if (ieta==_config.COMMON) _colorsBkgFake.push_back(_INPUT->allInputs_[iSource].color_);
+    if (ieta==_config.COMMON) std::cout<<"iSource="<<iSource<<", source name="<<_vecStrBkgMCFakeNames.back()<<std::endl;
     tr->Draw(_varKin+TString(">>")+yieldsName+TString("fake"),_cutWeight*(CutEta(ieta)&&_cutAdd),"goff");
     std::cout<<"set _vecBkgMCFakeGammaYieldTot: #"<<iSource<<std::endl;
+    float val, err;
     SetTotalYield(tr,CutEta(ieta)&& _cutAdd  && _cutKin, val, err);
     _vecBkgMCFakeGammaYieldTot[ieta].push_back(val);
     _vecBkgMCFakeGammaYieldTotErr[ieta].push_back(err);  
-  }
 }
 
 void TPrepareYields::SetTotalYield(TTree* tr, TCut cut, float& val, float& err)
@@ -282,9 +321,6 @@ void TPrepareYields::SubtractBackground()
     _signalDataYields[ieta]->SetTitle(yieldsName);
     int nBins = _signalDataYields[ieta]->GetNbinsX();
     for (int i=0; i<_vecBkgMCTrueGammaYields[ieta].size(); i++){
-      if (_INPUT->allInputs_[i+2].sourceName_=="Wjets_to_lnu") continue;
-      if (_INPUT->allInputs_[i+2].sourceName_=="ttbarjets") continue;
-      if (_INPUT->allInputs_[i+2].sourceName_=="DYjets_to_ll") continue;
       _signalDataYields[ieta]->Add(_vecBkgMCTrueGammaYields[ieta][i],-1);
       _signalDataYieldTot[ieta]-=_vecBkgMCTrueGammaYieldTot[ieta][i];
       _signalDataYieldTotErr[ieta]+=_vecBkgMCTrueGammaYieldTotErr[ieta][i]*_vecBkgMCTrueGammaYieldTotErr[ieta][i];
@@ -308,21 +344,13 @@ void TPrepareYields::CompareFakeBkgDDvsMC(int ieta)
   hSum->Reset();
   
   for (int i=0; i<_vecBkgMCFakeGammaYields[ieta].size(); i++){
-    if (_INPUT->allInputs_[i+2].sourceName_=="Wg_to_taunu") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="Wg_to_munu") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="Wg") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="ttbarg") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="Zg_to_tautau") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="Zg_to_mumu") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="Zg") continue;
-    int color = _INPUT->allInputs_[i+2].color_;
-    _vecBkgMCFakeGammaYields[ieta][i]->SetLineColor(color);
-    _vecBkgMCFakeGammaYields[ieta][i]->SetFillColor(color);
-    _vecBkgMCFakeGammaYields[ieta][i]->SetMarkerColor(color);
+    _vecBkgMCFakeGammaYields[ieta][i]->SetLineColor(_colorsBkgFake[i]);
+    _vecBkgMCFakeGammaYields[ieta][i]->SetFillColor(_colorsBkgFake[i]);
+    _vecBkgMCFakeGammaYields[ieta][i]->SetMarkerColor(_colorsBkgFake[i]);
     _vecBkgMCFakeGammaYields[ieta][i]->SetStats(0);
     mcHists->Add(_vecBkgMCFakeGammaYields[ieta][i]);
     hSum->Add(_vecBkgMCFakeGammaYields[ieta][i]);
-    legend->AddEntry(_vecBkgMCFakeGammaYields[ieta][i],"MC: "+_INPUT->allInputs_[i+2].sourceName_);
+    legend->AddEntry(_vecBkgMCFakeGammaYields[ieta][i],"MC: "+_vecStrBkgFakeLabels[i]);
   }
  
   legend->AddEntry(_DDFakeGammaYields[ieta],"Data Driven");
@@ -347,23 +375,19 @@ void TPrepareYields::CompareTrueBkgDDvsMC(int ieta)
   TLegend *legend = new TLegend(0.7,0.7,0.95,0.95);
   THStack* mcHists = new THStack("mcHists","jets #rightarrow #gamma  bkg, DD vs MC estimation");
   TH1F* hSum=(TH1F*)_sigMCYields[ieta]->Clone("hSum_trueGammaMC");
-  _sigMCYields[ieta]->SetLineColor(_INPUT->allInputs_[1].color_);
-  _sigMCYields[ieta]->SetFillColor(_INPUT->allInputs_[1].color_);
-  _sigMCYields[ieta]->SetMarkerColor(_INPUT->allInputs_[1].color_);
+  _sigMCYields[ieta]->SetLineColor(_colorSIGMC);
+  _sigMCYields[ieta]->SetFillColor(_colorSIGMC);
+  _sigMCYields[ieta]->SetMarkerColor(_colorSIGMC);
   mcHists->Add(_sigMCYields[ieta]);
   
   for (int i=0; i<_vecBkgMCTrueGammaYields[ieta].size(); i++){
-    if (_INPUT->allInputs_[i+2].sourceName_=="Wjets_to_lnu") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="ttbarjets") continue;
-    if (_INPUT->allInputs_[i+2].sourceName_=="DYjets_to_ll") continue;
-    int color = _INPUT->allInputs_[i+2].color_;
-    _vecBkgMCTrueGammaYields[ieta][i]->SetLineColor(color);
-    _vecBkgMCTrueGammaYields[ieta][i]->SetFillColor(color);
-    _vecBkgMCTrueGammaYields[ieta][i]->SetMarkerColor(color);
+    _vecBkgMCTrueGammaYields[ieta][i]->SetLineColor(_colorsBkgTrue[i]);
+    _vecBkgMCTrueGammaYields[ieta][i]->SetFillColor(_colorsBkgTrue[i]);
+    _vecBkgMCTrueGammaYields[ieta][i]->SetMarkerColor(_colorsBkgTrue[i]);
     _vecBkgMCTrueGammaYields[ieta][i]->SetStats(0);
     mcHists->Add(_vecBkgMCTrueGammaYields[ieta][i]);
     hSum->Add(_vecBkgMCTrueGammaYields[ieta][i]);
-    legend->AddEntry(_vecBkgMCTrueGammaYields[ieta][i],"MC: "+_INPUT->allInputs_[i+2].sourceName_);
+    legend->AddEntry(_vecBkgMCTrueGammaYields[ieta][i],"MC: "+_vecStrBkgTrueLabels[i]);
   }
 
  
@@ -442,19 +466,15 @@ void TPrepareYields::CompareTotalDATAvsSIGplusBKG(int ieta)
 
 
   for (int i=0; i<_vecBkgMCTrueGammaYields[ieta].size(); i++){
-        if (_INPUT->allInputs_[i+2].sourceName_=="Wjets_to_lnu") continue;
-        if (_INPUT->allInputs_[i+2].sourceName_=="ttbarjets") continue;
-        if (_INPUT->allInputs_[i+2].sourceName_=="DYjets_to_ll") continue;
-        int color = _INPUT->allInputs_[i+2].color_;
-        _vecBkgMCTrueGammaYields[ieta][i]->SetLineColor(color);
-        _vecBkgMCTrueGammaYields[ieta][i]->SetFillColor(color);
-        _vecBkgMCTrueGammaYields[ieta][i]->SetMarkerColor(color);
+        _vecBkgMCTrueGammaYields[ieta][i]->SetLineColor(_colorsBkgTrue[i]);
+        _vecBkgMCTrueGammaYields[ieta][i]->SetFillColor(_colorsBkgTrue[i]);
+        _vecBkgMCTrueGammaYields[ieta][i]->SetMarkerColor(_colorsBkgTrue[i]);
         _vecBkgMCTrueGammaYields[ieta][i]->SetStats(0);
         mcHists1->Add(_vecBkgMCTrueGammaYields[ieta][i]);
         hSum->Add(_vecBkgMCTrueGammaYields[ieta][i]);
         hSumTrue->Add(_vecBkgMCTrueGammaYields[ieta][i]);
-        TString strLeg = "MC: "+_INPUT->allInputs_[i+2].sourceLatexLabel_;
-        strLeg.ReplaceAll("jets","#gamma");
+        TString strLeg = "MC: "+_vecStrBkgTrueLabels[i];
+        //strLeg.ReplaceAll("jets","#gamma");
         legend1->AddEntry(_vecBkgMCTrueGammaYields[ieta][i],strLeg);
   }
   hSumTrue->SetLineColor(8);
@@ -463,10 +483,9 @@ void TPrepareYields::CompareTotalDATAvsSIGplusBKG(int ieta)
   hSumTrue->SetStats(0);
   mcHists2->Add(hSumTrue);
   legend2->AddEntry(hSumTrue,"MC: true gamma bkg");
-  int colMC = _INPUT->allInputs_[1].color_;
-  _sigMCYields[ieta]->SetLineColor(colMC);
-  _sigMCYields[ieta]->SetFillColor(colMC);
-  _sigMCYields[ieta]->SetMarkerColor(colMC);
+  _sigMCYields[ieta]->SetLineColor(_colorSIGMC);
+  _sigMCYields[ieta]->SetFillColor(_colorSIGMC);
+  _sigMCYields[ieta]->SetMarkerColor(_colorSIGMC);
   _sigMCYields[ieta]->SetStats(0);
   mcHists1->Add(_sigMCYields[ieta]);
   mcHists2->Add(_sigMCYields[ieta]);
@@ -505,19 +524,13 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
 
   for (int i=0; i<_vecBkgMCYields[ieta].size(); i++){
     std::cout<<"CompareTotalDATAvsMC: processing iSource "<<_INPUT->allInputs_[i+2].sourceName_<<std::endl;
-    //if (_INPUT->allInputs_[i+2].sourceName_=="Wjets_to_lnu" ||
-    //    _INPUT->allInputs_[i+2].sourceName_=="ttbarjets" ||
-    //    _INPUT->allInputs_[i+2].sourceName_=="DYjets_to_ll" ||
-    //    _INPUT->allInputs_[i+2].sourceName_=="multibosons"); 
-    //else continue;
-    int color = _INPUT->allInputs_[i+2].color_;
-    _vecBkgMCYields[ieta][i]->SetLineColor(color);
-    _vecBkgMCYields[ieta][i]->SetFillColor(color);
-    _vecBkgMCYields[ieta][i]->SetMarkerColor(color);
+    _vecBkgMCYields[ieta][i]->SetLineColor(_colorsBkg[i]);
+    _vecBkgMCYields[ieta][i]->SetFillColor(_colorsBkg[i]);
+    _vecBkgMCYields[ieta][i]->SetMarkerColor(_colorsBkg[i]);
     _vecBkgMCYields[ieta][i]->SetStats(0);
     mcHists->Add(_vecBkgMCYields[ieta][i]);
     hSum->Add(_vecBkgMCYields[ieta][i]);
-    TString strLeg = "MC: "+_INPUT->allInputs_[i+2].sourceLatexLabel_;
+    TString strLeg = "MC: "+_vecStrBkgLabels[i];
     legend->AddEntry(_vecBkgMCYields[ieta][i],strLeg);
   }
 
@@ -528,7 +541,7 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   _sigMCYields[ieta]->SetLineColor(color);
   _sigMCYields[ieta]->SetFillColor(color);
   _sigMCYields[ieta]->SetMarkerColor(color);
-  TString strLegSig = "sigMC: "+_INPUT->allInputs_[1].sourceLatexLabel_;
+  TString strLegSig = "sigMC: "+_strSIGMCLabel;
   legend->AddEntry(_sigMCYields[ieta],strLegSig);
 
   legend->SetLineColor(1);
@@ -641,6 +654,9 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   line->Draw("same");
 
   TString nameForSave="canv";
+  nameForSave+="_";
+  nameForSave+=_varKin;
+  nameForSave+="_";
   nameForSave+=canv->GetTitle();
   nameForSave.ReplaceAll(" ","");
   nameForSave+=".png";
@@ -656,33 +672,39 @@ void TPrepareYields::PrintYields()
     std::cout<<"etaBin = "<<StrLabelEta(ieta)<<std::endl;
 
     //BKG MC yields
+    std::cout<< "Bkg MC gamma: "<<std::endl;
     for (int i=0; i<_vecBkgMCYieldTot[ieta].size(); i++){
-      TString name = "Bkg MC fake gamma ";
-      name+=i;
+      TString name = _vecStrBkgMCNames[i];
+      name+=": ";
       PrintYieldsOne(name, _vecBkgMCYieldTot[ieta][i], _vecBkgMCYieldTotErr[ieta][i], _vecBkgMCYields[ieta][i]);
     }
 
     PrintYieldsOne("DATA_______________", _dataYieldTot[ieta], _dataYieldTotErr[ieta], _dataYields[ieta]);
 
-    PrintYieldsOne("DD fake from fit___", _DDFakeGammaYieldTot[ieta], _DDFakeGammaYieldTotErr[ieta], _DDFakeGammaYields[ieta]);
+    if (!_noDDBkgComputation) 
+      PrintYieldsOne("DD fake from fit___", _DDFakeGammaYieldTot[ieta], _DDFakeGammaYieldTotErr[ieta], _DDFakeGammaYields[ieta]);
 
     //BKG MC fake gamma yields
+    std::cout<< "Bkg MC fake gamma: "<<std::endl;
     for (int i=0; i<_vecBkgMCFakeGammaYieldTot[ieta].size(); i++){
-      TString name = "Bkg MC fake gamma ";
-      name+=i;
+      TString name = _vecStrBkgMCFakeNames[i];
+      name+=": ";
       PrintYieldsOne(name, _vecBkgMCFakeGammaYieldTot[ieta][i], _vecBkgMCFakeGammaYieldTotErr[ieta][i], _vecBkgMCFakeGammaYields[ieta][i]);
     }
 
-    PrintYieldsOne("DD true from fit___", _DDTrueGammaYieldTot[ieta], _DDTrueGammaYieldTotErr[ieta], _DDTrueGammaYields[ieta]);
+    if (!_noDDBkgComputation)     
+       PrintYieldsOne("DD true from fit___", _DDTrueGammaYieldTot[ieta], _DDTrueGammaYieldTotErr[ieta], _DDTrueGammaYields[ieta]);
 
     //BKG MC true gamma yields
+    std::cout<< "Bkg MC true gamma: "<<std::endl;
     for (int i=0; i<_vecBkgMCTrueGammaYieldTot[ieta].size(); i++){
-      TString name = "Bkg MC true gamma ";
-      name+=i;
+      TString name = _vecStrBkgMCTrueNames[i];
+      name+=": ";
       PrintYieldsOne(name, _vecBkgMCTrueGammaYieldTot[ieta][i], _vecBkgMCTrueGammaYieldTotErr[ieta][i], _vecBkgMCTrueGammaYields[ieta][i]);
     }
 
-    PrintYieldsOne("bkg subtracted DATA", _signalDataYieldTot[ieta], _signalDataYieldTotErr[ieta], _signalDataYields[ieta]);
+    if (!_noDDBkgComputation)
+      PrintYieldsOne("bkg subtracted DATA", _signalDataYieldTot[ieta], _signalDataYieldTotErr[ieta], _signalDataYields[ieta]);
 
     PrintYieldsOne("signal MC__________", _sigMCYieldTot[ieta], _sigMCYieldTotErr[ieta], _sigMCYields[ieta]);
 
