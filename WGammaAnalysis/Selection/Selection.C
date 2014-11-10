@@ -150,6 +150,7 @@ void Selection::LoopOverInputFiles()
        _outTree = new TTree("selectedEvents","selected Events");
        _selEvTree.SetAsOutputTree(_outTree);
 
+       _passed.metFiltersPassed=0;
        _passed.triggerPassed=0;
        _passed.goodVertexPassed=0;
        _passed.leptonPtPassed=0;
@@ -239,9 +240,6 @@ void Selection::LoopOverTreeEvents()
 
    //loop over events in the tree
      _eventTree.GetEntryNeededBranchesOnly(_channel,_sample,ientry);
-
-     if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(ientry);
-     //method of TEventTree class
      if (_channel==_config.MUON) _nLe=_eventTree.treeLeaf.nMu;
      else if (_channel==_config.ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
      else{
@@ -285,9 +283,11 @@ void Selection::LoopOverTreeEvents()
   } //end of loop over ientry in the tree
 
   std::cout<<"Summary:"<<std::endl;
-  std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<", nBlind="<<nBlind<<std::endl;
+  std::cout<<"nEntries="<<nentries<<", nTotal="<<nTotal;
+  if (nTotal==0) return;
+  std::cout<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<", nBlind="<<nBlind<<std::endl;
   std::cout<<"Weighted:"<<"nTotal="<<nTotalW<<", nPassed="<<nPassedW<<", eff="<<(float)nPassedW/nTotalW<<", nBlind="<<nBlindW<<std::endl;
-  std::cout<<", triggerPassed="<<_passed.triggerPassed<<", goodVertexPassed="<<_passed.goodVertexPassed<<", vgvjOverlapPassed="<<_passed.vgvjOverlapPassed<<", phoPt="<<_passed.phoPtPassed<<", phoEta="<<_passed.phoEtaPassed<<std::endl;
+  std::cout<<", metFiltersPassed="<<_passed.metFiltersPassed<<", triggerPassed="<<_passed.triggerPassed<<", goodVertexPassed="<<_passed.goodVertexPassed<<", vgvjOverlapPassed="<<_passed.vgvjOverlapPassed<<", phoPt="<<_passed.phoPtPassed<<", phoEta="<<_passed.phoEtaPassed<<std::endl;
   std::cout<<"leptonPt="<<_passed.leptonPtPassed<<", leptonEta="<<_passed.leptonEtaPassed<<", dR="<<_passed.dRPassed<<std::endl;
   std::cout<<"nBlind="<<nBlind<<std::endl;
 
@@ -357,7 +357,7 @@ void Selection::PrintErrorMessageMaxNumberOf(int particle)
        std::cout<<std::endl;
 }
 
-void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode, int blind, int wp, bool noPhoPFChIsoCut)
+void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode, int blind, int wp)
 {
   TFullCuts fullCut;
   TConfiguration config;
@@ -382,16 +382,16 @@ void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode
     
     std::cout<<"ExtraSelection: sample="<<_config.StrSample(sample)<<", _blind="<<_config.StrBlindType(_blind)<<std::endl;
     if (sample==config.DATA){
-      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,_blind,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,_blind);
     }
     else{
-      ExtraSelectionOne(INPUT,i,config,fullCut,year,channel,vgamma,wp,config.UNBLIND,noPhoPFChIsoCut);
+      ExtraSelectionOne(INPUT,i,config,fullCut,year,channel,vgamma,wp,config.UNBLIND);
     }
   }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
 
 }
 
-void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind, bool noPhoPFChIsoCut)
+void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind)
 {
 
     std::cout<<"ExtraSelection; year="<<year<<", channel="<<_config.StrChannel(channel)<<", vgamma="<<_config.StrVgType(vgamma)<<", wp="<<wp<<",blind="<<_config.StrBlindType(blind)<<std::endl;
@@ -407,66 +407,58 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
     std::cout<<"file "<<fInName<<" was open"<<std::endl;
     _tr = (TTree*)fIn.Get("selectedEvents");
 
-    if (INPUT.allInputs_[iSource].sample_==_config.DATA && blind==_config.UNBLIND);
-    else{
-      TString fOutName1=config.GetSelectedName(config.PRELIMINARY_FOR_MET_CUT,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
-      TFile fOut1(fOutName1,"recreate");
-      _tr1 = _tr->CopyTree(fullCut.RangeForMetCut(year,channel,vgamma,wp));
-      _tr1->Write();
-    }
-
     if (INPUT.allInputs_[iSource].sample_==_config.SIGMC || 
         (INPUT.allInputs_[iSource].sample_==_config.DATA && blind==_config.UNBLIND)){
+
       TString fOutName2=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
       TFile fOut2(fOutName2,"recreate");
       std::cout<<"For TemplateMethodCut Selection cut:      "<<fullCut.RangeForTemplateMethodCut(year,channel,vgamma,wp).GetTitle()<<std::endl;
       _tr2 = new TTree("selectedEvents","selected events, one candidate per event");
        _trReduced = _tr->CopyTree(fullCut.RangeForTemplateMethodCut(year,channel,vgamma,wp));
-      TSelectedEventsTree selEvTree;
-      selEvTree.SetAsInputTree(_trReduced);
-      selEvTree.SetAsOutputTree(_tr2);
-      long nEntries = _trReduced->GetEntries();
-      long eventCurr=0;
-      long eventPrev=-1;
-      for (long ientry=0; ientry<nEntries; ientry++){
-        _trReduced->GetEntry(ientry);
-        eventPrev=eventCurr;
-        eventCurr = selEvTree._event;
-        if (eventCurr==eventPrev) continue;
-        _tr2->Fill();
-      }
+
+      PickHardestPhotonInEvent(_tr2, _trReduced);
+
       _tr2->Write();
       std::cout<<"Will be saved to file:      "<<fOutName2<<std::endl;
+
     }
 
-    if (1){
+//    if (1){
       TString fOutName3=config.GetSelectedName(config.FULLY,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
       TFile fOut3(fOutName3,"recreate");
       _tr3 = new TTree("selectedEvents","selected events, one candidate per event");
-      _trReduced = _tr->CopyTree(fullCut.RangeFullCut(year,channel,vgamma,wp,noPhoPFChIsoCut));
+      _trReduced = _tr->CopyTree(fullCut.RangeFullCut(year,channel,vgamma,wp));
 
       std::cout<<std::endl;
-      std::cout<<"full Selection cut:      "<<fullCut.RangeFullCut(year,channel,vgamma,wp,noPhoPFChIsoCut).GetTitle()<<std::endl;
+      std::cout<<"full Selection cut:      "<<fullCut.RangeFullCut(year,channel,vgamma,wp).GetTitle()<<std::endl;
       std::cout<<std::endl;
-      TSelectedEventsTree selEvTree;
-      selEvTree.SetAsInputTree(_trReduced);
-      selEvTree.SetAsOutputTree(_tr3);
-      long nEntries = _trReduced->GetEntries();
-      long eventCurr=0;
-      long eventPrev=-1;
-      for (long ientry=0; ientry<nEntries; ientry++){
-        _trReduced->GetEntry(ientry);
-        eventPrev=eventCurr;
-        eventCurr = selEvTree._event;
-        if (eventCurr==eventPrev) continue;
-        _tr3->Fill();
-      }
+      
+      PickHardestPhotonInEvent(_tr3, _trReduced);
+
+      _tr3->Write();
       if (INPUT.allInputs_[iSource].sample_==_config.DATA && blind==_config.UNBLIND);
       else{
         std::cout<<"before hardest photon selection: "<<_trReduced->GetEntries()<<std::endl;
         std::cout<<"after  hardest photon selection: "<<_tr3->GetEntries()<<std::endl;
       }
-//    _trReduced->Write();
-      _tr3->Write();
-    }
+//    }
+
+}
+
+void Selection::PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced)
+{
+      TSelectedEventsTree selEvTree;
+      selEvTree.SetAsInputTree(trReduced);
+      selEvTree.SetAsOutputTree(trToBeWritten);
+      long nEntries = trReduced->GetEntries();
+      long eventCurr=0;
+      long eventPrev=-1;
+      for (long ientry=0; ientry<nEntries; ientry++){
+        trReduced->GetEntry(ientry);
+        eventPrev=eventCurr;
+        eventCurr = selEvTree._event;
+        if (eventCurr==eventPrev) continue;
+        trToBeWritten->Fill();
+      }
+
 }

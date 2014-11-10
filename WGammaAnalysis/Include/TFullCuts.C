@@ -42,7 +42,15 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
    _cands=cands;
    _passed=passed;
 
-//  std::cout<<"vgamma="<<_config.StrVgType(vgamma)<<std::endl;
+   if (!_inpTreeLeaf.metFilters[0]) return 0; //[0]CSC Beam Halo
+   if (!_inpTreeLeaf.metFilters[1]) return 0; //[1]HBHE Noise
+   if (!_inpTreeLeaf.metFilters[2]) return 0; //[2]HCAL laser
+   if (!_inpTreeLeaf.metFilters[3]) return 0; //[3]ECAL dead cell
+   if (!_inpTreeLeaf.metFilters[4]) return 0; //[4]Tracking failure
+   if (!_inpTreeLeaf.metFilters[5]) return 0; //[5]Bad EE SC
+//   if (!_inpTreeLeaf.metFilters[9]) return 0; //[9]log error too many clusters
+
+   _passed.metFiltersPassed++;
 
    _kinPhoton=new bool[inpTreeLeaf.nPho];
 
@@ -67,13 +75,6 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
    if (inpTreeLeaf.nPho < 1){ passed=_passed;  return 0;}
    if (nLe < 1) { passed=_passed;  return 0;}
 
-      //these variables are fields of TEventTree
-//   if (!inpTreeLeaf.metFilters[6]) return 0;
-// we don't need it because we're running Jan22 rereco
-      //metFilters - is field of TEventTree
-      //[6] - ecalLaserCorrFilter
-      //necessary to remove spikes in the photon distributions 
-      //for Jul13 rereco
    if (isVJets && IsOverlapVJetsVGamma(channel)) { passed=_passed;  return 0;}
       _passed.vgvjOverlapPassed++;
 
@@ -201,7 +202,6 @@ bool TFullCuts::IsOverlapVJetsVGamma(int channel)
 
 float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 
 { 
-
   float deta=fabs(eta1-eta2);
   float dphi=fabs(phi1-phi2);
   for (dphi=fabs(phi1-phi2); dphi>=2*TMath::Pi(); dphi=dphi-2*TMath::Pi());
@@ -267,7 +267,7 @@ TCut TFullCuts::RangeForMetCut(int year, int channel, int vgamma, int phoWP){
 
 TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP){
   TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 1, 0, 0);
+  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 0, 0);
   //no cuts on sigmaIEtaIEta and chIso
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
@@ -285,10 +285,10 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
   return cut;
 }
 
-TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP, bool noPhoPFChIsoCut)
+TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP)
 {
   TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, noPhoPFChIsoCut);
+  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP);
   TCut cutLepton;
   if (channel==TConfiguration::MUON){
     TMuonCuts emptyMuon;

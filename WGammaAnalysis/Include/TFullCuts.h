@@ -21,6 +21,7 @@ public:
   TFullCuts();
   virtual ~TFullCuts();
   struct PassedLevels{
+    long metFiltersPassed;
     long triggerPassed;
     long goodVertexPassed;
     long phoPtPassed;
@@ -30,7 +31,6 @@ public:
     long leptonEtaPassed;
     long dRPassed;
     long evAfterKinCuts;
-
 //    long phoBarrelPassed;
 //    long phoEndcapPassed;
   };
@@ -58,7 +58,7 @@ public:
   TCut RangeExtraLeptonPt2011();
   TCut RangeForMetCut(int year, int channel, int vgamma, int phoWP);
   TCut RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP);
-  TCut RangeFullCut(int year, int channel, int vgamma, int phoWP, bool noPhoPFChIsoCut);
+  TCut RangeFullCut(int year, int channel, int vgamma, int phoWP);
 
 private:
   TConfiguration _config;

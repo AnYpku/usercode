@@ -19,7 +19,7 @@
 class TTemplatesRandCone
 {
   public:
-    TTemplatesRandCone(int channel, int vgamma, int phoWP, TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization);
+    TTemplatesRandCone(int channel, int vgamma, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
     virtual ~TTemplatesRandCone();
 
 
@@ -43,14 +43,14 @@ class TTemplatesRandCone
     void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
     float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
 
-    void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0);
+    void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
 
     void PlotTemplates();
     void PlotOneTemplate(int kinBin, int etaBin);
 
     void SaveYields();
 
-    TCut SidebandCut();
+    TCut SidebandCut(int ikin, int ieta);
     TCut SidebandVarNominalCut();
     TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
@@ -63,7 +63,6 @@ class TTemplatesRandCone
     TPhotonCuts _photon;
     int _vgamma;
     int _channel;
-    bool _isMetCutOptimization;
     int _selectionStage;
 
     TCut _cutWeight;
@@ -83,6 +82,7 @@ class TTemplatesRandCone
 
     TH1D* _hTrue[_nBinsMax][3];
     TH1D* _hFake[_nBinsMax][3];
+    TH1D* _hLeak[_nBinsMax][3];
     TH1D* _hTrueReference[_nBinsMax][3];
     TH1D* _hFakeReference[_nBinsMax][3];
     TH1D* _hData[_nBinsMax][3];

@@ -212,7 +212,7 @@ void CalcAccAndEff::ComputeEfficiency()
     TH1F* hTot = new TH1F("hTot","hTot",1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
     TH1F* h1D = new TH1F("h1D","h1D",_config.GetNPhoPtBins(),_phoPtLimits);
     TCut cutWeight="PUweight";//"weight";
-    TCut cut = cutWeight*_fullCuts.RangeFullCut(_year,_channel,_vgamma,_phoWP,0);
+    TCut cut = cutWeight*_fullCuts.RangeFullCut(_year,_channel,_vgamma,_phoWP);
     tr->Draw("phoGenEt>>hTot",cutWeight,"goff");
     tr->Draw("phoGenEt>>h1D",cutWeight,"goff");
     std::cout<<"file for efficiency selection: "<<_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.UNBLIND,_config.SIGMC)<<std::endl;

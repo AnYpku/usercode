@@ -12,7 +12,6 @@
 TConfiguration::TConfiguration()
 {
   _selectedNameBase[VERY_PRELIMINARY]="VeryPreliminarySelected/selected";
-  _selectedNameBase[PRELIMINARY_FOR_MET_CUT]="PreliminaryForMEtCutSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_TEMPLATE_METHOD]="PreliminaryForTemplateMethodSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_UNFOLDING]="PreliminaryForUnfoldingSelected/selected";
   _selectedNameBase[FULLY]="FullySelected/selected";
@@ -25,7 +24,7 @@ TConfiguration::~TConfiguration()
 TString TConfiguration::StrChannel(int channel){
   if (channel==MUON) return "MUON";
   if (channel==ELECTRON) return "ELECTRON";
-  if (channel==BOTH) return "BOTH";
+  if (channel==BOTH_CHANNELS) return "BOTH_CHANNELS";
 }
  
 TString TConfiguration::StrVgType(int vg_type){
@@ -60,7 +59,6 @@ TString TConfiguration::StrCsMode(int csMode){
 
 TString TConfiguration::StrSelectionStage(int sel){
   if (sel==VERY_PRELIMINARY) return "VERY_PRELIMINARY"; 
-  if (sel==PRELIMINARY_FOR_MET_CUT) return "PRELIMINARY_FOR_MET_CUT"; 
   if (sel==PRELIMINARY_FOR_TEMPLATE_METHOD) return "PRELIMINARY_FOR_TEMPLATE_METHOD"; 
   if (sel==PRELIMINARY_FOR_UNFOLDING) return "PRELIMINARY_FOR_UNFOLDING"; 
   if (sel==FULLY) return "FULLY"; 

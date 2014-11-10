@@ -12,14 +12,13 @@ class TConfiguration
     TConfiguration();
     virtual ~TConfiguration();
 
-    enum {MUON, ELECTRON, BOTH};//channel
+    enum {MUON, ELECTRON, BOTH_CHANNELS};//channel
     enum {W_GAMMA, Z_GAMMA, V_GAMMA};//vg_type
     enum {DATA, SIGMC, BKGMC};//sample
     enum {UNBLIND, BLIND_PRESCALE, BLIND_DECRACC};//blinding type
     enum {BARREL, ENDCAP, COMMON};//eta bin
     enum {TOTAL, ONEDI, TWODI};//csMode
     enum {VERY_PRELIMINARY,
-          PRELIMINARY_FOR_MET_CUT,
           PRELIMINARY_FOR_TEMPLATE_METHOD,
           PRELIMINARY_FOR_UNFOLDING,
           FULLY};//selection stage

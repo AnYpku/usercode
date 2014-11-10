@@ -17,8 +17,8 @@ TEventTree::~TEventTree()
 void TEventTree::GetEntryNeededBranchesOnly(int channel, int sample, Long64_t entry)
 {
   GetEntryCommon(entry);
-  if (channel==config.MUON || channel==config.BOTH) GetEntryMuoSpecific(entry);
-  if (channel==config.ELECTRON || channel==config.BOTH) GetEntryEleSpecific(entry);
+  if (channel==config.MUON || channel==config.BOTH_CHANNELS) GetEntryMuoSpecific(entry);
+  if (channel==config.ELECTRON || channel==config.BOTH_CHANNELS) GetEntryEleSpecific(entry);
   if (sample==config.DATA) GetEntryDataSpecific(entry);
   else GetEntryMCSpecific(entry);
 }
@@ -49,12 +49,15 @@ void TEventTree::GetEntryCommon(Long64_t entry)
    b_phoHoverE12->GetEntry(entry);
    b_phoEleVeto->GetEntry(entry);
    b_phoSigmaIEtaIEta->GetEntry(entry);
+
    b_phoPFChIso->GetEntry(entry);
    b_phoPFPhoIso->GetEntry(entry);
    b_phoPFNeuIso->GetEntry(entry);
+
    b_phoSCRChIso->GetEntry(entry);
    b_phoSCRPhoIso->GetEntry(entry);
    b_phoSCRNeuIso->GetEntry(entry);
+
    b_phoSCRChIso04->GetEntry(entry);
    b_phoSCRPhoIso04->GetEntry(entry);
    b_phoSCRNeuIso04->GetEntry(entry);
@@ -91,6 +94,8 @@ void TEventTree::GetEntryMuoSpecific(Long64_t entry)
    b_muType->GetEntry(entry);
    b_muD0->GetEntry(entry);
    b_muDz->GetEntry(entry);
+   b_muInnerD0GV->GetEntry(entry);
+   b_muInnerDzGV->GetEntry(entry);
    b_muNumberOfValidTrkLayers->GetEntry(entry);
    b_muNumberOfValidTrkHits->GetEntry(entry);
    b_muNumberOfValidPixelHits->GetEntry(entry);
@@ -104,6 +109,7 @@ void TEventTree::GetEntryMuoSpecific(Long64_t entry)
 void TEventTree::GetEntryEleSpecific(Long64_t entry)
 {
    b_nEle->GetEntry(entry);
+   b_eleTrg->GetEntry(entry);
    b_elePt->GetEntry(entry);
    b_elePhi->GetEntry(entry);
    b_eleEta->GetEntry(entry);
@@ -212,7 +218,7 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.trkMETy = 0;
 //   treeLeaf.trkMETPhi = 0;
 //   treeLeaf.trkMET = 0;
-//   treeLeaf.eleTrg = 0;
+   treeLeaf.eleTrg = 0;
 //   treeLeaf.eleClass = 0;
 //   treeLeaf.eleIsEcalDriven = 0;
 //   treeLeaf.eleCharge = 0;
@@ -527,8 +533,8 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.muDzVtx = 0;
 //   treeLeaf.muInnerD0 = 0;
 //   treeLeaf.muInnerDz = 0;
-//   treeLeaf.muInnerD0GV = 0;
-//   treeLeaf.muInnerDzGV = 0;
+   treeLeaf.muInnerD0GV = 0;
+   treeLeaf.muInnerDzGV = 0;
 //   treeLeaf.muInnerPt = 0;
 //   treeLeaf.muInnerPtErr = 0;
    treeLeaf.muNumberOfValidTrkLayers = 0;
@@ -797,7 +803,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("trkMET", &treeLeaf.trkMET, &b_trkMET);
    fChain->SetBranchAddress("metFilters", treeLeaf.metFilters, &b_metFilters);
    fChain->SetBranchAddress("nEle", &treeLeaf.nEle, &b_nEle);
-//   fChain->SetBranchAddress("eleTrg", &treeLeaf.eleTrg, &b_eleTrg);
+   fChain->SetBranchAddress("eleTrg", &treeLeaf.eleTrg, &b_eleTrg);
 //   fChain->SetBranchAddress("eleClass", &treeLeaf.eleClass, &b_eleClass);
 //   fChain->SetBranchAddress("eleIsEcalDriven", &treeLeaf.eleIsEcalDriven, &b_eleIsEcalDriven);
 //   fChain->SetBranchAddress("eleCharge", &treeLeaf.eleCharge, &b_eleCharge);
@@ -809,7 +815,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("eleESEn", &treeLeaf.eleESEn, &b_eleESEn);
    fChain->SetBranchAddress("elePt", &treeLeaf.elePt, &b_elePt);
    fChain->SetBranchAddress("eleEta", &treeLeaf.eleEta, &b_eleEta);
-//   fChain->SetBranchAddress("elePhi", &treeLeaf.elePhi, &b_elePhi);
+   fChain->SetBranchAddress("elePhi", &treeLeaf.elePhi, &b_elePhi);
 //   fChain->SetBranchAddress("eleR9", &treeLeaf.eleR9, &b_eleR9);
 //   fChain->SetBranchAddress("eleEtaVtx", &treeLeaf.eleEtaVtx, &b_eleEtaVtx);
 //   fChain->SetBranchAddress("elePhiVtx", &treeLeaf.elePhiVtx, &b_elePhiVtx);
@@ -1114,8 +1120,8 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("muDzVtx", &treeLeaf.muDzVtx, &b_muDzVtx);
 //   fChain->SetBranchAddress("muInnerD0", &treeLeaf.muInnerD0, &b_muInnerD0);
 //   fChain->SetBranchAddress("muInnerDz", &treeLeaf.muInnerDz, &b_muInnerDz);
-//   fChain->SetBranchAddress("muInnerD0GV", &treeLeaf.muInnerD0GV, &b_muInnerD0GV);
-//   fChain->SetBranchAddress("muInnerDzGV", &treeLeaf.muInnerDzGV, &b_muInnerDzGV);
+   fChain->SetBranchAddress("muInnerD0GV", &treeLeaf.muInnerD0GV, &b_muInnerD0GV);
+   fChain->SetBranchAddress("muInnerDzGV", &treeLeaf.muInnerDzGV, &b_muInnerDzGV);
 //   fChain->SetBranchAddress("muInnerPt", &treeLeaf.muInnerPt, &b_muInnerPt);
 //   fChain->SetBranchAddress("muInnerPtErr", &treeLeaf.muInnerPtErr, &b_muInnerPtErr);
    fChain->SetBranchAddress("muNumberOfValidTrkLayers", &treeLeaf.muNumberOfValidTrkLayers, &b_muNumberOfValidTrkLayers);

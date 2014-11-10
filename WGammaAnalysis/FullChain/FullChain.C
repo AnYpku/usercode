@@ -5,7 +5,6 @@
 #include "../Configuration/TAllInputSamples.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Selection/Selection.h"
-#include "../DDBkgTemplateMethod/TTemplates.h"
 #include "../DDBkgTemplateMethod/TTemplatesRandCone.h"
 #include "../PrepareYields/TPrepareYields.h"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
@@ -37,13 +36,9 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.analyzedSamples="";
   anPars.configfile="../Configuration/config.txt";
   anPars.isNoPuReweight=0;
-  anPars.isDebugMode=1;
-  anPars.noAdjustBinning=0;
-  anPars.isMetCutOptimization=0;
+  anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
-  anPars.phoWP=TPhotonCuts::WP_TIGHT;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
-
-  anPars.noPhoPFChIsoCut=0;
+  anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
 
   anPars.noPreSelection=0;
   anPars.noExtraSelection=0;
@@ -192,16 +187,14 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
     anPars.kinBinLims[16]=2.1;
   }
   if (varKin=="WMt"){
-//    anPars.isMetCutOptimization=1;
     anPars.varKin=varKin;
-    anPars.nKinBins=9;
+    anPars.nKinBins=20;
 //    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=50+7*ib;
+      anPars.kinBinLims[ib]=50+5*ib;
   }
   if (varKin=="Mleplep"){
-    anPars.isMetCutOptimization=0;
     anPars.varKin=varKin;
     anPars.nKinBins=30;
 //    anPars.nKinBins=2;
@@ -218,11 +211,10 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
   }
   if (varKin=="pfMET"){
     anPars.varKin="pfMET";
-    anPars.nKinBins=2;
-//    anPars.nKinBins=9;
+    anPars.nKinBins=20;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=50+10*ib;
+      anPars.kinBinLims[ib]=50+5*ib;
   }
   if (varKin=="pfMETPhi"){
     anPars.varKin="pfMETPhi";
@@ -257,7 +249,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Extra Selection"<<std::endl;
     Selection selection;
-    selection.ExtraSelection(anPars.year, anPars.channel,anPars.vgamma, anPars.sampleMode,anPars.blind,anPars.phoWP,anPars.noPhoPFChIsoCut);
+    selection.ExtraSelection(anPars.year, anPars.channel,anPars.vgamma, anPars.sampleMode,anPars.blind,anPars.phoWP);
     std::cout<<"%_%  DONE Extra Selection"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
@@ -266,8 +258,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //compute fake-gamma background by data-driven template method
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO DataDriven bkg"<<std::endl;
-//    TTemplates temp(anPars.year,anPars.channel,anPars.vgamma,anPars.blind, anPars.phoWP,anPars.strDDbkgVarFit,anPars.strDDbkgVarSideband, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.noAdjustBinning,anPars.noPhoPFChIsoCut, anPars.isMetCutOptimization,anPars.doSystTemplateStat);
-   TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.isMetCutOptimization);
+   TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
    temp.ComputeBackground();
     std::cout<<"%_%  DONE Extra DataDriven bkg"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
@@ -277,7 +268,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //prepare yields and subtract background
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
-    TPrepareYields yields(anPars.year, anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims,anPars.isMetCutOptimization, anPars.phoWP, anPars.noDDBkgComputation);
+    TPrepareYields yields(anPars.year, anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.phoWP, anPars.noDDBkgComputation);
     yields.PrepareYields();
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;

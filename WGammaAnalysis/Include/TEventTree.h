@@ -116,7 +116,7 @@ public:
 //   vector<float>   *trkMET;
      Int_t           metFilters[10];
      Int_t           nEle;
-//   vector<unsigned long> *eleTrg;
+   vector<unsigned long> *eleTrg;
 //   vector<int>     *eleClass;
 //   vector<int>     *eleIsEcalDriven;
 //   vector<int>     *eleCharge;
@@ -433,8 +433,8 @@ public:
 //   vector<vector<float> > *muDzVtx;
 //   vector<float>   *muInnerD0;
 //   vector<float>   *muInnerDz;
-//   vector<float>   *muInnerD0GV;
-//   vector<float>   *muInnerDzGV;
+   vector<float>   *muInnerD0GV;
+   vector<float>   *muInnerDzGV;
 //   vector<float>   *muInnerPt;
 //   vector<float>   *muInnerPtErr;
    vector<int>     *muNumberOfValidTrkLayers;

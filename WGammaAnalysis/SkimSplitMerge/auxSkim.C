@@ -16,7 +16,7 @@ void auxSkim(TString fileToSkimName)
 
   std::cout<<"file "<<fileToSkimName<<" will be skimmed"<<std::endl;
 
-  SkimLeptonPhoton skimmer(TConfiguration::MUON, TConfiguration::BKGMC,fileToSkimName, "ggNtuplizer", "EventTree", "./");
+  SkimLeptonPhoton skimmer(TConfiguration::MUON, TConfiguration::W_GAMMA, TConfiguration::DATA,fileToSkimName);
   skimmer.LoopOverInputTree();
 
   std::cout<<"file "<<fileToSkimName<<" was skimmed"<<std::endl;

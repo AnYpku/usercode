@@ -63,7 +63,7 @@ void SplitVDecayMC::LoopOverInputTree()
     {
       if (entry < 0) break;
 
-     _TREE.GetEntryNeededBranchesOnly(config.BOTH,config.SIGMC,entry);
+     _TREE.GetEntryNeededBranchesOnly(config.BOTH_CHANNELS,config.SIGMC,entry);
 
       bool hasWorZ=0;
       for (int iMC=0; iMC<_TREE.treeLeaf.nMC; iMC++)

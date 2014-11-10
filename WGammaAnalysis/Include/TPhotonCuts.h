@@ -48,12 +48,10 @@ class TPhotonCuts
     TCut RangeSigmaIEtaIEta(int year, int wp);
     TCut SidebandSigmaIEtaIEta();
     TCut RangeOneIsolation(int year, int wp, int isoType);
-    TCut RangePhoSCRChIsoCorr();
-    TCut SidebandPhoSCRChIsoCorr();
     TCut RangeHoverE(int year);
     TCut RangePhoEleVeto();
     TCut RangePhoHasPixelSeed();
-    TCut RangePhoton(int year, int wp, bool noPhoPFChIsoCut,
+    TCut RangePhoton(int year, int wp, 
            bool doSigmaIEtaIEtaCut=1, bool doChOrTrkIsoCut=1, 
            bool doNeuOrHcalIsoCut=1, bool doPhoOrEcalIsoCut=1, 
            bool doHoverECut=1, bool doElectronVetoCut=1);

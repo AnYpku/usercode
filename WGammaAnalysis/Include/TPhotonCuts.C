@@ -274,22 +274,6 @@ TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
   return cut;
 }
 
-TCut TPhotonCuts::RangePhoSCRChIsoCorr()
-{
-  TString str="phoSCRChIsoCorr<";
-  str+=_phoSCRChIsoCorrCut;
-  TCut cut(str);
-  return cut;
-}
-
-TCut TPhotonCuts::SidebandPhoSCRChIsoCorr()
-{
-  TString str="phoSCRChIsoCorr>";
-  str+=_phoSCRChIsoCorrSideband;
-  TCut cut(str);
-  return cut;
-}
-
 TCut TPhotonCuts::RangeHoverE(int year)
 {
   TString cutStr="";
@@ -313,7 +297,6 @@ TCut TPhotonCuts::RangePhoHasPixelSeed()
 }
 
 TCut TPhotonCuts::RangePhoton(int year, int wp,  
-           bool noPhoPFChIsoCut,
            bool doSigmaIEtaIEtaCut, bool doChOrTrkIsoCut, 
            bool doNeuOrHcalIsoCut, bool doPhoOrEcalIsoCut, 
            bool doHoverECut, bool doElectronVetoCut)
@@ -327,8 +310,7 @@ TCut TPhotonCuts::RangePhoton(int year, int wp,
   if (doElectronVetoCut) cut = cut && RangePhoEleVeto();
   if (year==2011) cut = cut && RangePhoHasPixelSeed();
   if (doChOrTrkIsoCut){
-    if (!noPhoPFChIsoCut) cut = cut && RangeOneIsolation(year,wp,ISO_CHorTRK);
-//    cut = cut && RangePhoSCRChIsoCorr();
+    cut = cut && RangeOneIsolation(year,wp,ISO_CHorTRK);
   }
   if (doNeuOrHcalIsoCut){
     cut = cut && RangeOneIsolation(year,wp,ISO_NEUorHCAL);

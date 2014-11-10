@@ -4,11 +4,12 @@
 #include <TH1F.h>
 #include <iostream>
 
-SkimLeptonPhoton::SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool isDebugMode, TString outDir, TString nameDir, TString nameTree)
+SkimLeptonPhoton::SkimLeptonPhoton(int channel, int vgamma, int sample, TString inputFileName, bool isDebugMode, TString outDir, TString nameDir, TString nameTree)
 {
 
   _sample=sample;
-  _channel=channel;  
+  _channel=channel; 
+  _vgamma=vgamma; 
 
   _isDebugMode=isDebugMode;
 
@@ -23,35 +24,42 @@ SkimLeptonPhoton::SkimLeptonPhoton(int channel, int sample, TString inputFileNam
   }
   inpTemp.ReplaceAll(".root","");
 
-  if (channel == _config.MUON || channel == _config.BOTH){
-    _skimmedFileNameMu=outDir+inpTemp+"_MuPhoSkim.root";
-    _fileOutMu = new TFile(_skimmedFileNameMu,"recreate");
-    _fileOutMu->mkdir(_nameDir);
-    _fileOutMu->cd(_nameDir);
-    _outputTreeMu = new TTree(_nameTree,_nameTree);
-    _TREE.InitOutputTree(_outputTreeMu);
-      //method of TInputOutputTree
-    _hskimMu = new TH1F("hskim","hskim",2,0,2);
-  }
+  TString skimPartOfName[2][2];
+  skimPartOfName[_config.MUON][_config.W_GAMMA]="_MuPhoSkim";// muon + photon
+  skimPartOfName[_config.MUON][_config.Z_GAMMA]="_MuMuPhoSkim";// two muons + photon
+  skimPartOfName[_config.ELECTRON][_config.W_GAMMA]="_ElePhoSkim";// electron + photon
+  skimPartOfName[_config.ELECTRON][_config.Z_GAMMA]="_EleElePhoSkim";// two electrons + photon
 
-  if (channel == _config.ELECTRON || channel == _config.BOTH){
-    _skimmedFileNameEle=outDir+inpTemp+"_ElePhoSkim.root"; 
-    _fileOutEle = new TFile(_skimmedFileNameEle,"recreate");
-    _fileOutEle->mkdir(_nameDir);
-    _fileOutEle->cd(_nameDir);
-    _outputTreeEle = new TTree(_nameTree,_nameTree);
-    _TREE.InitOutputTree(_outputTreeEle);
-      //method of TInputOutputTree
-    _hskimEle = new TH1F("hskim","hskim",2,0,2);
-  }
-
+  for (int ich=_config.MUON; ich<=_config.ELECTRON; ich++){
+    if (ich==_channel || _channel==_config.BOTH_CHANNELS);
+    else continue;
+    for (int ivg=_config.W_GAMMA; ivg<=_config.Z_GAMMA; ivg++){
+      if (ivg==_vgamma || _vgamma==_config.V_GAMMA);
+      else continue;
+      _skimmedFileName[ich][ivg]=outDir+inpTemp+skimPartOfName[ich][ivg]+".root";
+      _fileOut[ich][ivg] = new TFile(_skimmedFileName[ich][ivg],"recreate");
+      _fileOut[ich][ivg]->mkdir(_nameDir);
+      _fileOut[ich][ivg]->cd(_nameDir);
+      _outputTree[ich][ivg] = new TTree(_nameTree,_nameTree);
+      _TREE.InitOutputTree(_outputTree[ich][ivg]);
+        //method of TInputOutputTree
+      _hskim[ich][ivg] = new TH1F("hskim","hskim",2,0,2);      
+    }//end of loop over ivg
+  }//end of loop over ich
 }
 
 SkimLeptonPhoton::~SkimLeptonPhoton()
 {
   _TREE.fChain = 0;
-  if (_channel==_config.MUON || _channel==_config.BOTH) _fileOutMu->Close();
-  if (_channel==_config.ELECTRON || _channel==_config.BOTH) _fileOutEle->Close();
+  for (int ich=_config.MUON; ich<=_config.ELECTRON; ich++){
+    if (ich==_channel || _channel==_config.BOTH_CHANNELS);
+    else continue;
+    for (int ivg=_config.W_GAMMA; ivg<=_config.Z_GAMMA; ivg++){
+      if (ivg==_vgamma || _vgamma==_config.V_GAMMA);
+      else continue;
+      _fileOut[ich][ivg]->Close();
+    }
+  }
 }
 
 void SkimLeptonPhoton::LoopOverInputTree()
@@ -84,40 +92,54 @@ void SkimLeptonPhoton::LoopOverInputTree()
         //field of TInputTree
 
   Long64_t nentries = _TREE.fChain->GetEntries();
- // nentries = 100;
-  int nMuPassed=0;
-  int nElePassed=0;
+  if (_isDebugMode) nentries=100;
 
-  for (Long64_t entry=0; entry<nentries; entry++) 
-    {
-      if (entry < 0) break;
+  for (Long64_t entry=0; entry<nentries; entry++) {
 
-      _TREE.GetEntryNeededBranchesOnly(_channel,_sample,entry);
-      
-      if (_TREE.treeLeaf.nPho<1) continue;
-      bool phoExists=0;
-      for (int ipho=0; ipho<_TREE.treeLeaf.nPho; ipho++){
-        if (_TREE.treeLeaf.phoEt->at(ipho)>10) phoExists=1;
-      }
-      if (!phoExists) continue;
-      if (_TREE.treeLeaf.nMu>0 && (_channel==_config.MUON || _channel==_config.BOTH))
-        {
-          nMuPassed++; 
-          _outputTreeMu->Fill();
-        }
-      if (_TREE.treeLeaf.nEle>0 && (_channel==_config.ELECTRON || _channel==_config.BOTH))
-        {
-          nElePassed++;
-          _outputTreeEle->Fill();
-        } 
+    if (entry < 0) break;
+    _TREE.GetEntryNeededBranchesOnly(_channel,_sample,entry);
   
-    }//loop over entries ends
+    if (_TREE.treeLeaf.nPho<1) continue;
+    if (_TREE.treeLeaf.phoEt->at(0)<10) continue;
+
+
+    if (_channel==_config.MUON || _channel==_config.BOTH_CHANNELS){
+      if (_vgamma==_config.W_GAMMA || _vgamma==_config.V_GAMMA){
+        if (_TREE.treeLeaf.nMu>=1)
+          if (_TREE.treeLeaf.muPt->at(0)>20)
+            _outputTree[_config.MUON][_config.W_GAMMA]->Fill();
+      }// if MUON, W_GAMMA
+      if (_vgamma==_config.Z_GAMMA || _vgamma==_config.V_GAMMA){
+        if (_TREE.treeLeaf.nMu>=2)
+          if (_TREE.treeLeaf.muPt->at(0)>20)
+            _outputTree[_config.MUON][_config.Z_GAMMA]->Fill();
+      }// if MUON, Z_GAMMA
+    }// if MUON or BOTH
+    if (_channel==_config.ELECTRON || _channel==_config.BOTH_CHANNELS){
+      if (_vgamma==_config.W_GAMMA || _vgamma==_config.V_GAMMA){
+        if (_TREE.treeLeaf.nEle>=1)
+          if (_TREE.treeLeaf.elePt->at(0)>20)
+            _outputTree[_config.ELECTRON][_config.W_GAMMA]->Fill();
+      }// if ELECTRON, W_GAMMA
+      if (_vgamma==_config.Z_GAMMA || _vgamma==_config.V_GAMMA){
+        if (_TREE.treeLeaf.nEle>=2)
+          if (_TREE.treeLeaf.elePt->at(0)>20)
+            _outputTree[_config.ELECTRON][_config.Z_GAMMA]->Fill();
+      }// if ELECTRON, Z_GAMMA
+    }// if ELECTRON or BOTH 
+
+  }//loop over entries ends
 
   //writing output trees to files
-  if (_channel==_config.MUON || _channel==_config.BOTH){
-    _fileOutMu->cd();
-    _fileOutMu->cd(_nameDir);
-    _outputTreeMu->Write(_nameTree);
+  for (int ich=_config.MUON; ich<=_config.ELECTRON; ich++){
+    if (ich==_channel || _channel==_config.BOTH_CHANNELS);
+    else continue;
+    for (int ivg=_config.W_GAMMA; ivg<=_config.Z_GAMMA; ivg++){
+      if (ivg==_vgamma || _vgamma==_config.V_GAMMA);
+      else continue;
+    _fileOut[ich][ivg]->cd();
+    _fileOut[ich][ivg]->cd(_nameDir);
+    _outputTree[ich][ivg]->Write(_nameTree);
     if (hashEvents)
       hEvents->Write();
     if (hashPU)
@@ -125,28 +147,10 @@ void SkimLeptonPhoton::LoopOverInputTree()
     if (hashPUTrue)
       hPUTrue->Write();
     if (hashskim)
-      _hskimMu->SetBinContent(1,hskim->GetBinContent(1));
+      _hskim[ich][ivg]->SetBinContent(1,hskim->GetBinContent(1));
     else 
-      _hskimMu->SetBinContent(1,tree->GetEntries());
-    _hskimMu->SetBinContent(2,nMuPassed); 
-    _hskimMu->Write();
-  }
+      _hskim[ich][ivg]->SetBinContent(1,tree->GetEntries());
 
-  if (_channel==_config.ELECTRON || _channel==_config.BOTH){
-    _fileOutEle->cd();
-    _fileOutEle->cd(_nameDir);
-    _outputTreeEle->Write(_nameTree);
-    //if (hashEvents)
-    //  hEvents->Write();
-    if (hashPU)
-      hPU->Write();
-    //if (hashPUTrue)
-    //  hPUTrue->Write();
-    if (hashskim)
-      _hskimEle->SetBinContent(1,hskim->GetBinContent(1));
-    else 
-      _hskimEle->SetBinContent(1,tree->GetEntries());
-    _hskimEle->SetBinContent(2,nElePassed); 
-    _hskimEle->Write();
-  }
+    }//end of loop over ivg
+  }//end of loop over ich
 }//Skim::LoopOverInputTree() ends

@@ -40,7 +40,7 @@ bool TMuonCuts::MuId(int year, float muChi2NDF, float muD0, float muDZ,
   if (muType != _muType2012) return false;
   if (muChi2NDF >= _muChi2NDFCut) return false;
   if (muNumberOfValidMuonHits <= _muNOfValidMuonHitsCut) return false;
-  if (muNumberOfValidTrkHits <= _muNOfValidTrkHitsCut) return false;
+//  if (muNumberOfValidTrkHits <= _muNOfValidTrkHitsCut) return false;
   if ((year==2012) && (fabs(muD0) >= _D0Cut2012)) return false;
   if ((year==2012) && (fabs(muDZ) >= _DZCut2012)) return false;
   if ((year==2011) && (fabs(muD0) >= _D0Cut2011)) return false;

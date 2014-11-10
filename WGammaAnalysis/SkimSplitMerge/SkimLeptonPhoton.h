@@ -8,7 +8,7 @@
 
 class SkimLeptonPhoton{
 public :
-   SkimLeptonPhoton(int channel, int sample, TString inputFileName, bool isDebugMode=0, TString outDir="./", TString nameDir="ggNtuplizer", TString nameTree="EventTree");
+   SkimLeptonPhoton(int channel, int vgamma, int sample, TString inputFileName, bool isDebugMode=0, TString outDir="./", TString nameDir="ggNtuplizer", TString nameTree="EventTree");
    virtual ~SkimLeptonPhoton();
    void LoopOverInputTree();
      //the main function which is called from outside
@@ -19,17 +19,14 @@ private :
    TInputOutputTree _TREE;
    TConfiguration _config;
    int _channel;
+   int _vgamma;
    int _sample;
    bool _isDebugMode;
-   TFile    *_fileOutMu; //output Files
-   TFile    *_fileOutEle; //output Files
-   TTree    *_outputTreeMu; //output Trees
-   TTree    *_outputTreeEle; //output Trees
-   TH1F     *_hskimMu;
-   TH1F     *_hskimEle;
+   TFile    *_fileOut[2][2]; //output Files
+   TTree    *_outputTree[2][2]; //output Trees
+   TH1F     *_hskim[2][2];
    TString  _inputFileName; 
-   TString  _skimmedFileNameMu; 
-   TString  _skimmedFileNameEle;
+   TString  _skimmedFileName[2][2]; 
    TString  _nameDir;
    TString  _nameTree;
 

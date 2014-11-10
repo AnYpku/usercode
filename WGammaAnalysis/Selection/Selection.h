@@ -31,8 +31,8 @@ class Selection
        void    LoopOverTreeEvents();
        bool    CheckMaxNumbersInTree();
        void    PrintErrorMessageMaxNumberOf(int particle);
-       void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int blind,int wp, bool noPhoPFChIsoCut);
-       void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind, bool noPhoPFChIsoCut);
+       void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int blind,int wp);
+       void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind);
 
        enum {DATA, SIGMC, BKGMC, MC, NOBKG, ALL, NOTSPECIFIED};//sampleMode
        TString StrSampleMode(int sampleMode);
@@ -83,6 +83,8 @@ class Selection
        zgamma::PhosphorCorrectionFunctor* _photonCorrector;
        TPuReweight* _puWeight;
        TString _selectedTreeFileName;
+
+       void PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced);
   };
 
 #endif //#ifndef Selection_h

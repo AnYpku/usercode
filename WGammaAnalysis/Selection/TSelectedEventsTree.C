@@ -29,6 +29,7 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   for (int il=0; il<=1; il++){
     TString stril="";
     stril+=il+1;// 1 and 2
+    tree->Branch(TString("ilep")+stril,&_ilep[il],TString("ilep")+stril+TString("/I"));
     tree->Branch(TString("iMClep")+stril,&_iMClep[il],TString("iMClep")+stril+TString("/I"));
     tree->Branch(TString("lepton")+stril+TString("Eta"),&_lepEta[il],TString("lepton")+stril+TString("Eta/F"));
     tree->Branch(TString("lepton")+stril+TString("Phi"),&_lepPhi[il],TString("lepton")+stril+TString("Phi/F"));
@@ -52,6 +53,7 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("HLT_IsoMu24_eta2p1_",&_HLT_IsoMu24_eta2p1_,"HLT_IsoMu24_eta2p1_/I");
   tree->Branch("HLT_IsoMu24_v",&_HLT_IsoMu24_v,"HLT_IsoMu24_v/I");
   tree->Branch("HLT_Mu22_Mu8_v",&_HLT_Mu22_Mu8_v,"HLT_Mu22_Mu8_v/I");
+  tree->Branch("ipho",&_ipho,"ipho/I");
   tree->Branch("iMCpho",&_iMCpho,"iMCpho/I");
   tree->Branch("phoElectronVeto",&_phoEleVeto,"phoElectronVeto/I");
   tree->Branch("phoEta",&_phoEta,"phoEta/F");
@@ -69,15 +71,28 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("phoHoverE12",&_phoHoverE12,"phoHoverE12/F");
   tree->Branch("phoHoverE",&_phoHoverE,"phoHoverE/F");
   tree->Branch("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,"phoSigmaIEtaIEta/F");
+
   tree->Branch("phoPFChIsoCorr",&_phoPFChIsoCorr,"phoPFChIsoCorr/F");
-  tree->Branch("phoSCRChIsoCorr",&_phoSCRChIsoCorr,"phoSCRChIsoCorr/F");
-  tree->Branch("phoRandConeChIsoCorr",&_phoRandConeChIsoCorr,"phoRandConeChIsoCorr/F");
   tree->Branch("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,"phoPFNeuIsoCorr/F");
-  tree->Branch("phoSCRNeuIsoCorr",&_phoSCRNeuIsoCorr,"phoSCRNeuIsoCorr/F");
-  tree->Branch("phoRandConeNeuIsoCorr",&_phoRandConeNeuIsoCorr,"phoRandConeNeuIsoCorr/F");
   tree->Branch("phoPFPhoIsoCorr",&_phoPFPhoIsoCorr,"phoPFPhoIsoCorr/F");
+
+  tree->Branch("phoSCRChIsoCorr",&_phoSCRChIsoCorr,"phoSCRChIsoCorr/F");
+  tree->Branch("phoSCRNeuIsoCorr",&_phoSCRNeuIsoCorr,"phoSCRNeuIsoCorr/F");
   tree->Branch("phoSCRPhoIsoCorr",&_phoSCRPhoIsoCorr,"phoSCRPhoIsoCorr/F");
+
+  tree->Branch("phoSCRChIso04Corr",&_phoSCRChIso04Corr,"phoSCRChIso04Corr/F");
+  tree->Branch("phoSCRNeuIso04Corr",&_phoSCRNeuIso04Corr,"phoSCRNeuIso04Corr/F");
+  tree->Branch("phoSCRPhoIso04Corr",&_phoSCRPhoIso04Corr,"phoSCRPhoIso04Corr/F");
+
+  tree->Branch("phoRandConeChIsoCorr",&_phoRandConeChIsoCorr,"phoRandConeChIsoCorr/F");
+  tree->Branch("phoRandConeNeuIsoCorr",&_phoRandConeNeuIsoCorr,"phoRandConeNeuIsoCorr/F");
   tree->Branch("phoRandConePhoIsoCorr",&_phoRandConePhoIsoCorr,"phoRandConePhoIsoCorr/F");
+
+
+  tree->Branch("phoRandConeChIso04Corr",&_phoRandConeChIso04Corr,"phoRandConeChIso04Corr/F");
+  tree->Branch("phoRandConeNeuIso04Corr",&_phoRandConeNeuIso04Corr,"phoRandConeNeuIso04Corr/F");
+  tree->Branch("phoRandConePhoIso04Corr",&_phoRandConePhoIso04Corr,"phoRandConePhoIso04Corr/F");
+
   tree->Branch("phoEcalIsoDR04Corr",&_phoEcalIsoDR04Corr,"phoEcalIsoDR04Corr/F");
   tree->Branch("phoHcalIsoDR04Corr",&_phoHcalIsoDR04Corr,"phoHcalIsoDR04Corr/F");
   tree->Branch("phoTrkIsoHollowDR04Corr",&_phoTrkIsoHollowDR04Corr,"phoTrkIsoHollowCorr/F");
@@ -109,6 +124,7 @@ void TSelectedEventsTree::SetAsInputTree(TTree* tree)
   for (int il=0; il<=1; il++){
     TString stril="";
     stril+=il+1;// 1 and 2
+    tree->SetBranchAddress(TString("ilep")+stril,&_ilep[il],&_b_ilep[il]);
     tree->SetBranchAddress(TString("iMClep")+stril,&_iMClep[il],&_b_iMClep[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Eta"),&_lepEta[il],&_b_lepEta[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Phi"),&_lepPhi[il],&_b_lepPhi[il]);
@@ -132,6 +148,7 @@ void TSelectedEventsTree::SetAsInputTree(TTree* tree)
   tree->SetBranchAddress("HLT_IsoMu24_eta2p1_",&_HLT_IsoMu24_eta2p1_,&_b_HLT_IsoMu24_eta2p1_);
   tree->SetBranchAddress("HLT_IsoMu24_v",&_HLT_IsoMu24_v,&_b_HLT_IsoMu24_v);
   tree->SetBranchAddress("HLT_Mu22_Mu8_v",&_HLT_Mu22_Mu8_v,&_b_HLT_Mu22_Mu8_v);
+  tree->SetBranchAddress("ipho",&_ipho,&_b_ipho);
   tree->SetBranchAddress("iMCpho",&_iMCpho,&_b_iMCpho);
   tree->SetBranchAddress("phoElectronVeto",&_phoEleVeto,&_b_phoEleVeto);
   tree->SetBranchAddress("phoEta",&_phoEta,&_b_phoEta);
@@ -149,15 +166,27 @@ void TSelectedEventsTree::SetAsInputTree(TTree* tree)
   tree->SetBranchAddress("phoHoverE12",&_phoHoverE12,&_b_phoHoverE12);
   tree->SetBranchAddress("phoHoverE",&_phoHoverE,&_b_phoHoverE);
   tree->SetBranchAddress("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,&_b_phoSigmaIEtaIEta);
+
   tree->SetBranchAddress("phoPFChIsoCorr",&_phoPFChIsoCorr,&_b_phoPFChIsoCorr);
-  tree->SetBranchAddress("phoSCRChIsoCorr",&_phoSCRChIsoCorr,&_b_phoSCRChIsoCorr);
-  tree->SetBranchAddress("phoRandConeChIsoCorr",&_phoRandConeChIsoCorr,&_b_phoRandConeChIsoCorr);
   tree->SetBranchAddress("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,&_b_phoPFNeuIsoCorr);
-  tree->SetBranchAddress("phoSCRNeuIsoCorr",&_phoSCRNeuIsoCorr,&_b_phoSCRNeuIsoCorr);
-  tree->SetBranchAddress("phoRandConeNeuIsoCorr",&_phoRandConeNeuIsoCorr,&_b_phoRandConeNeuIsoCorr);
   tree->SetBranchAddress("phoPFPhoIsoCorr",&_phoPFPhoIsoCorr,&_b_phoPFPhoIsoCorr);
+
+  tree->SetBranchAddress("phoSCRChIsoCorr",&_phoSCRChIsoCorr,&_b_phoSCRChIsoCorr);
+  tree->SetBranchAddress("phoSCRNeuIsoCorr",&_phoSCRNeuIsoCorr,&_b_phoSCRNeuIsoCorr);
   tree->SetBranchAddress("phoSCRPhoIsoCorr",&_phoSCRPhoIsoCorr,&_b_phoSCRPhoIsoCorr);
+
+  tree->SetBranchAddress("phoSCRChIso04Corr",&_phoSCRChIso04Corr,&_b_phoSCRChIso04Corr);
+  tree->SetBranchAddress("phoSCRNeuIso04Corr",&_phoSCRNeuIso04Corr,&_b_phoSCRNeuIso04Corr);
+  tree->SetBranchAddress("phoSCRPhoIso04Corr",&_phoSCRPhoIso04Corr,&_b_phoSCRPhoIso04Corr);
+
+  tree->SetBranchAddress("phoRandConeChIsoCorr",&_phoRandConeChIsoCorr,&_b_phoRandConeChIsoCorr);
+  tree->SetBranchAddress("phoRandConeNeuIsoCorr",&_phoRandConeNeuIsoCorr,&_b_phoRandConeNeuIsoCorr);
   tree->SetBranchAddress("phoRandConePhoIsoCorr",&_phoRandConePhoIsoCorr,&_b_phoRandConePhoIsoCorr);
+
+  tree->SetBranchAddress("phoRandConeChIso04Corr",&_phoRandConeChIso04Corr,&_b_phoRandConeChIso04Corr);
+  tree->SetBranchAddress("phoRandConeNeuIso04Corr",&_phoRandConeNeuIso04Corr,&_b_phoRandConeNeuIso04Corr);
+  tree->SetBranchAddress("phoRandConePhoIso04Corr",&_phoRandConePhoIso04Corr,&_b_phoRandConePhoIso04Corr);
+
   tree->SetBranchAddress("phoEcalIsoDR04Corr",&_phoEcalIsoDR04Corr,&_b_phoEcalIsoDR04Corr);
   tree->SetBranchAddress("phoHcalIsoDR04Corr",&_phoHcalIsoDR04Corr,&_b_phoHcalIsoDR04Corr);
   tree->SetBranchAddress("phoTrkIsoHollowDR04Corr",&_phoTrkIsoHollowDR04Corr,&_b_phoTrkIsoHollowDR04Corr);
@@ -206,6 +235,7 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
       int ilep=cand.ilep1;
       if (il==0) ilep=cand.ilep1;
       if (il==1) ilep=cand.ilep2;
+      _ilep[il]=ilep;
       _lepEta[il]=treeLeaf.muEta->at(ilep);
       _lepPhi[il]=treeLeaf.muPhi->at(ilep);
       _lepPt[il]=treeLeaf.muPt->at(ilep);
@@ -233,6 +263,7 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
   else if (channel==TConfiguration::ELECTRON);
 
   //photon values
+  _ipho=cand.ipho;
   _iMCpho=-1;
   _phoGenPID=0;
   _phoGenParentage=0;
@@ -313,10 +344,18 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
   _phoSCRNeuIsoCorr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoSCRNeuIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
   _phoSCRPhoIsoCorr=emptyPhoton.GetPhoPhoIsoCorr(treeLeaf.phoSCRPhoIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
 
+  _phoSCRChIso04Corr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoSCRChIso04->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+  _phoSCRNeuIso04Corr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoSCRNeuIso04->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+  _phoSCRPhoIso04Corr=emptyPhoton.GetPhoPhoIsoCorr(treeLeaf.phoSCRPhoIso04->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+
   if (sample==_config.DATA) {
     _phoRandConeChIsoCorr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoRandConeChIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
     _phoRandConeNeuIsoCorr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoRandConeNeuIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
     _phoRandConePhoIsoCorr=emptyPhoton.GetPhoPhoIsoCorr(treeLeaf.phoRandConePhoIso->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+
+    _phoRandConeChIso04Corr=emptyPhoton.GetPhoChIsoCorr(treeLeaf.phoRandConeChIso04->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+    _phoRandConeNeuIso04Corr=emptyPhoton.GetPhoNeuIsoCorr(treeLeaf.phoRandConeNeuIso04->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
+    _phoRandConePhoIso04Corr=emptyPhoton.GetPhoPhoIsoCorr(treeLeaf.phoRandConePhoIso04->at(cand.ipho),treeLeaf.rho2012,treeLeaf.phoSCEta->at(cand.ipho));
   }
   //photon isolation corrections 2011
   _phoEcalIsoDR04Corr=emptyPhoton.GetPhoEcalIsoDR04Corr(treeLeaf.phoEcalIsoDR04->at(cand.ipho),treeLeaf.rho2011,treeLeaf.phoSCEta->at(cand.ipho));
@@ -379,7 +418,8 @@ bool TSelectedEventsTree::SetValuesMuId(TEventTree::InputTreeLeaves treeLeaf, in
 {
   TMuonCuts muon;
   return muon.MuId(year,treeLeaf.muChi2NDF->at(ile), 
-            treeLeaf.muD0->at(ile), treeLeaf.muDz->at(ile), 
+//            treeLeaf.muD0->at(ile), treeLeaf.muDz->at(ile), 
+            treeLeaf.muInnerD0GV->at(ile), treeLeaf.muInnerDzGV->at(ile), 
             treeLeaf.muNumberOfValidMuonHits->at(ile),
             treeLeaf.muNumberOfValidTrkHits->at(ile), 
             treeLeaf.muNumberOfValidPixelHits->at(ile),

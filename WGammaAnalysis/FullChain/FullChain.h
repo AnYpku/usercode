@@ -22,8 +22,6 @@ class FullChain
       int sampleMode;
       string analyzedSamples;
       string configfile;
-      bool noAdjustBinning;
-      bool isMetCutOptimization;
       bool doSystTemplateStat;
       bool isNoPuReweight;
       bool isDebugMode;
@@ -34,7 +32,6 @@ class FullChain
       TString strDDbkgVarSideband;
       //end for template method;
  
-      bool noPhoPFChIsoCut;
 
       bool noPreSelection;
       bool noExtraSelection;

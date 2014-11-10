@@ -25,7 +25,7 @@
   gROOT->ProcessLine(".L ../Selection/TSelectionPlots.C+");
   gROOT->ProcessLine(".L ../Selection/Selection.C+");
 
-  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
+//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesRandCone.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");

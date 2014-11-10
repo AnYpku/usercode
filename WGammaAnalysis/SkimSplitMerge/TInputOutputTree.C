@@ -89,7 +89,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("trkMET",  "vector<float>", &treeLeaf.trkMET);
    outputTree->Branch("metFilters", treeLeaf.metFilters, "metFilters[10]/I");
    outputTree->Branch("nEle", &treeLeaf.nEle, "nEle/I");
-//   outputTree->Branch("eleTrg", "vector<unsigned long>", &treeLeaf.eleTrg);
+   outputTree->Branch("eleTrg", "vector<unsigned long>", &treeLeaf.eleTrg);
      //unsigned long 
 //   outputTree->Branch("eleClass", "vector<int>", &treeLeaf.eleClass);
 //   outputTree->Branch("eleIsEcalDriven", "vector<int>", &treeLeaf.eleIsEcalDriven);
@@ -175,7 +175,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("eleModIsoTrk", "vector<float>",&treeLeaf.eleModIsoTrk);
 //   outputTree->Branch("eleModIsoEcal", "vector<float>",&treeLeaf.eleModIsoEcal);
 //   outputTree->Branch("eleModIsoHcal", "vector<float>",&treeLeaf.eleModIsoHcal);
-//   outputTree->Branch("eleMissHits", "vector<int>",&treeLeaf.eleMissHits);
+   outputTree->Branch("eleMissHits", "vector<int>",&treeLeaf.eleMissHits);
 //   outputTree->Branch("eleConvDist", "vector<float>",&treeLeaf.eleConvDist);
 //   outputTree->Branch("eleConvDcot", "vector<float>",&treeLeaf.eleConvDcot);
    outputTree->Branch("eleConvVtxFit", "vector<int>", &treeLeaf.eleConvVtxFit);
@@ -407,8 +407,8 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("muDzVtx", "vector<vector<float>>",&treeLeaf.muDzVtx);
 //   outputTree->Branch("muInnerD0","vector<float>", &treeLeaf.muInnerD0);
 //   outputTree->Branch("muInnerDz","vector<float>", &treeLeaf.muInnerDz);
-//   outputTree->Branch("muInnerD0GV","vector<float>", &treeLeaf.muInnerD0GV);
-//   outputTree->Branch("muInnerDzGV","vector<float>", &treeLeaf.muInnerDzGV);
+   outputTree->Branch("muInnerD0GV","vector<float>", &treeLeaf.muInnerD0GV);
+   outputTree->Branch("muInnerDzGV","vector<float>", &treeLeaf.muInnerDzGV);
 //   outputTree->Branch("muInnerPt","vector<float>", &treeLeaf.muInnerPt);
 //   outputTree->Branch("muInnerPtErr","vector<float>", &treeLeaf.muInnerPtErr);
    outputTree->Branch("muNumberOfValidTrkLayers","vector<int>", 

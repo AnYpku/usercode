@@ -20,16 +20,12 @@
 #include "TLine.h"
 #include "TLatex.h"
 
-TPrepareYields::TPrepareYields(int year,int channel,int vgamma,int blind,TString varKin, int nKinBins, float* kinBinLims, bool isMetCutOptimization, int phoWP, bool noDDBkgComputation)
+TPrepareYields::TPrepareYields(int year,int channel,int vgamma,int blind,TString varKin, int nKinBins, float* kinBinLims,int phoWP, bool noDDBkgComputation)
 {
   _channel=channel;
   _vgamma=vgamma;
   _blind=blind;
-  _isMetCutOptimization=isMetCutOptimization;
   _noDDBkgComputation=noDDBkgComputation;
-  _cutAdd="1";
-  if (isMetCutOptimization)
-    _cutAdd=_emptyPhoton.RangePhoton(year, phoWP, 1);
   _INPUT=new TAllInputSamples(_channel,_vgamma,"../Configuration/config.txt");
   _fOut=0;
   for (int ieta=_config.BARREL; ieta<=_config.COMMON; ieta++){
@@ -126,7 +122,6 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
     _cutWeight=strCutWeight;
   }
   int selStage=_config.FULLY;
-  if (_isMetCutOptimization) selStage=_config.PRELIMINARY_FOR_MET_CUT;
   TString fInName = _config.GetSelectedName(selStage,_channel,_vgamma,_blind,sample,strSourceName);
   TFile fIn(fInName);
   if (!fIn.IsOpen()){
@@ -175,26 +170,26 @@ void TPrepareYields::SetYieldsDATA(TTree* tr, TString yieldsName, int iSource, i
     if (ieta==_config.COMMON) _strDATAName=_INPUT->allInputs_[iSource].sourceName_;
     if (ieta==_config.COMMON) _strDATALabel=_INPUT->allInputs_[iSource].sourceLatexLabel_;
     if (ieta==_config.COMMON) _colorDATA=_INPUT->allInputs_[iSource].color_;
-    tr->Draw(_varKin+TString(">>")+yieldsName,(_cutAdd && CutEta(ieta))*_cutWeight,"goff");
+    tr->Draw(_varKin+TString(">>")+yieldsName,(CutEta(ieta))*_cutWeight,"goff");
     std::cout<<"set _dataYieldTot: "<<std::endl;
-    SetTotalYield(tr, _cutAdd && CutEta(ieta) && _cutKin, _dataYieldTot[ieta], _dataYieldTotErr[ieta]);
+    SetTotalYield(tr, CutEta(ieta) && _cutKin, _dataYieldTot[ieta], _dataYieldTotErr[ieta]);
 }
 
 void TPrepareYields::SetYieldsSIGMC(TTree* tr, TString yieldsName, TString yieldsGenName, int iSource, int ieta)
 {
     _sigMCYields[ieta] = new TH1F(yieldsName,yieldsName,_nKinBins,_kinBinLims);
     _sigMCYields[ieta]->Sumw2();
-    tr->Draw(_varKin+TString(">>")+yieldsName,(_cutAdd && CutEta(ieta))*_cutWeight,"goff");
+    tr->Draw(_varKin+TString(">>")+yieldsName,( CutEta(ieta))*_cutWeight,"goff");
     _sigMCGenYields[ieta] = new TH1F(yieldsGenName,yieldsGenName,_nKinBins,_kinBinLims);
     _sigMCGenYields[ieta]->Sumw2();
     if (ieta==_config.COMMON) _strSIGMCName=_INPUT->allInputs_[iSource].sourceName_;
     if (ieta==_config.COMMON) _strSIGMCLabel=_INPUT->allInputs_[iSource].sourceLatexLabel_;
     if (ieta==_config.COMMON) _colorSIGMC=_INPUT->allInputs_[iSource].color_;
-    tr->Draw(TString("phoGenEt>>")+yieldsGenName,(_cutAdd && CutEta(ieta))*_cutWeight,"goff");
+    tr->Draw(TString("phoGenEt>>")+yieldsGenName,(CutEta(ieta))*_cutWeight,"goff");
     std::cout<<"set _sigMCYieldTot: "<<std::endl;
-    SetTotalYield(tr, (_cutAdd && CutEta(ieta) && _cutKin), _sigMCYieldTot[ieta], _sigMCYieldTotErr[ieta]);
+    SetTotalYield(tr, (CutEta(ieta) && _cutKin), _sigMCYieldTot[ieta], _sigMCYieldTotErr[ieta]);
     std::cout<<"set _sigMCGenYieldTot: "<<std::endl;
-    SetTotalYield(tr, (_cutAdd && CutEta(ieta) && _cutKin), _sigMCGenYieldTot[ieta], _sigMCGenYieldTotErr[ieta]);
+    SetTotalYield(tr, ( CutEta(ieta) && _cutKin), _sigMCGenYieldTot[ieta], _sigMCGenYieldTotErr[ieta]);
 }
 
 void TPrepareYields::SetYieldsBKGMC_all(TTree* tr, TString yieldsName, int iSource, int ieta)
@@ -205,12 +200,11 @@ void TPrepareYields::SetYieldsBKGMC_all(TTree* tr, TString yieldsName, int iSour
     if (ieta==_config.COMMON) _vecStrBkgLabels.push_back(_INPUT->allInputs_[iSource].sourceLatexLabel_);
     if (ieta==_config.COMMON) _colorsBkg.push_back(_INPUT->allInputs_[iSource].color_);
     if (ieta==_config.COMMON) std::cout<<"iSource="<<iSource<<", source name="<<_vecStrBkgMCNames.back()<<std::endl;
-    TCut cut = _cutAdd;
-    tr->Draw(_varKin+TString(">>")+yieldsName,(cut && CutEta(ieta))*_cutWeight,"goff");
+    tr->Draw(_varKin+TString(">>")+yieldsName,( CutEta(ieta))*_cutWeight,"goff");
     float val;
     float err;
     std::cout<<"set _vecBkgMCYieldTot: #"<<iSource<<std::endl;
-    SetTotalYield(tr, cut && CutEta(ieta) && _cutKin, val, err);
+    SetTotalYield(tr, CutEta(ieta) && _cutKin, val, err);
     _vecBkgMCYieldTot[ieta].push_back(val);
     _vecBkgMCYieldTotErr[ieta].push_back(err);
 }
@@ -222,10 +216,10 @@ void TPrepareYields::SetYieldsBKGMC_true(TTree* tr, TString yieldsName, int iSou
     if (ieta==_config.COMMON) _vecStrBkgTrueLabels.push_back(_INPUT->allInputs_[iSource].sourceLatexLabel_);
     if (ieta==_config.COMMON) _colorsBkgTrue.push_back(_INPUT->allInputs_[iSource].color_);
     if (ieta==_config.COMMON) std::cout<<"iSource="<<iSource<<", source name="<<_vecStrBkgMCTrueNames.back()<<std::endl;
-    tr->Draw(_varKin+TString(">>")+yieldsName+TString("true"),_cutWeight*(_emptyPhoton.RangeGenTruePhoton()&&CutEta(ieta)&&_cutAdd),"goff");
+    tr->Draw(_varKin+TString(">>")+yieldsName+TString("true"),_cutWeight*(_emptyPhoton.RangeGenTruePhoton()&&CutEta(ieta)),"goff");
     std::cout<<"set _vecBkgMCTrueGammaYieldTot: #"<<iSource<<std::endl;
     float val, err;
-    SetTotalYield(tr,_emptyPhoton.RangeGenTruePhoton() && CutEta(ieta)&& _cutAdd  && _cutKin, val, err);
+    SetTotalYield(tr,_emptyPhoton.RangeGenTruePhoton() && CutEta(ieta)&& _cutKin, val, err);
     _vecBkgMCTrueGammaYieldTot[ieta].push_back(val);
     _vecBkgMCTrueGammaYieldTotErr[ieta].push_back(err);    
 }
@@ -237,10 +231,10 @@ void TPrepareYields::SetYieldsBKGMC_fake(TTree* tr, TString yieldsName, int iSou
     if (ieta==_config.COMMON) _vecStrBkgFakeLabels.push_back(_INPUT->allInputs_[iSource].sourceLatexLabel_);
     if (ieta==_config.COMMON) _colorsBkgFake.push_back(_INPUT->allInputs_[iSource].color_);
     if (ieta==_config.COMMON) std::cout<<"iSource="<<iSource<<", source name="<<_vecStrBkgMCFakeNames.back()<<std::endl;
-    tr->Draw(_varKin+TString(">>")+yieldsName+TString("fake"),_cutWeight*(CutEta(ieta)&&_cutAdd),"goff");
+    tr->Draw(_varKin+TString(">>")+yieldsName+TString("fake"),_cutWeight*(CutEta(ieta)),"goff");
     std::cout<<"set _vecBkgMCFakeGammaYieldTot: #"<<iSource<<std::endl;
     float val, err;
-    SetTotalYield(tr,CutEta(ieta)&& _cutAdd  && _cutKin, val, err);
+    SetTotalYield(tr,CutEta(ieta)&& _cutKin, val, err);
     _vecBkgMCFakeGammaYieldTot[ieta].push_back(val);
     _vecBkgMCFakeGammaYieldTotErr[ieta].push_back(err);  
 }

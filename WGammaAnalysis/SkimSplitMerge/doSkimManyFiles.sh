@@ -1,7 +1,9 @@
 #!/bin/bash
 
-inputDirName=/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/
-skimmedDirName=/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/
+#inputDirName=/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/
+#skimmedDirName=/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/MuPhoSkim/
+inputDirName=/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/
+skimmedDirName=/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/
 rootFileDirName=ggNtuplizer
 treeName=EventTree
 

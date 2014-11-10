@@ -8,124 +8,108 @@
 #include "TCut.h" 
 #include <iostream> 
 
-void BestSidebandLeftAndRight(TTree* trData, TTree* trSign, TTree* trBkg1, TTree* trBkg2, TString sidebandVar, TCut cutExceptWeight, TCut cutWeight, TCut cutTruePhoton, int nPointsLeft, float sidebandLeftMin, float sidebandLeftMax, int nPointsRight=1, float sidebandRightMin=100000, float sidebandRightMax=100000)
+void PlotHistsAndRatio(TCanvas* c1, TH1D* hData, TH1D* hSign);
+void BestSideband(TTree* trData, TTree* trSign)
+{
+  TCut cutWeight("weight");
+  TCut cutBarrel("phoSCEta>-1.4442 && phoSCEta<1.4442");
+  TCut cutEndcap("(phoSCEta>-2.5 && phoSCEta<-1.566)||(phoSCEta<2.5 && phoSCEta>1.566)");
+  TCut cutPhoSigmaIEtaIEta("phoSigmaIEtaIEta<1");
+  TCut cutPt[10];
+  cutPt[0]="phoEt>15";
+  cutPt[1]="phoEt>15 && phoEt<20";
+  cutPt[2]="phoEt>20 && phoEt<25";
+  cutPt[3]="phoEt>25 && phoEt<30";
+  cutPt[4]="phoEt>30 && phoEt<35";
+  cutPt[5]="phoEt>35 && phoEt<40";
+  cutPt[6]="phoEt>40 && phoEt<55";
+  cutPt[7]="phoEt>55 && phoEt<75";
+  cutPt[8]="phoEt>75 && phoEt<95";
+  cutPt[9]="phoEt>95 && phoEt<500";
+  
+  TH1D* hDataB = new TH1D("hDataB", "hDataB", 20, 0.005,0.025);
+  TH1D* hSignB = new TH1D("hSignB", "hSignB", 20, 0.005,0.025);
+  hSignB->Sumw2();
+
+  TH1D* hDataE = new TH1D("hDataE", "hDataE", 24, 0.019,0.067);
+  TH1D* hSignE = new TH1D("hSignE", "hSignE", 24, 0.019,0.067);
+  hSignE->Sumw2();
+
+  for (int iptB=0; iptB<2; iptB++){
+    trData->Draw("phoSigmaIEtaIEta>>hDataB",(cutPt[iptB] && cutBarrel)*cutWeight);
+    trData->Draw("phoSigmaIEtaIEta>>hDataE",(cutPt[iptB] && cutEndcap)*cutWeight);
+
+    trSign->Draw("phoSigmaIEtaIEta>>hSignB",(cutPt[iptB] && cutBarrel)*cutWeight);
+    trSign->Draw("phoSigmaIEtaIEta>>hSignE",(cutPt[iptB] && cutEndcap)*cutWeight);
+
+    TString cBName="cBestSidebandBarrel_";
+    cBName+=cutPt[iptB].GetTitle();
+    cBName.ReplaceAll(" && phoEt<","_");
+    cBName.ReplaceAll(">","_");
+    cBName.ReplaceAll("(","");
+    cBName.ReplaceAll(")","");
+    TString cEName="cBestSidebandEndcap_";
+    cEName+=cutPt[iptB].GetTitle();
+    cEName.ReplaceAll(" && phoEt<","_");
+    cEName.ReplaceAll(">","_");
+    cEName.ReplaceAll("(","");
+    cEName.ReplaceAll(")","");
+    TCanvas* cB = new TCanvas(cBName,cBName);
+    TCanvas* cE = new TCanvas(cEName,cEName);
+
+    PlotHistsAndRatio(cB, hDataB, hSignB);
+    PlotHistsAndRatio(cE, hDataE, hSignE);
+  }
+}
+
+void PlotHistsAndRatio(TCanvas* c1, TH1D* hData, TH1D* hSign)
 {
 
-  TH1D* hSign = new TH1D ("hSign","hist signal",1,trSign->GetMinimum(sidebandVar),trSign->GetMaximum(sidebandVar));
-  TH1D* hBkg1 = new TH1D ("hBkg1","hist bkg1",1,trBkg1->GetMinimum(sidebandVar),trBkg1->GetMaximum(sidebandVar));
-  TH1D* hBkg2 = new TH1D ("hBkg2","hist bkg2",1,trBkg2->GetMinimum(sidebandVar),trBkg2->GetMaximum(sidebandVar));
-  TH1D* hData = new TH1D ("hData","hist data  ",1,trData->GetMinimum(sidebandVar),trData->GetMaximum(sidebandVar));
-  TString drawToHistSign=sidebandVar;
-  drawToHistSign+=">>hSign";
-  TString drawToHistBkg1=sidebandVar;
-  drawToHistBkg1+=">>hBkg1";
-  TString drawToHistBkg2=sidebandVar;
-  drawToHistBkg2+=">>hBkg2";
-  TString drawToHistData=sidebandVar;
-  drawToHistData+=">>hData";
-  trSign->Draw(drawToHistSign,cutWeight,"goff");
-  trSign->Draw(drawToHistBkg1,cutWeight*cutTruePhoton,"goff");
-  trSign->Draw(drawToHistBkg2,cutWeight*cutTruePhoton,"goff");
-  trData->Draw(drawToHistData,cutWeight,"goff");
+  TString strRatio=hSign->GetName();
+  strRatio+="_over_";
+  strRatio+=hData->GetName();
 
-  float sidebandLeft[nPointsLeft];
-  float sidebandRight[nPointsRight];
-  float quality[nPointsLeft][nPointsRight];
+  TH1D* hRatio=(TH1D*)hSign->Clone(strRatio);
+  hRatio->Sumw2();  
 
-  std::cout<<"left: ";
-  for (int i=0; i<nPointsLeft; i++){
-   sidebandLeft[i] = sidebandLeftMin+(sidebandLeftMax-sidebandLeftMin)*(i+0.5)/(nPointsLeft);
-   std::cout<<sidebandLeft[i]<<" ";
-  }
-  std::cout<<std::endl;
+  hRatio->Divide(hData);
 
-  std::cout<<"right: ";
-  for (int j=0; j<nPointsRight; j++){
-    sidebandRight[j] = sidebandRightMin+(sidebandRightMax-sidebandRightMin)*(j+0.5)/(nPointsRight);
-   std::cout<<sidebandRight[j]<<" ";
-  }
-  std::cout<<std::endl;
+    c1->Divide(1,2);
+    TPad* pad1 = (TPad*)c1->GetPad(1);
+    TPad* pad2 = (TPad*)c1->GetPad(2);
+    pad1->SetPad(0,0.3,1.0,1.0);
+    pad2->SetPad(0,0,  1.0,0.28);
+    pad1->SetLeftMargin(0.18);
+    pad1->SetTopMargin(0.08);
+    pad1->SetRightMargin(0.07);
+    pad1->SetBottomMargin(0.01); // All X axis labels and titles are thus cut off
+    pad2->SetLeftMargin(0.18);
+    pad2->SetTopMargin(0.01);
+    pad2->SetRightMargin(0.07);
+    pad2->SetBottomMargin(0.45);
 
-  TString name="bestSideband_";
-  name+=sidebandVar;
-  name+="_";
-  name+=cutExceptWeight;
+    pad1->cd();
 
-  for (int i=0; i<nPointsLeft; i++){
-    for (int j=0; j<nPointsRight; j++){
-
-      if (sidebandRight[j]<=sidebandLeft[i]){
-        quality[i][j]=0;
-        continue;
-      }
-
-      TString sidebandStr = sidebandVar;
-      sidebandStr+=" > ";
-      sidebandStr+=sidebandLeft[i];
-
-      if (nPointsRight>1){
-        sidebandStr+=" && ";
-        sidebandStr+=sidebandVar;
-        sidebandStr+=" < ";
-        sidebandStr+=sidebandRight[j];
-      }
-
-      std::cout<<"cut="<<sidebandStr<<std::endl;
-      TCut sideband(sidebandStr);
-
-      trSign->Draw(drawToHistSign,(sideband && cutExceptWeight)*cutWeight,"goff");
-      trBkg1->Draw(drawToHistBkg1,(sideband && cutExceptWeight && cutTruePhoton)*cutWeight,"goff");
-      trBkg2->Draw(drawToHistBkg2,(sideband && cutExceptWeight && cutTruePhoton)*cutWeight,"goff");
-      trData->Draw(drawToHistData,(sideband && cutExceptWeight)*cutWeight,"goff"); 
-
-      double Ndata=(double)hData->GetBinContent(1);
-      double Nsign=(double)hSign->GetBinContent(1);
-      double Nbkg1=(double)hBkg1->GetBinContent(1);
-      double Nbkg2=(double)hBkg2->GetBinContent(1);
+    hData->SetTitle("");
+    hSign->SetTitle("");
+    hData->SetLineWidth(2);
+    hData->Draw("HIST");
+    hSign->SetLineColor(2);
+    hSign->SetLineWidth(2);
+    hSign->Draw("HIST same");
     
-      if (Ndata<=0) quality[i][j]=0;
-      else quality[i][j]=(Ndata-Nsign-Nbkg1-Nbkg2)/sqrt(Ndata);
+    pad2->cd();
+    hRatio->SetLineWidth(2);
+    hRatio->SetStats(0);
+    hRatio->GetYaxis()->SetLabelSize(0.1);
+    hRatio->GetXaxis()->SetLabelSize(0.1);
+    hRatio->GetXaxis()->SetTitleOffset(1.0);
+    hRatio->GetXaxis()->SetTitleSize(0.12);
+    hRatio->SetTitle(TString("; pho #sigma_i#etai#eta ;"));
+    hRatio->Draw();
+   
+    TString cName=c1->GetName();
+    cName+=".png";
+    c1->SaveAs(cName);
 
- //     std::cout<<"sideband="<<sidebandStr<<", quality="<<quality[i][j]<<std::endl;
-
-    }//end of loop over j
-  }//end of loop over i
-
-  delete hData;
-  delete hSign;
-  delete hBkg1;
-  delete hBkg2;
- 
-
-  float Q[nPointsLeft];
-  for (int j=0; j<nPointsRight; j++){
-    name+=j;
-    for (int i=0; i<nPointsLeft; i++){
-      Q[i]=quality[i][j];
-    }    
-    TString name2="sidebandRight=";
-    name2+=sidebandRight[j];
-    TCanvas* cQ = new TCanvas(name,name2);
-    TGraph* grQ = new TGraph(nPointsLeft,sidebandLeft,Q);
-    grQ->SetMarkerStyle(20);
-    grQ->Draw("AP");
-  }
-
-
-//  TCanvas* cQnPointsRight = new TCanvas(name,name);
-//  TGraph2D* grQ = new TGraph2D(nPointsLeft*nPointsRight,left,right,Q);
-
-//  hQuality->Draw("COLZ");
-//  grQ->Draw("A COLZ");
-//  name.ReplaceAll("(","");
-//  name.ReplaceAll(")","");
-//  name.ReplaceAll("&","");
-//  name.ReplaceAll("|","");
-//  name.ReplaceAll(" ","");
-//  name.ReplaceAll("-","");
-//  name.ReplaceAll(".","");
-//  name.ReplaceAll(">","");
-//  name.ReplaceAll("<","");
-//  name+=".png";
-//  cQ->SaveAs(name);
 }

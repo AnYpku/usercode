@@ -26,6 +26,7 @@ class TSelectedEventsTree
     TConfiguration _config;
 
     int _event;
+    int _ilep[2];
     int _iMClep[2];
     float _lepEta[2];
     float _lepPhi[2];
@@ -47,6 +48,7 @@ class TSelectedEventsTree
     int _HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
     int _HLT_IsoMu24_v;//HLT[HLTIndex[19]]
     int _HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
+    int _ipho;
     int _iMCpho;
     int _phoEleVeto;
     float _phoEta;
@@ -64,15 +66,27 @@ class TSelectedEventsTree
     float _phoHoverE;//for 2011 cuts
     float _phoHoverE12;
     float _phoSigmaIEtaIEta;
+
     float _phoPFChIsoCorr;
-    float _phoSCRChIsoCorr;
-    float _phoRandConeChIsoCorr;
     float _phoPFNeuIsoCorr;
-    float _phoSCRNeuIsoCorr;
-    float _phoRandConeNeuIsoCorr;
     float _phoPFPhoIsoCorr;
+
+    float _phoSCRChIsoCorr;
+    float _phoSCRNeuIsoCorr;
     float _phoSCRPhoIsoCorr;
+
+    float _phoSCRChIso04Corr;
+    float _phoSCRNeuIso04Corr;
+    float _phoSCRPhoIso04Corr;
+
+    float _phoRandConeChIsoCorr;
+    float _phoRandConeNeuIsoCorr;
     float _phoRandConePhoIsoCorr;
+
+    float _phoRandConeChIso04Corr;
+    float _phoRandConeNeuIso04Corr;
+    float _phoRandConePhoIso04Corr;
+
     float _phoEcalIsoDR04Corr;//for 2011 cuts
     float _phoHcalIsoDR04Corr;//for 2011 cuts
     float _phoTrkIsoHollowDR04Corr;//for 2011 cuts
@@ -97,6 +111,7 @@ class TSelectedEventsTree
     vector <int>* _mcGMomPID;
 
     TBranch* _b_event;
+    TBranch* _b_ilep[2];
     TBranch* _b_iMClep[2];
     TBranch* _b_lepEta[2];
     TBranch* _b_lepPhi[2];
@@ -118,6 +133,7 @@ class TSelectedEventsTree
     TBranch* _b_HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
     TBranch* _b_HLT_IsoMu24_v;//HLT[HLTIndex[19]]
     TBranch* _b_HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
+    TBranch* _b_ipho;
     TBranch* _b_iMCpho;
     TBranch* _b_phoEleVeto;
     TBranch* _b_phoEta;
@@ -135,15 +151,27 @@ class TSelectedEventsTree
     TBranch* _b_phoHoverE;//for 2011 cuts
     TBranch* _b_phoHoverE12;
     TBranch* _b_phoSigmaIEtaIEta;
+
     TBranch* _b_phoPFChIsoCorr;
-    TBranch* _b_phoSCRChIsoCorr;
-    TBranch* _b_phoRandConeChIsoCorr;
     TBranch* _b_phoPFNeuIsoCorr;
-    TBranch* _b_phoSCRNeuIsoCorr;
-    TBranch* _b_phoRandConeNeuIsoCorr;
     TBranch* _b_phoPFPhoIsoCorr;
+
+    TBranch* _b_phoSCRChIsoCorr;
+    TBranch* _b_phoSCRNeuIsoCorr;
     TBranch* _b_phoSCRPhoIsoCorr;
+
+    TBranch* _b_phoSCRChIso04Corr;
+    TBranch* _b_phoSCRNeuIso04Corr;
+    TBranch* _b_phoSCRPhoIso04Corr;
+
+    TBranch* _b_phoRandConeChIsoCorr;
+    TBranch* _b_phoRandConeNeuIsoCorr;
     TBranch* _b_phoRandConePhoIsoCorr;
+
+    TBranch* _b_phoRandConeChIso04Corr;
+    TBranch* _b_phoRandConeNeuIso04Corr;
+    TBranch* _b_phoRandConePhoIso04Corr;
+
     TBranch* _b_phoEcalIsoDR04Corr;//for 2011 cuts
     TBranch* _b_phoHcalIsoDR04Corr;//for 2011 cuts
     TBranch* _b_phoTrkIsoHollowDR04Corr;//for 2011 cuts

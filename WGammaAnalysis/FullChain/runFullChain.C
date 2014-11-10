@@ -9,11 +9,11 @@
   FullChain fch;
   FullChain::FullChainParameters anPars;
 
-//  fch.SetDefaultFullChainParameters(anPars,"phoEt");
+  fch.SetDefaultFullChainParameters(anPars,"phoEt");
 //  fch.SetDefaultFullChainParameters(anPars,"phoEtNoPhosphor");
 //  fch.SetDefaultFullChainParameters(anPars,"Mleplep");
-  fch.SetDefaultFullChainParameters(anPars,"WMt");
-//  fch.SetDefaultFullChainParameters(anPars,"phoEta");
+//  fch.SetDefaultFullChainParameters(anPars,"WMt");
+//  fch.SetDefaultFullChainParameters(anPars,"phoSCEta");
 //  fch.SetDefaultFullChainParameters(anPars,"phoPhi");
 //  fch.SetDefaultFullChainParameters(anPars,"lepton1Pt");
 //  fch.SetDefaultFullChainParameters(anPars,"lepton1Eta");
@@ -25,8 +25,7 @@
   std::cout<<"varFit="<<anPars.strDDbkgVarFit<<", varSideband="<<anPars.strDDbkgVarSideband<<std::endl;
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
-  anPars.noAdjustBinning=1;
-  anPars.noPhoPFChIsoCut=0;
+
 
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
@@ -39,7 +38,7 @@
 
   anPars.year=2012;
   anPars.noPreSelection=1;
-  anPars.noExtraSelection=0;
+  anPars.noExtraSelection=1;
   anPars.noDDBkgComputation=0;
   anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;
