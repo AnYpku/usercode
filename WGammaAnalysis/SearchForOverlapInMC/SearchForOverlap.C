@@ -19,10 +19,10 @@
 #include <sstream>  
   //standard C++ class
 
-SearchForOverlap::SearchForOverlap(int channel, int cutType, bool isDebugMode, string analyzedSampleNames, string configFile, bool isNoPuReweight)
+SearchForOverlap::SearchForOverlap(int channel, int vgamma, int cutType, bool isDebugMode, string analyzedSampleNames, string configFile, bool isNoPuReweight)
 {
 
-  _INPUT = new TAllInputSamples(channel, configFile);
+  _INPUT = new TAllInputSamples(channel, vgamma, configFile);
 
   _channel=channel;
   _cutType=cutType;

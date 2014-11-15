@@ -35,7 +35,7 @@ $   DATA     MUON    1    lumiTotal 19593.0
 
 
 ###################################################################
-$ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  
+$ BKGMC  WGAMMA MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  
 #csTotal 36257.2  
 #433=kCyan+1
 
@@ -44,19 +44,19 @@ $ BKGMC  MUON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433
 #value of cross section is preliminary
 
 ###################################################################
-$   BKGMC    MUON   Wg  W#gamma    634     
+$   BKGMC  WGAMMA  MUON   Wg  W#gamma    634     
 #634=kRed+2
 
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_250000Skim.root   553.92 
 
 ###################################################################
-$ BKGMC   MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
+$ BKGMC  ZGAMMA MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
 #418=kGreen+2
 
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_DYToLL_250000Skim.root   3503.7
 
 ###################################################################
-$ BKGMC   MUON   Zg     Z#gamma#rightarrowl#bar{l}      440    
+$ BKGMC  ZGAMMA  MUON   Zg     Z#gamma#rightarrowl#bar{l}      440    
 #418=kGreen+2, same as DY
 #401=kYellow+1
 

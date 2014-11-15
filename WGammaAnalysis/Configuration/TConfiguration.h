@@ -16,7 +16,7 @@ class TConfiguration
     enum {W_GAMMA, Z_GAMMA, V_GAMMA};//vg_type
     enum {DATA, SIGMC, BKGMC};//sample
     enum {UNBLIND, BLIND_PRESCALE, BLIND_DECRACC};//blinding type
-    enum {BARREL, ENDCAP, COMMON};//eta bin
+    enum {BARREL=0, ENDCAP=1, COMMON=2};//eta bin, must match enum in TTemplateRandCone.h
     enum {TOTAL, ONEDI, TWODI};//csMode
     enum {VERY_PRELIMINARY,
           PRELIMINARY_FOR_TEMPLATE_METHOD,
@@ -90,10 +90,10 @@ class TConfiguration
 /////////////////////////////////////////
 //photon Pt binning
 //and other analysis constants
-//static const int _nPhoPtBins = 2;
-//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
-static const int _nPhoPtBins = 9;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,55.,75.,95.,500.};
+static const int _nPhoPtBins = 1;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,40.};
+//static const int _nPhoPtBins = 9;
+//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,55.,75.,95.,500.};
 //static const int _nPhoPtBins = 8;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,55.,75.,95.};
 //static const int _nPhoPtBins = 5;

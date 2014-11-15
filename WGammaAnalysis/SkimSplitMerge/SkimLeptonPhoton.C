@@ -50,21 +50,13 @@ SkimLeptonPhoton::SkimLeptonPhoton(int channel, int vgamma, int sample, TString 
 
 SkimLeptonPhoton::~SkimLeptonPhoton()
 {
-  _TREE.fChain = 0;
-  for (int ich=_config.MUON; ich<=_config.ELECTRON; ich++){
-    if (ich==_channel || _channel==_config.BOTH_CHANNELS);
-    else continue;
-    for (int ivg=_config.W_GAMMA; ivg<=_config.Z_GAMMA; ivg++){
-      if (ivg==_vgamma || _vgamma==_config.V_GAMMA);
-      else continue;
-      _fileOut[ich][ivg]->Close();
-    }
-  }
+
 }
 
 void SkimLeptonPhoton::LoopOverInputTree()
 {
   TFile f(_inputFileName,"READ");
+  std::cout<<"processing "<<_inputFileName<<std::endl;
   f.cd(_nameDir);
   TTree* tree =(TTree*)gDirectory->Get(_nameTree);
   bool hashEvents = gDirectory->GetListOfKeys()->Contains("hEvents");
@@ -93,10 +85,12 @@ void SkimLeptonPhoton::LoopOverInputTree()
 
   Long64_t nentries = _TREE.fChain->GetEntries();
   if (_isDebugMode) nentries=100;
+  std::cout<<"nentries "<<nentries<<std::endl;
 
   for (Long64_t entry=0; entry<nentries; entry++) {
 
     if (entry < 0) break;
+    if ((entry%1000000)==0) std::cout<<"entry="<<entry<<std::endl;
     _TREE.GetEntryNeededBranchesOnly(_channel,_sample,entry);
   
     if (_TREE.treeLeaf.nPho<1) continue;
@@ -153,4 +147,18 @@ void SkimLeptonPhoton::LoopOverInputTree()
 
     }//end of loop over ivg
   }//end of loop over ich
+
+  //close output files
+  _TREE.fChain = 0;
+  for (int ich=_config.MUON; ich<=_config.ELECTRON; ich++){
+    if (ich==_channel || _channel==_config.BOTH_CHANNELS);
+    else continue;
+    for (int ivg=_config.W_GAMMA; ivg<=_config.Z_GAMMA; ivg++){
+      if (ivg==_vgamma || _vgamma==_config.V_GAMMA);
+      else continue;
+      _fileOut[ich][ivg]->Close();
+      std::cout<<"file "<<_fileOut[ich][ivg]->GetName()<<" closed"<<std::endl;
+    }
+  }
+
 }//Skim::LoopOverInputTree() ends

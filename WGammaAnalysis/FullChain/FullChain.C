@@ -6,6 +6,7 @@
 #include "../Configuration/TConfiguration.h"
 #include "../Selection/Selection.h"
 #include "../DDBkgTemplateMethod/TTemplatesRandCone.h"
+#include "../DDBkgTemplateMethod/AuxTemplatesRandCone.C"
 #include "../PrepareYields/TPrepareYields.h"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
 //#include "../CrossSection/CalcCrossSection.h"
@@ -258,8 +259,9 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //compute fake-gamma background by data-driven template method
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO DataDriven bkg"<<std::endl;
-   TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
-   temp.ComputeBackground();
+   //TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+   //temp.ComputeBackground();
+    AuxTemplatesRandCone(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
     std::cout<<"%_%  DONE Extra DataDriven bkg"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }

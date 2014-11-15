@@ -14,7 +14,7 @@ class SearchForOverlap
      //TEventTree - class for input tree
      //TSelectedEventsTree - class for output tree and output root file
      public:
-       SearchForOverlap(int channel, int cutType, bool isDebugMode=0, string analyzedSampleNames="Wg Wjets_to_lnu Zg DYjets_to_ll", string configFile="../Configuration/configForOverlapSearch.txt", bool isNoPuReweight=0);
+       SearchForOverlap(int channel, int vgamma, int cutType, bool isDebugMode=0, string analyzedSampleNames="Wg Wjets_to_lnu Zg DYjets_to_ll", string configFile="../Configuration/configForOverlapSearch.txt", bool isNoPuReweight=0);
        virtual ~SearchForOverlap();
        void    LoopOverInputFiles();   
        enum {CUT_PAR, CUT_SOME_KIN_NO_PAR, CUT_KIN_PAR, CUT_KIN_MLL_PAR};

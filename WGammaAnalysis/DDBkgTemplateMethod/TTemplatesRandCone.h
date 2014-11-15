@@ -12,21 +12,58 @@
 
 #include <vector>
 
-#include "../Configuration/TConfiguration.h"
-#include "../Configuration/TAllInputSamples.h"
-#include "../Include/TPhotonCuts.h"
+//#include "../Configuration/TConfiguration.h"
+//#include "../Configuration/TAllInputSamples.h"
+//#include "../Include/TPhotonCuts.h"
 
 class TTemplatesRandCone
 {
   public:
-    TTemplatesRandCone(int channel, int vgamma, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
+    const static int nKinBinsMax=50;
+    struct TemplatesRandConePars{
+//      int channel;
+//      int vgamma;
+      TString varKin;
+      int nKinBins;
+      float kinBinLims[nKinBinsMax];
+      int nFitBins[nKinBinsMax][2];
+      float maxVarFit[nKinBinsMax][2];
+      float sideband[nKinBinsMax][2];
+      TFile* fOutForSave;
+      TString strFileOutName;
+      TString strTrueYieldsTot[3];
+      TString strTrueYields1D[3];
+      TString strFakeYieldsTot[3];
+      TString strFakeYields1D[3];
+      TTree* treeData;
+      TTree* treeSign;
+      TString varSideband;
+      TString varTrueTempl;
+      TString varFakeTempl;
+      TString varFit; 
+      TString varPhoEta;
+      TString varWeight;
+      TCut cutBarrel;
+      TCut cutEndcap;
+      TCut cutChIsolation;
+      TCut cutSidebandVarNominalRange;
+      TCut cutWeight;
+    };//end of struct TemplatesRandConePars
+    TTemplatesRandCone(TemplatesRandConePars pars);
     virtual ~TTemplatesRandCone();
 
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
 
 
+
   private:
+
+    enum {_BARREL=0, _ENDCAP=1, _COMMON=2};
+    // should properly match the enum in TConfiguration.h
+    //added here to make class independent on TConfiguration  
+
+    TemplatesRandConePars _pars;  
 
     //methods
     void ComputeBackgroundOne(int ikin, bool noPrint=0);
@@ -36,9 +73,8 @@ class TTemplatesRandCone
 
     void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
     void PrintYieldsAndChi2();
-    const static int _nBinsMax=50;
-    void PrintHistogramsBinByBin(TH1D* hist[_nBinsMax][3]);
-    void PrintOneHistogramBinByBin(TH1D* hist[_nBinsMax][3], int ikin, int ieta);
+    void PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]);
+    void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
     void ComputeYieldOneKinBin(int ikin, bool noPrint=0);
     void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
     float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
@@ -59,60 +95,60 @@ class TTemplatesRandCone
 
     //fields
 
-    TConfiguration _config;
-    TPhotonCuts _photon;
-    int _vgamma;
-    int _channel;
-    int _selectionStage;
+//    TConfiguration _config;
+//    TPhotonCuts _photon;
+//    int _vgamma;
+//    int _channel;
+//    int _selectionStage;
 
-    TCut _cutWeight;
+//    TCut _cutWeight;
 
-    int _phoWP;
-    TAllInputSamples* _INPUT;
-    TFile* _fData;
-    TTree* _treeData;
-    TFile* _fSign;
-    TTree* _treeSign;
+//    int _phoWP;
+//    TAllInputSamples* _INPUT;
+//    TFile* _fData;
+//    TTree* _treeData;
+//    TFile* _fSign;
+//    TTree* _treeSign;
 
-    TString _varKin;
-    int _nKinBins;
-    float* _kinBinLims;
+//    TString _varKin;
+//    int _nKinBins;
+//    float _kinBinLims[nKinBinsMax];
 
     TRandom _random;
 
-    TH1D* _hTrue[_nBinsMax][3];
-    TH1D* _hFake[_nBinsMax][3];
-    TH1D* _hLeak[_nBinsMax][3];
-    TH1D* _hTrueReference[_nBinsMax][3];
-    TH1D* _hFakeReference[_nBinsMax][3];
-    TH1D* _hData[_nBinsMax][3];
-    TH1D* _hSumm[_nBinsMax][3];
-    TH1D* _hRatio[_nBinsMax][3];
-    RooPlot* _plotter[_nBinsMax][3];
-    double _chi2ToNDF[_nBinsMax][3];
+    TH1D* _hTrue[nKinBinsMax][3];
+    TH1D* _hFake[nKinBinsMax][3];
+    TH1D* _hLeak[nKinBinsMax][3];
+    TH1D* _hTrueReference[nKinBinsMax][3];
+    TH1D* _hFakeReference[nKinBinsMax][3];
+    TH1D* _hData[nKinBinsMax][3];
+    TH1D* _hSumm[nKinBinsMax][3];
+    TH1D* _hRatio[nKinBinsMax][3];
+    RooPlot* _plotter[nKinBinsMax][3];
+    double _chi2ToNDF[nKinBinsMax][3];
 
-    double _nFakeFromFitVal[_nBinsMax][3];
-    double _nFakeFromFitErr[_nBinsMax][3];
-    double _nTrueFromFitVal[_nBinsMax][3];
-    double _nTrueFromFitErr[_nBinsMax][3];
+    double _nFakeFromFitVal[nKinBinsMax][3];
+    double _nFakeFromFitErr[nKinBinsMax][3];
+    double _nTrueFromFitVal[nKinBinsMax][3];
+    double _nTrueFromFitErr[nKinBinsMax][3];
 
     const static int _nToys=100;
-    //double _nFakeFromFitToyVal[_nBinsMax][3][_nToys];
-    //double _nTrueFromFitToyVal[_nBinsMax][3][_nToys];
+    //double _nFakeFromFitToyVal[nKinBinsMax][3][_nToys];
+    //double _nTrueFromFitToyVal[nKinBinsMax][3][_nToys];
 
-    int _nFitBins[_nBinsMax][3];
+//    int _nFitBins[nKinBinsMax][3];
 
-    double _nFakeYieldsVal[_nBinsMax][3];
-    double _nFakeYieldsErr[_nBinsMax][3];
-    double _nTrueYieldsVal[_nBinsMax][3];
-    double _nTrueYieldsErr[_nBinsMax][3];
+    double _nFakeYieldsVal[nKinBinsMax][3];
+    double _nFakeYieldsErr[nKinBinsMax][3];
+    double _nTrueYieldsVal[nKinBinsMax][3];
+    double _nTrueYieldsErr[nKinBinsMax][3];
     // strictly, Fake and True are not background and signal
     // but Fake is fake gamma Fake
     // and True is signal plus true gamma Fake
 
-    TFile* _fOutForSave;
+//    TFile* _fOutForSave;
 
-    float _maxVarFit[_nBinsMax][3];
+//    float _maxVarFit[nKinBinsMax][3];
 
 };
 
