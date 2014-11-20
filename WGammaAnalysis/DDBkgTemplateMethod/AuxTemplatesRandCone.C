@@ -1,4 +1,5 @@
 #include "TTemplatesRandCone.h"
+#include "TTemplatesRandConeSyst.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
 #include <iostream>
@@ -19,6 +20,19 @@ void AuxTemplatesRandCone(int channel, int vgamma, int phoWP, TString varKin, in
 
   TTemplatesRandCone temp(pars);
   temp.ComputeBackground();
+}
+
+void AuxTemplatesRandConeSystSidebandVariation(int channel, int vgamma, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+{
+  //this function is called in FullChain
+
+  TTemplatesRandCone::TemplatesRandConePars pars;
+
+  SetParsRegularCases(pars, channel, vgamma, phoWP, varKin, nKinBins, kinBinLims);
+  SetParsSpecialCases(pars, vgamma);
+
+  TTemplatesRandConeSyst temp(pars);
+  temp.SidebandVariation();
 }
 
 void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
@@ -106,6 +120,14 @@ void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vg
         pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
         pars.sideband[ikin][config.ENDCAP] = 0.025;
       }
+    }//end of if (pars.varKin=="phoEt")
+    if (pars.varKin=="WMt"){
+      if (pars.kinBinLims[ikin-1]>119){
+        pars.nFitBins[ikin][config.BARREL] = 8;
+        pars.maxVarFit[ikin][config.BARREL] = 16.0;
+        pars.nFitBins[ikin][config.ENDCAP] = 8;
+        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
+      }     
     }
   }//end of loop over ikin
   if (vgamma == config.W_GAMMA) return;

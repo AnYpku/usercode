@@ -262,7 +262,15 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
    //TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
    //temp.ComputeBackground();
     AuxTemplatesRandCone(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
-    std::cout<<"%_%  DONE Extra DataDriven bkg"<<std::endl;
+    std::cout<<"%_%  DONE DataDriven bkg"<<std::endl;
+    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+  }
+
+  if (!anPars.noSystDDBkgSidebandVariation){
+    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+    std::cout<<"%^%  WILL DO Syst DDBkg Sideband Variation "<<std::endl;
+    AuxTemplatesRandConeSystSidebandVariation(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+    std::cout<<"%_%  DONE Syst DDBkg Sideband Variation"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
 

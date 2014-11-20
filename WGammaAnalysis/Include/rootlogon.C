@@ -26,6 +26,7 @@
   gROOT->ProcessLine(".L ../Selection/Selection.C+");
 
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesRandCone.C+");
+  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesRandConeSyst.C+");
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesRandCone.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");

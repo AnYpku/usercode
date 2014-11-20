@@ -49,15 +49,14 @@ class TTemplatesRandCone
       TCut cutSidebandVarNominalRange;
       TCut cutWeight;
     };//end of struct TemplatesRandConePars
+    TTemplatesRandCone();
     TTemplatesRandCone(TemplatesRandConePars pars);
     virtual ~TTemplatesRandCone();
 
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
 
-
-
-  private:
+  protected:
 
     enum {_BARREL=0, _ENDCAP=1, _COMMON=2};
     // should properly match the enum in TConfiguration.h
@@ -65,8 +64,20 @@ class TTemplatesRandCone
 
     TemplatesRandConePars _pars;  
 
-    //methods
+    void SetPars(TemplatesRandConePars pars);
     void ComputeBackgroundOne(int ikin, bool noPrint=0);
+
+    double _nFakeYieldsVal[nKinBinsMax][3];
+    double _nFakeYieldsErr[nKinBinsMax][3];
+    double _nTrueYieldsVal[nKinBinsMax][3];
+    double _nTrueYieldsErr[nKinBinsMax][3];
+
+    TString StrLabelEta(int etaBin);
+    TString StrLabelKin(int kinBin);
+
+  private:
+
+
     void SetHists(int kinBin, int etaBin, bool noPrint=0);
     void RandomizeTemplates(int ikin, int ieta);
     void DeleteHists(int kinBin, int etaBin);
@@ -76,8 +87,9 @@ class TTemplatesRandCone
     void PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]);
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
     void ComputeYieldOneKinBin(int ikin, bool noPrint=0);
-    void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
-    float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
+    void ComputeOneYield(int ikin, bool noPrint, bool isTrueGamma,double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
+ //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
+//    float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
 
     void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
 
@@ -90,29 +102,6 @@ class TTemplatesRandCone
     TCut SidebandVarNominalCut();
     TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
-    TString StrLabelEta(int etaBin);
-    TString StrLabelKin(int kinBin);
-
-    //fields
-
-//    TConfiguration _config;
-//    TPhotonCuts _photon;
-//    int _vgamma;
-//    int _channel;
-//    int _selectionStage;
-
-//    TCut _cutWeight;
-
-//    int _phoWP;
-//    TAllInputSamples* _INPUT;
-//    TFile* _fData;
-//    TTree* _treeData;
-//    TFile* _fSign;
-//    TTree* _treeSign;
-
-//    TString _varKin;
-//    int _nKinBins;
-//    float _kinBinLims[nKinBinsMax];
 
     TRandom _random;
 
@@ -133,22 +122,7 @@ class TTemplatesRandCone
     double _nTrueFromFitErr[nKinBinsMax][3];
 
     const static int _nToys=100;
-    //double _nFakeFromFitToyVal[nKinBinsMax][3][_nToys];
-    //double _nTrueFromFitToyVal[nKinBinsMax][3][_nToys];
 
-//    int _nFitBins[nKinBinsMax][3];
-
-    double _nFakeYieldsVal[nKinBinsMax][3];
-    double _nFakeYieldsErr[nKinBinsMax][3];
-    double _nTrueYieldsVal[nKinBinsMax][3];
-    double _nTrueYieldsErr[nKinBinsMax][3];
-    // strictly, Fake and True are not background and signal
-    // but Fake is fake gamma Fake
-    // and True is signal plus true gamma Fake
-
-//    TFile* _fOutForSave;
-
-//    float _maxVarFit[nKinBinsMax][3];
 
 };
 

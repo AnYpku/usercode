@@ -26,7 +26,7 @@ class FullChain
       bool isNoPuReweight;
       bool isDebugMode;
       int phoWP;
-
+    
       //for template method:
       TString strDDbkgVarFit;
       TString strDDbkgVarSideband;
@@ -39,6 +39,8 @@ class FullChain
       bool noPrepareYields;
       bool noCalcAccAndEff;
       bool noCalcCrossSection;
+
+      bool noSystDDBkgSidebandVariation;
     };
 
     void SetDefaultFullChainParameters(FullChainParameters& anPars, TString varKin="phoEt");

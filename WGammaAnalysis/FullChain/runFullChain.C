@@ -29,7 +29,9 @@
 
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
+  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
+
+  anPars.noChIsoCut=1;
 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
@@ -38,11 +40,13 @@
 
   anPars.year=2012;
   anPars.noPreSelection=1;
-  anPars.noExtraSelection=0;
-  anPars.noDDBkgComputation=0;
-  anPars.noPrepareYields=0;
+  anPars.noExtraSelection=1;
+  anPars.noDDBkgComputation=1;
+  anPars.noPrepareYields=1;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
+
+  anPars.noSystDDBkgSidebandVariation=0;
 
   fch.RunAnalysis(anPars);
 
