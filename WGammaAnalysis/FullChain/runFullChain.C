@@ -39,7 +39,7 @@
   anPars.year=2012;
   anPars.noPreSelection=1;
   anPars.noExtraSelection=1;
-  anPars.noDDBkgComputation=0;
+  anPars.noDDBkgComputation=1;
   anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
