@@ -31,8 +31,6 @@
   anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
   anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
 
-  anPars.noChIsoCut=1;
-
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
   anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
@@ -41,12 +39,12 @@
   anPars.year=2012;
   anPars.noPreSelection=1;
   anPars.noExtraSelection=1;
-  anPars.noDDBkgComputation=1;
-  anPars.noPrepareYields=1;
+  anPars.noDDBkgComputation=0;
+  anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
 
-  anPars.noSystDDBkgSidebandVariation=0;
+  anPars.noSystDDBkgSidebandVariation=1;
 
   fch.RunAnalysis(anPars);
 
