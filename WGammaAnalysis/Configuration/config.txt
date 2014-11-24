@@ -55,11 +55,8 @@ $ BKGMC WGAMMA   MUON   Zg     Z#gamma#rightarrowl#bar{l}      879
 $ BKGMC WGAMMA   MUON   Wg_to_taunu     W#gamma#rightarrow#tau#nu#gamma      401    
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wg_taunu_MuPhoSkim.root    553.92  
 
-$ BKGMC WGAMMA  MUON    multibosons      multibosons       884    
+$ BKGMC WGAMMA  MUON    WWg      WW#gamma       884    
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_WWg_MuPhoSkim.root    1.44
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_WW_2l2nu_MuPhoSkim.root   5.995
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_WZ_3lnu_MuPhoSkim.root   1.057
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_WZ_2l2q_MuPhoSkim.root   5.995  
 
 #$ BKGMC WGAMMA  MUON    ttbarg     t#bar{t}#gamma        807    
 #- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_ttg_MuPhoSkim.root                 1.444
