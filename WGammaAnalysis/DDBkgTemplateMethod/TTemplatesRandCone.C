@@ -429,18 +429,32 @@ void TTemplatesRandCone::ComputeYieldOneKinBin(int ikin, bool noPrint)
 void TTemplatesRandCone::ComputeOneYield(int ikin, bool noPrint, bool isTrueGamma,
 	double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr)
 {
-  int nTotal[2];
-  int nPassed[2];
+  int nPassedChIso[2];
+  int nPassedFitVar[2];
+  int nTot[2];
   float eff[2];
   TCut cutSidebandVar;
+  TTree* tr;
+  if (isTrueGamma) tr=_pars.treeSign;
+  else tr=_pars.treeData;
 
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
     if (isTrueGamma) cutSidebandVar=_pars.cutSidebandVarNominalRange;
     else cutSidebandVar=SidebandCut(ikin,ieta);
-    nTotal[ieta] = _pars.treeData->GetEntries(cutSidebandVar&&CutEtaBin(ieta)&&CutKinBin(ikin));
-    nPassed[ieta] = _pars.treeData->GetEntries(cutSidebandVar&&CutEtaBin(ieta)&&CutKinBin(ikin)&&_pars.cutChIsolation);
-    if (nTotal[ieta]!=0) eff[ieta]=1.0*nPassed[ieta]/nTotal[ieta];
+
+    TCut cutTot = cutSidebandVar && CutEtaBin(ieta) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta);
+
+    TCut cutPassedChIso = cutTot && _pars.cutChIsolation;
+    nPassedChIso[ieta] = tr->GetEntries(cutPassedChIso);
+
+    //TCut cutPassedFitVar = cutTot && FitVarFitRangeCut(ikin,ieta);
+    //nPassedFitVar[ieta] = tr->GetEntries(cutPassedFitVar);
+
+    nTot[ieta] = tr->GetEntries(cutTot);
+
+    if (nTot[ieta]!=0) eff[ieta]=1.0*nPassedChIso[ieta]/nTot[ieta];
     else eff[ieta]=0;
+
     nYieldsVal[ieta]=nFromFitVal[ieta]*eff[ieta];
     nYieldsErr[ieta]=nFromFitErr[ieta]*eff[ieta];
   }//end of loop over ieta
@@ -453,10 +467,14 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, bool noPrint, bool isTrueGamm
     for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
       std::cout<<setprecision(2)<<std::endl;
       std::cout<<StrLabelEta(ieta)<<": "<<std::endl;
+      std::cout<<"cutEta="<<CutEtaBin(ieta).GetTitle()<<std::endl;
+      std::cout<<"cutKin="<<CutKinBin(ikin).GetTitle()<<std::endl;
+      std::cout<<"cutSidebandVar="<<cutSidebandVar.GetTitle()<<std::endl;
+      std::cout<<"cutChIso="<<_pars.cutChIsolation.GetTitle()<<std::endl;
       TString strTrueOrFake;
       if (isTrueGamma) strTrueOrFake="nTrue";
       else strTrueOrFake="nFake";
-      std::cout<<"fromFit*eff="<<strTrueOrFake<<"="<<nFromFitVal[ieta]<<"+-"<<nFromFitErr[ieta]<<"*"<<eff[ieta]<<"="<<nYieldsVal[ieta]<<"+-"<<nYieldsErr[ieta]<<";"<<std::endl;
+      std::cout<<"fromFit*effChIso*(1/effFitVar)="<<strTrueOrFake<<"=("<<nFromFitVal[ieta]<<"+-"<<nFromFitErr[ieta]<<")*"<<eff[ieta]<<"="<<nYieldsVal[ieta]<<"+-"<<nYieldsErr[ieta]<<";"<<std::endl;
     }//loop over ieta
   }//end of if (!noPrint)
 }
@@ -678,29 +696,35 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
 //  cName+="plotter";
 //  TCanvas* c2 = new TCanvas(cName);
 //  _plotter[ikin][ieta]->Draw();
-}
+}// end of plotOneTemplate
 
 TCut TTemplatesRandCone::SidebandCut(int ikin, int ieta)
 {
-  float limB=_pars.sideband[ikin][_BARREL]; 
-  float limE=_pars.sideband[ikin][_ENDCAP];
-  TString strCutB=_pars.varSideband;
-  strCutB+=">";
-  strCutB+=limB;
-  TString strCutE=_pars.varSideband;
-  strCutE+=">";
-  strCutE+=limE;
-  TCut cut;
-  TCut cutSidebandB(strCutB);
-  TCut cutSidebandE(strCutE);
-  if (ieta==_BARREL) cut=_pars.cutBarrel && cutSidebandB;
-  if (ieta==_ENDCAP) cut=_pars.cutEndcap && cutSidebandE;
+  float lim=_pars.sideband[ikin][ieta]; 
+  TString strCut=_pars.varSideband;
+  strCut+=">";
+  strCut+=lim;
+  TCut cut(strCut);
+  if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
+  if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;
   return ( cut ); 
 }
 
 TCut TTemplatesRandCone::SidebandVarNominalCut()
 {
   return _pars.cutSidebandVarNominalRange;
+}
+
+TCut TTemplatesRandCone::FitVarFitRangeCut(int ikin, int ieta)
+{
+  float lim=_pars.maxVarFit[ikin][ieta]; 
+  TString strCut=_pars.varFit;
+  strCut+="<";
+  strCut+=lim;
+  TCut cut(strCut);
+  if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
+  if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;
+  return ( cut );
 }
 
 void TTemplatesRandCone::SaveYields()

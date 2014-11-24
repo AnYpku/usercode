@@ -100,6 +100,7 @@ class TTemplatesRandCone
 
     TCut SidebandCut(int ikin, int ieta);
     TCut SidebandVarNominalCut();
+    TCut FitVarFitRangeCut(int ikin, int ieta);
     TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
 
