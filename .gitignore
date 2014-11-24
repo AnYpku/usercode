@@ -9,3 +9,6 @@
 *.log
 *.png~
 *.log~
+*.root
+*~
+*.nfs000000*
