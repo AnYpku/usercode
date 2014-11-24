@@ -72,7 +72,7 @@ float TPhotonCuts::EffAreaPhotons(float eta)
 float TPhotonCuts::IsoCorr(float iso, float rho, float EA)
 {
 //  std::cout<<"iso-rho*EA="<<iso<<"-"<<rho<<"*"<<EA<<"="<<iso-rho*EA<<std::endl;
-  if (iso-rho*EA>0.0) return iso-rho*EA;
+  if ((iso-rho*EA)>0.0 || (iso-rho*EA)<-100.0) return iso-rho*EA;
   return 0.0;
 }
 
@@ -231,7 +231,7 @@ TCut TPhotonCuts::SidebandSigmaIEtaIEta()
 
 TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
 {
-  if (isoType==ISO_CHorTRK) return "1";
+//  if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
   if (year==2011 && isoType==ISO_CHorTRK) strIso="phoTrkIsoHollowDR04Corr";
   if (year==2012 && isoType==ISO_CHorTRK) strIso="phoPFChIsoCorr";

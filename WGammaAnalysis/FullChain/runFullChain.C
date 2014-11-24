@@ -29,14 +29,12 @@
 
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
-
-  anPars.noChIsoCut=1;
+  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
   anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
-//  anPars.analyzedSamples="Zg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
+//  anPars.analyzedSamples="WWg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
 
   anPars.year=2012;
   anPars.noPreSelection=1;
