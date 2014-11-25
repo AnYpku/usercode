@@ -2,7 +2,16 @@
 #include "TTemplatesRandConeSyst.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
+//this package
+
 #include <iostream>
+//standard C++
+
+#include "TTree.h"
+#include "TFile.h"
+#include "TString.h"
+#include "TCut.h"
+//ROOT
 
 void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
 	int vgamma, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
@@ -33,6 +42,17 @@ void AuxTemplatesRandConeSystSidebandVariation(int channel, int vgamma, int phoW
 
   TTemplatesRandConeSyst temp(pars);
   temp.SidebandVariation();
+}
+
+TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
+{
+  f = new TFile(strFileName);
+  if (!f->IsOpen()){
+    std::cout<<"ERROR in AuxTemplatesRandCone, SetParsRegularCases: file with "<<strFileWithWhat<<": "<<strFileName<<" can't be open"<<std::endl;
+    return 0;
+  }
+  else std::cout<<"file with "<<strFileWithWhat<<": "<<strFileName<<std::endl;
+  return (TTree*)f->Get("selectedEvents");
 }
 
 void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
@@ -76,16 +96,30 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
     //for TOTAL and differentian (ONEDI) cross section, 
     //for barrel, endcap and common(barrel+endcap)
 
-  TFile* fData = new TFile(config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA));
-  pars.treeData=(TTree*)fData->Get("selectedEvents");
-  TFile* fSign = new TFile(config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.SIGMC));
-  pars.treeSign=(TTree*)fSign->Get("selectedEvents");
+  std::cout<<std::endl;
+
+  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  pars.treeData=LoadOneTree("data", strData, pars.fData);
+  if (!pars.treeData) return;
+
+  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.SIGMC);
+  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
+  if (!pars.treeSign) return;
+
+  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
+  if (!pars.treeTrue) return;
+
+  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
+  if (!pars.treeFake) return;
 
   pars.varSideband="phoSigmaIEtaIEta";//TString
   pars.varTrueTempl="phoRandConeChIso04Corr";//TString
   pars.varFakeTempl="phoSCRChIso04Corr";//TString
   pars.varFit="phoSCRChIso04Corr"; //TString
   pars.varPhoEta="phoSCEta";//TString
+  pars.varWeight="weight";//TString
 
   pars.cutChIsolation=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK);//TCut; 
     //charged isolation cut as applied during selection procedure;
@@ -93,7 +127,10 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
   pars.cutSidebandVarNominalRange=photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut;
     //phoSigmaIEtaIEta cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-  pars.cutWeight="weight";//TCut; weight for signal MC tree
+//  pars.cutWeight="weight";//TCut; weight for signal MC tree
+
+  pars.cutBarrel=photon.RangeBarrel();//TCut
+  pars.cutEndcap=photon.RangeEndcap();//TCut
 }
 
 void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma)

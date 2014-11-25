@@ -35,8 +35,14 @@ class TTemplatesRandCone
       TString strTrueYields1D[3];
       TString strFakeYieldsTot[3];
       TString strFakeYields1D[3];
+      TFile* fTrue;
+      TFile* fFake;
+      TFile* fData;
+      TFile* fSign;//treeSign has to be consistent with treeFake
+      TTree* treeTrue;
+      TTree* treeFake;
       TTree* treeData;
-      TTree* treeSign;
+      TTree* treeSign;//treeSign has to be consistent with treeFake
       TString varSideband;
       TString varTrueTempl;
       TString varFakeTempl;
@@ -65,7 +71,7 @@ class TTemplatesRandCone
     TemplatesRandConePars _pars;  
 
     void SetPars(TemplatesRandConePars pars);
-    void ComputeBackgroundOne(int ikin, bool noPrint=0);
+    void ComputeBackgroundOne(int ikin, int ieta, bool noPrint=0);
 
     double _nFakeYieldsVal[nKinBinsMax][3];
     double _nFakeYieldsErr[nKinBinsMax][3];
@@ -86,8 +92,8 @@ class TTemplatesRandCone
     void PrintYieldsAndChi2();
     void PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]);
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
-    void ComputeYieldOneKinBin(int ikin, bool noPrint=0);
-    void ComputeOneYield(int ikin, bool noPrint, bool isTrueGamma,double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
+    void ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint=0);
+    void ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma,double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
 //    float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
 
