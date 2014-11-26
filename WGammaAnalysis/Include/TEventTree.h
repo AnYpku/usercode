@@ -134,7 +134,7 @@ public:
 //   vector<vector<float> > *elePhiVtx;
 //   vector<vector<float> > *eleEtVtx;
      vector<float>   *eleSCEta;
-//   vector<float>   *eleSCPhi;
+     vector<float>   *eleSCPhi; 
 //   vector<float>   *eleSCEtaWidth;
 //   vector<float>   *eleSCPhiWidth;
 //   vector<float>   *eleVtx_x;

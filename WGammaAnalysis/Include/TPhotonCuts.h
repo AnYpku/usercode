@@ -1,6 +1,8 @@
 #ifndef TPhotonCuts_h
 #define TPhotonCuts_h
 
+#include "TEventTree.h"
+#include "TMathTools.h"
 #include "TCut.h"
  //ROOT
 
@@ -42,6 +44,8 @@ class TPhotonCuts
     float GetOneIsolationCutE(int year, int wp, int isoType, float phoEt);
     float GetPhoSCRChIsoCorrCut();
 
+    bool HasMatchingGSFelectron(TEventTree::InputTreeLeaves &leaf, int ipho);
+
 
     TCut RangeBarrel();
     TCut RangeEndcap();
@@ -65,6 +69,8 @@ class TPhotonCuts
     enum {ISO_CHorTRK, ISO_NEUorHCAL, ISO_PHOorECAL};
 
   private:
+
+    TMathTools _math;
 
     const static float _phoPtCut = 15.0;
       //WP - working point

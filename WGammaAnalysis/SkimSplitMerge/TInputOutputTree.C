@@ -108,7 +108,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
 //   outputTree->Branch("elePhiVtx", "vector<vector<float>>",&treeLeaf.elePhiVtx);
 //   outputTree->Branch("eleEtVtx", "vector<vector<float>>",&treeLeaf.eleEtVtx);
    outputTree->Branch("eleSCEta", "vector<float>",&treeLeaf.eleSCEta);
-//   outputTree->Branch("eleSCPhi", "vector<float>",&treeLeaf.eleSCPhi);
+   outputTree->Branch("eleSCPhi", "vector<float>",&treeLeaf.eleSCPhi);
 //   outputTree->Branch("eleSCEtaWidth", "vector<float>",&treeLeaf.eleSCEtaWidth);
 //   outputTree->Branch("eleSCPhiWidth", "vector<float>",&treeLeaf.eleSCPhiWidth);
 //   outputTree->Branch("eleVtx_x", "vector<float>",&treeLeaf.eleVtx_x);

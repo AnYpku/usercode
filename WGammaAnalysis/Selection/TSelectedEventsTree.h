@@ -7,6 +7,7 @@
 
 #include "../Include/TEventTree.h" //class of this package
 #include "../Include/TFullCuts.h" //class of this package
+#include "../Include/TMathTools.h" //class of this package
 #include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
 
 class TSelectedEventsTree
@@ -24,6 +25,7 @@ class TSelectedEventsTree
 
   private:
     TConfiguration _config;
+    TMathTools _math;
 
     int _event;
     int _ilep[2];

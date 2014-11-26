@@ -168,6 +168,16 @@ float TPhotonCuts::GetOneIsolationCutE(int year, int wp, int isoType, float phoE
   return _phoIsoEndcapCut2012[isoType][2*wp+1]+phoEt*_phoIsoEndcapCut2012[isoType][2*wp+1]; 
 }
 
+bool TPhotonCuts::HasMatchingGSFelectron(TEventTree::InputTreeLeaves &leaf, int ipho)
+{
+  for (int iele=0; iele<leaf.nEle; iele++){
+    if (leaf.elePt->at(iele)<2) break;
+    float dR = _math.DeltaR(leaf.phoSCPhi->at(ipho),leaf.phoSCEta->at(ipho),leaf.eleSCPhi->at(iele),leaf.eleSCEta->at(iele));
+    if (dR<0.02) return 1;
+  }
+  return 0;
+}
+
 TCut TPhotonCuts::RangeBarrel()
 {
   TString str="phoSCEta<1.4442 && phoSCEta>-1.4442";
@@ -231,7 +241,7 @@ TCut TPhotonCuts::SidebandSigmaIEtaIEta()
 
 TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
 {
-//  if (isoType==ISO_CHorTRK) return "1";
+  //if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
   if (year==2011 && isoType==ISO_CHorTRK) strIso="phoTrkIsoHollowDR04Corr";
   if (year==2012 && isoType==ISO_CHorTRK) strIso="phoPFChIsoCorr";

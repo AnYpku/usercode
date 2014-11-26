@@ -17,11 +17,12 @@ TMathTools::~TMathTools()
 {
 }
 
-float TMathTools::DeltaR (float eta1, float phi1, float eta2, float phi2)
+float TMathTools::DeltaR (float phi1, float eta1, float phi2, float eta2)
 {
+  float deta=fabs(eta1-eta2);
   float dphi;
   for (dphi=fabs(phi1-phi2); fabs(dphi)>=2*TMath::Pi(); dphi=dphi-2*TMath::Pi()) ;
-  float dR=sqrt((eta1-eta2)*(eta1-eta2)+dphi*dphi);
+  float dR=sqrt(deta*deta+dphi*dphi);
   return dR;
 }
 

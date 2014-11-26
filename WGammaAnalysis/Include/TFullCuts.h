@@ -15,6 +15,7 @@
 #include "TEventTree.h"
 #include "TMuonCuts.h"
 #include "TPhotonCuts.h"
+#include "TMathTools.h"
 
 class TFullCuts{
 public:
@@ -42,14 +43,16 @@ public:
     float dRlep2pho;    
   };
 
-  bool VeryPreliminaryCut(TEventTree::InputTreeLeaves& inpTreeLeaf,
+  bool VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
                     zgamma::PhosphorCorrectionFunctor* photonCorrector,   
                     int channel, int vgamma, bool isVJets,
                     int& nCands, Candidate* cands,
                     PassedLevels& passed);
 
+  bool ZMassWindowCut(TEventTree::InputTreeLeaves& leaf, int ipho, int iele);
 
-  float DeltaR(float phi1, float eta1, float phi2, float eta2); 
+
+  //float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut(int year);
 
   TCut RangeMoreLeptonsVeto();
@@ -62,10 +65,11 @@ public:
 
 private:
   TConfiguration _config;
-  TMuonCuts _emptyMuon;
-  TPhotonCuts _emptyPhoton;
+  TMuonCuts _muon;
+  TPhotonCuts _photon;
+  TMathTools _math;
 
-  TEventTree::InputTreeLeaves _inpTreeLeaf;
+  TEventTree::InputTreeLeaves _leaf;
   PassedLevels _passed;
   Candidate* _cands;
   bool* _kinPhoton;
@@ -80,6 +84,10 @@ private:
   const static float _WMtCut2012 = 50.;//for 8 TeV
   const static float _WMtCut2011 = 70.;//from 7 TeV
   const static float _lePhoDeltaRCut = 0.7;//0.7;
+
+  const static float _ZmassLeft = 70.; 
+  const static float _ZmassRight = 110.;
+    // for Z-mass window cut for W_GAMMA in ELECTRON channel
 };
 
 #endif 

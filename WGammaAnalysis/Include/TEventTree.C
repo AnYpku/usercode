@@ -113,6 +113,7 @@ void TEventTree::GetEntryEleSpecific(Long64_t entry)
    b_elePt->GetEntry(entry);
    b_elePhi->GetEntry(entry);
    b_eleEta->GetEntry(entry);
+   b_eleSCPhi->GetEntry(entry);
    b_eleSCEta->GetEntry(entry);
    b_eledEtaAtVtx->GetEntry(entry);
    b_eledPhiAtVtx->GetEntry(entry);
@@ -236,7 +237,7 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.elePhiVtx = 0;
 //   treeLeaf.eleEtVtx = 0;
    treeLeaf.eleSCEta = 0;
-//   treeLeaf.eleSCPhi = 0;
+   treeLeaf.eleSCPhi = 0;
 //   treeLeaf.eleSCEtaWidth = 0;
 //   treeLeaf.eleSCPhiWidth = 0;
 //   treeLeaf.eleVtx_x = 0;
@@ -821,7 +822,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("elePhiVtx", &treeLeaf.elePhiVtx, &b_elePhiVtx);
 //   fChain->SetBranchAddress("eleEtVtx", &treeLeaf.eleEtVtx, &b_eleEtVtx);
    fChain->SetBranchAddress("eleSCEta", &treeLeaf.eleSCEta, &b_eleSCEta);
-//   fChain->SetBranchAddress("eleSCPhi", &treeLeaf.eleSCPhi, &b_eleSCPhi);
+   fChain->SetBranchAddress("eleSCPhi", &treeLeaf.eleSCPhi, &b_eleSCPhi);
 //   fChain->SetBranchAddress("eleSCEtaWidth", &treeLeaf.eleSCEtaWidth, &b_eleSCEtaWidth);
 //   fChain->SetBranchAddress("eleSCPhiWidth", &treeLeaf.eleSCPhiWidth, &b_eleSCPhiWidth);
 //   fChain->SetBranchAddress("eleVtx_x", &treeLeaf.eleVtx_x, &b_eleVtx_x);

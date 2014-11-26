@@ -4,6 +4,7 @@
 #include "../Include/TMuonCuts.h" //this package
 #include "../Include/TFullCuts.h" //this package
 #include "../Include/TMetTools.h" //this package
+#include "../Include/TMathTools.h"
 #include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
 #include "TTree.h" //ROOT class
 #include "TFile.h" //ROOT class
@@ -274,7 +275,7 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
     float dRmin=1000;
     for (int iMC=0; iMC<treeLeaf.nMC; iMC++){
       if (treeLeaf.mcPID->at(iMC)==22){
-        float dR = fullCut.DeltaR(treeLeaf.phoPhi->at(_ipho),treeLeaf.phoEta->at(_ipho),treeLeaf.mcPhi->at(iMC),treeLeaf.mcEta->at(iMC));
+        float dR = _math.DeltaR(treeLeaf.phoPhi->at(_ipho),treeLeaf.phoEta->at(_ipho),treeLeaf.mcPhi->at(iMC),treeLeaf.mcEta->at(iMC));
         if (dR<dRmin) dRmin=dR;
       }
     }
@@ -288,7 +289,7 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
           std::cout<<"event="<<treeLeaf.event<<", ipho="<<cand.ipho<<", imc="<<iMC<<std::endl;
           std::cout<<"mcIndex="<<treeLeaf.mcIndex->at(iMC)<<", phoGenIndex="<<treeLeaf.phoGenIndex->at(cand.ipho)<<std::endl;
           std::cout<<"mcPID="<<treeLeaf.mcPID->at(iMC)<<", mcMomPID="<<treeLeaf.mcMomPID->at(iMC)<<std::endl;
-          std::cout<<"dR(gen,reco)="<<fullCut.DeltaR(treeLeaf.phoPhi->at(_ipho),treeLeaf.phoEta->at(_ipho),treeLeaf.mcPhi->at(iMC),treeLeaf.mcEta->at(iMC))<<", dRmin="<<dRmin<<std::endl;
+          std::cout<<"dR(gen,reco)="<<_math.DeltaR(treeLeaf.phoPhi->at(_ipho),treeLeaf.phoEta->at(_ipho),treeLeaf.mcPhi->at(iMC),treeLeaf.mcEta->at(iMC))<<", dRmin="<<dRmin<<std::endl;
           std::cout<<std::endl;
         }
         _phoGenMomPID=treeLeaf.mcMomPID->at(iMC);
@@ -416,6 +417,7 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
     vlep2.SetPtEtaPhiM(_lepPt[1],_lepEta[1],_lepPhi[1],0);
     _Mleplep=(vlep1 + vlep2).M();
   }
+
 
   _rho2012=treeLeaf.rho2012;
   _rho2011=treeLeaf.rho2011;

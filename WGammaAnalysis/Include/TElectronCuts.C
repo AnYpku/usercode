@@ -9,53 +9,82 @@ TElectronCuts::~TElectronCuts()
 {
 }
 
-bool TElectronCuts::HasMoreElectrons(int nEle, int iele, vector <float> *elePt, vector <float> *eleEta)
+bool TElectronCuts::HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele)
 {
-  return true;
+  for (int iele1=0; iele1<leaf.nEle; iele1++){
+    if (iele1==iele) continue;
+    if ( PassedKinematics(leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1)) &&
+         EleID2012(leaf,iele1,ELE_VETO)) return 1;
+  }
+  return 0;
 }
 
-bool TElectronCuts::EleID2012(TEventTree::InputTreeLeaves& leaf, int iele){
-  float EffectiveArea = GetEffectiveArea((*leaf.eleSCEta)[iele]);
-  if((*leaf.elePt)[iele] < 10) return false;
-  bool pass = true;
-  if (fabs((*leaf.eleSCEta)[iele]) < 1.4442) {
-    if (fabs((*leaf.eledEtaAtVtx)[iele]) > 0.007) pass = false;
-    if (fabs((*leaf.eledPhiAtVtx)[iele]) > 0.15) pass = false;
-    if ((*leaf.eleSigmaIEtaIEta)[iele] > 0.01) pass = false;
-    if ((*leaf.eleHoverE)[iele] > 0.12) pass = false;
-    if (fabs((*leaf.eleD0Vtx)[iele][0]) > 0.02) pass = false;
-    if (fabs((*leaf.eleDzVtx)[iele][0]) > 0.2) pass = false;
-    if (fabs(1./(*leaf.eleEcalEn)[iele] - 1./(*leaf.elePin)[iele]) > 0.05) pass = false;
-    if ((*leaf.eleConvVtxFit)[iele] == 1) pass = false;
-    if ((*leaf.eleMissHits)[iele] > 1) pass = false;
-    if ( ((*leaf.elePFChIso03)[iele] + TMath::Max((Double_t) 0.,(Double_t) (*leaf.elePFPhoIso03)[iele] + (*leaf.elePFNeuIso03)[iele] - EffectiveArea*leaf.rho2012))/(*leaf.elePt)[iele] > 0.15) pass = false;
-  } else {
-    if (fabs((*leaf.eledEtaAtVtx)[iele]) > 0.009) pass = false;
-    if (fabs((*leaf.eledPhiAtVtx)[iele]) > 0.10) pass = false;
-    if ((*leaf.eleSigmaIEtaIEta)[iele] > 0.03) pass = false;
-    if ((*leaf.eleHoverE)[iele] > 0.1) pass = false;
-    if (fabs((*leaf.eleD0Vtx)[iele][0]) > 0.02) pass = false;
-    if (fabs((*leaf.eleDzVtx)[iele][0]) > 0.2) pass = false;
-    if (fabs(1./(*leaf.eleEcalEn)[iele] - 1./(*leaf.elePin)[iele]) > 0.05) pass = false;
-    if ((*leaf.eleConvVtxFit)[iele] == 1) pass = false;
-    if ((*leaf.eleMissHits)[iele] > 1) pass = false;
-    if ((*leaf.elePt)[iele] < 20){
-      if ( ((*leaf.elePFChIso03)[iele] + TMath::Max((Double_t) 0., (Double_t) (*leaf.elePFPhoIso03)[iele] +   (*leaf.elePFNeuIso03)[iele] - EffectiveArea*leaf.rho2012))/(*leaf.elePt)[iele] > 0.10) pass = false;
-    } else {
-      if ( ((*leaf.elePFChIso03)[iele] + TMath::Max((Double_t) 0., (Double_t) (*leaf.elePFPhoIso03)[iele] +   (*leaf.elePFNeuIso03)[iele] - EffectiveArea*leaf.rho2012))/(*leaf.elePt)[iele] > 0.15) pass = false;
-    }
+bool TElectronCuts::PassedKinematics(float pt, float eta)
+{
+  if (!IsBarrel(eta) && !IsEndcap(eta)) return 0;
+  if (!(pt>_elePtCut)) return 0;
+  return 1;
+}
+
+bool TElectronCuts::EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int wp){
+  
+  int etaBin=0;
+  if (IsBarrel(leaf.eleSCEta->at(iele))) etaBin=_config.BARREL;
+  else if (IsEndcap(leaf.eleSCEta->at(iele))) etaBin=_config.ENDCAP;
+  else return 0;
+
+  if (!(fabs(leaf.eledEtaAtVtx->at(iele))<_dEtaIn_Cut[etaBin][wp])) return 0;
+  if (!(fabs(leaf.eledPhiAtVtx->at(iele))<_dPhiIn_Cut[etaBin][wp])) return 0;
+  if (!(leaf.eleSigmaIEtaIEta->at(iele)<_sigmaIEtaIEta_Cut[etaBin])) return 0;
+  if (!(leaf.eleHoverE12->at(iele)<_HoverE_Cut[etaBin][wp])) return 0;
+  if (!(fabs((leaf.eleD0Vtx->at(iele))[0])<_d0_vtx_Cut[wp])) return 0;
+  if (!(fabs((leaf.eleDzVtx->at(iele))[0])<_dZ_vtx_Cut[wp])) return 0;
+
+  if (wp==ELE_VETO);
+  else{
+    if (leaf.eleEcalEn->at(iele)==0 || leaf.elePt->at(iele)==0) return 0;
+    float oneOverE=1.0/leaf.eleEcalEn->at(iele);
+    float oneOverp=1.0/leaf.elePt->at(iele);
+    if (!(fabs(oneOverE-oneOverp)<_1ovE_1ovp_Cut)) return 0;
+    if (!(leaf.eleConvVtxFit->at(iele)<_vertex_fit_probability_Cut)) return 0;
+    if (!(leaf.eleMissHits->at(iele)<_missing_hits_Cut[wp])) return 0;
   }
-  return pass;
+
+  if (leaf.elePt->at(iele)==0) return 0;
+  float isoCorr = GetCorrectedIsolation(leaf, iele)/leaf.elePt->at(iele);
+  if (etaBin==_config.ENDCAP && leaf.elePt->at(iele)<20) {
+    if (!(isoCorr<_PFisoOvPT03_E_PTless20_Cut[wp])) return 0;
+  } 
+  else{
+    if (!(isoCorr<_PFisoOvPT03_Cut[wp])) return 0;
+  }   
+
+  return 1;
+}
+
+float TElectronCuts::GetCorrectedIsolation(TEventTree::InputTreeLeaves& leaf, int iele){
+ float EA = GetEffectiveArea(leaf.eleSCEta->at(iele));
+ float phoANDhad = leaf.elePFPhoIso03->at(iele)+leaf.elePFNeuIso03->at(iele)-leaf.rho2012*EA;
+ if (phoANDhad<0) phoANDhad=0;
+ return (leaf.elePFChIso03->at(iele)+ phoANDhad);
 }
 
 float TElectronCuts::GetEffectiveArea(float eta){
-  float EffectiveArea = 0;
-  if (fabs(eta) >= 0.0 && fabs(eta) < 1.0 ) EffectiveArea = 0.013 + 0.122;
-  if (fabs(eta) >= 1.0 && fabs(eta) < 1.479 ) EffectiveArea = 0.021 + 0.147 ;
-  if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) EffectiveArea = 0.013 + 0.055;
-  if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) EffectiveArea = 0.010 + 0.106;
-  if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) EffectiveArea = 0.024 + 0.138;
-  if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) EffectiveArea = 0.020 + 0.221;
-  if (fabs(eta) >= 2.4 ) EffectiveArea = 0.019 + 0.211;
-  return EffectiveArea;
+  if (fabs(eta)<1.0) return 0.13;
+  if (fabs(eta)<1.479) return 0.14;
+  if (fabs(eta)<2.0) return 0.07;
+  if (fabs(eta)<2.2) return 0.09;
+  if (fabs(eta)<2.3) return 0.11;
+  if (fabs(eta)<2.4) return 0.14;
+  return 0.14;
+}
+
+bool TElectronCuts::IsBarrel(float eta){
+  if (fabs(eta)<1.4442) return 1;
+  return 0;
+}
+
+bool TElectronCuts::IsEndcap(float eta){
+  if (fabs(eta)>1.566 && fabs(eta)<2.5) return 1;
+  return 0;
 }
