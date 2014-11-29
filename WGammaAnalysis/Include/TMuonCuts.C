@@ -13,13 +13,13 @@ TMuonCuts::~TMuonCuts()
 {
 }
 
-bool TMuonCuts::HasMoreMuons(int nMu, int imu, vector <float> *muPt, vector <float> *muEta) 
+bool TMuonCuts::HasMoreMuons(TEventTree::InputTreeLeaves &leaf, int imu) 
 {
-  if (nMu<2) return false;
-  for (int i=0; i<nMu; i++)
+  if (leaf.nMu<2) return false;
+  for (int i=0; i<leaf.nMu; i++)
     {
       if (i==imu) continue;
-      else if (muPt->at(i)>_extraMuPtCut && fabs(muEta->at(i))<_extraMuEtaCut) return true;
+      else if (leaf.muPt->at(i)>_extraMuPtCut && fabs(leaf.muEta->at(i))<_extraMuEtaCut) return true;
     }
   return false;
 }
@@ -32,45 +32,44 @@ bool TMuonCuts::PassedKinematics(float muPt, float muEta, bool& ifPassedPt, bool
   return (ifPassedPt && ifPassedEta); 
 }
 
-bool TMuonCuts::MuId(int year, float muChi2NDF, float muD0, float muDZ, 
-                int muNumberOfValidMuonHits, int muNumberOfValidTrkHits, 
-                int muNumberOfValidPixelHits, int muNumberOfValidTrkLayers, 
-                int muStations, int muType) 
+bool TMuonCuts::MuId(int year, TEventTree::InputTreeLeaves &leaf, int imu) 
 {
-  if (muType != _muType2012) return false;
-  if (muChi2NDF >= _muChi2NDFCut) return false;
-  if (muNumberOfValidMuonHits <= _muNOfValidMuonHitsCut) return false;
-//  if (muNumberOfValidTrkHits <= _muNOfValidTrkHitsCut) return false;
-  if ((year==2012) && (fabs(muD0) >= _D0Cut2012)) return false;
-  if ((year==2012) && (fabs(muDZ) >= _DZCut2012)) return false;
-  if ((year==2011) && (fabs(muD0) >= _D0Cut2011)) return false;
-  if ((year==2011) && fabs(muDZ) >= _DZCut2011) return false;
+  if (!(leaf.muType->at(imu) == 46)) return 0;
+  if (!(leaf.muChi2NDF->at(imu) < 10)) return 0;
+  if (!(leaf.muNumberOfValidMuonHits->at(imu)>0)) return 0;
+  if ((year==2012) && !(fabs(leaf.muInnerD0GV->at(imu)) < 0.20)) return 0;
+  if ((year==2012) && !(fabs(leaf.muInnerDzGV->at(imu)) < 0.50)) return 0;
+  if ((year==2011) && !(fabs(leaf.muInnerD0GV->at(imu)) < 0.02)) return 0;
+  if ((year==2011) && !(fabs(leaf.muInnerDzGV->at(imu)) < 0.10)) return 0;
      //it might be muD0GV, muD0 or muDoVtx
-  if (muStations<=_muStationsCut) return false;
-  if (muNumberOfValidPixelHits<=_muNOfValidPixelHitsCut) return false;
-  if (muNumberOfValidTrkLayers<=_muNOfValidTrkLayersCut) return false;
-  return true;
+  if (!(leaf.muStations->at(imu)>1)) return 0;
+  if (!(leaf.muNumberOfValidPixelHits->at(imu)>0)) return 0;
+  if (!(leaf.muNumberOfValidTrkLayers->at(imu)>5)) return 0;
+
+  // isolation are set up to be part of muon ID 
+  // to be consistent with electron selection
+  // (in POG they are separated)
+  if ((year==2012) && !(MuIsolation2012(leaf,imu)<0.12)) return 0;
+  if ((year==2011) && !(MuIsolation2012(leaf,imu)<0.10)) return 0;
+  return 1;
 }
 
-float TMuonCuts::MuIsolation2012(float muPt, 
-                 float muPFIsoR04_NH, float muPFIsoR04_Pho, 
-                 float muPFIsoR04_PU,float muPFIsoR04_CH) {
-  if (muPt == 0) return 10000;
+float TMuonCuts::MuIsolation2012(TEventTree::InputTreeLeaves &leaf, int imu) {
+  if (leaf.muPt->at(imu) == 0) return 10000;
   float isolation;
-  if (muPFIsoR04_NH+muPFIsoR04_Pho-0.5*muPFIsoR04_PU < 0 )
-    isolation=muPFIsoR04_CH/muPt;
-  else isolation=(muPFIsoR04_CH+muPFIsoR04_NH
-                  +muPFIsoR04_Pho-0.5*muPFIsoR04_PU)/muPt;
+  if (leaf.muPFIsoR04_NH->at(imu)+leaf.muPFIsoR04_Pho->at(imu)-0.5*leaf.muPFIsoR04_PU->at(imu) < 0 )
+    isolation=leaf.muPFIsoR04_CH->at(imu)/leaf.muPt->at(imu);
+  else isolation=(leaf.muPFIsoR04_CH->at(imu)+leaf.muPFIsoR04_NH->at(imu)
+                  +leaf.muPFIsoR04_Pho->at(imu)
+                  -0.5*leaf.muPFIsoR04_PU->at(imu))/leaf.muPt->at(imu);
   return isolation; 
 }
 
 //  if ( (muIsoTrk[imu]+muIsoEcal[imu]+muIsoHcal[imu] - rho*TMath::Pi()*0.3*0.3) < 0.1*muPt[imu] ) {
-float TMuonCuts::MuIsolation2011(float muPt, 
-                 float muIsoTrk, float muIsoEcal, 
-                 float muIsoHcal,float rho2011) {
+float TMuonCuts::MuIsolation2011(TEventTree::InputTreeLeaves &leaf, int imu) {
 //  if ( (muIsoTrk[imu]+muIsoEcal[imu]+muIsoHcal[imu] - rho*TMath::Pi()*0.3*0.3) < 0.1*muPt[imu] ) - from Senka's code
-  if (muPt == 0) return 10000;
-  float isolation=(muIsoTrk+muIsoHcal+muIsoEcal-rho2011*TMath::Pi()*0.3*0.3)/muPt;
+  if (leaf.muPt->at(imu) == 0) return 10000;
+  float isolation=(leaf.muIsoTrk->at(imu)+leaf.muIsoHcal->at(imu)+leaf.muIsoEcal->at(imu)-leaf.rho2011*TMath::Pi()*0.3*0.3)/leaf.muPt->at(imu);
   return isolation; 
 }
 
@@ -82,7 +81,7 @@ TCut TMuonCuts::RangeId(int year, int ilep){
   TCut cut(lepName);
   return cut;
 }
-
+/*
 TCut TMuonCuts::RangeIsolation(int year, int ilep){
   TString strCut="lepton";
   strCut+=ilep;
@@ -98,7 +97,7 @@ TCut TMuonCuts::RangeIsolation(int year, int ilep){
   TCut cut(strCut);
   return cut;
 }
-
+*/
 TCut TMuonCuts::RangeTriggerMatch(int vgamma, int ilep){
   TString strLep="";
   strLep+=ilep;
@@ -126,11 +125,11 @@ TCut TMuonCuts::RangeTriggerOne(TString strHLT, TString strMuTrg){
   return cutTrg;
 }
 
-TCut TMuonCuts::RangeMuon(int year, int vgamma, int ilep, bool doIsoCut, bool doIdCut, bool doTrgCut){
+TCut TMuonCuts::RangeMuon(int year, int vgamma, int ilep, bool doIdCut, bool doTrgCut){
   TCut cut="1";
   if (doTrgCut) cut=cut && RangeTriggerMatch(vgamma,ilep);
   if (doIdCut)  cut=cut && RangeId(year,ilep);
-  if (doIsoCut) cut=cut && RangeIsolation(year,ilep);
+  //if (doIsoCut) cut=cut && RangeIsolation(year,ilep);
   return cut;
 }
 

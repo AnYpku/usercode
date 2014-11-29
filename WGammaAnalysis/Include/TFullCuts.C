@@ -58,17 +58,8 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
    int nLe=0;
    if (channel==_config.MUON) nLe=leaf.nMu;
    else if (channel==_config.ELECTRON) nLe=leaf.nEle;
-   if (channel==_config.MUON && vgamma==_config.W_GAMMA)
-     if ((!leaf.HLT[leaf.HLTIndex[18]]) && (!leaf.HLT[leaf.HLTIndex[19]]))
-     //_HLT_IsoMu24_eta2p1_, _HLT_IsoMu24_v
-       { passed=_passed;  return 0;}
-   if (channel==_config.ELECTRON && vgamma==_config.W_GAMMA);
-   if (channel==_config.MUON && vgamma==_config.Z_GAMMA);
-     if (!leaf.HLT[leaf.HLTIndex[21]])
-     //_HLT_Mu22_Mu8_v
-       { passed=_passed;  return 0;}
-   if (channel==_config.ELECTRON && vgamma==_config.Z_GAMMA);
 
+   if (!TriggerCut(leaf,channel,vgamma)) { passed=_passed; return 0;}
    _passed.triggerPassed++;
 
    if ((leaf.IsVtxGood)==-1){ passed=_passed; return 0;}
@@ -85,7 +76,7 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
    bool kinLepton2Exists=0;
 
 
- bool kinPhotonExists=0;
+  bool kinPhotonExists=0;
   int icand=0;
   //check matching between lepton and photon
   bool hasOverlap=0;
@@ -106,14 +97,32 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
         _kinLepton1[ilep1] = _muon.PassedKinematics(_leaf.muPt->at(ilep1),_leaf.muEta->at(ilep1),ifPassedPt,ifPassedEta);
         if (ifPassedPt) _passed.leptonPtPassed++; else continue;
         if (ifPassedEta) _passed.leptonEtaPassed++; else continue;
+        if (!_muon.MuId(2012,leaf,ilep1)) continue;
       }
-      else if (channel==_config.ELECTRON);
+      else if (channel==_config.ELECTRON){
+        _kinLepton1[ilep1] = _electron.PassedKinematics(_leaf.elePt->at(ilep1),_leaf.eleSCEta->at(ilep1));
+        if (!_kinLepton1[ilep1]) continue;
+        if (!_electron.EleID2012(leaf,ilep1,_electron.ELE_MEDIUM)) continue;
+      }
+
+      if (!TriggerMatch(leaf,channel,vgamma,ilep1)) continue;
+
       float dR1;
       if (channel==_config.MUON){
         dR1=_math.DeltaR(_leaf.muPhi->at(ilep1),_leaf.muEta->at(ilep1),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
       }
-      else if (channel==_config.ELECTRON);
+      else if (channel==_config.ELECTRON){
+        dR1=_math.DeltaR(_leaf.elePhi->at(ilep1),_leaf.eleEta->at(ilep1),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
+      }
       if (vgamma==_config.W_GAMMA){
+        if (channel==_config.ELECTRON){
+          if (_electron.HasMoreElectrons(leaf,ilep1)) continue;
+          if (!ZMassWindowCut(leaf,ipho,ilep1)) continue;
+          if (_photon.HasMatchingGSFelectron(leaf,ipho)) continue;
+        }
+        else if (channel==_config.MUON){
+          if (_muon.HasMoreMuons(leaf,ilep1)) continue;
+        }
         CheckDRandProceed(_config.W_GAMMA, isVJets, icand,
                     hasEventAfterPass, hasOverlap,
                     dR1, -1, ipho, ilep1, -1);
@@ -126,17 +135,29 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
           if (channel==_config.MUON){
             _kinLepton2[ilep2] = _muon.PassedKinematics(_leaf.muPt->at(ilep2),_leaf.muEta->at(ilep2),ifPassedPt,ifPassedEta);
             if (!_kinLepton2[ilep2]) continue;
+            if (!_muon.MuId(2012,leaf,ilep2)) continue;
             vlep1.SetPtEtaPhiM(_leaf.muPt->at(ilep1),_leaf.muEta->at(ilep1),_leaf.muPhi->at(ilep1),0);
             vlep2.SetPtEtaPhiM(_leaf.muPt->at(ilep2),_leaf.muEta->at(ilep2),_leaf.muPhi->at(ilep2),0);
           }
-          else if (channel==_config.ELECTRON);
+          else if (channel==_config.ELECTRON){
+            _kinLepton2[ilep2] = _electron.PassedKinematics(_leaf.elePt->at(ilep2),_leaf.eleSCEta->at(ilep2));
+            if (!_kinLepton2[ilep2]) continue;
+            if (!_electron.EleID2012(leaf,ilep2,_electron.ELE_MEDIUM)) continue;
+            vlep1.SetPtEtaPhiM(_leaf.elePt->at(ilep1),_leaf.eleEta->at(ilep1),_leaf.elePhi->at(ilep1),0);
+            vlep2.SetPtEtaPhiM(_leaf.elePt->at(ilep2),_leaf.eleEta->at(ilep2),_leaf.elePhi->at(ilep2),0);
+          }
+
+          if (!TriggerMatch(leaf,channel,vgamma,ilep2)) continue;
+
           if((vlep1 + vlep2).M() < 50) continue;
 
           float dR2;
           if (channel==_config.MUON){
             dR2=_math.DeltaR(_leaf.muPhi->at(ilep2),_leaf.muEta->at(ilep2),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
           }
-          else if (channel==_config.ELECTRON);
+          else if (channel==_config.ELECTRON){
+            dR2=_math.DeltaR(_leaf.elePhi->at(ilep2),_leaf.eleEta->at(ilep2),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
+          }
           CheckDRandProceed(_config.Z_GAMMA, isVJets, icand,
                     hasEventAfterPass, hasOverlap,
                     dR1, dR2, ipho, ilep1, ilep2);
@@ -161,6 +182,72 @@ bool TFullCuts::ZMassWindowCut(TEventTree::InputTreeLeaves& leaf, int ipho, int 
   if (M>_ZmassLeft && M<_ZmassRight) return 0;
   return 1;
 }// end of ZMassWindowCut
+
+bool TFullCuts::TriggerCut(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma)
+{
+   if (channel==_config.MUON && vgamma==_config.W_GAMMA){
+     if (leaf.HLTIndex[18]>=0 && leaf.HLT[leaf.HLTIndex[18]]) return 1; 
+     //_HLT_IsoMu24_eta2p1_
+     else  return 0;
+   }// MUON, W_GAMMA
+
+   if (channel==_config.ELECTRON && vgamma==_config.W_GAMMA){
+     if (leaf.HLTIndex[17]>=0 && leaf.HLT[leaf.HLTIndex[17]]) return 1;
+     //_HLT_Ele27_WP80_v
+     else return 0;
+   }// ELECTRON, W_GAMMA
+
+   if (channel==_config.MUON && vgamma==_config.Z_GAMMA){
+     if (leaf.HLTIndex[14]>=0 && leaf.HLT[leaf.HLTIndex[14]]) return 1;
+     //_HLT_Mu17_Mu8_v
+     else return 0;
+   }// MUON, Z_GAMMA
+
+   if (channel==_config.ELECTRON && vgamma==_config.Z_GAMMA){
+     if (leaf.HLTIndex[9]>=0 && leaf.HLT[leaf.HLTIndex[9]]) return 1;
+     //_HLT_Ele17_Ele8_v, many other conditions
+     else return 0;
+   }// ELECTRON, Z_GAMMA
+
+   return 0; 
+}
+
+bool TFullCuts::TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma, int ilep)
+{
+   if (channel==_config.MUON && vgamma==_config.W_GAMMA){
+     if (leaf.HLTIndex[18]>=0 && leaf.HLT[leaf.HLTIndex[18]] && (leaf.muTrg->at(ilep)%2) ) 
+       return 1; 
+     //_HLT_IsoMu24_eta2p1_
+     //"muonTriggerMatchHLTIsoMu24eta2p1"
+     else  return 0;
+   }// MUON, W_GAMMA
+
+   if (channel==_config.ELECTRON && vgamma==_config.W_GAMMA){
+     if (leaf.HLTIndex[17]>=0 && leaf.HLT[leaf.HLTIndex[17]] && (leaf.eleTrg->at(ilep)%2) ) 
+       return 1;
+     //_HLT_Ele27_WP80_v
+     //"electronTriggerMatchHLTEle27WP80"
+     else return 0;
+   }// ELECTRON, W_GAMMA
+
+   if (channel==_config.MUON && vgamma==_config.Z_GAMMA){
+     if (leaf.HLTIndex[14]>=0 && leaf.HLT[leaf.HLTIndex[14]] && ((leaf.muTrg->at(ilep)/4)%2) ) 
+       return 1;
+     //_HLT_Mu17_Mu8_v
+     //"muonTriggerMatchHLTMu17Mu8"
+     else return 0;
+   }// MUON, Z_GAMMA
+
+   if (channel==_config.ELECTRON && vgamma==_config.Z_GAMMA){
+     if (leaf.HLTIndex[9]>=0 && leaf.HLT[leaf.HLTIndex[9]]  && ((leaf.eleTrg->at(ilep)/16)%2) ) 
+       return 1;
+     //"HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v"
+     //"electronTriggerMatchEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVLEle8CaloIdTCaloIsoVLTrkIdVLTrkIsoVL"
+     else return 0;
+   }// ELECTRON, Z_GAMMA
+
+   return 0; 
+}
 
 void TFullCuts::CheckDRandProceed(int vgamma, bool isVJets, int& icand,
                     bool& hasEventAfterPass, bool& hasOverlap,
@@ -255,61 +342,33 @@ TCut TFullCuts::RangeExtraLeptonPt2011()
   return cut;
 }
 
-TCut TFullCuts::RangeForMetCut(int year, int channel, int vgamma, int phoWP){
-  TCut cut;
-  TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 0);
-  TCut cutLepton;
-  if (channel==_config.MUON){
-    TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon(year,vgamma,1);//1st muon
-    if (vgamma==_config.Z_GAMMA)
-      cutLepton = cutLepton && emptyMuon.RangeMuon(year,vgamma,2);//2nd muon
-  }
-  else if (channel==_config.ELECTRON);
-  cut = cutPhoton && cutLepton && RangePhoEt();
-  if (vgamma==_config.W_GAMMA) 
-    cut = cut && RangeMoreLeptonsVeto();
-  if (year==2011) 
-    cut = cut && RangeExtraLeptonPt2011();
-  return cut;
-}
-
 TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP){
-  TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP, 0, 0);
+  TCut cutPhoton=_photon.RangePhoton(year, phoWP, 0, 0);
   //no cuts on sigmaIEtaIEta and chIso
-  TCut cutLepton;
-  if (channel==_config.MUON){
-    TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon(year,vgamma,1);//1st muon
-    if (vgamma==_config.Z_GAMMA)
-      cutLepton = cutLepton && emptyMuon.RangeMuon(year,vgamma,2);//2nd muon
+
+  TCut cut = cutPhoton; 
+  if (vgamma==_config.W_GAMMA) {
+    cut = cut && RangeMetRelatedCut(year);
+    if (channel==_config.ELECTRON)
+     cut = cut && _photon.RangePhoHasPixelSeed();
   }
-  else if (channel==_config.ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangePhoEt();
-  if (vgamma==_config.W_GAMMA) 
-    cut = cut && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year);
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
   return cut;
+
 }
 
 TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP)
 {
   TPhotonCuts emptyPhoton;
   TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP);
-  TCut cutLepton;
-  if (channel==_config.MUON){
-    TMuonCuts emptyMuon;
-    cutLepton=emptyMuon.RangeMuon(year,vgamma,1);//1st muon
-    if (vgamma==_config.Z_GAMMA)
-      cutLepton = cutLepton && emptyMuon.RangeMuon(year,vgamma,2);//2nd muon
+
+  TCut cut = cutPhoton; 
+  if (vgamma==_config.W_GAMMA) {
+    cut = cut && RangeMetRelatedCut(year);
+    if (channel==_config.ELECTRON)
+     cut = cut && _photon.RangePhoHasPixelSeed();
   }
-  else if (channel==_config.ELECTRON);
-  TCut cut = cutPhoton && cutLepton && RangePhoEt();
-  if (vgamma==_config.W_GAMMA) 
-    cut = cut && RangeMoreLeptonsVeto() && RangeMetRelatedCut(year);
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
   return cut;

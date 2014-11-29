@@ -6,6 +6,9 @@
 #include "TString.h" //ROOT class
 
 #include "../Include/TEventTree.h" //class of this package
+#include "../Include/TPhotonCuts.h" //class of this package
+#include "../Include/TMuonCuts.h" //class of this package
+#include "../Include/TElectronCuts.h" //class of this package
 #include "../Include/TFullCuts.h" //class of this package
 #include "../Include/TMathTools.h" //class of this package
 #include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
@@ -18,20 +21,28 @@ class TSelectedEventsTree
 
     void SetAsOutputTree(TTree* tree);
     void SetAsInputTree(TTree* tree);
-    void SetValues(int channel, int sample, TEventTree::InputTreeLeaves treeLeaf, TFullCuts::Candidate cand, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector); 
-    bool SetValuesMuId(TEventTree::InputTreeLeaves treeLeaf, int year, int ile);
-    float SetValuesMuIsolation(TEventTree::InputTreeLeaves treeLeaf, int year, int ile);
+    void SetValues(int channel, int sample, TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector);
+    void SetMuonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand,int ilMax); 
+    void SetElectronValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int ilMax); 
+    void SetPhotonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int channel, int ilMax); 
+    void SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int sample); 
+    void SetThreeIsolations(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, float &chCorr, float &neuCorr, float &phoCorr, float chOrig, float neuOrig, float phoOrig);
 
 
   private:
     TConfiguration _config;
     TMathTools _math;
+    TPhotonCuts _photon;
+    TMuonCuts _muon;
+    TElectronCuts _electron;
 
     int _event;
     int _ilep[2];
     int _iMClep[2];
     float _lepEta[2];
     float _lepPhi[2];
+    float _lepSCEta[2];
+    float _lepSCPhi[2];
     float _lepPt[2];
     int _lepGenPID[2];
     int _lepGenParentage[2];
@@ -41,15 +52,21 @@ class TSelectedEventsTree
     bool _lepId2011[2];
     float _lepIsolation2012[2];
     float _lepIsolation2011[2];
-    int _lepTrg[2];
+//    int _lepTrg[2];
     int _lepType[2];
-    bool _trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
-    bool _trgMatchIsoMu24[2];//1th bit of muTrg[imu]
-    bool _trgMatchMu22Mu8[2];//5th(?) bit of muTrg[imu]
+   // bool _trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
+   // bool _trgMatchIsoMu24[2];//1th bit of muTrg[imu]
+   // bool _trgMatchMu22Mu8[2];//4th(?) bit of muTrg[imu]
+   // bool _trgMatchEle27WP80[2];//0th bit of eleTrg[iele]
+   // bool _trgMatchEle17Ele8[2];//2nd bit of eleTrg[iele]
+    bool _lepTrgMatch[2];
     bool _hasMoreLeptons;
-    int _HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
-    int _HLT_IsoMu24_v;//HLT[HLTIndex[19]]
-    int _HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
+//    int _HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
+//    int _HLT_IsoMu24_v;//HLT[HLTIndex[19]]
+//    int _HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
+//    int _HLT_Ele27_WP80_v;//HLT[HLTIndex[17]]
+//    int _HLT_Ele17_Ele8_v;//HLT[HLTIndex[22]]
+    int _HLT;
     int _ipho;
     int _iMCpho;
     int _phoEleVeto;
@@ -117,6 +134,8 @@ class TSelectedEventsTree
     TBranch* _b_iMClep[2];
     TBranch* _b_lepEta[2];
     TBranch* _b_lepPhi[2];
+    TBranch* _b_lepSCEta[2];
+    TBranch* _b_lepSCPhi[2];
     TBranch* _b_lepPt[2];
     TBranch* _b_lepGenPID[2];
     TBranch* _b_lepGenParentage[2];
@@ -126,15 +145,21 @@ class TSelectedEventsTree
     TBranch* _b_lepId2011[2];
     TBranch* _b_lepIsolation2012[2];
     TBranch* _b_lepIsolation2011[2];
-    TBranch* _b_lepTrg[2];
+//    TBranch* _b_lepTrg[2];
     TBranch* _b_lepType[2];
-    TBranch* _b_trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
-    TBranch* _b_trgMatchIsoMu24[2];//1th bit of muTrg[imu]
-    TBranch* _b_trgMatchMu22Mu8[2];//5th (?) bit of muTrg[imu]
+//    TBranch* _b_trgMatchIsoMu24eta2p1[2];//0th bit of muTrg[imu]
+//    TBranch* _b_trgMatchIsoMu24[2];//1th bit of muTrg[imu]
+//    TBranch* _b_trgMatchMu22Mu8[2];//5th (?) bit of muTrg[imu]
+//    TBranch* _b_trgMatchEle27WP80[2];//0th bit of eleTrg[iele]
+//    TBranch* _b_trgMatchEle17Ele8[2];//2nd bit of eleTrg[iele]
+    TBranch* _b_lepTrgMatch[2];
     TBranch* _b_hasMoreLeptons;
-    TBranch* _b_HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
-    TBranch* _b_HLT_IsoMu24_v;//HLT[HLTIndex[19]]
-    TBranch* _b_HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
+//    TBranch* _b_HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
+//    TBranch* _b_HLT_IsoMu24_v;//HLT[HLTIndex[19]]
+//    TBranch* _b_HLT_Mu22_Mu8_v;//HLT[HLTIndex[21]]
+//    TBranch* _b_HLT_Ele27_WP80_v;//HLT[HLTIndex[17]]
+//    TBranch* _b_HLT_Ele17_Ele8_v;//HLT[HLTIndex[22]]
+    TBranch* _b_HLT;
     TBranch* _b_ipho;
     TBranch* _b_iMCpho;
     TBranch* _b_phoEleVeto;

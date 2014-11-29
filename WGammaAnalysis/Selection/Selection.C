@@ -203,6 +203,7 @@ void Selection::LoopOverInputFiles()
 
 void Selection::LoopOverTreeEvents()
 {
+
    if (_eventTree.fChain == 0) return;
    Long64_t nentries = _eventTree.fChain->GetEntries();
    if (_isDebugMode) 
@@ -236,17 +237,18 @@ void Selection::LoopOverTreeEvents()
 
    TPhotonCuts emptyPhoton;
    std::cout<<"nentries="<<nentries<<std::endl;
+
    for (Long64_t ientry=0; ientry<nentries; ientry++){
 
    //loop over events in the tree
      _eventTree.GetEntryNeededBranchesOnly(_channel,_sample,ientry);
+
      if (_channel==_config.MUON) _nLe=_eventTree.treeLeaf.nMu;
      else if (_channel==_config.ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
      else{
        std::cout<<"Error detected in  Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
        return;
      }
-
      _totalWeight = _lumiWeight;
      if (!_eventTree.treeLeaf.isData && !_isNoPuReweight)
        _totalWeight*=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
@@ -261,9 +263,11 @@ void Selection::LoopOverTreeEvents()
      
      if (!selPassed) continue;
        //added blinding prescaling into the beginning
+
      for (int icand=0; icand<nCands; icand++){
 
      if (_sample==_config.DATA && _blind==_config.BLIND_PRESCALE && (_eventTree.treeLeaf.event % _config.GetBlindPrescale() != 0)) continue;
+
      nBlind+=1;
      nBlindW+=_totalWeight;
 
@@ -271,13 +275,16 @@ void Selection::LoopOverTreeEvents()
        nPassed+=1;
        float puWeightVal=1;
        float puTrueVal=1;
+
        if (_sample!=_config.DATA){
          puWeightVal=_puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
          puTrueVal=_eventTree.treeLeaf.puTrue->at(1);
-       }//end of if (_sample!=_config.DATA)            
+       }//end of if (_sample!=_config.DATA)     
+       
        _selEvTree.SetValues(_channel, _sample, _eventTree.treeLeaf,  cands[icand],_inputFileN, 
                _totalWeight, puWeightVal, puTrueVal, _photonCorrector);
        _outTree->Fill();
+
      }//end of loop over icand
 
   } //end of loop over ientry in the tree

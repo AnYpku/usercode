@@ -26,12 +26,6 @@ class FullChain
       bool isNoPuReweight;
       bool isDebugMode;
       int phoWP;
-    
-      //for template method:
-      TString strDDbkgVarFit;
-      TString strDDbkgVarSideband;
-      //end for template method;
- 
 
       bool noPreSelection;
       bool noExtraSelection;

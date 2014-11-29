@@ -59,9 +59,11 @@ void SplitVDecayMC::LoopOverInputTree()
   Long64_t nentries = _TREE.fChain->GetEntries();
   if (_isDebugMode) nentries = 100;
   TConfiguration config;
+  std::cout<<"nentries "<<nentries<<std::endl;
   for (Long64_t entry=0; entry<nentries; entry++) 
     {
       if (entry < 0) break;
+      if ((entry%500000)==0) std::cout<<"entry="<<entry<<std::endl;
 
      _TREE.GetEntryNeededBranchesOnly(config.BOTH_CHANNELS,config.SIGMC,entry);
 
@@ -110,5 +112,9 @@ void SplitVDecayMC::LoopOverInputTree()
   hPU->Write();
   hPUTrue->Write();
 
+  //close output files
+  _fileOutEle->Close();
+  _fileOutMuo->Close();
+  _fileOutTau->Close();
 
 }//SplitVDecayMC::LoopOverInputTree() ends

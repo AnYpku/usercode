@@ -14,6 +14,7 @@
 #include "../Configuration/TConfiguration.h"
 #include "TEventTree.h"
 #include "TMuonCuts.h"
+#include "TElectronCuts.h"
 #include "TPhotonCuts.h"
 #include "TMathTools.h"
 
@@ -51,6 +52,9 @@ public:
 
   bool ZMassWindowCut(TEventTree::InputTreeLeaves& leaf, int ipho, int iele);
 
+  bool TriggerCut(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma);
+  bool TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma, int ilep);
+
 
   //float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut(int year);
@@ -59,13 +63,13 @@ public:
   TCut RangeMetRelatedCut(int year);
   TCut RangePhoEt();
   TCut RangeExtraLeptonPt2011();
-  TCut RangeForMetCut(int year, int channel, int vgamma, int phoWP);
   TCut RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP);
   TCut RangeFullCut(int year, int channel, int vgamma, int phoWP);
 
 private:
   TConfiguration _config;
   TMuonCuts _muon;
+  TElectronCuts _electron;
   TPhotonCuts _photon;
   TMathTools _math;
 

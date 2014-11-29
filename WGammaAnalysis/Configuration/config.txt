@@ -108,7 +108,7 @@ $   DATA   WGAMMA    ELECTRON    1
 # no files yet
 
 $   SIGMC  WGAMMA    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    921     
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_enu.root   553.92  
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_enu.root   553.92  
 
 
 

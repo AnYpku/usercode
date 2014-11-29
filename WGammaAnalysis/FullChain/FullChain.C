@@ -48,13 +48,6 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.noCalcAccAndEff=0;
   anPars.noCalcCrossSection=0;
 
-
-  //for template method:
-  anPars.strDDbkgVarFit="phoSCRChIsoCorr";
-  anPars.strDDbkgVarSideband="phoSigmaIEtaIEta";
-//  anPars.strDDbkgVarFit="phoSigmaIEtaIEta";
-//  anPars.strDDbkgVarSideband="phoSCRChIsoCorr";
-
   if (varKin=="phoEt")
     SetAnalysisKinParameters(anPars);
   else
@@ -293,6 +286,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%_%  DONE Compute Acceptance and Efficiency"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
+
 /*
   if (!anPars.noCalcCrossSection){
     //compute acceptance and efficiency constants

@@ -22,29 +22,28 @@
 //  fch.SetDefaultFullChainParameters(anPars,"pfMET");
 //  fch.SetDefaultFullChainParameters(anPars,"pfMETPhi");
 
-  std::cout<<"varFit="<<anPars.strDDbkgVarFit<<", varSideband="<<anPars.strDDbkgVarSideband<<std::endl;
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
 
-
+  anPars.channel=TConfiguration::ELECTRON;//MUON, ELECTRON
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
-  anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
+  anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
+  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
-  anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+  anPars.sampleMode=Selection::SIGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
 //  anPars.analyzedSamples="WWg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
 
   anPars.year=2012;
-  anPars.noPreSelection=1;
-  anPars.noExtraSelection=1;
+  anPars.noPreSelection=0;
+  anPars.noExtraSelection=0;
   anPars.noDDBkgComputation=1;
   anPars.noPrepareYields=1;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
 
-  anPars.noSystDDBkgSidebandVariation=0;
+  anPars.noSystDDBkgSidebandVariation=1;
 
   fch.RunAnalysis(anPars);
 

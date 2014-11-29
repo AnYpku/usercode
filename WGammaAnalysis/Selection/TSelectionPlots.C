@@ -117,18 +117,18 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   TString strDescr[nCuts];
 
   TCut cut="1";
-
+/*
   if (vgamma==_config.W_GAMMA){
     cutExtra[0]="!hasMoreLeptons";                 strDescr[0]="veto on extra muons";
     cutExtra[1]=muon.RangeTriggerMatch(vgamma,1);  strDescr[1]="muon trigger match";
     cutExtra[2]=muon.RangeId(year,1);              strDescr[2]="muon ID";
-    cutExtra[3]=muon.RangeIsolation(year,1);       strDescr[3]="muon isolation";
+    cutExtra[3]="1";       strDescr[3]="muon isolation";
   }
   else if (vgamma==_config.Z_GAMMA){
     cutExtra[0]="1";                 strDescr[0]="no veto on extra muons";
     cutExtra[1]=muon.RangeTriggerMatch(vgamma,1)&&muon.RangeTriggerMatch(vgamma,2);  strDescr[1]="muon trigger match";
     cutExtra[2]=muon.RangeId(year,1)&&muon.RangeId(year,2);                          strDescr[2]="muon ID";
-    cutExtra[3]=muon.RangeIsolation(year,1)&&muon.RangeIsolation(year,2);            strDescr[3]="muon isolation";
+    cutExtra[3]="1";            strDescr[3]="muon isolation";
   }
 
   if (year==2011) cutExtra[4]="leptonPt>35"; else cutExtra[4]="1";
@@ -152,7 +152,7 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
     SelectionEfficiencyOneStage(nSources, nTot, nPass, eff, cut, cutExtra[ic], strDescr[ic]);
     cut = cut && cutExtra[ic];
   }
-
+*/
 }
 
 void TSelectionPlots::SelectionEfficiencyOneStage(int nSources, int* nTot, int* nPass, float* eff, TCut cut, TCut cutExtra, TString strCutDescription)
