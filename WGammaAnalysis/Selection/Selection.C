@@ -150,16 +150,8 @@ void Selection::LoopOverInputFiles()
        _outTree = new TTree("selectedEvents","selected Events");
        _selEvTree.SetAsOutputTree(_outTree);
 
-       _passed.metFiltersPassed=0;
-       _passed.triggerPassed=0;
-       _passed.goodVertexPassed=0;
-       _passed.leptonPtPassed=0;
-       _passed.leptonEtaPassed=0;
-       _passed.evAfterKinCuts=0;
-       _passed.vgvjOverlapPassed=0;
-       _passed.phoPtPassed=0;
-       _passed.phoEtaPassed=0;
-       _passed.dRPassed=0;
+       TFullCuts fullCuts;
+       fullCuts.SetPassedToZeros(_passed);
 
        for (_inputFileN=0; _inputFileN< inputFileNMax; _inputFileN++){
 
@@ -203,7 +195,6 @@ void Selection::LoopOverInputFiles()
 
 void Selection::LoopOverTreeEvents()
 {
-
    if (_eventTree.fChain == 0) return;
    Long64_t nentries = _eventTree.fChain->GetEntries();
    if (_isDebugMode) 
@@ -229,7 +220,6 @@ void Selection::LoopOverTreeEvents()
        std::cout<<"Error detected in Selection::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
        return;
    }
-
    int nCands=_eventTree.kMaxnPho*nLeptonMax;
    TFullCuts::Candidate cands[nCands];
 
@@ -256,20 +246,18 @@ void Selection::LoopOverTreeEvents()
      nTotal+=1;
 
      TFullCuts fullCuts;
-//     bool selPassed=1;
+     //bool selPassed=1;
      bool selPassed = fullCuts.VeryPreliminaryCut(_eventTree.treeLeaf,_photonCorrector,
-       _channel,_vgamma,_isVJets,nCands,cands,_passed);   
-       
+       _channel,_vgamma,_isVJets,nCands,cands,_passed);        
      
      if (!selPassed) continue;
        //added blinding prescaling into the beginning
 
      for (int icand=0; icand<nCands; icand++){
+       if (_sample==_config.DATA && _blind==_config.BLIND_PRESCALE && (_eventTree.treeLeaf.event % _config.GetBlindPrescale() != 0)) continue;
 
-     if (_sample==_config.DATA && _blind==_config.BLIND_PRESCALE && (_eventTree.treeLeaf.event % _config.GetBlindPrescale() != 0)) continue;
-
-     nBlind+=1;
-     nBlindW+=_totalWeight;
+       nBlind+=1;
+       nBlindW+=_totalWeight;
 
        nPassedW+=_totalWeight;
        nPassed+=1;
@@ -294,15 +282,14 @@ void Selection::LoopOverTreeEvents()
   if (nTotal==0) return;
   std::cout<<", nPassed="<<nPassed<<", eff="<<(float)nPassed/nTotal<<", nBlind="<<nBlind<<std::endl;
   std::cout<<"Weighted:"<<"nTotal="<<nTotalW<<", nPassed="<<nPassedW<<", eff="<<(float)nPassedW/nTotalW<<", nBlind="<<nBlindW<<std::endl;
-  std::cout<<", metFiltersPassed="<<_passed.metFiltersPassed<<", triggerPassed="<<_passed.triggerPassed<<", goodVertexPassed="<<_passed.goodVertexPassed<<", vgvjOverlapPassed="<<_passed.vgvjOverlapPassed<<", phoPt="<<_passed.phoPtPassed<<", phoEta="<<_passed.phoEtaPassed<<std::endl;
-  std::cout<<"leptonPt="<<_passed.leptonPtPassed<<", leptonEta="<<_passed.leptonEtaPassed<<", dR="<<_passed.dRPassed<<std::endl;
-  std::cout<<"nBlind="<<nBlind<<std::endl;
+  TFullCuts fullCut;
+  fullCut.Print(_passed);
 
 }
 
 bool Selection::CheckMaxNumbersInTree()
 {
-   if ((_channel=_config.MUON) 
+   if ((_channel==_config.MUON) 
        && (_eventTree.fChain->GetMaximum("nMu")>_eventTree.kMaxnMu))
      //kMaxnMu - field of TEventTree
      {

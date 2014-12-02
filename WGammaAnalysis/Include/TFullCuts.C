@@ -38,7 +38,12 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   // This function is called from LoopOverEvents.
   // returns 1 if entry is accepted (has at least one candidate)
   // returns 0 otherwise (has no candidates)
-   
+
+   _isEvForCheck=0;
+   if (leaf.event==140199000 || leaf.event==213426400 ||
+       leaf.event==497487460 || leaf.event==20192560) _isEvForCheck=1;
+   if (_isEvForCheck) {std::cout<<std::endl; std::cout<<"event="<<leaf.event<<std::endl;}
+
    _leaf=leaf;
    _cands=cands;
    _passed=passed;
@@ -51,160 +56,199 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
    if (!_leaf.metFilters[5]) return 0; //[5]Bad EE SC
 //   if (!_leaf.metFilters[9]) return 0; //[9]log error too many clusters
 
-   _passed.metFiltersPassed++;
+   _passed.metFilters++;
+  
+   if (_isEvForCheck) std::cout<<"passed met filters"<<std::endl;
 
-   _kinPhoton=new bool[leaf.nPho];
+   _nLep=0;
+   if (channel==_config.MUON) _nLep=leaf.nMu;
+   else if (channel==_config.ELECTRON) _nLep=leaf.nEle;
 
-   int nLe=0;
-   if (channel==_config.MUON) nLe=leaf.nMu;
-   else if (channel==_config.ELECTRON) nLe=leaf.nEle;
-
-   if (!TriggerCut(leaf,channel,vgamma)) { passed=_passed; return 0;}
-   _passed.triggerPassed++;
+   if (!TriggerCut(channel,vgamma)) { passed=_passed; return 0;}
+   _passed.trigger++;
+   if (_isEvForCheck) std::cout<<"passed trigger"<<std::endl;
 
    if ((leaf.IsVtxGood)==-1){ passed=_passed; return 0;}
-   _passed.goodVertexPassed++;
+   _passed.goodVertex++;
+   if (_isEvForCheck) std::cout<<"passed good vertex"<<std::endl;
+
    if (leaf.nPho < 1){ passed=_passed;  return 0;}
-   if (nLe < 1) { passed=_passed;  return 0;}
+   if (_nLep < 1) { passed=_passed;  return 0;}
 
    if (isVJets && IsOverlapVJetsVGamma(channel)) { passed=_passed;  return 0;}
-      _passed.vgvjOverlapPassed++;
+      _passed.vgvjOverlap++;
+   if (_isEvForCheck) std::cout<<"passed overlap removal"<<std::endl;
 
-   _kinLepton1=new bool[nLe];
-   bool kinLepton1Exists=0;
-   _kinLepton2=new bool[nLe];
-   bool kinLepton2Exists=0;
+   int nGoodPhotons=0;
+   int nGoodLeptons=0;
 
-
-  bool kinPhotonExists=0;
   int icand=0;
   //check matching between lepton and photon
   bool hasOverlap=0;
   bool hasEventAfterPass=0;
-  bool ifPassedPt=0;
-  bool ifPassedEta=0;
-  for (int ipho=0; ipho<_leaf.nPho; ipho++){   
 
-    for (int ilep1=0; ilep1<nLe; ilep1++){ 
+  // find good photons
+  nGoodPhotons=FindGoodPhotons(channel,vgamma);
+  if (nGoodPhotons==0) {passed=_passed; return 0;} 
+  _passed.photon++;
+   if (_isEvForCheck) std::cout<<"passed photon"<<std::endl;
 
-      //double phoEtCorr = photonCorrector->GetCorrEtData(_leaf.phoR9->at(ipho), 2012, _leaf.phoEt->at(ipho), _leaf.phoEta->at(ipho));
+  // find good leptons
+  nGoodLeptons=FindGoodLeptons(channel,vgamma);
+  if (nGoodLeptons==0) {passed=_passed; return 0;} 
+  if (vgamma==_config.Z_GAMMA && nGoodLeptons!=2) {passed=_passed; return 0;} 
+  _passed.lepton++;
+   if (_isEvForCheck) std::cout<<"passed lepton"<<std::endl;
 
-      _kinPhoton[ipho]=_photon.PassedKinematics(_leaf.phoEt->at(ipho),_leaf.phoSCEta->at(ipho),ifPassedPt,ifPassedEta);
-      if (ifPassedPt) _passed.phoPtPassed++; else continue;
-      if (ifPassedEta) _passed.phoEtaPassed++; else continue;
-   
-      if (channel==_config.MUON){
-        _kinLepton1[ilep1] = _muon.PassedKinematics(_leaf.muPt->at(ilep1),_leaf.muEta->at(ilep1),ifPassedPt,ifPassedEta);
-        if (ifPassedPt) _passed.leptonPtPassed++; else continue;
-        if (ifPassedEta) _passed.leptonEtaPassed++; else continue;
-        if (!_muon.MuId(2012,leaf,ilep1)) continue;
-      }
-      else if (channel==_config.ELECTRON){
-        _kinLepton1[ilep1] = _electron.PassedKinematics(_leaf.elePt->at(ilep1),_leaf.eleSCEta->at(ilep1));
-        if (!_kinLepton1[ilep1]) continue;
-        if (!_electron.EleID2012(leaf,ilep1,_electron.ELE_MEDIUM)) continue;
-      }
 
-      if (!TriggerMatch(leaf,channel,vgamma,ilep1)) continue;
-
-      float dR1;
-      if (channel==_config.MUON){
-        dR1=_math.DeltaR(_leaf.muPhi->at(ilep1),_leaf.muEta->at(ilep1),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-      }
-      else if (channel==_config.ELECTRON){
-        dR1=_math.DeltaR(_leaf.elePhi->at(ilep1),_leaf.eleEta->at(ilep1),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-      }
-      if (vgamma==_config.W_GAMMA){
-        if (channel==_config.ELECTRON){
-          if (_electron.HasMoreElectrons(leaf,ilep1)) continue;
-          if (!ZMassWindowCut(leaf,ipho,ilep1)) continue;
-          if (_photon.HasMatchingGSFelectron(leaf,ipho)) continue;
+  // second lepton veto for W_GAMMA
+  if (vgamma==_config.W_GAMMA){
+    if (_isEvForCheck)
+      std::cout<<"passedLepton = "<<std::endl;
+    for (int ilep=0; ilep<_nLep; ilep++){
+      if (_isEvForCheck)
+        std::cout<<"ilep="<<ilep<<", passedLepton="<<_passedLepton[ilep]<<std::endl;
+      if (_passedLepton[ilep] && channel==_config.MUON){
+        if (_isEvForCheck){
+          std::cout<<"Check second lepton veto:"<<std::endl;
+          std::cout<<"imu="<<ilep;
+          for (int ilep1=0; ilep1<_nLep; ilep1++)
+            std::cout<<", ilep1="<<ilep1<<", muPt="<<_leaf.muPt->at(ilep1)<<", muEta="<<_leaf.muEta->at(ilep1);
+          std::cout<<", hasMoreMuons="<<_muon.HasMoreMuons(_leaf,ilep)<<std::endl;
         }
-        else if (channel==_config.MUON){
-          if (_muon.HasMoreMuons(leaf,ilep1)) continue;
-        }
-        CheckDRandProceed(_config.W_GAMMA, isVJets, icand,
-                    hasEventAfterPass, hasOverlap,
-                    dR1, -1, ipho, ilep1, -1);
-        continue;
-      }//end of if (vgamma==_config.W_GAMMA) 
-      // for vgamma==_config.Z_GAMMA, loop over the second lepton
-      for (int ilep2=0; ilep2<nLe; ilep2++){  
-        if (ilep1==ilep2) continue;      
-          TLorentzVector vlep1, vlep2;
-          if (channel==_config.MUON){
-            _kinLepton2[ilep2] = _muon.PassedKinematics(_leaf.muPt->at(ilep2),_leaf.muEta->at(ilep2),ifPassedPt,ifPassedEta);
-            if (!_kinLepton2[ilep2]) continue;
-            if (!_muon.MuId(2012,leaf,ilep2)) continue;
-            vlep1.SetPtEtaPhiM(_leaf.muPt->at(ilep1),_leaf.muEta->at(ilep1),_leaf.muPhi->at(ilep1),0);
-            vlep2.SetPtEtaPhiM(_leaf.muPt->at(ilep2),_leaf.muEta->at(ilep2),_leaf.muPhi->at(ilep2),0);
-          }
-          else if (channel==_config.ELECTRON){
-            _kinLepton2[ilep2] = _electron.PassedKinematics(_leaf.elePt->at(ilep2),_leaf.eleSCEta->at(ilep2));
-            if (!_kinLepton2[ilep2]) continue;
-            if (!_electron.EleID2012(leaf,ilep2,_electron.ELE_MEDIUM)) continue;
-            vlep1.SetPtEtaPhiM(_leaf.elePt->at(ilep1),_leaf.eleEta->at(ilep1),_leaf.elePhi->at(ilep1),0);
-            vlep2.SetPtEtaPhiM(_leaf.elePt->at(ilep2),_leaf.eleEta->at(ilep2),_leaf.elePhi->at(ilep2),0);
-          }
+        if (_muon.HasMoreMuons(_leaf,ilep)) {passed=_passed; return 0;}
+      }
+      if (_passedLepton[ilep] && channel==_config.ELECTRON)
+        if (_electron.HasMoreElectrons(_leaf,ilep)) {passed=_passed; return 0;}
+    }
+  }//end of if (vgamma==W_GAMMA)
+  _passed.secondLeptonVeto++;
+   if (_isEvForCheck) std::cout<<"passed second lepton veto"<<std::endl;
 
-          if (!TriggerMatch(leaf,channel,vgamma,ilep2)) continue;
-
-          if((vlep1 + vlep2).M() < 50) continue;
-
-          float dR2;
-          if (channel==_config.MUON){
-            dR2=_math.DeltaR(_leaf.muPhi->at(ilep2),_leaf.muEta->at(ilep2),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-          }
-          else if (channel==_config.ELECTRON){
-            dR2=_math.DeltaR(_leaf.elePhi->at(ilep2),_leaf.eleEta->at(ilep2),_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-          }
-          CheckDRandProceed(_config.Z_GAMMA, isVJets, icand,
-                    hasEventAfterPass, hasOverlap,
-                    dR1, dR2, ipho, ilep1, ilep2);
-      } //end of loop over ilep2
-
-    } //end of loop over ilep1
-  } //end of loop over ipho 
+  // check lep-lep invariant mass for Z_GAMMA case
+  if (vgamma==_config.Z_GAMMA) 
+    if (!MLeptonLeptonCut(channel)) {passed=_passed; return 0;}
+  _passed.leptonInvMass++;
+   if (_isEvForCheck) std::cout<<"passed lepton inv mass"<<std::endl;
+ 
+  // check pho-lep cuts (dR and Zmass window for W_GAMMA ELECTRON)
+  // and form candidate if passed
+  bool pass = CheckDRandProceed(channel, vgamma, isVJets, icand);
+  if (!pass) {passed=_passed; return 0;}
+  if (_isEvForCheck) std::cout<<"passed dR"<<std::endl;
 
   nCands=icand;
   passed=_passed;
-  return (icand);
-//  return 1;
+  if (nCands==0) return 0;
+  if (_isEvForCheck) std::cout<<"I passed; nCands="<<nCands<<std::endl;
+  return 1;
 }//end of TFullCuts::VeryPreliminaryCut
 
-bool TFullCuts::ZMassWindowCut(TEventTree::InputTreeLeaves& leaf, int ipho, int iele)
+int TFullCuts::FindGoodPhotons(int channel, int vgamma)
+{
+  int nGoodPhotons=0;
+  bool ifPassedPt=0;
+  bool ifPassedEta=0;
+  for (int ipho=0; ipho<_leaf.nPho; ipho++){ 
+      _passedPhoton[ipho]=0;
+      _photon.PassedKinematics(_leaf.phoEt->at(ipho),_leaf.phoSCEta->at(ipho),ifPassedPt,ifPassedEta);
+      if (ifPassedPt) _passed.phoPt++; else continue;
+      if (ifPassedEta) _passed.phoEta++; else continue;
+      if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON){
+        if (_photon.HasMatchingGSFelectron(_leaf,ipho)) continue;
+        if (_leaf.phohasPixelSeed->at(ipho)) continue;
+      }
+      _passedPhoton[ipho]=1;   
+      nGoodPhotons++;
+  } //end of loop over ipho
+  return nGoodPhotons;
+}// end of FindGoodPhotons
+
+int TFullCuts::FindGoodLeptons(int channel, int vgamma)
+{
+  int nGoodLeptons=0;
+  bool ifPassedPt=0;
+  bool ifPassedEta=0;
+  for (int ilep=0; ilep<_nLep; ilep++){  
+    _passedLepton[ilep]=0;
+    if (channel==_config.MUON){
+      bool passKin = _muon.PassedKinematics(_leaf.muPt->at(ilep),_leaf.muEta->at(ilep),ifPassedPt,ifPassedEta);
+      if (ifPassedPt) _passed.leptonPt++; else continue;
+      if (ifPassedEta) _passed.leptonEta++; else continue;
+      if (!passKin) continue;
+      if (!_muon.MuId(2012,_leaf,ilep)) continue;
+    }
+    else if (channel==_config.ELECTRON){
+      bool passKin = _electron.PassedKinematics(_leaf.elePt->at(ilep),_leaf.eleSCEta->at(ilep));
+      if (!passKin) continue;
+      if (!_electron.EleID2012(_leaf,ilep,_electron.ELE_MEDIUM)) continue;
+    }
+    _passed.leptonId++;
+    if (!TriggerMatch(channel,vgamma,ilep)) continue;
+    _passed.leptonTriggerMatch++;
+    _passedLepton[ilep]=1;
+    nGoodLeptons++;
+  }//end of loop over ilep1
+  if (_isEvForCheck)
+          std::cout<<"nGoodLeptons="<<nGoodLeptons<<std::endl;
+  return nGoodLeptons; 
+}// end of FindGoodLeptons
+
+bool TFullCuts::MLeptonLeptonCut(int channel)
+{
+ for (int ilep1=0; ilep1<_nLep; ilep1++){  
+   for (int ilep2=0; ilep2<_nLep; ilep2++){  
+     if (ilep1==ilep2) continue; 
+     if (!_passedLepton[ilep1]) continue; 
+     if (!_passedLepton[ilep2]) continue; 
+     TLorentzVector vlep1, vlep2;
+     if (channel==_config.MUON){
+       vlep1.SetPtEtaPhiM(_leaf.muPt->at(ilep1),_leaf.muEta->at(ilep1),_leaf.muPhi->at(ilep1),0);
+       vlep2.SetPtEtaPhiM(_leaf.muPt->at(ilep2),_leaf.muEta->at(ilep2),_leaf.muPhi->at(ilep2),0);
+     }
+     else if (channel==_config.ELECTRON){
+       vlep1.SetPtEtaPhiM(_leaf.elePt->at(ilep1),_leaf.eleEta->at(ilep1),_leaf.elePhi->at(ilep1),0);
+       vlep2.SetPtEtaPhiM(_leaf.elePt->at(ilep2),_leaf.eleEta->at(ilep2),_leaf.elePhi->at(ilep2),0);
+     }
+     if((vlep1 + vlep2).M() > 50) return 1;
+   }// end of loop over ilep2
+ }// end of loop over ilep1
+ return 0;
+}// end of MLeptonLeptonCut()
+
+bool TFullCuts::ZMassWindowCut(int ipho, int iele)
 {
   //only for W_GAMMA, ELECTRON channel
   TLorentzVector vele, vpho;
-  vele.SetPtEtaPhiM(leaf.elePt->at(iele),leaf.eleEta->at(iele),leaf.elePhi->at(iele),0);
-  vpho.SetPtEtaPhiM(leaf.phoEt->at(ipho),leaf.phoEta->at(ipho),leaf.phoPhi->at(ipho),0);
+  vele.SetPtEtaPhiM(_leaf.elePt->at(iele),_leaf.eleEta->at(iele),_leaf.elePhi->at(iele),0);
+  vpho.SetPtEtaPhiM(_leaf.phoEt->at(ipho),_leaf.phoEta->at(ipho),_leaf.phoPhi->at(ipho),0);
   float M=(vele + vpho).M(); 
   if (M>_ZmassLeft && M<_ZmassRight) return 0;
   return 1;
 }// end of ZMassWindowCut
 
-bool TFullCuts::TriggerCut(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma)
+bool TFullCuts::TriggerCut(int channel, int vgamma)
 {
    if (channel==_config.MUON && vgamma==_config.W_GAMMA){
-     if (leaf.HLTIndex[18]>=0 && leaf.HLT[leaf.HLTIndex[18]]) return 1; 
+     if (_leaf.HLTIndex[18]>=0 && _leaf.HLT[_leaf.HLTIndex[18]]) return 1; 
      //_HLT_IsoMu24_eta2p1_
      else  return 0;
    }// MUON, W_GAMMA
 
    if (channel==_config.ELECTRON && vgamma==_config.W_GAMMA){
-     if (leaf.HLTIndex[17]>=0 && leaf.HLT[leaf.HLTIndex[17]]) return 1;
+     if (_leaf.HLTIndex[17]>=0 && _leaf.HLT[_leaf.HLTIndex[17]]) return 1;
      //_HLT_Ele27_WP80_v
      else return 0;
    }// ELECTRON, W_GAMMA
 
    if (channel==_config.MUON && vgamma==_config.Z_GAMMA){
-     if (leaf.HLTIndex[14]>=0 && leaf.HLT[leaf.HLTIndex[14]]) return 1;
+     if (_leaf.HLTIndex[14]>=0 && _leaf.HLT[_leaf.HLTIndex[14]]) return 1;
      //_HLT_Mu17_Mu8_v
      else return 0;
    }// MUON, Z_GAMMA
 
    if (channel==_config.ELECTRON && vgamma==_config.Z_GAMMA){
-     if (leaf.HLTIndex[9]>=0 && leaf.HLT[leaf.HLTIndex[9]]) return 1;
+     if (_leaf.HLTIndex[9]>=0 && _leaf.HLT[_leaf.HLTIndex[9]]) return 1;
      //_HLT_Ele17_Ele8_v, many other conditions
      else return 0;
    }// ELECTRON, Z_GAMMA
@@ -212,10 +256,10 @@ bool TFullCuts::TriggerCut(TEventTree::InputTreeLeaves& leaf, int channel, int v
    return 0; 
 }
 
-bool TFullCuts::TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma, int ilep)
+bool TFullCuts::TriggerMatch(int channel, int vgamma, int ilep)
 {
    if (channel==_config.MUON && vgamma==_config.W_GAMMA){
-     if (leaf.HLTIndex[18]>=0 && leaf.HLT[leaf.HLTIndex[18]] && (leaf.muTrg->at(ilep)%2) ) 
+     if (_leaf.HLTIndex[18]>=0 && _leaf.HLT[_leaf.HLTIndex[18]] && (_leaf.muTrg->at(ilep)%2) ) 
        return 1; 
      //_HLT_IsoMu24_eta2p1_
      //"muonTriggerMatchHLTIsoMu24eta2p1"
@@ -223,7 +267,7 @@ bool TFullCuts::TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int
    }// MUON, W_GAMMA
 
    if (channel==_config.ELECTRON && vgamma==_config.W_GAMMA){
-     if (leaf.HLTIndex[17]>=0 && leaf.HLT[leaf.HLTIndex[17]] && (leaf.eleTrg->at(ilep)%2) ) 
+     if (_leaf.HLTIndex[17]>=0 && _leaf.HLT[_leaf.HLTIndex[17]] && (_leaf.eleTrg->at(ilep)%2) ) 
        return 1;
      //_HLT_Ele27_WP80_v
      //"electronTriggerMatchHLTEle27WP80"
@@ -231,7 +275,7 @@ bool TFullCuts::TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int
    }// ELECTRON, W_GAMMA
 
    if (channel==_config.MUON && vgamma==_config.Z_GAMMA){
-     if (leaf.HLTIndex[14]>=0 && leaf.HLT[leaf.HLTIndex[14]] && ((leaf.muTrg->at(ilep)/4)%2) ) 
+     if (_leaf.HLTIndex[14]>=0 && _leaf.HLT[_leaf.HLTIndex[14]] && ((_leaf.muTrg->at(ilep)/4)%2) ) 
        return 1;
      //_HLT_Mu17_Mu8_v
      //"muonTriggerMatchHLTMu17Mu8"
@@ -239,7 +283,7 @@ bool TFullCuts::TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int
    }// MUON, Z_GAMMA
 
    if (channel==_config.ELECTRON && vgamma==_config.Z_GAMMA){
-     if (leaf.HLTIndex[9]>=0 && leaf.HLT[leaf.HLTIndex[9]]  && ((leaf.eleTrg->at(ilep)/16)%2) ) 
+     if (_leaf.HLTIndex[9]>=0 && _leaf.HLT[_leaf.HLTIndex[9]]  && ((_leaf.eleTrg->at(ilep)/16)%2) ) 
        return 1;
      //"HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v"
      //"electronTriggerMatchEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVLEle8CaloIdTCaloIsoVLTrkIdVLTrkIsoVL"
@@ -249,30 +293,48 @@ bool TFullCuts::TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int
    return 0; 
 }
 
-void TFullCuts::CheckDRandProceed(int vgamma, bool isVJets, int& icand,
-                    bool& hasEventAfterPass, bool& hasOverlap,
-                    float dR1, float dR2, int ipho, int ilep1, int ilep2)
+bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& icand)
 {
 
-  bool passCond;
-  if (vgamma==_config.W_GAMMA) passCond=_kinPhoton[ipho] && _kinLepton1[ilep1] && (dR1>_lePhoDeltaRCut);
-  if (vgamma==_config.Z_GAMMA) passCond=_kinPhoton[ipho] && _kinLepton1[ilep1] && (dR1>_lePhoDeltaRCut) && _kinLepton2[ilep2] && (dR2>_lePhoDeltaRCut);
-  if (!passCond) return;
-  //all the rest - if (passCond)
-  _passed.dRPassed++;
-  if (!hasEventAfterPass) _passed.evAfterKinCuts++;
-  hasEventAfterPass=1; 
-  _cands[icand].ipho=ipho; 
-  if (vgamma==_config.W_GAMMA || dR1<dR2){
-    _cands[icand].ilep1=ilep1; _cands[icand].ilep2=ilep2;
-    _cands[icand].dRlep1pho=dR1; _cands[icand].dRlep2pho=dR2;
-  }
-  else{
-    _cands[icand].ilep1=ilep2; _cands[icand].ilep2=ilep1;
-    _cands[icand].dRlep1pho=dR2; _cands[icand].dRlep2pho=dR1;
-  }
-  icand++;
-}
+  for (int ipho=0; ipho<_leaf.nPho; ipho++){
+    float dR1=-1, dR2=-1;
+    int ilep1=-1, ilep2=-1;
+    for (int ilep=0; ilep<_nLep; ilep++){
+      if (!_passedPhoton[ipho]) continue;
+      if (!_passedLepton[ilep]) continue;
+      if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON)
+        if (!ZMassWindowCut(ipho,ilep)) return 0;
+      float lepPhi, lepEta;
+      if (channel==_config.MUON)
+        { lepPhi=_leaf.muPhi->at(ilep); lepEta=_leaf.muEta->at(ilep); }
+      if (channel==_config.ELECTRON)
+        { lepPhi=_leaf.elePhi->at(ilep); lepEta=_leaf.eleEta->at(ilep); }
+      if (dR1<0){
+        dR1=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
+        if (dR1<_lePhoDeltaRCut) return 0;
+        ilep1=ilep;
+      }
+      else{ // if Z_GAMMA and first dR already found
+        dR2=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
+        if (dR2<_lePhoDeltaRCut) return 0;
+        ilep2=ilep;
+      }
+      if (_isEvForCheck){std::cout<<"ipho="<<ipho<<", ilep1="<<ilep1<<", ilep2="<<ilep2<<", dR1="<<dR1<<", dR2="<<dR2<<std::endl;} 
+      _passed.dR++;
+      _cands[icand].ipho=ipho; 
+      if (vgamma==_config.W_GAMMA || dR1<dR2){
+        _cands[icand].ilep1=ilep1; _cands[icand].ilep2=ilep2;
+        _cands[icand].dRlep1pho=dR1; _cands[icand].dRlep2pho=dR2;
+      }
+      else{
+        _cands[icand].ilep1=ilep2; _cands[icand].ilep2=ilep1;
+        _cands[icand].dRlep1pho=dR2; _cands[icand].dRlep2pho=dR1;
+      }
+      icand++;
+    }//end of loop over ilep
+  }//end of loop over ipho
+  return 1;
+}// end of CheckDRandProceed
 
 bool TFullCuts::IsOverlapVJetsVGamma(int channel)
 {
@@ -373,3 +435,47 @@ TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP)
     cut = cut && RangeExtraLeptonPt2011();
   return cut;
 }
+
+void TFullCuts::SetPassedToZeros(PassedLevels& p)
+{
+    p.metFilters=0;
+    p.trigger=0;
+    p.goodVertex=0;
+    p.vgvjOverlap=0;
+    p.phoPt=0;
+    p.phoEta=0;
+    p.photon=0;
+    p.leptonPt=0;
+    p.leptonEta=0;
+    p.leptonId=0;
+    p.leptonTriggerMatch=0;
+    p.lepton=0;
+    p.secondLeptonVeto=0;
+    p.leptonInvMass=0;
+    p.dR=0;
+}// end of SetPassedToZeros
+
+void TFullCuts::Print(PassedLevels& p)
+{
+    std::cout<<std::endl;
+    std::cout<<"metFilters="<<p.metFilters<<"; ";
+    std::cout<<"trigger="<<p.trigger<<"; ";
+    std::cout<<"goodVertex="<<p.goodVertex<<"; ";
+    std::cout<<"vgvjOverlap="<<p.vgvjOverlap<<std::endl;
+
+    std::cout<<"phoPt="<<p.phoPt<<"; ";
+    std::cout<<"phoEta="<<p.phoEta<<"; ";
+    std::cout<<"photon="<<p.photon<<std::endl;
+
+    std::cout<<"leptonPt="<<p.leptonPt<<"; ";
+    std::cout<<"leptonEta="<<p.leptonEta<<"; ";
+    std::cout<<"leptonId="<<p.leptonId<<"; ";
+    std::cout<<"leptonTriggerMatch="<<p.leptonTriggerMatch<<std::endl;
+
+    std::cout<<"lepton="<<p.lepton<<"; ";
+    std::cout<<"secondLeptonVeto="<<p.secondLeptonVeto<<"; ";
+    std::cout<<"leptonInvMass="<<p.leptonInvMass<<std::endl;
+
+    std::cout<<"dR="<<p.dR<<std::endl;
+    std::cout<<std::endl;
+}// end of SetPassedToZeros

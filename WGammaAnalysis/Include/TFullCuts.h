@@ -23,18 +23,21 @@ public:
   TFullCuts();
   virtual ~TFullCuts();
   struct PassedLevels{
-    long metFiltersPassed;
-    long triggerPassed;
-    long goodVertexPassed;
-    long phoPtPassed;
-    long phoEtaPassed;
-    long vgvjOverlapPassed;
-    long leptonPtPassed;
-    long leptonEtaPassed;
-    long dRPassed;
-    long evAfterKinCuts;
-//    long phoBarrelPassed;
-//    long phoEndcapPassed;
+    long metFilters;
+    long trigger;
+    long goodVertex;
+    long vgvjOverlap;
+    long phoPt;
+    long phoEta;
+    long photon;
+    long leptonPt;
+    long leptonEta;
+    long leptonId;
+    long leptonTriggerMatch;
+    long lepton;
+    long secondLeptonVeto;
+    long leptonInvMass;
+    long dR;
   };
   struct Candidate{
     int ipho;
@@ -50,11 +53,8 @@ public:
                     int& nCands, Candidate* cands,
                     PassedLevels& passed);
 
-  bool ZMassWindowCut(TEventTree::InputTreeLeaves& leaf, int ipho, int iele);
-
-  bool TriggerCut(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma);
-  bool TriggerMatch(TEventTree::InputTreeLeaves& leaf, int channel, int vgamma, int ilep);
-
+   void SetPassedToZeros(PassedLevels& p);
+   void Print(PassedLevels& p);
 
   //float DeltaR(float phi1, float eta1, float phi2, float eta2); 
   float GetWMtCut(int year);
@@ -67,6 +67,15 @@ public:
   TCut RangeFullCut(int year, int channel, int vgamma, int phoWP);
 
 private:
+
+  int FindGoodPhotons(int channel, int vgamma);
+  int FindGoodLeptons(int channel, int vgamma);
+  bool MLeptonLeptonCut(int channel);
+  bool ZMassWindowCut( int ipho, int iele);
+
+  bool TriggerCut(int channel, int vgamma);
+  bool TriggerMatch(int channel, int vgamma, int ilep);
+
   TConfiguration _config;
   TMuonCuts _muon;
   TElectronCuts _electron;
@@ -76,14 +85,14 @@ private:
   TEventTree::InputTreeLeaves _leaf;
   PassedLevels _passed;
   Candidate* _cands;
-  bool* _kinPhoton;
-  bool* _kinLepton1;
-  bool* _kinLepton2;
-  void CheckDRandProceed(int vgamma, bool isVJets, int& icand,
-                    bool& hasEventAfterPass, bool& hasOverlap,
-                    float dR1, float dR2, int ipho, int ilep1, int ilep2);
+  bool _passedPhoton[TEventTree::kMaxnPho];
+  bool _passedLepton[TEventTree::kMaxnMu+TEventTree::kMaxnEle];
+  bool CheckDRandProceed(int channel, int vgamma, bool isVJets, int& icand);
   bool IsOverlapVJetsVGamma(int channel);
   
+  int _nLep;
+
+  bool _isEvForCheck;
 
   const static float _WMtCut2012 = 50.;//for 8 TeV
   const static float _WMtCut2011 = 70.;//from 7 TeV
