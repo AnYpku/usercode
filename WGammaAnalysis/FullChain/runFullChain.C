@@ -25,7 +25,7 @@
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
 
-  anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
+  anPars.channel=TConfiguration::ELECTRON;//MUON, ELECTRON
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
   anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA

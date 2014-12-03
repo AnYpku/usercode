@@ -40,8 +40,7 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   // returns 0 otherwise (has no candidates)
 
    _isEvForCheck=0;
-   if (leaf.event==140199000 || leaf.event==213426400 ||
-       leaf.event==497487460 || leaf.event==20192560) _isEvForCheck=1;
+   if (leaf.event==213426400 || leaf.event==20192560) _isEvForCheck=1;
    if (_isEvForCheck) {std::cout<<std::endl; std::cout<<"event="<<leaf.event<<std::endl;}
 
    _leaf=leaf;
@@ -91,14 +90,20 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   nGoodPhotons=FindGoodPhotons(channel,vgamma);
   if (nGoodPhotons==0) {passed=_passed; return 0;} 
   _passed.photon++;
-   if (_isEvForCheck) std::cout<<"passed photon"<<std::endl;
+   if (_isEvForCheck) {
+     std::cout<<"passed photon; nGoodPhotons="<<nGoodPhotons<<std::endl;
+     std::cout<<"ipho good: ";
+     for (int ipho=0; ipho<_leaf.nPho; ipho++) 
+       if (_passedPhoton[ipho]) std::cout<<ipho<<", ";
+     std::cout<<std::endl;
+   }//end of (_isEvForCheck)
 
   // find good leptons
   nGoodLeptons=FindGoodLeptons(channel,vgamma);
   if (nGoodLeptons==0) {passed=_passed; return 0;} 
   if (vgamma==_config.Z_GAMMA && nGoodLeptons!=2) {passed=_passed; return 0;} 
   _passed.lepton++;
-   if (_isEvForCheck) std::cout<<"passed lepton"<<std::endl;
+   if (_isEvForCheck) {std::cout<<"passed lepton; nGoodLeptons="<<nGoodLeptons<<std::endl;}
 
 
   // second lepton veto for W_GAMMA
@@ -189,8 +194,6 @@ int TFullCuts::FindGoodLeptons(int channel, int vgamma)
     _passedLepton[ilep]=1;
     nGoodLeptons++;
   }//end of loop over ilep1
-  if (_isEvForCheck)
-          std::cout<<"nGoodLeptons="<<nGoodLeptons<<std::endl;
   return nGoodLeptons; 
 }// end of FindGoodLeptons
 
@@ -303,37 +306,46 @@ bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& ic
       if (!_passedPhoton[ipho]) continue;
       if (!_passedLepton[ilep]) continue;
       if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON)
-        if (!ZMassWindowCut(ipho,ilep)) return 0;
+        {  if (!ZMassWindowCut(ipho,ilep)) break; }
+      _passed.zMassWindow++;
+      if (_isEvForCheck)
+        std::cout<<"passed zMassWindow"<<std::endl;
       float lepPhi, lepEta;
       if (channel==_config.MUON)
         { lepPhi=_leaf.muPhi->at(ilep); lepEta=_leaf.muEta->at(ilep); }
       if (channel==_config.ELECTRON)
         { lepPhi=_leaf.elePhi->at(ilep); lepEta=_leaf.eleEta->at(ilep); }
-      if (dR1<0){
+
+      if (ilep1==-1){
         dR1=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-        if (dR1<_lePhoDeltaRCut) return 0;
+        if (dR1<_lePhoDeltaRCut) break;
         ilep1=ilep;
       }
-      else{ // if Z_GAMMA and first dR already found
+      else if (vgamma==_config.Z_GAMMA){ // if Z_GAMMA and first dR already found
         dR2=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-        if (dR2<_lePhoDeltaRCut) return 0;
+        if (dR2<_lePhoDeltaRCut) break;
         ilep2=ilep;
       }
-      if (_isEvForCheck){std::cout<<"ipho="<<ipho<<", ilep1="<<ilep1<<", ilep2="<<ilep2<<", dR1="<<dR1<<", dR2="<<dR2<<std::endl;} 
       _passed.dR++;
-      _cands[icand].ipho=ipho; 
-      if (vgamma==_config.W_GAMMA || dR1<dR2){
-        _cands[icand].ilep1=ilep1; _cands[icand].ilep2=ilep2;
-        _cands[icand].dRlep1pho=dR1; _cands[icand].dRlep2pho=dR2;
-      }
-      else{
-        _cands[icand].ilep1=ilep2; _cands[icand].ilep2=ilep1;
-        _cands[icand].dRlep1pho=dR2; _cands[icand].dRlep2pho=dR1;
-      }
-      icand++;
+
     }//end of loop over ilep
+
+    if (ilep1==-1) continue;
+    if (vgamma==_config.Z_GAMMA && ilep2==-1) continue;
+
+    _cands[icand].ipho=ipho; 
+    if (vgamma==_config.W_GAMMA || dR1<dR2){
+      _cands[icand].ilep1=ilep1; _cands[icand].ilep2=ilep2;
+      _cands[icand].dRlep1pho=dR1; _cands[icand].dRlep2pho=dR2;
+    }
+    else{
+      _cands[icand].ilep1=ilep2; _cands[icand].ilep2=ilep1;
+      _cands[icand].dRlep1pho=dR2; _cands[icand].dRlep2pho=dR1;
+    }
+
+    icand++;
   }//end of loop over ipho
-  return 1;
+  return icand;
 }// end of CheckDRandProceed
 
 bool TFullCuts::IsOverlapVJetsVGamma(int channel)
@@ -402,7 +414,7 @@ TCut TFullCuts::RangeExtraLeptonPt2011()
   TString cutStr="lepton1Pt>35";
   TCut cut(cutStr);
   return cut;
-}
+}// end of RangeExtraLeptonPt2011
 
 TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP){
   TCut cutPhoton=_photon.RangePhoton(year, phoWP, 0, 0);
@@ -411,14 +423,14 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
   TCut cut = cutPhoton; 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year);
-    if (channel==_config.ELECTRON)
-     cut = cut && _photon.RangePhoHasPixelSeed();
+//    if (channel==_config.ELECTRON)
+//     cut = cut && _photon.RangePhoHasPixelSeed();
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
   return cut;
 
-}
+}// end of RangeForTemplateMethodCut
 
 TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP)
 {
@@ -428,13 +440,13 @@ TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP)
   TCut cut = cutPhoton; 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year);
-    if (channel==_config.ELECTRON)
-     cut = cut && _photon.RangePhoHasPixelSeed();
+//    if (channel==_config.ELECTRON)
+//     cut = cut && _photon.RangePhoHasPixelSeed();
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
   return cut;
-}
+}//end of RangeFullCut
 
 void TFullCuts::SetPassedToZeros(PassedLevels& p)
 {
@@ -452,6 +464,7 @@ void TFullCuts::SetPassedToZeros(PassedLevels& p)
     p.lepton=0;
     p.secondLeptonVeto=0;
     p.leptonInvMass=0;
+    p.zMassWindow=0;
     p.dR=0;
 }// end of SetPassedToZeros
 
@@ -476,6 +489,7 @@ void TFullCuts::Print(PassedLevels& p)
     std::cout<<"secondLeptonVeto="<<p.secondLeptonVeto<<"; ";
     std::cout<<"leptonInvMass="<<p.leptonInvMass<<std::endl;
 
+    std::cout<<"zMassWindow="<<p.zMassWindow<<", ";
     std::cout<<"dR="<<p.dR<<std::endl;
     std::cout<<std::endl;
 }// end of SetPassedToZeros

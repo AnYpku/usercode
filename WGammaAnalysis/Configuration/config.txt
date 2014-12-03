@@ -36,9 +36,9 @@
 
 $ DATA  WGAMMA   MUON    1    lumiTotal 19593.0        
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012a_Jan22rereco_MuPhoSkim.root
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012b_Jan22rereco_MuPhoSkim.root
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012c_Jan22rereco_MuPhoSkim.root
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012d_Jan22rereco_MuPhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012b_Jan22rereco_MuPhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012c_Jan22rereco_MuPhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_muon_2012d_Jan22rereco_MuPhoSkim.root
 
 $ SIGMC  WGAMMA    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634     
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wg_munu_MuPhoSkim.root   553.92  

@@ -466,18 +466,18 @@ void TSelectedEventsTree::SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, 
   //photon isolation corrections 2012
 //  std::cout<<"event="<<_event<<", ipho="<<cand.ipho<<std::endl;
 
-    SetThreeIsolations(leaf, cand, _phoPFChIsoCorr, _phoPFNeuIsoCorr, _phoPFPhoIsoCorr, leaf.phoPFChIso->at(cand.ipho), leaf.phoPFNeuIso->at(cand.ipho), leaf.phoPFNeuIso->at(cand.ipho));
+    SetThreeIsolations(leaf, cand, _phoPFChIsoCorr, _phoPFNeuIsoCorr, _phoPFPhoIsoCorr, leaf.phoPFChIso->at(cand.ipho), leaf.phoPFNeuIso->at(cand.ipho), leaf.phoPFPhoIso->at(cand.ipho));
 
-    SetThreeIsolations(leaf, cand, _phoSCRChIsoCorr, _phoSCRNeuIsoCorr, _phoSCRPhoIsoCorr, leaf.phoSCRChIso->at(cand.ipho), leaf.phoSCRNeuIso->at(cand.ipho), leaf.phoSCRNeuIso->at(cand.ipho));
+    SetThreeIsolations(leaf, cand, _phoSCRChIsoCorr, _phoSCRNeuIsoCorr, _phoSCRPhoIsoCorr, leaf.phoSCRChIso->at(cand.ipho), leaf.phoSCRNeuIso->at(cand.ipho), leaf.phoSCRPhoIso->at(cand.ipho));
 
-    SetThreeIsolations(leaf, cand, _phoSCRChIso04Corr, _phoSCRNeuIso04Corr, _phoSCRPhoIso04Corr, leaf.phoSCRChIso04->at(cand.ipho), leaf.phoSCRNeuIso04->at(cand.ipho), leaf.phoSCRNeuIso04->at(cand.ipho));
+    SetThreeIsolations(leaf, cand, _phoSCRChIso04Corr, _phoSCRNeuIso04Corr, _phoSCRPhoIso04Corr, leaf.phoSCRChIso04->at(cand.ipho), leaf.phoSCRNeuIso04->at(cand.ipho), leaf.phoSCRPhoIso04->at(cand.ipho));
 
 
   if (sample==_config.DATA) {
 
-    SetThreeIsolations(leaf, cand, _phoRandConeChIsoCorr, _phoRandConeNeuIsoCorr, _phoRandConePhoIsoCorr, leaf.phoRandConeChIso->at(cand.ipho), leaf.phoRandConeNeuIso->at(cand.ipho), leaf.phoRandConeNeuIso->at(cand.ipho));
+    SetThreeIsolations(leaf, cand, _phoRandConeChIsoCorr, _phoRandConeNeuIsoCorr, _phoRandConePhoIsoCorr, leaf.phoRandConeChIso->at(cand.ipho), leaf.phoRandConeNeuIso->at(cand.ipho), leaf.phoRandConePhoIso->at(cand.ipho));
 
-    SetThreeIsolations(leaf, cand, _phoRandConeChIso04Corr, _phoRandConeNeuIso04Corr, _phoRandConePhoIso04Corr, leaf.phoRandConeChIso04->at(cand.ipho), leaf.phoRandConeNeuIso04->at(cand.ipho), leaf.phoRandConeNeuIso04->at(cand.ipho));
+    SetThreeIsolations(leaf, cand, _phoRandConeChIso04Corr, _phoRandConeNeuIso04Corr, _phoRandConePhoIso04Corr, leaf.phoRandConeChIso04->at(cand.ipho), leaf.phoRandConeNeuIso04->at(cand.ipho), leaf.phoRandConePhoIso04->at(cand.ipho));
 
   } //phoRandcone isolations for data only
 

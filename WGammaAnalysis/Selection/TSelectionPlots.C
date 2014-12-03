@@ -112,56 +112,37 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   int nPass[nSources];
   float eff[nSources];
 
-  int nCuts=13;
+  int nCuts=7;
   TCut cutExtra[nCuts];
   TString strDescr[nCuts];
 
-  TCut cut="1";
-/*
-  if (vgamma==_config.W_GAMMA){
-    cutExtra[0]="!hasMoreLeptons";                 strDescr[0]="veto on extra muons";
-    cutExtra[1]=muon.RangeTriggerMatch(vgamma,1);  strDescr[1]="muon trigger match";
-    cutExtra[2]=muon.RangeId(year,1);              strDescr[2]="muon ID";
-    cutExtra[3]="1";       strDescr[3]="muon isolation";
-  }
-  else if (vgamma==_config.Z_GAMMA){
-    cutExtra[0]="1";                 strDescr[0]="no veto on extra muons";
-    cutExtra[1]=muon.RangeTriggerMatch(vgamma,1)&&muon.RangeTriggerMatch(vgamma,2);  strDescr[1]="muon trigger match";
-    cutExtra[2]=muon.RangeId(year,1)&&muon.RangeId(year,2);                          strDescr[2]="muon ID";
-    cutExtra[3]="1";            strDescr[3]="muon isolation";
-  }
+  TCut cut="event==213426400 || event==20192560";
 
-  if (year==2011) cutExtra[4]="leptonPt>35"; else cutExtra[4]="1";
+  cutExtra[0]=photon.RangeSigmaIEtaIEta(year, wp);
+  cutExtra[1]=photon.RangeHoverE(year);
+  cutExtra[2]=photon.RangePhoEleVeto();
+  cutExtra[3]=photon.RangeOneIsolation(year,wp,photon.ISO_CHorTRK);
+  cutExtra[4]=photon.RangeOneIsolation(year,wp,photon.ISO_NEUorHCAL);
+  cutExtra[5]=photon.RangeOneIsolation(year,wp,photon.ISO_PHOorECAL);
+  cutExtra[6]=fullCuts.RangeMetRelatedCut(year);
 
 
-  cutExtra[5]=photon.RangeSigmaIEtaIEta(year, wp);
-  cutExtra[6]=photon.RangeHoverE(year);
-  cutExtra[7]=photon.RangePhoEleVeto();
-  if (year==2011) cutExtra[8]=photon.RangePhoHasPixelSeed(); else cutExtra[8]="1";
-
-  cutExtra[9]=photon.RangeOneIsolation(year,wp,photon.ISO_CHorTRK);
-
-  cutExtra[10]=photon.RangeOneIsolation(year,wp,photon.ISO_NEUorHCAL);
-
-  cutExtra[11]=photon.RangeOneIsolation(year,wp,photon.ISO_PHOorECAL);
-
-  cutExtra[12]=fullCuts.RangeMetRelatedCut(year);
-
-
-  for (int ic=0; ic<13; ic++){
+  for (int ic=0; ic<7; ic++){
     SelectionEfficiencyOneStage(nSources, nTot, nPass, eff, cut, cutExtra[ic], strDescr[ic]);
     cut = cut && cutExtra[ic];
   }
-*/
+
 }
 
 void TSelectionPlots::SelectionEfficiencyOneStage(int nSources, int* nTot, int* nPass, float* eff, TCut cut, TCut cutExtra, TString strCutDescription)
 {
   std::cout<<std::endl;
   std::cout<<"cut: "<<strCutDescription<<" ( "<<cutExtra.GetTitle()<<" )"<<std::endl;
-  for (int is=0; is<nSources; is++){
+//  for (int is=0; is<nSources; is++){
+  for (int is=0; is<1; is++){
     if (!_hasHist[is]) {nTot[is]=0; nPass[is]=0; eff[is]=0; continue;}
     nTot[is]=_tree[is]->GetEntries(cut);
+    if (nTot[is]==0){std::cout<<_sourceName[is]<<": nTot="<<nTot[is]<<std::endl;continue;} 
     nPass[is]=_tree[is]->GetEntries(cut && cutExtra);
     eff[is]=1.0*nPass[is]/nTot[is];
     std::cout<<_sourceName[is]<<": nTot="<<nTot[is]<<", nPass="<<nPass[is]<<", eff="<<eff[is]<<std::endl;        

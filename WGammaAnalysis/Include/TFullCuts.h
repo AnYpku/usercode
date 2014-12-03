@@ -37,6 +37,7 @@ public:
     long lepton;
     long secondLeptonVeto;
     long leptonInvMass;
+    long zMassWindow;
     long dR;
   };
   struct Candidate{
