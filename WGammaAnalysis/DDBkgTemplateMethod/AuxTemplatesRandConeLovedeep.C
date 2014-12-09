@@ -67,8 +67,8 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, TStrin
       pars.nFitBins[ikb][ieta]=20;
       pars.maxVarFit[ikb][ieta]=20.0;
     }
-    pars.sideband[ikb][0]=0.012;
-    pars.sideband[ikb][1]=0.034;
+    pars.sideband[ikb][0]=0.011;
+    pars.sideband[ikb][1]=0.033;
       //for these arrays, nFitBins[ikin][ieta], 
       //maxVarFit[ikin][ieta], sideband[ikin][ieta]
       // ikin=0 stands for total fit (e.g. 15-500)
@@ -128,7 +128,7 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, TStrin
   pars.cutSidebandVarNominalRange=(cutSihihB && pars.cutBarrel) || (cutSihihE && pars.cutEndcap);//TCut;
     //phoSigmaIEtaIEta cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-//  pars.cutWeight="weight";//TCut; weight for signal MC tree
+  pars.noLeakSubtr=0;
 }
 
 void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars)

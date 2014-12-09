@@ -409,6 +409,18 @@ TCut TFullCuts::RangePhoEt()
   return "1";
 }
 
+TCut TFullCuts::RangeBlinding(int blind)
+{
+  TCut cut="1";
+  if (blind==_config.BLIND_PRESCALE){
+    TString strCut=" (event % ";
+    strCut+=_config.GetBlindPrescale();
+    strCut+=")==0";
+    cut=strCut;
+  }
+  return cut;
+}
+
 TCut TFullCuts::RangeExtraLeptonPt2011()
 {
   TString cutStr="lepton1Pt>35";
@@ -416,35 +428,32 @@ TCut TFullCuts::RangeExtraLeptonPt2011()
   return cut;
 }// end of RangeExtraLeptonPt2011
 
-TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int phoWP){
+TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int blind, int phoWP){
+  //all cuts except phoSigmaIEtaIEta and phoChIso
   TCut cutPhoton=_photon.RangePhoton(year, phoWP, 0, 0);
-  //no cuts on sigmaIEtaIEta and chIso
-
   TCut cut = cutPhoton; 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year);
-//    if (channel==_config.ELECTRON)
-//     cut = cut && _photon.RangePhoHasPixelSeed();
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
+  if (blind!=_config.UNBLIND)
+    cut = cut && RangeBlinding(blind);
   return cut;
-
 }// end of RangeForTemplateMethodCut
 
-TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int phoWP)
-{
+TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP){
+  //all cuts 
   TPhotonCuts emptyPhoton;
   TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP);
-
   TCut cut = cutPhoton; 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year);
-//    if (channel==_config.ELECTRON)
-//     cut = cut && _photon.RangePhoHasPixelSeed();
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
+  if (blind!=_config.UNBLIND)
+    cut = cut && RangeBlinding(blind);
   return cut;
 }//end of RangeFullCut
 

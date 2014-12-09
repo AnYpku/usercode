@@ -241,7 +241,7 @@ TCut TPhotonCuts::SidebandSigmaIEtaIEta()
 
 TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
 {
-  //if (isoType==ISO_CHorTRK) return "1";
+//  if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
   if (year==2011 && isoType==ISO_CHorTRK) strIso="phoTrkIsoHollowDR04Corr";
   if (year==2012 && isoType==ISO_CHorTRK) strIso="phoPFChIsoCorr";

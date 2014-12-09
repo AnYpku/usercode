@@ -265,30 +265,30 @@ void TPrepareYields::SetYieldsDDBkgTemplate(int ieta)
   TH1F* hT = (TH1F*)fDDBkgTemplate->Get(nameYieldTot);
   _DDFakeGammaYieldTot[ieta] = hT->GetBinContent(1);
   _DDFakeGammaYieldTotErr[ieta] = hT->GetBinError(1);
-  if (_blind==_config.BLIND_PRESCALE){
-    _DDFakeGammaYieldTot[ieta]*=1.0/_config.GetBlindPrescale();
-    _DDFakeGammaYieldTotErr[ieta]*=1.0/_config.GetBlindPrescale();
-    for (int ib=1; ib<=_DDFakeGammaYields[ieta]->GetNbinsX(); ib++){
-      float cont=_DDFakeGammaYields[ieta]->GetBinContent(ib);
-      float err=_DDFakeGammaYields[ieta]->GetBinError(ib);
-      _DDFakeGammaYields[ieta]->SetBinContent(ib,cont*1.0/_config.GetBlindPrescale());
-      _DDFakeGammaYields[ieta]->SetBinError(ib,err*1.0/_config.GetBlindPrescale());
-    }
-  }
+//  if (_blind==_config.BLIND_PRESCALE){
+//    _DDFakeGammaYieldTot[ieta]*=1.0/_config.GetBlindPrescale();
+//    _DDFakeGammaYieldTotErr[ieta]*=1.0/_config.GetBlindPrescale();
+//    for (int ib=1; ib<=_DDFakeGammaYields[ieta]->GetNbinsX(); ib++){
+//      float cont=_DDFakeGammaYields[ieta]->GetBinContent(ib);
+//      float err=_DDFakeGammaYields[ieta]->GetBinError(ib);
+//      _DDFakeGammaYields[ieta]->SetBinContent(ib,cont*1.0/_config.GetBlindPrescale());
+//      _DDFakeGammaYields[ieta]->SetBinError(ib,err*1.0/_config.GetBlindPrescale());
+//    }
+//  }
   nameYieldTot = _config.GetYieldsDDTemplateTrueName(_config.TOTAL,ieta);
   hT = (TH1F*)fDDBkgTemplate->Get(nameYieldTot);
   _DDTrueGammaYieldTot[ieta] = hT->GetBinContent(1);
   _DDTrueGammaYieldTotErr[ieta] = hT->GetBinError(1);
-  if (_blind==_config.BLIND_PRESCALE){
-    _DDTrueGammaYieldTot[ieta]*=1.0/_config.GetBlindPrescale();
-    _DDTrueGammaYieldTotErr[ieta]*=1.0/_config.GetBlindPrescale();
-    for (int ib=1; ib<=_DDTrueGammaYields[ieta]->GetNbinsX(); ib++){
-      float cont=_DDTrueGammaYields[ieta]->GetBinContent(ib);
-      float err=_DDTrueGammaYields[ieta]->GetBinError(ib);
-      _DDTrueGammaYields[ieta]->SetBinContent(ib,cont*1.0/_config.GetBlindPrescale());
-      _DDTrueGammaYields[ieta]->SetBinError(ib,err*1.0/_config.GetBlindPrescale());
-    }
-  }
+//  if (_blind==_config.BLIND_PRESCALE){
+//    _DDTrueGammaYieldTot[ieta]*=1.0/_config.GetBlindPrescale();
+//    _DDTrueGammaYieldTotErr[ieta]*=1.0/_config.GetBlindPrescale();
+//    for (int ib=1; ib<=_DDTrueGammaYields[ieta]->GetNbinsX(); ib++){
+//      float cont=_DDTrueGammaYields[ieta]->GetBinContent(ib);
+//      float err=_DDTrueGammaYields[ieta]->GetBinError(ib);
+//      _DDTrueGammaYields[ieta]->SetBinContent(ib,cont*1.0/_config.GetBlindPrescale());
+//      _DDTrueGammaYields[ieta]->SetBinError(ib,err*1.0/_config.GetBlindPrescale());
+//    }
+//  }
 
   std::cout<<"_DDFakeGammaYields:"<<std::endl;
   _DDFakeGammaYields[ieta]->Print();

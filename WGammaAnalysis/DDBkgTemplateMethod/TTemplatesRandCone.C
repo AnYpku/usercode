@@ -131,7 +131,7 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   //_pars.kinBinLims[ikin-1] is lower limit
 
   name+="_True"; 
-  cut = cutEta && cutKin;// && cutSignal;;
+  cut = cutEta && cutKin && SidebandVarNominalCut();// && cutSignal;;
   if (!noPrint) {
     std::cout<<"cutEta="<<cutEta.GetTitle()<<std::endl;
     std::cout<<"cutKin="<<cutKin.GetTitle()<<std::endl;
@@ -162,7 +162,7 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   _hLeak[ikin][ieta]->Sumw2();
   name.ReplaceAll("_Leak","_Data");
   _hData[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
-  _hData[ikin][ieta]->Sumw2();
+//  _hData[ikin][ieta]->Sumw2();
   SetTemplate(0,_hFake[ikin][ieta], cut, noPrint, _hLeak[ikin][ieta]);
   // "0" for fake gamma template
 
@@ -192,6 +192,7 @@ void TTemplatesRandCone::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut
   }
 
   if (isTrueGamma) return;
+  if (_pars.noLeakSubtr) return;
 
 
   TString strNameLeak=hLeak->GetName();
@@ -317,10 +318,16 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   }
   TCut cut = kinCut && etaCut && sidebandVarNominalCut;
 	
-  TString varDraw=_pars.varFit+TString(">>");
-  varDraw+= _hData[ikin][ieta]->GetName();
-
+//  TH1D* histTemp = (TH1D*)_hData[ikin][ieta]->Clone(); 
+//  histTemp->SetName(TString("histTemp")+StrLabelKin(ikin)+StrLabelEta(ieta));
+  TString varDraw=_pars.varFit+TString(">>")+_hData[ikin][ieta]->GetName();
   _pars.treeData->Draw(varDraw,cut*_pars.cutWeight,"goff");
+//  for (int ib=1; ib<=_hData[ikin][ieta]->GetNbinsX(); ib++){
+//    _hData[ikin][ieta]->SetBinContent(ib,histTemp->GetBinContent(ib));
+//    _hData[ikin][ieta]->SetBinError(ib,histTemp->GetBinError(ib));
+//  }
+
+
 /*
   TH1F* histTemp = new TH1F("histTemp","histTemp",1,_pars.treeData->GetMinimum(_pars.varWeight)-1,_pars.treeData->GetMaximum(_pars.varWeight)+1);
   histTemp->Sumw2();

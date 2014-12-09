@@ -25,20 +25,20 @@
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
 
-  anPars.channel=TConfiguration::ELECTRON;//MUON, ELECTRON
+  anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
-  anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
+  anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
   anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
-  anPars.sampleMode=Selection::DATA;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+  anPars.sampleMode=Selection::BKGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
 //  anPars.analyzedSamples="WWg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
 
   anPars.year=2012;
-  anPars.noPreSelection=0;
-  anPars.noExtraSelection=0;
-  anPars.noDDBkgComputation=1;
+  anPars.noPreSelection=1;
+  anPars.noExtraSelection=1;
+  anPars.noDDBkgComputation=0;
   anPars.noPrepareYields=1;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;

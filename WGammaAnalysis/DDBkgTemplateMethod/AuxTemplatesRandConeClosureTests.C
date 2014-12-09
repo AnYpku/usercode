@@ -13,49 +13,38 @@
 #include "TCut.h"
 //ROOT
 
-void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+void SetParsRegularCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
 	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
 
-void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma);
+void SetParsSpecialCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma);
 
-void AuxTemplatesRandCone(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplatesRandConeClosure(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
 {
   //this function is called in FullChain
 
   TTemplatesRandCone::TemplatesRandConePars pars;
 
-  SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-  SetParsSpecialCases(pars, vgamma);
+  SetParsRegularCasesClosure(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+  SetParsSpecialCasesClosure(pars, vgamma);
 
   TTemplatesRandCone temp(pars);
   temp.ComputeBackground();
 }
 
-void AuxTemplatesRandConeSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplatesRandConeClosureSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
 {
   //this function is called in FullChain
 
   TTemplatesRandCone::TemplatesRandConePars pars;
 
-  SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-  SetParsSpecialCases(pars, vgamma);
+  SetParsRegularCasesClosure(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+  SetParsSpecialCasesClosure(pars, vgamma);
 
   TTemplatesRandConeSyst temp(pars);
   temp.SidebandVariation();
 }
 
-TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
-{
-  f = new TFile(strFileName);
-  if (!f->IsOpen()){
-    std::cout<<"ERROR in AuxTemplatesRandCone, SetParsRegularCases: file with "<<strFileWithWhat<<": "<<strFileName<<" can't be open"<<std::endl;
-    return 0;
-  }
-  else std::cout<<"file with "<<strFileWithWhat<<": "<<strFileName<<std::endl;
-  return (TTree*)f->Get("selectedEvents");
-}
-
-void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+void SetParsRegularCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
 	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
 {
   TConfiguration config;
@@ -73,8 +62,8 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
       pars.nFitBins[ikb][ieta]=20;
       pars.maxVarFit[ikb][ieta]=20.0;
     }
-    pars.sideband[ikb][config.BARREL]=0.012;
-    pars.sideband[ikb][config.ENDCAP]=0.034;
+    pars.sideband[ikb][config.BARREL]=0;//0.012;
+    pars.sideband[ikb][config.ENDCAP]=0;//0.034;
       //for these arrays, nFitBins[ikin][ieta], 
       //maxVarFit[ikin][ieta], sideband[ikin][ieta]
       // ikin=0 stands for total fit (e.g. 15-500)
@@ -98,24 +87,48 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
 
   std::cout<<std::endl;
 
-  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,config.DATA);
-  pars.treeData=LoadOneTree("data", strData, pars.fData);
-  if (!pars.treeData) return;
+  enum {F_DATA, F_SIGN, F_TRUE, F_FAKE};
+  TString strfiles[4]; // 0 - data, 1 - sigmc, 2 - true, 3 - fake
+  if (channel==config.MUON && vgamma==config.W_GAMMA){
+    strfiles[F_DATA]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGamma_WjetsAndWg.root";
+    strfiles[F_SIGN]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root";
+    strfiles[F_TRUE]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root";
+    strfiles[F_FAKE]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaBKGMC_Wjets_to_lnu.root";
+  }
+  if (channel==config.MUON && vgamma==config.Z_GAMMA){
+    strfiles[F_DATA]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGamma_ZjetsAndZg.root";
+    strfiles[F_SIGN]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root";
+    strfiles[F_TRUE]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root";
+    strfiles[F_FAKE]="../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
+  }
 
-  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.SIGMC);
-  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
-  if (!pars.treeSign) return;
+  pars.fData=new TFile(strfiles[F_DATA]);
+  pars.treeData=(TTree*)pars.fData->Get("selectedEvents");
+  if(!pars.treeData) return;
 
-  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
-  pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
-  if (!pars.treeTrue) return;
+  pars.fSign=new TFile(strfiles[F_SIGN]);
+  pars.treeSign=(TTree*)pars.fSign->Get("selectedEvents");
+  if(!pars.treeSign) return;
 
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
-  pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
-  if (!pars.treeFake) return;
+  pars.fTrue=new TFile(strfiles[F_TRUE]);
+  pars.treeTrue=(TTree*)pars.fTrue->Get("selectedEvents");
+  if(!pars.treeTrue) return;
+
+  pars.fFake=new TFile(strfiles[F_FAKE]);
+  pars.treeFake=(TTree*)pars.fFake->Get("selectedEvents");
+  if(!pars.treeFake) return;
+
+  std::cout<<"files used:"<<std::endl;
+  std::cout<<"data: "<<strfiles[F_DATA]<<std::endl;
+  std::cout<<"sign: "<<strfiles[F_SIGN]<<std::endl;
+  std::cout<<"true: "<<strfiles[F_TRUE]<<std::endl;
+  std::cout<<"fake: "<<strfiles[F_FAKE]<<std::endl;
+
+  pars.noLeakSubtr=1;
 
   pars.varSideband="phoSigmaIEtaIEta";//TString
-  pars.varTrueTempl="phoRandConeChIso04Corr";//TString
+//  pars.varTrueTempl="phoRandConeChIso04Corr";//TString
+  pars.varTrueTempl="phoSCRChIso04Corr";//TString
   pars.varFakeTempl="phoSCRChIso04Corr";//TString
   pars.varFit="phoSCRChIso04Corr"; //TString
   pars.varPhoEta="phoSCEta";//TString
@@ -132,10 +145,10 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
 
-  pars.noLeakSubtr=0;
+  pars.noLeakSubtr=1;
 }
 
-void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma)
+void SetParsSpecialCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma)
 {
   TConfiguration config;
 

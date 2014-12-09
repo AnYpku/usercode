@@ -24,14 +24,14 @@ class Selection
      //TSelectedEventsTree - class for output tree and output root file
      public:
        Selection ();
-       Selection (int channel, int vgamma, int sampleMode = ALL, int blind = TConfiguration::BLIND_PRESCALE, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
-       Selection(int channel, int vgamma, string analyzedSampleNames,  int blind = TConfiguration::BLIND_PRESCALE, string configFile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       Selection (int channel, int vgamma, int sampleMode = ALL, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       Selection(int channel, int vgamma, string analyzedSampleNames, string configFile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
        virtual ~Selection();
        void    LoopOverInputFiles();
        void    LoopOverTreeEvents();
        bool    CheckMaxNumbersInTree();
        void    PrintErrorMessageMaxNumberOf(int particle);
-       void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int blind,int wp);
+       void    ExtraSelection(int year, int channel, int vgamma,int sampleMode, int wp);
        void    ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind);
 
        enum {DATA, SIGMC, BKGMC, MC, NOBKG, ALL, NOTSPECIFIED};//sampleMode
@@ -61,7 +61,7 @@ class Selection
        //int _blind;//_config.UNBLIND, _config.BLIND_PRESCALE, _config.BLIND_DECRACC
        int _sample; //_config.DATA, _config.SIGMC, _config.BKGMC
        int _vgamma;
-       int _blind;
+//       int _blind;
        bool _isVJets;
 
        bool _isDebugMode;

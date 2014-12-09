@@ -54,6 +54,7 @@ class TTemplatesRandCone
       TCut cutChIsolation;
       TCut cutSidebandVarNominalRange;
       TCut cutWeight;
+      bool noLeakSubtr;
     };//end of struct TemplatesRandConePars
     TTemplatesRandCone();
     TTemplatesRandCone(TemplatesRandConePars pars);
