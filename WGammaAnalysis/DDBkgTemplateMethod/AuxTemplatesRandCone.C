@@ -13,6 +13,9 @@
 #include "TCut.h"
 //ROOT
 
+void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
+
 void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
 	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
 
@@ -24,8 +27,10 @@ void AuxTemplatesRandCone(int channel, int vgamma, int blind, int phoWP, TString
 
   TTemplatesRandCone::TemplatesRandConePars pars;
 
-  SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-  SetParsSpecialCases(pars, vgamma);
+  SetParsSigmaIEtaIEtaTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+
+  //SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+  //SetParsSpecialCases(pars, vgamma);
 
   TTemplatesRandCone temp(pars);
   temp.ComputeBackground();
@@ -69,9 +74,9 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
   for (int ikb=0; ikb<=nKinBins; ikb++){
     pars.kinBinLims[ikb]=kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
     for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
-
-      pars.nFitBins[ikb][ieta]=20;
-      pars.maxVarFit[ikb][ieta]=20.0;
+      pars.nFitBins[ikb][ieta]=21;
+      pars.minVarFit[ikb][ieta]=-1.0+0.1;
+      pars.maxVarFit[ikb][ieta]=20.0+0.1;
     }
     pars.sideband[ikb][config.BARREL]=0.012;
     pars.sideband[ikb][config.ENDCAP]=0.034;
@@ -107,6 +112,7 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
   if (!pars.treeSign) return;
 
   TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+//  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
@@ -121,7 +127,8 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
-  pars.cutChIsolation=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK);//TCut; 
+  pars.cutNominal=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut; 
+  pars.cutNominalExceptSidebandVar=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK);//TCut; 
     //charged isolation cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
   pars.cutSidebandVarNominalRange=photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut;
@@ -213,4 +220,91 @@ void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vg
       }
     }//end of if (varKin=="phoEt")
   }//end of ikin loop
+}
+
+void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+{
+  TConfiguration config;
+  TPhotonCuts photon;
+  pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
+  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
+  if (nKinBins>TTemplatesRandCone::nKinBinsMax){
+    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+    return;
+  }
+  for (int ikb=0; ikb<=nKinBins; ikb++){
+    pars.kinBinLims[ikb]=kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
+    pars.nFitBins[ikb][config.BARREL]=32;
+    pars.minVarFit[ikb][config.BARREL]=0.005;
+    pars.maxVarFit[ikb][config.BARREL]=0.021;
+    pars.nFitBins[ikb][config.ENDCAP]=25;
+    pars.minVarFit[ikb][config.ENDCAP]=0.019;
+    pars.maxVarFit[ikb][config.ENDCAP]=0.069;
+    if (varKin=="phoEt" && pars.kinBinLims[ikb-1]>24){
+      pars.nFitBins[ikb][config.BARREL]=16;
+    }
+
+    pars.sideband[ikb][config.BARREL]=2.6;
+    pars.sideband[ikb][config.ENDCAP]=2.3;
+      //for these arrays, nFitBins[ikin][ieta], 
+      //maxVarFit[ikin][ieta], sideband[ikin][ieta]
+      // ikin=0 stands for total fit (e.g. 15-500)
+      // ikin=[1,nKinBins] are for individual bin fits 
+      // ieta=0 - BARREL, ieta=1 - ENDCAP
+  }
+
+  pars.strFileOutName=config.GetDDTemplateFileName(channel,vgamma,varKin);
+    //the histograms with extracted yields will be saved here
+
+
+  for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
+    pars.strTrueYieldsTot[ieta]=config.GetYieldsDDTemplateTrueName(config.TOTAL,ieta);
+    pars.strTrueYields1D[ieta] =config.GetYieldsDDTemplateTrueName(config.ONEDI,ieta);
+    pars.strFakeYieldsTot[ieta]=config.GetYieldsDDTemplateFakeName(config.TOTAL,ieta);
+    pars.strFakeYields1D[ieta] =config.GetYieldsDDTemplateFakeName(config.ONEDI,ieta);
+  }
+    //names of TH1F histograms with True and Fake extracted yields,
+    //for TOTAL and differentian (ONEDI) cross section, 
+    //for barrel, endcap and common(barrel+endcap)
+
+  std::cout<<std::endl;
+
+  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,config.DATA);
+  pars.treeData=LoadOneTree("data", strData, pars.fData);
+  if (!pars.treeData) return;
+
+  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.SIGMC);
+  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
+  if (!pars.treeSign) return;
+
+  TString strTrue=config.GetSelectedName(config.FSR,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+//  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+  pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
+  if (!pars.treeTrue) return;
+
+  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
+  if (!pars.treeFake) return;
+
+  pars.varSideband="phoPFChIsoCorr";//TString
+  pars.varTrueTempl="phoSigmaIEtaIEta";//TString
+  pars.varFakeTempl="phoSigmaIEtaIEta";//TString
+  pars.varFit="phoSigmaIEtaIEta"; //TString
+  pars.varPhoEta="phoSCEta";//TString
+  pars.varWeight="weight";//TString
+
+  pars.cutNominal=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut; 
+  pars.cutNominalExceptSidebandVar=photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut; 
+    //charged isolation cut as applied during selection procedure;
+    //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
+  pars.cutSidebandVarNominalRange=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK);//TCut;
+    //phoSigmaIEtaIEta cut as applied during selection procedure;
+    //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
+//  pars.cutWeight="weight";//TCut; weight for signal MC tree
+
+  pars.cutBarrel=photon.RangeBarrel();//TCut
+  pars.cutEndcap=photon.RangeEndcap();//TCut
+
+  pars.noLeakSubtr=0;
 }

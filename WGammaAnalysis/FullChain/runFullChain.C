@@ -12,6 +12,9 @@
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
 //  fch.SetDefaultFullChainParameters(anPars,"phoEtNoPhosphor");
 //  fch.SetDefaultFullChainParameters(anPars,"Mleplep");
+//  fch.SetDefaultFullChainParameters(anPars,"Mpholeplep");
+//  fch.SetDefaultFullChainParameters(anPars,"Mpholep1");
+//  fch.SetDefaultFullChainParameters(anPars,"Mpholep2");
 //  fch.SetDefaultFullChainParameters(anPars,"WMt");
 //  fch.SetDefaultFullChainParameters(anPars,"phoSCEta");
 //  fch.SetDefaultFullChainParameters(anPars,"phoPhi");
@@ -20,7 +23,7 @@
 //  fch.SetDefaultFullChainParameters(anPars,"lepton1Phi");
 //  fch.SetDefaultFullChainParameters(anPars,"lep1PhoDeltaR");
 //  fch.SetDefaultFullChainParameters(anPars,"pfMET");
-//  fch.SetDefaultFullChainParameters(anPars,"pfMETPhi");
+//  fch.SetDefaultFullChainParameters(anPars,"pfMETPhi");g
 
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
@@ -32,14 +35,14 @@
 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
-  anPars.sampleMode=Selection::BKGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+  anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
 //  anPars.analyzedSamples="WWg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
 
   anPars.year=2012;
   anPars.noPreSelection=1;
   anPars.noExtraSelection=1;
   anPars.noDDBkgComputation=0;
-  anPars.noPrepareYields=1;
+  anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
 

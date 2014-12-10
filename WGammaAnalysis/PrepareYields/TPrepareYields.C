@@ -122,6 +122,7 @@ void TPrepareYields::SetYieldsOneSource(int iSource, int ieta)
     _cutWeight=strCutWeight;
   }
   int selStage=_config.FULLY;
+//  int selStage=_config.FSR;
   TString fInName = _config.GetSelectedName(selStage,_channel,_vgamma,_blind,sample,strSourceName);
   TFile fIn(fInName);
   if (!fIn.IsOpen()){

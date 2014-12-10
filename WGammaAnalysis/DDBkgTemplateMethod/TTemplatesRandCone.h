@@ -27,6 +27,7 @@ class TTemplatesRandCone
       int nKinBins;
       float kinBinLims[nKinBinsMax];
       int nFitBins[nKinBinsMax][2];
+      float minVarFit[nKinBinsMax][2];
       float maxVarFit[nKinBinsMax][2];
       float sideband[nKinBinsMax][2];
       TFile* fOutForSave;
@@ -51,7 +52,8 @@ class TTemplatesRandCone
       TString varWeight;
       TCut cutBarrel;
       TCut cutEndcap;
-      TCut cutChIsolation;
+      TCut cutNominal;
+      TCut cutNominalExceptSidebandVar;
       TCut cutSidebandVarNominalRange;
       TCut cutWeight;
       bool noLeakSubtr;

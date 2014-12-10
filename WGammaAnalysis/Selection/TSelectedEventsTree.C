@@ -55,6 +55,7 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
 
 
     tree->Branch(TString("lep")+stril+TString("PhoDeltaR"),&_lepPhoDeltaR[il],TString("lep")+stril+TString("PhoDeltaR/F"));
+    tree->Branch(TString("Mpholep")+stril,&_Mpholep[il],TString("Mpholep")+stril+TString("/F"));
   }//end of loop over il (il=0 and transforms to 1 and 2)
 
   tree->Branch("hasMoreLeptons",&_hasMoreLeptons,"hasMoreLeptons/O");
@@ -110,6 +111,7 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("phohasPixelSeed",&_phohasPixelSeed,"phohasPixelSeed/I");
   tree->Branch("WMt",&_WMt,"WMt/F");
   tree->Branch("Mleplep",&_Mleplep,"Mleplep/F");
+  tree->Branch("Mpholeplep",&_Mpholeplep,"Mpholeplep/F");
   tree->Branch("pfMET",&_pfMET,"pfMET/F");
   tree->Branch("pfMETPhi",&_pfMETPhi,"pfMETPhi/F");
   tree->Branch("pfMET_notSmeared",&_pfMET_notSmeared,"pfMET_notSmeared/F");
@@ -158,6 +160,7 @@ void TSelectedEventsTree::SetAsInputTree(TTree* tree)
 //    tree->SetBranchAddress(TString("trgMatch")+stril+TString("Ele17Ele8"),&_trgMatchEle17Ele8[il],&_b_trgMatchEle17Ele8[il]);
 tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il],&_b_lepTrgMatch[il]);
     tree->SetBranchAddress(TString("lep")+stril+TString("PhoDeltaR"),&_lepPhoDeltaR[il],&_b_lepPhoDeltaR[il]);
+    tree->SetBranchAddress(TString("Mpholep")+stril,&_Mpholep[il],&_b_Mpholep[il]);
   }//end of loop over il (il=0 and transforms to 1 and 2)
 
   tree->SetBranchAddress("hasMoreLeptons",&_hasMoreLeptons,&_b_hasMoreLeptons);
@@ -212,6 +215,7 @@ tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il
   tree->SetBranchAddress("phohasPixelSeed",&_phohasPixelSeed,&_b_phohasPixelSeed);
   tree->SetBranchAddress("WMt",&_WMt,&_b_WMt);
   tree->SetBranchAddress("Mleplep",&_Mleplep,&_b_Mleplep);
+  tree->SetBranchAddress("Mpholeplep",&_Mpholeplep,&_b_Mpholeplep);
   tree->SetBranchAddress("pfMET",&_pfMET,&_b_pfMET);
   tree->SetBranchAddress("pfMETPhi",&_pfMETPhi,&_b_pfMETPhi);
   tree->SetBranchAddress("pfMET_notSmeared",&_pfMET_notSmeared,&_b_pfMET_notSmeared);
@@ -290,12 +294,16 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
 
   _WMt = sqrt(2*_lepPt[0]*_pfMET*(1-cos(_lepPhi[0]-_pfMETPhi))); //makes sense for W_GAMMA only
   
-  if (cand.ilep2<0) _Mleplep=-1; //if W_GAMMA and no second lepton
-  else{ //if Z_GAMMA
-    TLorentzVector vlep1, vlep2;
-    vlep1.SetPtEtaPhiM(_lepPt[0],_lepEta[0],_lepPhi[0],0);
-    vlep2.SetPtEtaPhiM(_lepPt[1],_lepEta[1],_lepPhi[1],0);
+  TLorentzVector vlep1, vlep2, vpho;
+  vlep1.SetPtEtaPhiM(_lepPt[0],_lepEta[0],_lepPhi[0],0);
+  vpho.SetPtEtaPhiM(_phoEt,_phoEta,_phoPhi,0);
+  _Mpholep[0]=(vpho+vlep1).M();
+  if (cand.ilep2<0) {_Mleplep=-1; _Mpholeplep=-1; _Mpholep[1]=-1;} //if W_GAMMA and no second lepton
+  else{ //if Z_GAMMA   
+    vlep2.SetPtEtaPhiM(_lepPt[1],_lepEta[1],_lepPhi[1],0);    
     _Mleplep=(vlep1 + vlep2).M();
+    _Mpholeplep=(vpho+vlep1 + vlep2).M();
+    _Mpholep[1]=(vpho+vlep2).M();
   }
 
 

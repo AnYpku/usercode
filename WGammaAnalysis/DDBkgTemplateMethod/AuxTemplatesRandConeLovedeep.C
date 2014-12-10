@@ -64,7 +64,8 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, TStrin
     pars.kinBinLims[ikb]=kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
     for (int ieta=0; ieta<=1; ieta++){
 
-      pars.nFitBins[ikb][ieta]=20;
+      pars.nFitBins[ikb][ieta]=21;
+      pars.maxVarFit[ikb][ieta]=-1.0;
       pars.maxVarFit[ikb][ieta]=20.0;
     }
     pars.sideband[ikb][0]=0.011;

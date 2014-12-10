@@ -112,7 +112,9 @@ class TSelectedEventsTree
     int _phohasPixelSeed;//for 2011 cuts
     float _lepPhoDeltaR[2];
     float _WMt;
+    float _Mpholep[2];
     float _Mleplep;//relevant for Z_GAMMA only
+    float _Mpholeplep;//relevant for Z_GAMMA only
     float _pfMET;
     float _pfMETPhi;
     float _pfMET_notSmeared;
@@ -205,7 +207,9 @@ class TSelectedEventsTree
     TBranch* _b_phohasPixelSeed;//for 2011 cuts
     TBranch* _b_lepPhoDeltaR[2];
     TBranch* _b_WMt;
+    TBranch* _b_Mpholep[2];
     TBranch* _b_Mleplep;
+    TBranch* _b_Mpholeplep;
     TBranch* _b_pfMET;
     TBranch* _b_pfMETPhi;
     TBranch* _b_pfMET_notSmeared;

@@ -109,9 +109,8 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
 
   int nFitBins=_pars.nFitBins[ikin][ieta];
   double max=_pars.maxVarFit[ikin][ieta];
-  double unit = max/nFitBins;
-  double min=0.0001-unit;
-  nFitBins++;
+  double min=_pars.minVarFit[ikin][ieta];
+  double unit = (max-min)/nFitBins;
   // one bin [-unit,0] is reserved for events for which Iso==0 
 
   double fitBinLims[nFitBins+1];
@@ -447,14 +446,11 @@ void TTemplatesRandCone::ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint)
 void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma,
 	double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr)
 {
-  int nPassedChIso[2];
+  int nPassed[2];
   int nPassedFitVar[2];
   int nTot[2];
   float eff[2];
   TCut cutSidebandVar;
-  TTree* tr;
-  if (isTrueGamma) tr=_pars.treeSign;
-  else tr=_pars.treeFake;
 
   for (int ieta1=_BARREL; ieta1<=_ENDCAP; ieta1++){
 
@@ -464,17 +460,41 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
     else cutSidebandVar=SidebandCut(ikin,ieta);
 
     TCut cutTot = cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta1);
+    TCut cutPassed = cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && _pars.cutNominalExceptSidebandVar;
 
-    TCut cutPassedChIso = cutTot && _pars.cutChIsolation;
-    nPassedChIso[ieta1] = tr->GetEntries(cutPassedChIso);
+    if (isTrueGamma){
+      TH1F* hSignPassed = new TH1F("histPassed","histPassed",1,-3.0,3.0);
+      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histPassed"),cutPassed*_pars.cutWeight,"goff");
+      TH1F* hSignTot = new TH1F("histTot","histTot",1,-3.0,3.0);
+      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histTot"),cutTot*_pars.cutWeight,"goff");
+      TH1F* hEff = (TH1F*)hSignPassed->Clone();
+      hEff->Divide(hSignTot);
+      eff[ieta1]=hEff->GetBinContent(1);
+      delete hSignPassed;
+      delete hSignTot;
+    }// end of isTrueGamma
+    else{
+      TH1F* hFakePassed = new TH1F("histPassedF","histPassedF",1,-3.0,3.0);
+      _pars.treeFake->Draw(_pars.varPhoEta+TString(">>histPassedF"),cutPassed*_pars.cutWeight,"goff");
+      TH1F* hFakeTot = new TH1F("histTotF","histTotF",1,-3.0,3.0);
+      _pars.treeFake->Draw(_pars.varPhoEta+TString(">>histTotF"),cutTot*_pars.cutWeight,"goff");
 
-    //TCut cutPassedFitVar = cutTot && FitVarFitRangeCut(ikin,ieta);
-    //nPassedFitVar[ieta] = tr->GetEntries(cutPassedFitVar);
-
-    nTot[ieta1] = tr->GetEntries(cutTot);
-
-    if (nTot[ieta1]!=0) eff[ieta1]=1.0*nPassedChIso[ieta1]/nTot[ieta1];
-    else eff[ieta1]=0;
+      if (!_pars.noLeakSubtr){
+        TH1F* hSignPassed = new TH1F("histPassed","histPassed",1,-3.0,3.0);
+        _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histPassed"),cutPassed*_pars.cutWeight,"goff");
+        TH1F* hSignTot = new TH1F("histTot","histTot",1,-3.0,3.0);
+        _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histTot"),cutTot*_pars.cutWeight,"goff");
+        hFakePassed->Add(hSignPassed,-1);
+        hFakeTot->Add(hSignTot,-1);
+        delete hSignPassed;
+        delete hSignTot;        
+      }
+      TH1F* hEff = (TH1F*)hFakePassed->Clone();
+      hEff->Divide(hFakeTot);
+      eff[ieta1]=hEff->GetBinContent(1);
+      delete hFakePassed;
+      delete hFakeTot;
+    }// end of else of if(isTrueGamma)
 
     nYieldsVal[ieta1]=nFromFitVal[ieta1]*eff[ieta1];
     nYieldsErr[ieta1]=nFromFitErr[ieta1]*eff[ieta1];
@@ -495,11 +515,11 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
       std::cout<<"cutEta="<<CutEtaBin(ieta1).GetTitle()<<std::endl;
       std::cout<<"cutKin="<<CutKinBin(ikin).GetTitle()<<std::endl;
       std::cout<<"cutSidebandVar="<<cutSidebandVar.GetTitle()<<std::endl;
-      std::cout<<"cutChIso="<<_pars.cutChIsolation.GetTitle()<<std::endl;
+      std::cout<<"cutNominal="<<_pars.cutNominal.GetTitle()<<std::endl;
       TString strTrueOrFake;
       if (isTrueGamma) strTrueOrFake="nTrue";
       else strTrueOrFake="nFake";
-      std::cout<<"fromFit*effChIso*(1/effFitVar)="<<strTrueOrFake<<"=("<<nFromFitVal[ieta1]<<"+-"<<nFromFitErr[ieta1]<<")*"<<eff[ieta1]<<"="<<nYieldsVal[ieta1]<<"+-"<<nYieldsErr[ieta1]<<";"<<std::endl;
+      std::cout<<"fromFit*eff="<<strTrueOrFake<<"=("<<nFromFitVal[ieta1]<<"+-"<<nFromFitErr[ieta1]<<")*"<<eff[ieta1]<<"="<<nYieldsVal[ieta1]<<"+-"<<nYieldsErr[ieta1]<<";"<<std::endl;
     }//loop over ieta
   }//end of if (!noPrint)
 }

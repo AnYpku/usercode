@@ -67,6 +67,7 @@ public:
   TCut RangeExtraLeptonPt2011();
   TCut RangeForTemplateMethodCut(int year, int channel, int vgamma, int blind, int phoWP);
   TCut RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP);
+  TCut RangeFsrCut(int channel);
 
 private:
 

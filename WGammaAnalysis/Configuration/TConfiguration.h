@@ -21,6 +21,7 @@ class TConfiguration
     enum {VERY_PRELIMINARY,
           PRELIMINARY_FOR_TEMPLATE_METHOD,
           PRELIMINARY_FOR_UNFOLDING,
+          FSR,
           FULLY};//selection stage
 
     TString StrChannel(int channel); 
