@@ -746,9 +746,14 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
 TCut TTemplatesRandCone::SidebandCut(int ikin, int ieta)
 {
   float lim=_pars.sideband[ikin][ieta]; 
+  float limUp=_pars.sidebandUp[ikin][ieta]; 
   TString strCut=_pars.varSideband;
   strCut+=">";
   strCut+=lim;
+  strCut+=" && ";
+  strCut+=_pars.varSideband;
+  strCut+="<";
+  strCut+=limUp;
   TCut cut(strCut);
   if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
   if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;

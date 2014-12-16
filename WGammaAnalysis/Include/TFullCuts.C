@@ -318,12 +318,12 @@ bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& ic
 
       if (ilep1==-1){
         dR1=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-        if (dR1<_lePhoDeltaRCut) break;
+        if (dR1<_lePhoDeltaRPreCut) break;
         ilep1=ilep;
       }
       else if (vgamma==_config.Z_GAMMA){ // if Z_GAMMA and first dR already found
         dR2=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-        if (dR2<_lePhoDeltaRCut) break;
+        if (dR2<_lePhoDeltaRPreCut) break;
         ilep2=ilep;
       }
       _passed.dR++;
@@ -380,21 +380,21 @@ bool TFullCuts::IsOverlapVJetsVGamma(int channel)
 //  return dR;
 //}
 
-float TFullCuts::GetWMtCut(int year)
+float TFullCuts::GetWMtCut(int year, int channel)
 {
-  if (year==2012) return _WMtCut2012;
+  if (year==2012) return _WMtCut2012[channel];
   else if (year==2011) return _WMtCut2011;
-  return _WMtCut2012;
+  return _WMtCut2012[channel];
 }
 
 TCut TFullCuts::RangeMoreLeptonsVeto(){
   return "!hasMoreLeptons";
 }
 
-TCut TFullCuts::RangeMetRelatedCut(int year)
+TCut TFullCuts::RangeMetRelatedCut(int year, int channel)
 {
   TString cutStr="WMt>";
-  if (year==2012) cutStr+=_WMtCut2012;
+  if (year==2012) cutStr+=_WMtCut2012[channel];
   else if (year==2011) cutStr+=_WMtCut2011;
   TCut cut(cutStr);
   return cut;
@@ -428,12 +428,20 @@ TCut TFullCuts::RangeExtraLeptonPt2011()
   return cut;
 }// end of RangeExtraLeptonPt2011
 
+TCut TFullCuts::RangeDeltaR(int vgamma)
+{
+  TCut cut="lep1PhoDeltaR>0.7";
+  TCut cut2="lep2PhoDeltaR>0.7";
+  if (vgamma==_config.Z_GAMMA) cut = (cut && cut2);
+  return cut;
+}
+
 TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int blind, int phoWP){
   //all cuts except phoSigmaIEtaIEta and phoChIso
   TCut cutPhoton=_photon.RangePhoton(year, phoWP, 0, 0);
-  TCut cut = cutPhoton; 
+  TCut cut = cutPhoton && RangeDeltaR(vgamma); 
   if (vgamma==_config.W_GAMMA) {
-    cut = cut && RangeMetRelatedCut(year);
+    cut = cut && RangeMetRelatedCut(year,channel);
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
@@ -444,11 +452,10 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
 
 TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP){
   //all cuts 
-  TPhotonCuts emptyPhoton;
-  TCut cutPhoton=emptyPhoton.RangePhoton(year, phoWP);
-  TCut cut = cutPhoton; 
+  TCut cutPhoton=_photon.RangePhoton(year, phoWP);
+  TCut cut = cutPhoton && RangeDeltaR(vgamma); 
   if (vgamma==_config.W_GAMMA) {
-    cut = cut && RangeMetRelatedCut(year);
+    cut = cut && RangeMetRelatedCut(year,channel);
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
@@ -462,7 +469,7 @@ TCut TFullCuts::RangeFsrCut(int channel)
   TCut cut;
 //  cut = "Mpholeplep<101 && Mpholeplep>81 && (lep1PhoDeltaR<0.8 || lep2PhoDeltaR<0.8)";
   cut = "Mpholeplep<101 && Mpholeplep>81";
-  cut = cut && _photon.RangePhoton(2012, _photon.WP_LOOSE, 0);// 0 - no sigmaIEtaIEta cut
+  cut = cut && _photon.RangePhoton(2012, _photon.WP_LOOSE, 0, 0);// 0 - no sigmaIEtaIEta cut
   return cut;
 }
 

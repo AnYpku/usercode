@@ -30,6 +30,7 @@ class TTemplatesRandCone
       float minVarFit[nKinBinsMax][2];
       float maxVarFit[nKinBinsMax][2];
       float sideband[nKinBinsMax][2];
+      float sidebandUp[nKinBinsMax][2];
       TFile* fOutForSave;
       TString strFileOutName;
       TString strTrueYieldsTot[3];

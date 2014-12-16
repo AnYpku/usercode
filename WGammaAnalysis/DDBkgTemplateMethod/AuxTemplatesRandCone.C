@@ -29,8 +29,8 @@ void AuxTemplatesRandCone(int channel, int vgamma, int blind, int phoWP, TString
 
   SetParsSigmaIEtaIEtaTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
 
-  //SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-  //SetParsSpecialCases(pars, vgamma);
+//  SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+//  SetParsSpecialCases(pars, vgamma);
 
   TTemplatesRandCone temp(pars);
   temp.ComputeBackground();
@@ -80,6 +80,8 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
     }
     pars.sideband[ikb][config.BARREL]=0.012;
     pars.sideband[ikb][config.ENDCAP]=0.034;
+    pars.sidebandUp[ikb][config.BARREL]=0.018;
+    pars.sidebandUp[ikb][config.ENDCAP]=0.053;
       //for these arrays, nFitBins[ikin][ieta], 
       //maxVarFit[ikin][ieta], sideband[ikin][ieta]
       // ikin=0 stands for total fit (e.g. 15-500)
@@ -242,16 +244,40 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
     pars.minVarFit[ikb][config.ENDCAP]=0.019;
     pars.maxVarFit[ikb][config.ENDCAP]=0.069;
     if (varKin=="phoEt" && pars.kinBinLims[ikb-1]>24){
-      pars.nFitBins[ikb][config.BARREL]=16;
+    pars.nFitBins[ikb][config.BARREL]=14;
+    pars.minVarFit[ikb][config.BARREL]=0.006;
+    pars.maxVarFit[ikb][config.BARREL]=0.018;
+    }
+    if (varKin=="phoEt" && pars.kinBinLims[ikb-1]>24){
+      pars.nFitBins[ikb][config.ENDCAP]=15;
+      pars.minVarFit[ikb][config.ENDCAP]=0.020;
+      pars.maxVarFit[ikb][config.ENDCAP]=0.065;
     }
 
-    pars.sideband[ikb][config.BARREL]=2.6;
-    pars.sideband[ikb][config.ENDCAP]=2.3;
+    pars.sideband[ikb][config.BARREL]=1.5;//2.6;
+    pars.sideband[ikb][config.ENDCAP]=1.2;//2.3;
+    pars.sidebandUp[ikb][config.BARREL]=5.0;//15.0;
+    pars.sidebandUp[ikb][config.ENDCAP]=5.0;//15.0;
       //for these arrays, nFitBins[ikin][ieta], 
       //maxVarFit[ikin][ieta], sideband[ikin][ieta]
       // ikin=0 stands for total fit (e.g. 15-500)
       // ikin=[1,nKinBins] are for individual bin fits 
       // ieta=0 - BARREL, ieta=1 - ENDCAP
+    if (vgamma==config.Z_GAMMA && varKin=="phoEt"){
+      pars.nFitBins[ikb][config.ENDCAP]=15;
+      pars.minVarFit[ikb][config.ENDCAP]=0.020;
+      pars.maxVarFit[ikb][config.ENDCAP]=0.065;
+      if (pars.kinBinLims[ikb-1]>24){
+        pars.nFitBins[ikb][config.BARREL]=10;
+        pars.minVarFit[ikb][config.BARREL]=0.006;
+        pars.maxVarFit[ikb][config.BARREL]=0.018;
+      }
+      if (pars.kinBinLims[ikb-1]>24){
+        pars.nFitBins[ikb][config.ENDCAP]=10;
+        pars.minVarFit[ikb][config.ENDCAP]=0.020;
+        pars.maxVarFit[ikb][config.ENDCAP]=0.060;
+      }
+    }
   }
 
   pars.strFileOutName=config.GetDDTemplateFileName(channel,vgamma,varKin);

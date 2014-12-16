@@ -107,6 +107,7 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   TMuonCuts muon;
   TPhotonCuts photon;
   TFullCuts fullCuts;
+  TConfiguration config;
   int nSources=_hasHist.size();
   int nTot[nSources];
   int nPass[nSources];
@@ -124,7 +125,7 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   cutExtra[3]=photon.RangeOneIsolation(year,wp,photon.ISO_CHorTRK);
   cutExtra[4]=photon.RangeOneIsolation(year,wp,photon.ISO_NEUorHCAL);
   cutExtra[5]=photon.RangeOneIsolation(year,wp,photon.ISO_PHOorECAL);
-  cutExtra[6]=fullCuts.RangeMetRelatedCut(year);
+  cutExtra[6]=fullCuts.RangeMetRelatedCut(year,config.MUON);
 
 
   for (int ic=0; ic<7; ic++){

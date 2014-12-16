@@ -200,11 +200,11 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
 
   if (varKin=="Mpholeplep"){
     anPars.varKin=varKin;
-    anPars.nKinBins=20;
+    anPars.nKinBins=11;
 //    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=60+5*ib;
+      anPars.kinBinLims[ib]=80+2*ib;
   }
 
   if (varKin=="Mpholep1" || varKin=="Mpholep2"){
@@ -218,10 +218,10 @@ void FullChain::SetDiffKinFullChainParameters(FullChainParameters& anPars, TStri
 
   if (varKin=="lep1PhoDeltaR" || varKin=="lep2PhoDeltaR"){
     anPars.varKin=varKin;
-    anPars.nKinBins=10;
+    anPars.nKinBins=55;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=0.7+0.5*ib;
+      anPars.kinBinLims[ib]=0.0+0.1*ib;
   }
   if (varKin=="pfMET"){
     anPars.varKin="pfMET";

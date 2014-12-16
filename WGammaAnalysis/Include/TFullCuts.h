@@ -58,13 +58,14 @@ public:
    void Print(PassedLevels& p);
 
   //float DeltaR(float phi1, float eta1, float phi2, float eta2); 
-  float GetWMtCut(int year);
+  float GetWMtCut(int year, int channel);
 
   TCut RangeMoreLeptonsVeto();
-  TCut RangeMetRelatedCut(int year);
+  TCut RangeMetRelatedCut(int year, int channel);
   TCut RangePhoEt();
   TCut RangeBlinding(int blind);
   TCut RangeExtraLeptonPt2011();
+  TCut RangeDeltaR(int vgamma);
   TCut RangeForTemplateMethodCut(int year, int channel, int vgamma, int blind, int phoWP);
   TCut RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP);
   TCut RangeFsrCut(int channel);
@@ -97,14 +98,17 @@ private:
 
   bool _isEvForCheck;
 
-  const static float _WMtCut2012 = 50.;//for 8 TeV
+
   const static float _WMtCut2011 = 70.;//from 7 TeV
   const static float _lePhoDeltaRCut = 0.7;//0.7;
+  const static float _lePhoDeltaRPreCut = 0.4;//for FSR selection
 
   const static float _ZmassLeft = 70.; 
   const static float _ZmassRight = 110.;
     // for Z-mass window cut for W_GAMMA in ELECTRON channel
 };
+
+  const static float _WMtCut2012[2] = {50.,70.};//MUON, ELECTRON //for 8 TeV
 
 #endif 
   //#ifndef TFullCuts_h

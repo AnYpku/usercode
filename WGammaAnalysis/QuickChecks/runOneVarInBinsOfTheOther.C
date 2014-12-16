@@ -1,6 +1,11 @@
 {
+  gStyle->SetCanvasColor(kWhite); 
   gROOT->ProcessLine(".L OneVarInBinsOfTheOther.C+");
-  TFile f("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root");
+//  TFile f("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
+//  TFile f("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_ZGammaBKGMC_DYjets_to_ll.root");
+  TFile f("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaBKGMC_Wjets_to_lnu.root");
+//  TFile f("../WGammaOutput/MUON/FsrSelected/selected_ZGamma_UNblind_DATA.root");
+
   TTree* tr = (TTree*)f.Get("selectedEvents");
   
   TCut cutB="phoSCEta<1.442 && phoSCEta>-1.442";
@@ -83,7 +88,7 @@
 */
 
 //phoSCRChIsoCorr in Barrel in 2 phoSigmaIEtaIEta bins: nominal and sideband
-
+/*
   TCut cutNoWeight="phoSCRChIsoCorr<20";
   cutNoWeight+=cutB;
   TString var1 = "phoSCRChIsoCorr";
@@ -95,6 +100,44 @@
   float histMax = 20.0;
 
   OneVarInBinsOfTheOther(tr, var1, cutNoWeight, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
+*/
 
+/*
+  TCut cutNoWeight="phoEt>15 && phoEt<20";
+  TString var1 = "phoSigmaIEtaIEta";
+  TString var2 = "phoPFChIsoCorr";
+  int nBinsVar2 = 4;
+  float binLimsVar2[nBinsVar2+1]={0,1.5,2.6,15,100};
+  int nBinsHist=16;
+  float histMin = 0.005;
+  float histMax = 0.021;
 
+//  OneVarInBinsOfTheOther("Wjets_MC_MUON_Sihih_Barrel", "pho #sigmai#etai#eta",tr, var1, cutNoWeight && cutB, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
+OneVarInBinsOfTheOther("DYjets_MC_MUON_Sihih_Barrel", "pho #sigmai#etai#eta",tr, var1, cutNoWeight && cutB, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
+
+  int nBinsVar2 = 4;
+  float binLimsVar2[nBinsVar2+1]={0,1.2,2.3,15,100};
+  int nBinsHist=12;
+  float histMin = 0.019;
+  float histMax = 0.067;
+
+  //OneVarInBinsOfTheOther("Wjets_MC_MUON_Sihih_Endcap", "pho #sigmai#etai#eta", tr, var1, cutNoWeight && cutE, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
+ // OneVarInBinsOfTheOther("DYjets_MC_MUON_Sihih_Endcap", "pho #sigmai#etai#eta", tr, var1, cutNoWeight && cutE, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
+*/
+
+  TCut cutNoWeight="phoEt>15 && phoEt<20";
+  TString var1 = "phoPFChIsoCorr";
+  TString var2 = "phoSigmaIEtaIEta";
+  int nBinsVar2 = 3;
+  float binLimsVar2[nBinsVar2+1]={0.005,0.011,0.014,0.021};
+  int nBinsHist=20;
+  float histMin = 0-0.1;
+  float histMax = 20-0.1;
+
+  OneVarInBinsOfTheOther("Wjets_MC_MUON_PFChIso_Barrel", "pho PF I_ch",tr, var1, cutNoWeight && cutB, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
+
+  int nBinsVar2 = 3;
+  float binLimsVar2[nBinsVar2+1]={0.019,0.034,0.050,0.067};
+
+  OneVarInBinsOfTheOther("Wjets_MC_MUON_PFChIso_Endcap", "pho PF I_ch",tr, var1, cutNoWeight && cutE, cutWeight, var2, nBinsVar2, binLimsVar2, nBinsHist, histMin, histMax);
 }
