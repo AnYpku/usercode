@@ -30,6 +30,8 @@
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesRandCone.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
+  gROOT->ProcessLine(".L ../PrepareYields/TSubtractBackground.C+");
+  gROOT->ProcessLine(".L ../PrepareYields/AuxPrepareYields.C+");
 
   gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
 

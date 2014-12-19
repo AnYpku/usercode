@@ -8,6 +8,7 @@
 #include "../DDBkgTemplateMethod/TTemplatesRandCone.h"
 #include "../DDBkgTemplateMethod/AuxTemplatesRandCone.C"
 #include "../PrepareYields/TPrepareYields.h"
+#include "../PrepareYields/AuxPrepareYields.C"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
 //#include "../CrossSection/CalcCrossSection.h"
 
@@ -291,8 +292,10 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     //prepare yields and subtract background
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
-    TPrepareYields yields(anPars.year, anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.phoWP, anPars.noDDBkgComputation);
-    yields.PrepareYields();
+    if (anPars.noDDBkgComputation) 
+      AuxPrepareYields(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+    else
+      AuxSubtractBackground(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
