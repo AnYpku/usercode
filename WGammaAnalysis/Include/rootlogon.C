@@ -30,7 +30,9 @@
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesRandCone.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
-/*
+  gROOT->ProcessLine(".L ../PrepareYields/TSubtractBackground.C+");
+  gROOT->ProcessLine(".L ../PrepareYields/AuxPrepareYields.C+");
+
   gROOT->ProcessLine(".L ../Unfolding/Unfolding.C+");
 
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
@@ -39,7 +41,7 @@
 
   gROOT->ProcessLine(".L ../FullChain/FullChain.C+");
 
-*/
+
   gROOT->ProcessLine(".L ../SkimSplitMerge/TInputOutputTree.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SkimLeptonPhoton.C+");
   gROOT->ProcessLine(".L ../SkimSplitMerge/SplitVDecayMC.C+");

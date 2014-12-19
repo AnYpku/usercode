@@ -26,26 +26,26 @@ TPrepareYields::~TPrepareYields()
 
 void TPrepareYields::SetPars(PrepareYieldsPars pars)
 {
-  _pars=pars;
+  _pyPars=pars;
 
-  //set _pars.cutKin
-  TString strCutKin=_pars.varKin;
+  //set _pyPars.cutKin
+  TString strCutKin=_pyPars.varKin;
   strCutKin+=">=";
-  strCutKin+=_pars.kinBinLims[0];
+  strCutKin+=_pyPars.kinBinLims[0];
   strCutKin+=" && ";
-  strCutKin+=_pars.varKin;
+  strCutKin+=_pyPars.varKin;
   strCutKin+="<=";
-  strCutKin+=_pars.kinBinLims[_pars.nKinBins];
-  _pars.cutKin=strCutKin;
-  std::cout<<"_cutKin="<<_pars.cutKin.GetTitle()<<std::endl;
+  strCutKin+=_pyPars.kinBinLims[_pyPars.nKinBins];
+  _pyPars.cutKin=strCutKin;
+  std::cout<<"_cutKin="<<_pyPars.cutKin.GetTitle()<<std::endl;
 
-  //set _pars.cutWeight
-  TString strWeight=_pars.varWeight;
+  //set _pyPars.cutWeight
+  TString strWeight=_pyPars.varWeight;
   strWeight+="*";
-  strWeight+=_pars.blindFraction;//0.05 if blinded, 1 if unblinded
-  _pars.cutWeight=strWeight;
+  strWeight+=_pyPars.blindFraction;//0.05 if blinded, 1 if unblinded
+  _pyPars.cutWeight=strWeight;
 
-  _pars.fOut=new TFile(_pars.strFileOut,"recreate");
+  _pyPars.fOut=new TFile(_pyPars.strFileOut,"recreate");
 }
 
 bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString label, int color, TString fileName, TString treeName)
@@ -84,15 +84,15 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
 
   TCut cutW="1";
   if (source.sourceType!=DATA)
-    cutW=_pars.cutWeight;
+    cutW=_pyPars.cutWeight;
 
-  _pars.fOut->cd();
+  _pyPars.fOut->cd();
 
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     //Set 1D yields
-    source.hist[ieta] = new TH1F(source.strYieldsName1D[ieta],source.strYieldsName1D[ieta],_pars.nKinBins,_pars.kinBinLims);
+    source.hist[ieta] = new TH1F(source.strYieldsName1D[ieta],source.strYieldsName1D[ieta],_pyPars.nKinBins,_pyPars.kinBinLims);
     source.hist[ieta]->Sumw2();
-    source.tr->Draw(_pars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta))*cutW,"goff");
+    source.tr->Draw(_pyPars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta))*cutW,"goff");
     source.hist[ieta]->SetLineColor(source.color);
     source.hist[ieta]->SetFillColor(source.color);
     if (source.sourceType==DATA) source.hist[ieta]->SetFillColor(0);
@@ -100,9 +100,9 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
     source.hist[ieta]->SetStats(0);
 
     //Set total yield
-    TH1F* floatingHist = new TH1F("floatingHist","hist for temprorary storage of total yields",1,source.tr->GetMinimum(_pars.varKin)-1,source.tr->GetMaximum(_pars.varKin)+1);//inputFileNumber
+    TH1F* floatingHist = new TH1F("floatingHist","hist for temprorary storage of total yields",1,source.tr->GetMinimum(_pyPars.varKin)-1,source.tr->GetMaximum(_pyPars.varKin)+1);//inputFileNumber
     floatingHist->Sumw2();
-    source.tr->Draw(_pars.varKin+TString(">>floatingHist"),(CutEta(ieta) && _pars.cutKin)*cutW,"goff");
+    source.tr->Draw(_pyPars.varKin+TString(">>floatingHist"),(CutEta(ieta) && _pyPars.cutKin)*cutW,"goff");
     source.yieldTotVal[ieta] = floatingHist->GetBinContent(1);
     source.yieldTotErr[ieta] = floatingHist->GetBinError(1);
     //std::cout<<"val+-err="<<source.yieldTotVal[ieta]<<"+-"<<source.yieldTotErr[ieta]<<std::endl;
@@ -134,7 +134,7 @@ void TPrepareYields::PlotPrintSave()
 
 void TPrepareYields::CompareTotalDATAvsMC(int ieta)
 {
-  _pars.fOut->cd();
+  _pyPars.fOut->cd();
   TString canvName="TotalDATAvsMC";
   canvName+=StrLabelEta(ieta);
   _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,800);
@@ -201,8 +201,8 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   pad2->SetTopMargin(0.01);
   pad2->SetRightMargin(0.07);
   pad2->SetBottomMargin(0.45);
-  if (_pars.doLogX) pad1->SetLogx();
-  if (_pars.doLogY) pad1->SetLogy();
+  if (_pyPars.doLogX) pad1->SetLogx();
+  if (_pyPars.doLogY) pad1->SetLogy();
   pad1->cd();
 
   float max = hist1->GetMaximum();
@@ -211,14 +211,14 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   float min = 0.3*hist1->GetMinimum();
   if (min>0.3*hist2->GetMinimum())
     min=0.3*hist2->GetMinimum();
-  if (!_pars.doLogX) min=0;
+  if (!_pyPars.doLogX) min=0;
   max=1.2*max;
 
   if (isStack) hist2->SetLineColor(2);
   if (isStack) hist2->SetFillStyle(0);
   hist1->GetYaxis()->SetRangeUser(min,max);
   hist1->SetStats(0);
-  if (_pars.doLogY) {hist1->GetYaxis()->SetMoreLogLabels(); hist1->GetYaxis()->SetNoExponent();}
+  if (_pyPars.doLogY) {hist1->GetYaxis()->SetMoreLogLabels(); hist1->GetYaxis()->SetNoExponent();}
   hist1->Draw("P");
   if (isStack) stack->Draw("HIST same"); 
   else hist2->Draw("HIST same");
@@ -232,7 +232,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   latexTitle->Draw("same");
 
   pad2->cd();
-  if (_pars.doLogX) pad2->SetLogx();
+  if (_pyPars.doLogX) pad2->SetLogx();
   TString hRName = "hRatio";
   hRName+=hist1->GetTitle();
   hRName+=hist2->GetTitle();
@@ -261,7 +261,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   hRatio->GetXaxis()->SetNoExponent();
 
   hRatio->Draw();
-  hRatio->SetTitle(TString("; ")+_pars.varKinLabel+TString(" ;"));
+  hRatio->SetTitle(TString("; ")+_pyPars.varKinLabel+TString(" ;"));
   int nBins = hRatio->GetNbinsX();
   TLine* line = new TLine(hRatio->GetBinLowEdge(1),1,hRatio->GetBinLowEdge(nBins)+hRatio->GetBinWidth(nBins),1);
   line->SetLineWidth(2);
@@ -270,7 +270,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
 
   TString nameForSave="canv";
   nameForSave+="_";
-  nameForSave+=_pars.varKin;
+  nameForSave+=_pyPars.varKin;
   nameForSave+="_";
   nameForSave+=canv->GetTitle();
   nameForSave.ReplaceAll(" ","");
@@ -281,8 +281,8 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
 
 TCut TPrepareYields::CutEta(int ieta)
 {
-  if (ieta==_BARREL) return _pars.cutBarrel;
-  if (ieta==_ENDCAP) return _pars.cutEndcap;
+  if (ieta==_BARREL) return _pyPars.cutBarrel;
+  if (ieta==_ENDCAP) return _pyPars.cutEndcap;
   return "1";
 }
 

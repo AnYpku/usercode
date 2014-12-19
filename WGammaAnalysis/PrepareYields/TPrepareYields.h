@@ -19,7 +19,7 @@ class TPrepareYields
     TPrepareYields();
     virtual ~TPrepareYields();
 
-    enum {DATA, SIGMC, BKGMC};//sourceType
+    enum {DATA, SIGMC, BKGMC, BKGMC_TRUE, BKGMC_FAKE, DATA_DRIVEN};//sourceType
 
     struct PrepareYieldsPars{
       TString varKin;
@@ -62,7 +62,7 @@ class TPrepareYields
 
     enum {_BARREL=0, _ENDCAP=1, _COMMON=2};
 
-    PrepareYieldsPars _pars;
+    PrepareYieldsPars _pyPars;
     vector <YieldsSource> _sources;
 
     TString StrLabelEta(int ieta);

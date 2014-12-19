@@ -281,6 +281,8 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
     if (anPars.noDDBkgComputation) 
       AuxPrepareYields(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+    else
+      AuxSubtractBackground(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
