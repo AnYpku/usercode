@@ -29,6 +29,7 @@ class TPrepareYields
       TString varWeight;
       TCut cutBarrel;
       TCut cutEndcap;
+      TCut cutAdd;
       bool doLogX;
       bool doLogY;
       TString varKinLabel;

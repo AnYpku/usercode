@@ -21,22 +21,13 @@ class TTemplatesRandCone
   public:
     const static int nKinBinsMax=50;
     struct TemplatesRandConePars{
-//      int channel;
-//      int vgamma;
       TString varKin;
-      int nKinBins;
-      float kinBinLims[nKinBinsMax];
-      int nFitBins[nKinBinsMax][2];
-      float minVarFit[nKinBinsMax][2];
-      float maxVarFit[nKinBinsMax][2];
-      float sideband[nKinBinsMax][2];
-      float sidebandUp[nKinBinsMax][2];
-      TFile* fOutForSave;
-      TString strFileOutName;
-      TString strTrueYieldsTot[3];
-      TString strTrueYields1D[3];
-      TString strFakeYieldsTot[3];
-      TString strFakeYields1D[3];
+      TString varTrueTempl;
+      TString varFakeTempl;
+      TString varSideband;
+      TString varFit; 
+      TString varPhoEta;
+      TString varWeight;
       TFile* fTrue;
       TFile* fFake;
       TFile* fData;
@@ -45,12 +36,16 @@ class TTemplatesRandCone
       TTree* treeFake;
       TTree* treeData;
       TTree* treeSign;//treeSign has to be consistent with treeFake
-      TString varSideband;
-      TString varTrueTempl;
-      TString varFakeTempl;
-      TString varFit; 
-      TString varPhoEta;
-      TString varWeight;
+      int nKinBins;
+      float kinBinLims[nKinBinsMax];
+      int nFitBins[nKinBinsMax][2];
+      float minVarFit[nKinBinsMax][2];
+      float maxVarFit[nKinBinsMax][2];
+      float sideband[nKinBinsMax][2];
+      float sidebandUp[nKinBinsMax][2];
+      bool combineTrueTempl[nKinBinsMax][2];
+      bool combineFakeTempl[nKinBinsMax][2];
+      TCut cutAdd;
       TCut cutBarrel;
       TCut cutEndcap;
       TCut cutNominal;
@@ -58,6 +53,12 @@ class TTemplatesRandCone
       TCut cutSidebandVarNominalRange;
       TCut cutWeight;
       bool noLeakSubtr;
+      TFile* fOutForSave;
+      TString strFileOutName;
+      TString strTrueYieldsTot[3];
+      TString strTrueYields1D[3];
+      TString strFakeYieldsTot[3];
+      TString strFakeYields1D[3];
     };//end of struct TemplatesRandConePars
     TTemplatesRandCone();
     TTemplatesRandCone(TemplatesRandConePars pars);
@@ -65,6 +66,7 @@ class TTemplatesRandCone
 
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
+    void PrintPars();
 
   protected:
 

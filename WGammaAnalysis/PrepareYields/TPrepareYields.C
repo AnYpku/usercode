@@ -39,11 +39,7 @@ void TPrepareYields::SetPars(PrepareYieldsPars pars)
   _pyPars.cutKin=strCutKin;
   std::cout<<"_cutKin="<<_pyPars.cutKin.GetTitle()<<std::endl;
 
-  //set _pyPars.cutWeight
-  TString strWeight=_pyPars.varWeight;
-  strWeight+="*";
-  strWeight+=_pyPars.blindFraction;//0.05 if blinded, 1 if unblinded
-  _pyPars.cutWeight=strWeight;
+
 
   _pyPars.fOut=new TFile(_pyPars.strFileOut,"recreate");
 }
@@ -83,9 +79,13 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
   }
   source.tr = (TTree*)f->Get(treeName);
 
-  TCut cutW="1";
-  if (source.sourceType!=DATA)
-    cutW=_pyPars.cutWeight;
+  
+  TString strWeight=_pyPars.varWeight;
+  if (source.sourceType!=DATA){
+    strWeight+="*";
+    strWeight+=_pyPars.blindFraction;//0.05 if blinded, 1 if unblinded
+  }
+  TCut cutW(strWeight);
 
   _pyPars.fOut->cd();
 
@@ -93,7 +93,7 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
     //Set 1D yields
     source.hist[ieta] = new TH1F(source.strYieldsName1D[ieta],source.strYieldsName1D[ieta],_pyPars.nKinBins,_pyPars.kinBinLims);
     source.hist[ieta]->Sumw2();
-    source.tr->Draw(_pyPars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta))*cutW,"goff");
+    source.tr->Draw(_pyPars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta) && _pyPars.cutAdd)*cutW,"goff");
     source.hist[ieta]->SetLineColor(source.color);
     source.hist[ieta]->SetFillColor(source.color);
     if (source.sourceType==DATA) source.hist[ieta]->SetFillColor(0);
@@ -103,7 +103,7 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
     //Set total yield
     TH1F* floatingHist = new TH1F("floatingHist","hist for temprorary storage of total yields",1,source.tr->GetMinimum(_pyPars.varKin)-1,source.tr->GetMaximum(_pyPars.varKin)+1);//inputFileNumber
     floatingHist->Sumw2();
-    source.tr->Draw(_pyPars.varKin+TString(">>floatingHist"),(CutEta(ieta) && _pyPars.cutKin)*cutW,"goff");
+    source.tr->Draw(_pyPars.varKin+TString(">>floatingHist"),(CutEta(ieta) && _pyPars.cutKin && _pyPars.cutAdd)*cutW,"goff");
     source.yieldTotVal[ieta] = floatingHist->GetBinContent(1);
     source.yieldTotErr[ieta] = floatingHist->GetBinError(1);
     //std::cout<<"val+-err="<<source.yieldTotVal[ieta]<<"+-"<<source.yieldTotErr[ieta]<<std::endl;

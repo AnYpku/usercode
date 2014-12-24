@@ -319,6 +319,7 @@ bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& ic
       if (ilep1==-1){
         dR1=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
         if (dR1<_lePhoDeltaRPreCut) break;
+        if (vgamma==_config.W_GAMMA && dR1<_lePhoDeltaRCut) break;
         ilep1=ilep;
       }
       else if (vgamma==_config.Z_GAMMA){ // if Z_GAMMA and first dR already found
@@ -468,7 +469,7 @@ TCut TFullCuts::RangeFsrCut(int channel)
 {
   TCut cut;
 //  cut = "Mpholeplep<101 && Mpholeplep>81 && (lep1PhoDeltaR<0.8 || lep2PhoDeltaR<0.8)";
-  cut = "Mpholeplep<101 && Mpholeplep>81";
+  cut = "Mpholeplep<101 && Mpholeplep>81 && lep1PhoDeltaR>0.4";
   cut = cut && _photon.RangePhoton(2012, _photon.WP_LOOSE, 0, 0);// 0 - no sigmaIEtaIEta cut
   return cut;
 }

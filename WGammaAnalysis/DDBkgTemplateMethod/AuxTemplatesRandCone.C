@@ -14,36 +14,40 @@
 //ROOT
 
 void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
+	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd="1");
 
-void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
+void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd="1");
 
-void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma);
+void SetLimsChIsoTempl_phoEt_Wg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
+void SetLimsChIsoTempl_phoEt_Zg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
+void SetLimsSihihTempl_phoEt_Wg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
+void SetLimsSihihTempl_phoEt_Zg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
 
-void AuxTemplatesRandCone(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplatesRandCone::TemplatesRandConePars &pars);
+
+void AuxTemplatesRandCone(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, int templFits, TCut cutAdd="1")
 {
   //this function is called in FullChain
 
   TTemplatesRandCone::TemplatesRandConePars pars;
 
-  SetParsSigmaIEtaIEtaTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+  if (templFits==TConfiguration::TEMPL_SIHIH) 
+    SetParsSigmaIEtaIEtaTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims, cutAdd);
 
-//  SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-//  SetParsSpecialCases(pars, vgamma);
+  if (templFits==TConfiguration::TEMPL_CHISO) 
+    SetParsChIsoTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims, cutAdd);
+
 
   TTemplatesRandCone temp(pars);
   temp.ComputeBackground();
 }
 
-void AuxTemplatesRandConeSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplatesRandConeSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, int templFits, TCut cutAdd="1")
 {
   //this function is called in FullChain
 
   TTemplatesRandCone::TemplatesRandConePars pars;
-
-  SetParsRegularCases(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-  SetParsSpecialCases(pars, vgamma);
 
   TTemplatesRandConeSyst temp(pars);
   temp.SidebandVariation();
@@ -60,9 +64,10 @@ TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
   return (TTree*)f->Get("selectedEvents");
 }
 
-void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd)
 {
+
   TConfiguration config;
   TPhotonCuts photon;
   pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
@@ -77,9 +82,11 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
       pars.nFitBins[ikb][ieta]=21;
       pars.minVarFit[ikb][ieta]=-1.0+0.1;
       pars.maxVarFit[ikb][ieta]=20.0+0.1;
+      pars.combineTrueTempl[ikb][ieta]=0;
+      pars.combineFakeTempl[ikb][ieta]=0;
     }
-    pars.sideband[ikb][config.BARREL]=0.012;
-    pars.sideband[ikb][config.ENDCAP]=0.034;
+    pars.sideband[ikb][config.BARREL]=0.011;
+    pars.sideband[ikb][config.ENDCAP]=0.033;
     pars.sidebandUp[ikb][config.BARREL]=0.018;
     pars.sidebandUp[ikb][config.ENDCAP]=0.053;
       //for these arrays, nFitBins[ikin][ieta], 
@@ -88,6 +95,11 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
       // ikin=[1,nKinBins] are for individual bin fits 
       // ieta=0 - BARREL, ieta=1 - ENDCAP
   }
+  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.W_GAMMA)
+    SetLimsChIsoTempl_phoEt_Wg_MUON(pars);
+
+  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.Z_GAMMA)
+    SetLimsChIsoTempl_phoEt_Zg_MUON(pars);
 
   pars.strFileOutName=config.GetDDTemplateFileName(channel,vgamma,varKin);
     //the histograms with extracted yields will be saved here
@@ -123,9 +135,9 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
   if (!pars.treeFake) return;
 
   pars.varSideband="phoSigmaIEtaIEta";//TString
-  pars.varTrueTempl="phoRandConeChIso04Corr";//TString
-  pars.varFakeTempl="phoSCRChIso04Corr";//TString
-  pars.varFit="phoSCRChIso04Corr"; //TString
+  pars.varTrueTempl="phoRandConeChIso04Corr";//"phoRandConeChIso04Corr";//TString
+  pars.varFakeTempl="phoSCRChIso04Corr";//"phoSCRChIso04Corr";//TString
+  pars.varFit="phoSCRChIso04Corr";//"phoSCRChIso04Corr"; //TString
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
@@ -140,93 +152,17 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, int ch
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
-
+  pars.cutAdd=cutAdd;
   pars.noLeakSubtr=0;
-}
 
-void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma)
-{
-  TConfiguration config;
+}// end of SetParsChIsoTempl()
 
-  // for 
-  for (int ikin=0; ikin<=pars.nKinBins; ikin++){
-    if (ikin==0) continue;//0 is for Total yield
-    if (pars.varKin=="phoEt"){
-      if (pars.kinBinLims[ikin-1]>34){
-        pars.sideband[ikin][config.ENDCAP] = 0.033;
-      }
-      if (pars.kinBinLims[ikin-1]>54){
-        pars.sideband[ikin][config.BARREL] = 0.011;
-      }
-      if (pars.kinBinLims[ikin-1]>74){
-        pars.nFitBins[ikin][config.ENDCAP] = 10;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-        pars.sideband[ikin][config.ENDCAP] = 0.030;
-      }
-      if (pars.kinBinLims[ikin-1]>94){
-        pars.nFitBins[ikin][config.ENDCAP] = 8;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-        pars.sideband[ikin][config.ENDCAP] = 0.025;
-      }
-    }//end of if (pars.varKin=="phoEt")
-    if (pars.varKin=="WMt"){
-      if (pars.kinBinLims[ikin-1]>119){
-        pars.nFitBins[ikin][config.BARREL] = 8;
-        pars.maxVarFit[ikin][config.BARREL] = 16.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 8;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-      }     
-    }
-  }//end of loop over ikin
-  if (vgamma == config.W_GAMMA) return;
-  // for Z_GAMMA only; make less bins and lower maxVarFit 
-  // for high phoEt bins otherwise fit doesn't work
-  for (int ikin=0; ikin<=pars.nKinBins; ikin++){
-    if (ikin==0) continue;//0 is for Total yield
-    if (pars.varKin=="phoEt" && vgamma==config.Z_GAMMA){ 
-      if (pars.kinBinLims[ikin-1]>24){
-        pars.nFitBins[ikin][config.BARREL] = 8;
-        pars.maxVarFit[ikin][config.BARREL] = 16.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 16;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-      }
-      if (pars.kinBinLims[ikin-1]>29){
-        pars.nFitBins[ikin][config.BARREL] = 10;
-        pars.maxVarFit[ikin][config.BARREL] = 16.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 10;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-      }
-      if (pars.kinBinLims[ikin-1]>34){
-        pars.nFitBins[ikin][config.BARREL] = 8;
-        pars.maxVarFit[ikin][config.BARREL] = 16.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 10;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-      }
-      if (pars.kinBinLims[ikin-1]>54){
-        pars.nFitBins[ikin][config.BARREL] = 10;
-        pars.maxVarFit[ikin][config.BARREL] = 16.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 5;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-      }
-      if (pars.kinBinLims[ikin-1]>74){
-        pars.nFitBins[ikin][config.BARREL] = 8;
-        pars.maxVarFit[ikin][config.BARREL] = 16.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 5;
-        pars.maxVarFit[ikin][config.ENDCAP] = 16.0;
-      }
-      if (pars.kinBinLims[ikin-1]>94){
-        pars.nFitBins[ikin][config.BARREL] = 3;
-        pars.maxVarFit[ikin][config.BARREL] = 12.0;
-        pars.nFitBins[ikin][config.ENDCAP] = 3;
-        pars.maxVarFit[ikin][config.ENDCAP] = 12.0;
-      }
-    }//end of if (varKin=="phoEt")
-  }//end of ikin loop
-}
+
 
 void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd)
 {
+
   TConfiguration config;
   TPhotonCuts photon;
   pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
@@ -243,42 +179,19 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
     pars.nFitBins[ikb][config.ENDCAP]=25;
     pars.minVarFit[ikb][config.ENDCAP]=0.019;
     pars.maxVarFit[ikb][config.ENDCAP]=0.069;
-    if (varKin=="phoEt" && pars.kinBinLims[ikb-1]>24){
-    pars.nFitBins[ikb][config.BARREL]=14;
-    pars.minVarFit[ikb][config.BARREL]=0.006;
-    pars.maxVarFit[ikb][config.BARREL]=0.018;
-    }
-    if (varKin=="phoEt" && pars.kinBinLims[ikb-1]>24){
-      pars.nFitBins[ikb][config.ENDCAP]=15;
-      pars.minVarFit[ikb][config.ENDCAP]=0.020;
-      pars.maxVarFit[ikb][config.ENDCAP]=0.065;
-    }
-
     pars.sideband[ikb][config.BARREL]=1.5;//2.6;
     pars.sideband[ikb][config.ENDCAP]=1.2;//2.3;
     pars.sidebandUp[ikb][config.BARREL]=5.0;//15.0;
     pars.sidebandUp[ikb][config.ENDCAP]=5.0;//15.0;
-      //for these arrays, nFitBins[ikin][ieta], 
-      //maxVarFit[ikin][ieta], sideband[ikin][ieta]
-      // ikin=0 stands for total fit (e.g. 15-500)
-      // ikin=[1,nKinBins] are for individual bin fits 
-      // ieta=0 - BARREL, ieta=1 - ENDCAP
-    if (vgamma==config.Z_GAMMA && varKin=="phoEt"){
-      pars.nFitBins[ikb][config.ENDCAP]=15;
-      pars.minVarFit[ikb][config.ENDCAP]=0.020;
-      pars.maxVarFit[ikb][config.ENDCAP]=0.065;
-      if (pars.kinBinLims[ikb-1]>24){
-        pars.nFitBins[ikb][config.BARREL]=10;
-        pars.minVarFit[ikb][config.BARREL]=0.006;
-        pars.maxVarFit[ikb][config.BARREL]=0.018;
-      }
-      if (pars.kinBinLims[ikb-1]>24){
-        pars.nFitBins[ikb][config.ENDCAP]=10;
-        pars.minVarFit[ikb][config.ENDCAP]=0.020;
-        pars.maxVarFit[ikb][config.ENDCAP]=0.060;
-      }
-    }
+    pars.combineTrueTempl[ikb][config.BARREL]=0;
+    pars.combineTrueTempl[ikb][config.ENDCAP]=0;
+    pars.combineFakeTempl[ikb][config.BARREL]=0;
+    pars.combineFakeTempl[ikb][config.ENDCAP]=0;
   }
+  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.W_GAMMA)
+    SetLimsSihihTempl_phoEt_Wg_MUON(pars);
+  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.Z_GAMMA)
+    SetLimsSihihTempl_phoEt_Zg_MUON(pars);
 
   pars.strFileOutName=config.GetDDTemplateFileName(channel,vgamma,varKin);
     //the histograms with extracted yields will be saved here
@@ -331,6 +244,149 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
-
+  pars.cutAdd=cutAdd;
   pars.noLeakSubtr=0;
+
 }
+
+void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplatesRandCone::TemplatesRandConePars &pars)
+{
+  TConfiguration config;
+  for (int ik=0; ik<=pars.nKinBins; ik++){
+    pars.nFitBins[ik][ieta]=(int)vals[0+7*ik];
+    pars.minVarFit[ik][ieta]=    vals[1+7*ik];
+    pars.maxVarFit[ik][ieta]=    vals[2+7*ik];
+    pars.sideband[ik][ieta]=     vals[3+7*ik];
+    pars.sidebandUp[ik][ieta]=   vals[4+7*ik];
+    pars.combineTrueTempl[ik][ieta]=vals[5+7*ik];
+    pars.combineFakeTempl[ik][ieta]=vals[6+7*ik];
+    std::cout<<"ik="<<ik<<", ieta="<<ieta<<", nFitBins="<<pars.nFitBins[ik][ieta]<<", varFit: "<<pars.minVarFit[ik][ieta]<<"-"<<pars.maxVarFit[ik][ieta]<<", sideband: "<<pars.sideband[ik][ieta]<<"-"<<pars.sidebandUp[ik][ieta]<<"; combTrue="<<pars.combineTrueTempl[ik][ieta]<<"; combineFake="<<pars.combineFakeTempl[ik][ieta]<<std::endl;
+  }
+}// end of SetValuesToKinEtaArray
+
+void SetLimsSihihTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+{
+    TConfiguration config;
+    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp, combTrue, combFake
+
+    float valsB[250]={32, 0.005, 0.021, 1.5, 5.0, 0, 0,//Total
+                      32, 0.005, 0.021, 1.5, 5.0, 0, 0,//15-20 GeV
+                      32, 0.005, 0.021, 1.5, 5.0, 0, 0,//20-25 GeV
+                      24, 0.006, 0.018, 1.5, 5.0, 0, 0,//25-30 GeV
+                      12, 0.006, 0.018, 1.5, 5.0, 0, 0,//30-35 GeV
+                      13, 0.005, 0.018, 1.5, 5.0, 0, 0,//35-40 GeV
+                      13, 0.005, 0.018, 1.7, 5.0, 0, 0,//40-55 GeV
+                       8, 0.006, 0.014, 2.5, 6.0, 1, 1,//55-75 GeV
+                       8, 0.006, 0.014, 2.5, 6.0, 1, 1,//75-95 GeV
+                       8, 0.006, 0.014, 2.5, 6.0, 1, 1};//95-500 GeV
+
+    float valsE[250]={25, 0.019, 0.069, 1.1, 5.0, 0, 0,//Total
+                      25, 0.019, 0.069, 1.1, 5.0, 0, 0,//15-20 GeV
+                      25, 0.019, 0.069, 1.1, 5.0, 0, 0,//20-25 GeV
+                      18, 0.019, 0.055, 1.2, 5.0, 0, 0,//25-30 GeV
+                      18, 0.019, 0.055, 1.2, 5.0, 0, 0,//30-35 GeV
+                      18, 0.019, 0.055, 1.2, 5.0, 0, 0,//35-40 GeV
+                      13, 0.019, 0.045, 1.2, 5.0, 0, 0,//40-55 GeV
+                      13, 0.019, 0.045, 1.8, 6.0, 1, 1,//55-75 GeV
+                      13, 0.019, 0.045, 1.8, 6.0, 1, 1,//75-95 GeV
+                      13, 0.019, 0.045, 1.8, 6.0, 1, 1};//95-500 GeV  
+                 
+    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
+    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
+}//end  of SetLimsSihihTempl_phoEt_Wg_MUON
+
+void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+{
+    TConfiguration config;
+    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
+
+    float valsB[250]={32, 0.005, 0.021, 1.5, 5.0, 0, 0,//Total
+                      32, 0.005, 0.021, 1.5, 5.0, 0, 0,//15-20 GeV
+                      32, 0.005, 0.021, 1.5, 5.0, 0, 0,//20-25 GeV
+                      24, 0.006, 0.018, 1.5, 5.0, 0, 0,//25-30 GeV
+                      12, 0.006, 0.018, 1.5, 5.0, 0, 0,//30-35 GeV
+                      13, 0.005, 0.018, 1.5, 5.0, 0, 0,//35-40 GeV
+                       8, 0.006, 0.014, 1.7, 5.0, 0, 0,//40-55 GeV
+                       8, 0.006, 0.014, 2.5, 6.0, 0, 0,//55-75 GeV
+                       8, 0.006, 0.014, 2.5, 6.0, 0, 0,//75-95 GeV
+                       8, 0.006, 0.014, 2.5, 6.0, 0, 0};//95-500 GeV
+
+    float valsE[250]={25, 0.019, 0.069, 1.2, 5.0, 0, 0,//Total
+                      25, 0.019, 0.069, 1.2, 5.0, 0, 0,//15-20 GeV
+                      18, 0.019, 0.055, 1.2, 5.0, 0, 0,//20-25 GeV
+                      18, 0.019, 0.055, 1.2, 5.0, 0, 0,//25-30 GeV
+                       9, 0.021, 0.039, 1.2, 5.0, 0, 0,//30-35 GeV
+                      10, 0.019, 0.039, 1.2, 5.0, 0, 0,//35-40 GeV
+                      13, 0.019, 0.045, 1.2, 5.0, 0, 0,//40-55 GeV
+                      13, 0.019, 0.045, 1.8, 6.0, 0, 0,//55-75 GeV
+                      13, 0.019, 0.045, 1.8, 6.0, 0, 0,//75-95 GeV
+                      13, 0.019, 0.045, 1.8, 6.0, 0, 0};//95-500 GeV 
+                 
+    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
+    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
+}//end  of SetLimsSihihTempl_phoEt_Zg_MUON
+
+
+void SetLimsChIsoTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+{
+    TConfiguration config;
+    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
+
+    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//Total
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//15-20 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//20-25 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//25-30 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//30-35 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//35-40 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//40-55 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//55-75 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//75-95 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0};//95-500 GeV
+
+    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//Total
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//15-20 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//20-25 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//25-30 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//30-35 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//35-40 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//40-55 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//55-75 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//75-95 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0};//95-500 GeV  
+                 
+    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
+    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars); 
+                 
+}//end  of SetLimsChIsoTempl_phoEt_Wg_MUON
+
+void SetLimsChIsoTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+{
+    TConfiguration config;
+    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
+
+    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//Total
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//15-20 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//20-25 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//25-30 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//30-35 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//35-40 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//40-55 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//55-75 GeV
+                      11, -2.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 1,//75-95 GeV
+                      10, -2.0+0.1, 18.0+0.1, 0.011, 0.018, 0, 1};//95-500 GeV
+
+    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.032, 0.053, 0, 0,//Total
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.053, 0, 0,//15-20 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.053, 0, 0,//20-25 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.053, 0, 0,//25-30 GeV
+                      15, -1.0+0.1, 14.0+0.1, 0.032, 0.053, 0, 0,//30-35 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.053, 0, 0,//35-40 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.053, 0, 0,//40-55 GeV
+                       9, -2.0+0.1, 16.0+0.1, 0.033, 0.053, 0, 0,//55-75 GeV
+                       9, -2.0+0.1, 16.0+0.1, 0.033, 0.053, 1, 1,//75-95 GeV
+                       7, -2.0+0.1, 12.0+0.1, 0.032, 0.053, 1, 1};//95-500 GeV  
+                 
+    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
+    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
+     
+}//end  of SetLimsChIsoTempl_phoEt_Zg_MUON

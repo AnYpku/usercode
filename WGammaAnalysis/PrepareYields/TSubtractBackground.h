@@ -16,29 +16,25 @@ class TSubtractBackground: public TPrepareYields
 
     void PlotPrintSave();
 
-    struct SubtractBackgroundPars{
-//      float DDTrueGammaYieldTot[3];
-//      float DDTrueGammaYieldTotErr[3];
-//      TH1F* DDTrueGammaYields[3];
-//      float DDFakeGammaYieldTot[3];
-//      float DDFakeGammaYieldTotErr[3];
-//      TH1F* DDFakeGammaYields[3];
-    };
+
   
   private:
-    SubtractBackgroundPars _sbPars;
+
     YieldsSource _sourceDDTrue;
     YieldsSource _sourceDDFake;
     YieldsSource _sourceBkgSubtrData;
 
     void SetYieldsDataDriven(YieldsSource& source, TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
     void CompareFakeDDvsMC(int ieta);
-//    void CompareTrueDDvsMC(int ieta);
+    void CompareTrueDDvsMC(int ieta);
+    void CompareDDvsMC(int ieta, TString strDD, int bkgType, YieldsSource& sourceDD, TCanvas* canv);
+    void CompareDATAvsDDsum(int ieta);
 //    void CompareBkgSubtrDATAvsSIGMC(int ieta);
 
     TCanvas* _canvFakeDDvsMC[3];
     TCanvas* _canvTrueDDvsMC[3];
     TCanvas* _canvBkgSubtrDATAvsSIGMC[3];
+    TCanvas* _canvDATAvsDDsum[3];
 };
 
 #endif //TSubtractBackground

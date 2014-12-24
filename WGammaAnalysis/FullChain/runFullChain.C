@@ -30,9 +30,11 @@
 
   anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
-  anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
-
+  anPars.blind=TConfiguration::UNBLIND;//_PRESCALE;//BLIND_PRESCALE or UNBLIND
+  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
+  anPars.templFits=TConfiguration::TEMPL_CHISO;//TEMPL_CHISO or TEMPL_SIHIH
+  anPars.cutAdd="1";//"phoEt<40";
+  //anPars.cutAdd="phoEt<40"; // for PT_THRESHOLD blinding 
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
   anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;

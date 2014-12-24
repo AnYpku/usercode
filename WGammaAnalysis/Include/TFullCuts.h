@@ -101,7 +101,7 @@ private:
 
   const static float _WMtCut2011 = 70.;//from 7 TeV
   const static float _lePhoDeltaRCut = 0.7;//0.7;
-  const static float _lePhoDeltaRPreCut = 0.4;//for FSR selection
+  const static float _lePhoDeltaRPreCut = 0.4;//0.4;//for FSR selection
 
   const static float _ZmassLeft = 70.; 
   const static float _ZmassRight = 110.;

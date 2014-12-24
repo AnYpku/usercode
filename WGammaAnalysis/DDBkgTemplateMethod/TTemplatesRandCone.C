@@ -56,6 +56,7 @@ void TTemplatesRandCone::SetPars(TemplatesRandConePars pars)
 
 void TTemplatesRandCone::ComputeBackground(bool noPrint, bool noPlot)
 {
+  if (!noPrint) PrintPars();
   for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
   //for (int ikin=0; ikin<=1; ikin++){
     ComputeBackgroundOne(ikin,_COMMON,noPrint);
@@ -64,6 +65,48 @@ void TTemplatesRandCone::ComputeBackground(bool noPrint, bool noPlot)
   PrintYieldsAndChi2();
   SaveYields();
 }
+
+void TTemplatesRandCone::PrintPars()
+{
+  std::cout<<"==============================="<<std::endl;
+  std::cout<<"||||========== TemplatesRandcone parameters"<<std::endl;
+  std::cout<<"varKin: "<<_pars.varKin<<std::endl;
+  std::cout<<"varTrueTempl: "<<_pars.varTrueTempl<<std::endl;
+  std::cout<<"varFakeTempl: "<<_pars.varFakeTempl<<std::endl;
+  std::cout<<"varSideband: "<<_pars.varSideband<<std::endl;
+  std::cout<<"varPhoEta: "<<_pars.varPhoEta<<std::endl;
+  std::cout<<"varWeight: "<<_pars.varWeight<<std::endl;
+//  std::cout<<"fTrue: "<<_pars.fTrue->GetTitle()<<std::endl;
+//  std::cout<<"fFake: "<<_pars.fFake->GetTitle()<<std::endl;
+//  std::cout<<"fData: "<<_pars.fData->GetTitle()<<std::endl;
+//  std::cout<<"fSign: "<<_pars.fSign->GetTitle()<<std::endl;
+  std::cout<<"nKinBins="<<_pars.nKinBins<<std::endl;
+  std::cout<<"kin bin lims; nFitBins; fit range; sideband"<<std::endl;
+  for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
+    std::cout<<StrLabelEta(ieta)<<std::endl;
+    for (int ik=0; ik<=_pars.nKinBins; ik++){
+      std::cout<<StrLabelKin(ik)<<"; "<<_pars.nFitBins[ik][ieta]<<"; "<<_pars.minVarFit[ik][ieta]<<"-"<<_pars.maxVarFit[ik][ieta]<<"; "<<_pars.sideband[ik][ieta]<<"-"<<_pars.sidebandUp[ik][ieta]<<std::endl;
+    }//end of loop over ik
+  }//end of loop over ieta
+  std::cout<<"cutAdd="<<_pars.cutAdd.GetTitle()<<std::endl;
+  std::cout<<"cutBarrel="<<_pars.cutBarrel.GetTitle()<<std::endl;
+  std::cout<<"cutEndcap="<<_pars.cutEndcap.GetTitle()<<std::endl;
+  std::cout<<"cutNominal="<<_pars.cutNominal.GetTitle()<<std::endl;
+  std::cout<<"cutNominalExceptSidebandVar="<<_pars.cutNominalExceptSidebandVar.GetTitle()<<std::endl;
+  std::cout<<"cutSidebandVarNominalRange="<<_pars.cutSidebandVarNominalRange.GetTitle()<<std::endl;
+  std::cout<<"cutWeight="<<_pars.cutWeight.GetTitle()<<std::endl;
+  std::cout<<"noLeakSubtr="<<_pars.noLeakSubtr<<std::endl;
+  std::cout<<"strFileOutName="<<_pars.strFileOutName<<std::endl;
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    std::cout<<StrLabelEta(ieta)<<":"<<std::endl;
+    std::cout<<"strTrueYieldsTot="<<_pars.strTrueYieldsTot[ieta]<<std::endl;
+    std::cout<<"strTrueYields1D="<<_pars.strTrueYields1D[ieta]<<std::endl;
+    std::cout<<"strFakeYieldsTot="<<_pars.strFakeYieldsTot[ieta]<<std::endl;
+    std::cout<<"strFakeYields1D="<<_pars.strFakeYields1D[ieta]<<std::endl;
+  }//end of loop over ieta
+  std::cout<<"|||| end of TemplatesRandcone parameters"<<std::endl;
+  std::cout<<"==============================="<<std::endl;
+}// end of TTemplatesRandCone::PrintPars()
 
 void TTemplatesRandCone::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
 {
@@ -130,13 +173,19 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   //_pars.kinBinLims[ikin-1] is lower limit
 
   name+="_True"; 
-  cut = cutEta && cutKin && SidebandVarNominalCut();// && cutSignal;;
+  if (_pars.combineTrueTempl[ikin][ieta] && ikin>0){
+     cutKin="1";
+     for (int i=1; i<=_pars.nKinBins; i++){
+       if (_pars.combineTrueTempl[i][ieta]) cutKin = cutKin || CutKinBin(i);
+     }
+  }
+  cut = _pars.cutAdd && cutEta && cutKin && SidebandVarNominalCut();// && cutSignal;;
   if (!noPrint) {
     std::cout<<"cutEta="<<cutEta.GetTitle()<<std::endl;
     std::cout<<"cutKin="<<cutKin.GetTitle()<<std::endl;
 //    std::cout<<"cutSignal="<<cutSignal.GetTitle()<<std::endl;
     std::cout<<"cutWeight="<<_pars.cutWeight.GetTitle()<<std::endl;
-    std::cout<<"true template cut=(cutEta && cutKin)*cutWeight="<<cut.GetTitle()<<std::endl;
+    std::cout<<"true template cut=(cutAdd && cutEta && cutKin)*cutWeight="<<cut.GetTitle()<<std::endl;
   }
 
 
@@ -147,11 +196,19 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   SetTemplate(1,_hTrue[ikin][ieta],cut,noPrint);
   // "1" for true gamma template
 
+  cutKin=CutKinBin(ikin);
+
   name.ReplaceAll("_True","_Fake");
-  cut = cutEta && cutKin && cutSideband;
+  if (_pars.combineFakeTempl[ikin][ieta] && ikin>0){
+     cutKin="1";
+     for (int i=1; i<=_pars.nKinBins; i++){
+       if (_pars.combineFakeTempl[i][ieta]) cutKin = cutKin || CutKinBin(i);
+     }
+  }
+  cut = _pars.cutAdd && cutEta && cutKin && cutSideband;
   if (!noPrint) {
     std::cout<<"cutSideband="<<cutSideband.GetTitle()<<std::endl;
-    std::cout<<"fake template cut=(cutEta && cutKin && cutSideband)*cutWeight="<<cut.GetTitle()<<std::endl;
+    std::cout<<"fake template cut=(cutAdd && cutEta && cutKin && cutSideband)*cutWeight="<<cut.GetTitle()<<std::endl;
   }
   if (!noPrint) std::cout<<"Fake template cut="<<cut.GetTitle()<<std::endl;
   _hFake[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
@@ -164,6 +221,8 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
 //  _hData[ikin][ieta]->Sumw2();
   SetTemplate(0,_hFake[ikin][ieta], cut, noPrint, _hLeak[ikin][ieta]);
   // "0" for fake gamma template
+
+  cutKin=CutKinBin(ikin);
 
   _hFakeReference[ikin][ieta] = (TH1D*)_hFake[ikin][ieta]->Clone(_hFake[ikin][ieta]->GetName()+TString("_Ref"));
   _hFakeReference[ikin][ieta]->SetTitle(_hFakeReference[ikin][ieta]->GetName());
@@ -315,7 +374,7 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
     std::cout<<"kinCut="<<kinCut.GetTitle()<<std::endl;
     std::cout<<"sidebandVarNominalCut="<<sidebandVarNominalCut.GetTitle()<<std::endl;
   }
-  TCut cut = kinCut && etaCut && sidebandVarNominalCut;
+  TCut cut = _pars.cutAdd && kinCut && etaCut && sidebandVarNominalCut;
 	
 //  TH1D* histTemp = (TH1D*)_hData[ikin][ieta]->Clone(); 
 //  histTemp->SetName(TString("histTemp")+StrLabelKin(ikin)+StrLabelEta(ieta));
@@ -354,7 +413,7 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   int nTrueStart = 0.5*nMax;
   int nFakeStart = 0.5*nMax;
 
-  RooRealVar rooVarFit(_pars.varFit,"pho I_ch", varMin, varMax);
+  RooRealVar rooVarFit(_pars.varFit,_pars.varFit, varMin, varMax);
   if (nMax<=0){
     if (!noPrint) std::cout<<"ATTENTION: No data events for bin "<<kinCut<<", "<<etaCut<<std::endl;
     _nFakeFromFitVal[ikin][ieta]=0;
@@ -457,10 +516,10 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
     if (ieta!=_COMMON && ieta!=ieta1) continue;
 
     if (isTrueGamma) cutSidebandVar=_pars.cutSidebandVarNominalRange;
-    else cutSidebandVar=SidebandCut(ikin,ieta);
+    else cutSidebandVar=SidebandCut(ikin,ieta1);
 
-    TCut cutTot = cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta1);
-    TCut cutPassed = cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && _pars.cutNominalExceptSidebandVar;
+    TCut cutTot = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta1);
+    TCut cutPassed = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && _pars.cutNominalExceptSidebandVar;
 
     if (isTrueGamma){
       TH1F* hSignPassed = new TH1F("histPassed","histPassed",1,-3.0,3.0);
@@ -527,10 +586,17 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
 void TTemplatesRandCone::PrintYieldsAndChi2()
 {
 
+  std::cout<<"Histograms:"<<std::endl;
+  PrintHistogramsBinByBin(_hTrue);
+  PrintHistogramsBinByBin(_hFake);
+  PrintHistogramsBinByBin(_hTrueReference);
+  PrintHistogramsBinByBin(_hFakeReference);
+  std::cout<<std::endl;
+
   std::cout<<"Fake and True values from fit:"<<std::endl;
-  std::cout<<"  bin                            Fake-B            True-B           Fake-E            True-E"<<std::endl;
+  std::cout<<"  bin            Fake-B     True-B  Leak%-B    Fake-E    True-E  Leak%-E"<<std::endl;
   for (int ikin=0; ikin<_pars.nKinBins+1; ikin++){
-    std::cout<<"ikin="<<ikin<<", "<<StrLabelKin(ikin)<<": ";
+    std::cout<<ikin<<", "<<StrLabelKin(ikin)<<": ";
     for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
      std::cout<<std::setw(6)<<std::setprecision(0)<<std::fixed;
 //      std::cout<<std::setw(6)<<std::setprecision(0)<<_nFakeFromFitVal[ikin][ieta]<<"+-";
@@ -541,16 +607,12 @@ void TTemplatesRandCone::PrintYieldsAndChi2()
       std::cout<<_nFakeFromFitErr[ikin][ieta]<<"; ";
       std::cout<<_nTrueFromFitVal[ikin][ieta]<<"+-";
       std::cout<<_nTrueFromFitErr[ikin][ieta]<<"; ";
+      if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
+        std::cout<<100.0*_hLeak[ikin][ieta]->GetSumOfWeights()/(_hLeak[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights())<<"%; ";
+      }
     }
     std::cout<<std::endl;
   }
-  std::cout<<std::endl;
-
-  std::cout<<"Histograms:"<<std::endl;
-  PrintHistogramsBinByBin(_hTrue);
-  PrintHistogramsBinByBin(_hFake);
-  PrintHistogramsBinByBin(_hTrueReference);
-  PrintHistogramsBinByBin(_hFakeReference);
   std::cout<<std::endl;
 
   std::cout<<"Chi2/NDF for different bins: "<<std::endl;
@@ -666,12 +728,16 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
       contT = _hTrue[ikin][ieta]->GetBinContent(ib)*_nTrueFromFitVal[ikin][ieta]/areaHistTrue;
       err1T = (_hTrue[ikin][ieta]->GetBinError(ib)*_nTrueFromFitVal[ikin][ieta])/areaHistTrue;
       err2T = (_hTrue[ikin][ieta]->GetBinContent(ib)*_nTrueFromFitErr[ikin][ieta])/areaHistTrue;
+      _hTrue[ikin][ieta]->SetBinContent(ib,contT);
+      _hTrue[ikin][ieta]->SetBinError(ib,sqrt(err1T*err1T+err2T*err2T));
     }
     if (areaHistFake==0);
     else {
       contF = _hFake[ikin][ieta]->GetBinContent(ib)*_nFakeFromFitVal[ikin][ieta]/areaHistFake;
       err1F = (_hFake[ikin][ieta]->GetBinError(ib)*_nFakeFromFitVal[ikin][ieta])/areaHistFake;
       err2F = (_hFake[ikin][ieta]->GetBinContent(ib)*_nFakeFromFitErr[ikin][ieta])/areaHistFake;
+      _hFake[ikin][ieta]->SetBinContent(ib,contF);
+      _hFake[ikin][ieta]->SetBinError(ib,sqrt(err1F*err1F+err2F*err2F));
     }
 //    _hTrue[ikin][ieta]->SetBinContent(ib,contS);
 //    _hTrue[ikin][ieta]->SetBinError(ib,sqrt(err1S*err1S+err2S*err2S));
@@ -713,8 +779,17 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
 
     _hSumm[ikin][ieta]->SetLineColor(7);
     _hSumm[ikin][ieta]->SetLineWidth(2);
-    _hSumm[ikin][ieta]->SetLineStyle(3);
-    _hSumm[ikin][ieta]->Draw("HIST same");  
+    _hSumm[ikin][ieta]->Draw("HIST same"); 
+    _hSumm[ikin][ieta]->SetLineColor(2);  
+    _hSumm[ikin][ieta]->Draw("EP same"); 
+    _hTrue[ikin][ieta]->SetLineWidth(2);
+    _hTrue[ikin][ieta]->SetLineColor(3);
+    _hTrue[ikin][ieta]->Draw("EP same");
+    _hFake[ikin][ieta]->SetLineWidth(2);
+    _hFake[ikin][ieta]->SetLineColor(4);
+    _hFake[ikin][ieta]->Draw("EP same");
+    _hData[ikin][ieta]->SetLineWidth(2);
+    _hData[ikin][ieta]->Draw("EP same");
 
     textBin->Draw("same");
     textChi2->Draw("same");
@@ -726,7 +801,7 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
     _hRatio[ikin][ieta]->GetXaxis()->SetLabelSize(0.1);
     _hRatio[ikin][ieta]->GetXaxis()->SetTitleOffset(1.0);
     _hRatio[ikin][ieta]->GetXaxis()->SetTitleSize(0.12);
-    _hRatio[ikin][ieta]->SetTitle(TString("; pho I_ch ;"));
+    _hRatio[ikin][ieta]->SetTitle(TString("; ")+_pars.varFit+TString(" ;"));
     _hRatio[ikin][ieta]->Draw();
     int nBins = _hRatio[ikin][ieta]->GetNbinsX();
     TLine* line = new TLine(_hRatio[ikin][ieta]->GetBinLowEdge(1),1,_hRatio[ikin][ieta]->GetBinLowEdge(nBins)+_hRatio[ikin][ieta]->GetBinWidth(nBins),1);

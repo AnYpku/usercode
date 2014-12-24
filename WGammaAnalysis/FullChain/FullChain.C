@@ -33,6 +33,7 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
   anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
   anPars.blind=TConfiguration::BLIND_PRESCALE;
+  anPars.templFits=TConfiguration::TEMPL_CHISO;
 
   anPars.sampleMode=Selection::ALL;
   anPars.analyzedSamples="";
@@ -41,6 +42,7 @@ void FullChain::SetDefaultFullChainParameters(FullChainParameters& anPars, TStri
   anPars.isDebugMode=0;
   anPars.doSystTemplateStat=0;
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
+  anPars.cutAdd="1";
 
   anPars.noPreSelection=0;
   anPars.noExtraSelection=0;
@@ -275,7 +277,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%  WILL DO DataDriven bkg"<<std::endl;
    //TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
    //temp.ComputeBackground();
-    AuxTemplatesRandCone(anPars.channel, anPars.vgamma, anPars.blind, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+    AuxTemplatesRandCone(anPars.channel, anPars.vgamma, anPars.blind, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.templFits, anPars.cutAdd);
     std::cout<<"%_%  DONE DataDriven bkg"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
@@ -283,7 +285,7 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
   if (!anPars.noSystDDBkgSidebandVariation){
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Syst DDBkg Sideband Variation "<<std::endl;
-    AuxTemplatesRandConeSystSidebandVariation(anPars.channel, anPars.vgamma, anPars.blind, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+    AuxTemplatesRandConeSystSidebandVariation(anPars.channel, anPars.vgamma, anPars.blind, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.templFits, anPars.cutAdd);
     std::cout<<"%_%  DONE Syst DDBkg Sideband Variation"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
@@ -293,9 +295,9 @@ void FullChain::RunAnalysis(FullChainParameters anPars)
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
     std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
     if (anPars.noDDBkgComputation) 
-      AuxPrepareYields(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+      AuxPrepareYields(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.cutAdd);
     else
-      AuxSubtractBackground(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
+      AuxSubtractBackground(anPars.channel, anPars.vgamma, anPars.blind, anPars.varKin, anPars.nKinBins, anPars.kinBinLims, anPars.cutAdd);
     std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }

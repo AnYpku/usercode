@@ -1,6 +1,7 @@
 #ifndef FullChain_h
 #define FullChain_h
 
+#include "TCut.h"
 #include "../Configuration/TAllInputSamples.h"
 #include "../Configuration/TConfiguration.h"
 #include <string>
@@ -16,6 +17,7 @@ class FullChain
       int channel;
       int vgamma;
       int blind;
+      int templFits;
       TString varKin;
       int nKinBins;
       float* kinBinLims;
@@ -26,6 +28,7 @@ class FullChain
       bool isNoPuReweight;
       bool isDebugMode;
       int phoWP;
+      TCut cutAdd;
 
       bool noPreSelection;
       bool noExtraSelection;
