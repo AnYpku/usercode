@@ -269,13 +269,17 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   line->SetLineStyle(9);
   line->Draw("same");
 
-  TString nameForSave="canv";
+  TString nameForSave=_pyPars.strPlotsDir+_pyPars.strPlotsBaseName;
   nameForSave+="_";
   nameForSave+=_pyPars.varKin;
   nameForSave+="_";
   nameForSave+=canv->GetTitle();
   nameForSave.ReplaceAll(" ","");
   nameForSave+=".png";
+  canv->SaveAs(nameForSave);
+  nameForSave.ReplaceAll(".png",".pdf");
+  canv->SaveAs(nameForSave);
+  nameForSave.ReplaceAll(".pdf",".root");
   canv->SaveAs(nameForSave);
 }// end of CompareStackVsHist
 

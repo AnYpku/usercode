@@ -1,14 +1,8 @@
 *.so
 *.d
-*.C~
-*.h~
-*.hh~
-*.cc~
-*.sh~
+*~
 *.png
 *.log
-*.png~
-*.log~
+*.pdf
 *.root
-*~
 *.nfs000000*

@@ -26,121 +26,109 @@ TString TConfiguration::StrChannel(int channel){
   if (channel==MUON) return "MUON";
   if (channel==ELECTRON) return "ELECTRON";
   if (channel==BOTH_CHANNELS) return "BOTH_CHANNELS";
+  return "";
 }
  
 TString TConfiguration::StrVgType(int vg_type){
-  if (vg_type==W_GAMMA) return "W_GAMMA";
-  if (vg_type==Z_GAMMA) return "Z_GAMMA";
-  if (vg_type==V_GAMMA) return "V_GAMMA";
+  if (vg_type==W_GAMMA) return "WGamma";
+  if (vg_type==Z_GAMMA) return "ZGamma";
+  if (vg_type==V_GAMMA) return "VGamma";
+  return "";
 } 
 
 TString TConfiguration::StrSample(int sample){
   if (sample==DATA) return "DATA";
   if (sample==SIGMC) return "SIGMC";
   if (sample==BKGMC) return "BKGMC";
+  return "";
 }
  
 TString TConfiguration::StrBlindType(int blind){
-  if (blind==UNBLIND) return "UNBLIND";
-  if (blind==BLIND_PRESCALE) return "BLIND_PRESCALE";
-  if (blind==BLIND_DECRACC) return "BLIND_DECRACC";
+  if (blind==UNBLIND) return "UNblind";
+  if (blind==BLIND_PRESCALE) return "blindPRESCALE";
+  if (blind==BLIND_DECRACC) return "blindDECRACC";
+  return "";
 }
 
 TString TConfiguration::StrEtaBin(int etaBin){
   if (etaBin==BARREL) return "BARREL";
   if (etaBin==ENDCAP) return "ENDCAP";
   if (etaBin==COMMON) return "COMMON";
+  return "";
 }
 
 TString TConfiguration::StrCsMode(int csMode){
   if (csMode==TOTAL) return "TOTAL"; 
   if (csMode==ONEDI) return "ONEDI"; 
-  if (csMode==TWODI) return "TWODI"; 
+  if (csMode==TWODI) return "TWODI";
+  return ""; 
 }
 
 TString TConfiguration::StrSelectionStage(int sel){
   if (sel==VERY_PRELIMINARY) return "VERY_PRELIMINARY"; 
   if (sel==PRELIMINARY_FOR_TEMPLATE_METHOD) return "PRELIMINARY_FOR_TEMPLATE_METHOD"; 
   if (sel==PRELIMINARY_FOR_UNFOLDING) return "PRELIMINARY_FOR_UNFOLDING"; 
-  if (sel==FULLY) return "FULLY"; 
+  if (sel==FULLY) return "FULLY";
+  return ""; 
+}
+
+TString TConfiguration::StrTempl(int templ){
+  if (templ==TEMPL_CHISO) return "TEMPL_CHISO";
+  if (templ==TEMPL_SIHIH) return "TEMPL_SIHIH";
+  return "";
+}
+
+TString TConfiguration::StrPlotsType(int plotsType)
+{
+  if (plotsType==PLOTS_TEMPL_FITS) return "TemplateFits";
+  if (plotsType==PLOTS_PREPARE_YIELDS) return "PrepareYields";
+  if (plotsType==PLOTS_CONSTANTS) return "Constants";
+  if (plotsType==PLOTS_CROSS_SECTION) return "CrossSection";
+  if (plotsType==PLOTS_QUICK_CHECKS) return "QuickChecks";
+  return "";
 }
 
 void TConfiguration::Print()
 {
 
-  std::cout<<"GetOutputDirName s: "<<GetOutputDirName(MUON)<<", "<<GetOutputDirName(ELECTRON)<<std::endl;
-  std::cout<<"GetSampleName s: "<<GetSampleName(DATA)<<", "<<GetSampleName(SIGMC)<<", "<<GetSampleName(BKGMC)<<std::endl;
-  std::cout<<"GetEtaBinName s: "<<GetEtaBinName(BARREL)<<", "<<GetEtaBinName(ENDCAP)<<", "<<GetEtaBinName(COMMON)<<std::endl;
+  std::cout<<"GetPlotsDirName s: "<<GetPlotsDirName(MUON, W_GAMMA, PLOTS_TEMPL_FITS)<<", "<<GetPlotsDirName(ELECTRON, Z_GAMMA, PLOTS_PREPARE_YIELDS)<<std::endl;
+  std::cout<<"GetOutputDirName s: "<<GetOutputDirName(MUON, W_GAMMA)<<", "<<GetOutputDirName(ELECTRON, W_GAMMA)<<std::endl;
+  std::cout<<"GetSampleName s: "<<StrSample(DATA)<<", "<<StrSample(SIGMC)<<", "<<StrSample(BKGMC)<<std::endl;
+  std::cout<<"GetEtaBinName s: "<<StrEtaBin(BARREL)<<", "<<StrEtaBin(ENDCAP)<<", "<<StrEtaBin(COMMON)<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetSelectedPreliminaryName s: "<<GetSelectedName(VERY_PRELIMINARY,MUON,W_GAMMA,UNBLIND,DATA,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,Z_GAMMA,UNBLIND,SIGMC,"[sourceName]")<<", "<<GetSelectedName(VERY_PRELIMINARY,MUON,Z_GAMMA,BLIND_PRESCALE,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON,W_GAMMA,"phoEt")<<", "<<GetYieldsFileName(ELECTRON,W_GAMMA,"WMt")<<std::endl;
+  std::cout<<"GetYieldsFileName s: "<<GetYieldsFileName(MUON,W_GAMMA,TEMPL_CHISO,"phoEt")<<", "<<GetYieldsFileName(ELECTRON,Z_GAMMA,TEMPL_SIHIH,"WMt")<<std::endl;
   std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
-  std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON,W_GAMMA,"WMt")<<std::endl;
+  std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON,W_GAMMA,TEMPL_CHISO,"WMt")<<std::endl;
 
 }
 
-TString TConfiguration::GetOutputDirName(int channel)
+TString TConfiguration::GetOutputDirName(int channel, int vgamma)
 {
-  if (channel==MUON) return _outputDirMu;
-  else if (channel==ELECTRON) return _outputDirEle;
-  return "0";
+  TString strDir=_outputDir+StrChannel(channel)+TString("_")+StrVgType(vgamma)+TString("/");
+  return strDir;
 } 
 
-TString TConfiguration::GetSampleName(int sample)
+TString TConfiguration::GetPlotsDirName(int channel, int vgamma, int plotsType)
 {
-  if (sample==DATA) return "DATA";
-  else if (sample==SIGMC) return "SIGMC";
-  else if (sample==BKGMC) return "BKGMC";
-  return "UNKNOWN_SAMPLE";
-}
-
-TString TConfiguration::GetEtaBinName(int etaBin)
-{
-  if (etaBin==BARREL) return "B";
-  else if (etaBin==ENDCAP) return "E";
-  else if (etaBin==COMMON) return "";
-  return "UNKNOWN_ETABIN";
-}
-
-TString TConfiguration::GetCsModeName(int csMode)
-{
-  if (csMode==TOTAL) return "Total";
-  else if (csMode==ONEDI) return "1D";
-  else if (csMode==TWODI) return "2D";
-  return "UNKNOWN_CSMODE";
-}
-
-TString TConfiguration::GetBlindModeName(int sample, int blindMode)
-{
-  if (sample!=DATA) return "";
-  if (blindMode==UNBLIND) return "UNblind";
-  else if (blindMode==BLIND_PRESCALE) return "blindPRESCALE";
-  else if (blindMode==BLIND_DECRACC) return "blindDECRACC";
-  return "UNKNOWN_BLIND_MODE";
-}
-
-TString TConfiguration::GetVgTypeName(int vgamma)
-{
-  if (vgamma==W_GAMMA) return "WGamma";
-  else if (vgamma==Z_GAMMA) return "ZGamma";
-  else if (vgamma==V_GAMMA) return "VGamma";
-  return "UNKNOWN_VGAMMA";
+  TString strDir=GetOutputDirName(channel, vgamma)+TString("Plots/")+StrPlotsType(plotsType)+TString("/");
+  return strDir;
 }
 
 TString TConfiguration::GetSelectedName(int selectionStage, int channel, int vgamma, int blindType, int sample, TString sourceName, bool isDebugMode, bool isNoPuReweight)
 {
-  TString name = GetOutputDirName(channel); 
+  TString name = GetOutputDirName(channel,vgamma); 
   name+=_selectedNameBase[selectionStage];
   name+="_";
-  name+=GetVgTypeName(vgamma);
+  name+=StrVgType(vgamma);
   if (sample==DATA){
     name+="_";
-    name+=GetBlindModeName(sample,blindType);
+    name+=StrBlindType(blindType);
     name+="_";
   }
-  name+=GetSampleName(sample);
+  name+=StrSample(sample);
   if (sample == BKGMC){
     name+="_";
     name+=sourceName;
@@ -159,63 +147,63 @@ TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight
   return name;
 }
 
-TString TConfiguration::GetYieldsFileName(int channel, int vgamma, TString strKin)
+TString TConfiguration::GetYieldsFileName(int channel, int vgamma, int templ, TString strKin)
 {
-  return GetOutputDirName(channel)+_yieldsFileName+TString("_")+GetVgTypeName(vgamma)+TString("_")+strKin+TString("_.root");
+  return GetOutputDirName(channel,vgamma)+_yieldsFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");
 }
 
 
 TString TConfiguration::GetYieldsSelectedName(int csMode, int etaBin,int sample, TString sourceName)
 {
-  TString name = _yieldsSelectedName+GetSampleName(sample);
+  TString name = _yieldsSelectedName+StrSample(sample);
   if (sample==BKGMC) name+=sourceName;
-  return name+GetCsModeName(csMode)+GetEtaBinName(etaBin);
+  return name+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
 TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode, int etaBin)
 {
-  return _yieldsSelectedSignalMCGenName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
+  return _yieldsSelectedSignalMCGenName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
 TString TConfiguration::GetYieldsDDTemplateFakeName(int csMode, int etaBin)
 {
-  return _yieldsDDTemplateFakeName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
+  return _yieldsDDTemplateFakeName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
 TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode, int etaBin)
 {
-  return _yieldsDDTemplateTrueName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
+  return _yieldsDDTemplateTrueName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
 TString TConfiguration::GetYieldsSignalName(int csMode, int etaBin)
 {
-  return _yieldsSignalName+GetCsModeName(csMode)+GetEtaBinName(etaBin);
+  return _yieldsSignalName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
-TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, TString strKin)
+TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin)
 {
-  return GetOutputDirName(channel)+_DDTemplateFileName+TString("_")+GetVgTypeName(vgamma)+TString("_")+strKin+TString("_.root");
+  return GetOutputDirName(channel,vgamma)+_DDTemplateFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");
 }
 
 
-TString TConfiguration::GetAccFileName(int channel)
+TString TConfiguration::GetAccFileName(int channel, int vgamma)
 {
-  return GetOutputDirName(channel)+_accFileName;
+  return GetOutputDirName(channel, vgamma)+_accFileName;
 }
 
 TString TConfiguration::GetAccName(int csMode)
 {
-  return _accName+GetCsModeName(csMode);
+  return _accName+StrCsMode(csMode);
 }
 
-TString TConfiguration::GetEffFileName(int channel)
+TString TConfiguration::GetEffFileName(int channel, int vgamma)
 {
-  return GetOutputDirName(channel)+_effFileName;
+  return GetOutputDirName(channel, vgamma)+_effFileName;
 }
 
 TString TConfiguration::GetEffName(int csMode)
 {
-  return _effName+GetCsModeName(csMode);
+  return _effName+StrCsMode(csMode);
 }
 
 

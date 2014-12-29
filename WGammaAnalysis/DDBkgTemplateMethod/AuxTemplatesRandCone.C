@@ -13,11 +13,9 @@
 #include "TCut.h"
 //ROOT
 
-void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd="1");
+void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars);
 
-void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd="1");
+void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars);
 
 void SetLimsChIsoTempl_phoEt_Wg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
 void SetLimsChIsoTempl_phoEt_Zg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
@@ -26,24 +24,24 @@ void SetLimsSihihTempl_phoEt_Zg_MUON(TTemplatesRandCone::TemplatesRandConePars &
 
 void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplatesRandCone::TemplatesRandConePars &pars);
 
-void AuxTemplatesRandCone(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, int templFits, TCut cutAdd="1")
+void AuxTemplatesRandCone(TConfiguration::AnalysisParameters &anPars)
 {
   //this function is called in FullChain
 
   TTemplatesRandCone::TemplatesRandConePars pars;
 
-  if (templFits==TConfiguration::TEMPL_SIHIH) 
-    SetParsSigmaIEtaIEtaTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims, cutAdd);
+  if (anPars.templFits==TConfiguration::TEMPL_SIHIH) 
+    SetParsSigmaIEtaIEtaTempl(pars, anPars);
 
-  if (templFits==TConfiguration::TEMPL_CHISO) 
-    SetParsChIsoTempl(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims, cutAdd);
+  if (anPars.templFits==TConfiguration::TEMPL_CHISO) 
+    SetParsChIsoTempl(pars, anPars);
 
 
   TTemplatesRandCone temp(pars);
   temp.ComputeBackground();
 }
 
-void AuxTemplatesRandConeSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, int templFits, TCut cutAdd="1")
+void AuxTemplatesRandConeSystSidebandVariation(TConfiguration::AnalysisParameters &anPars)
 {
   //this function is called in FullChain
 
@@ -64,20 +62,19 @@ TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
   return (TTree*)f->Get("selectedEvents");
 }
 
-void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd)
+void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars)
 {
 
   TConfiguration config;
   TPhotonCuts photon;
-  pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
-  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
-  if (nKinBins>TTemplatesRandCone::nKinBinsMax){
-    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+  pars.varKin=anPars.varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
+  pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
+  if (anPars.nKinBins>TTemplatesRandCone::nKinBinsMax){
+    std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
     return;
   }
-  for (int ikb=0; ikb<=nKinBins; ikb++){
-    pars.kinBinLims[ikb]=kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
+  for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
+    pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
     for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
       pars.nFitBins[ikb][ieta]=21;
       pars.minVarFit[ikb][ieta]=-1.0+0.1;
@@ -95,13 +92,13 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int chan
       // ikin=[1,nKinBins] are for individual bin fits 
       // ieta=0 - BARREL, ieta=1 - ENDCAP
   }
-  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.W_GAMMA)
+  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
     SetLimsChIsoTempl_phoEt_Wg_MUON(pars);
 
-  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.Z_GAMMA)
+  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
     SetLimsChIsoTempl_phoEt_Zg_MUON(pars);
 
-  pars.strFileOutName=config.GetDDTemplateFileName(channel,vgamma,varKin);
+  pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
     //the histograms with extracted yields will be saved here
 
 
@@ -115,22 +112,25 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int chan
     //for TOTAL and differentian (ONEDI) cross section, 
     //for barrel, endcap and common(barrel+endcap)
 
+ pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_TEMPL_FITS);
+ pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_CHISO)+TString("_")+config.StrBlindType(anPars.blind)+TString("_");
+
   std::cout<<std::endl;
 
-  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,config.DATA);
+  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind,config.DATA);
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
-  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.SIGMC);
+  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.SIGMC);
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
 
-  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
 //  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -141,38 +141,37 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int chan
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
-  pars.cutNominal=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut; 
-  pars.cutNominalExceptSidebandVar=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK);//TCut; 
+  pars.cutNominal=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut; 
+  pars.cutNominalExceptSidebandVar=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK);//TCut; 
     //charged isolation cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-  pars.cutSidebandVarNominalRange=photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut;
+  pars.cutSidebandVarNominalRange=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut;
     //phoSigmaIEtaIEta cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
 //  pars.cutWeight="weight";//TCut; weight for signal MC tree
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
-  pars.cutAdd=cutAdd;
+  pars.cutAdd=anPars.cutAdd;
   pars.noLeakSubtr=0;
 
 }// end of SetParsChIsoTempl()
 
 
 
-void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
-	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims, TCut cutAdd)
+void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars)
 {
 
   TConfiguration config;
   TPhotonCuts photon;
-  pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
-  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
-  if (nKinBins>TTemplatesRandCone::nKinBinsMax){
-    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+  pars.varKin=anPars.varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
+  pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
+  if (anPars.nKinBins>TTemplatesRandCone::nKinBinsMax){
+    std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
     return;
   }
-  for (int ikb=0; ikb<=nKinBins; ikb++){
-    pars.kinBinLims[ikb]=kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
+  for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
+    pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
     pars.nFitBins[ikb][config.BARREL]=32;
     pars.minVarFit[ikb][config.BARREL]=0.005;
     pars.maxVarFit[ikb][config.BARREL]=0.021;
@@ -188,12 +187,12 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
     pars.combineFakeTempl[ikb][config.BARREL]=0;
     pars.combineFakeTempl[ikb][config.ENDCAP]=0;
   }
-  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.W_GAMMA)
+  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
     SetLimsSihihTempl_phoEt_Wg_MUON(pars);
-  if (varKin=="phoEt" && channel==config.MUON && vgamma==config.Z_GAMMA)
+  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
     SetLimsSihihTempl_phoEt_Zg_MUON(pars);
 
-  pars.strFileOutName=config.GetDDTemplateFileName(channel,vgamma,varKin);
+  pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
     //the histograms with extracted yields will be saved here
 
 
@@ -207,22 +206,25 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
     //for TOTAL and differentian (ONEDI) cross section, 
     //for barrel, endcap and common(barrel+endcap)
 
+ pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_TEMPL_FITS);
+ pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_SIHIH)+TString("_")+config.StrBlindType(anPars.blind)+TString("_");
+
   std::cout<<std::endl;
 
-  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,blind,config.DATA);
+  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind,config.DATA);
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
-  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.SIGMC);
+  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.SIGMC);
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
 
-  TString strTrue=config.GetSelectedName(config.FSR,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+  TString strTrue=config.GetSelectedName(config.FSR,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
 //  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,vgamma,config.UNBLIND,config.DATA);
+  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -233,18 +235,18 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
-  pars.cutNominal=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut; 
-  pars.cutNominalExceptSidebandVar=photon.RangeSigmaIEtaIEta(2012, phoWP);//TCut; 
+  pars.cutNominal=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut; 
+  pars.cutNominalExceptSidebandVar=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut; 
     //charged isolation cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-  pars.cutSidebandVarNominalRange=photon.RangeOneIsolation(2012,phoWP,photon.ISO_CHorTRK);//TCut;
+  pars.cutSidebandVarNominalRange=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK);//TCut;
     //phoSigmaIEtaIEta cut as applied during selection procedure;
     //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
 //  pars.cutWeight="weight";//TCut; weight for signal MC tree
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
-  pars.cutAdd=cutAdd;
+  pars.cutAdd=anPars.cutAdd;
   pars.noLeakSubtr=0;
 
 }

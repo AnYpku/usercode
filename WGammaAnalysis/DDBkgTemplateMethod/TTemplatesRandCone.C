@@ -754,7 +754,7 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
   _hRatio[ikin][ieta]->Divide(_hSumm[ikin][ieta]);
 
 
-    TString cName="c";
+    TString cName=_pars.strPlotsDir+_pars.strPlotsBaseName;
     cName+=StrLabelKin(ikin);
     cName+=StrLabelEta(ieta);
     TCanvas* c1 = new TCanvas(cName,cName, 800, 600);
@@ -809,8 +809,12 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
     line->SetLineStyle(9);
     line->Draw("same");
    
-    cName+=".png";
     cName.ReplaceAll("-1","total");
+    cName+=".png";
+    c1->SaveAs(cName);
+    cName.ReplaceAll(".png",".pdf");
+    c1->SaveAs(cName);
+    cName.ReplaceAll(".pdf",".root");
     c1->SaveAs(cName);
 
 //  cName+="plotter";

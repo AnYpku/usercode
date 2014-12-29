@@ -37,6 +37,8 @@ class TPrepareYields
       TFile* fOut;//should be set up inside
       TCut cutKin;//should be set up inside
       TCut cutWeight;//should be set up inside
+      TString strPlotsDir;
+      TString strPlotsBaseName;
     };
 
     struct YieldsSource{

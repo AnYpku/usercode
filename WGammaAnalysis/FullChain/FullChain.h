@@ -12,40 +12,12 @@ class FullChain
     FullChain();
     virtual ~FullChain();
 
-    struct FullChainParameters{
-      int year;
-      int channel;
-      int vgamma;
-      int blind;
-      int templFits;
-      TString varKin;
-      int nKinBins;
-      float* kinBinLims;
-      int sampleMode;
-      string analyzedSamples;
-      string configfile;
-      bool doSystTemplateStat;
-      bool isNoPuReweight;
-      bool isDebugMode;
-      int phoWP;
-      TCut cutAdd;
+    void SetDefaultFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin="phoEt");
+    void SetAnalysisKinParameters(TConfiguration::AnalysisParameters& anPars);
 
-      bool noPreSelection;
-      bool noExtraSelection;
-      bool noDDBkgComputation;
-      bool noPrepareYields;
-      bool noCalcAccAndEff;
-      bool noCalcCrossSection;
+    void SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin);
 
-      bool noSystDDBkgSidebandVariation;
-    };
-
-    void SetDefaultFullChainParameters(FullChainParameters& anPars, TString varKin="phoEt");
-    void SetAnalysisKinParameters(FullChainParameters& anPars);
-
-    void SetDiffKinFullChainParameters(FullChainParameters& anPars, TString varKin);
-
-    void RunAnalysis(FullChainParameters anPars);
+    void RunAnalysis(TConfiguration::AnalysisParameters& anPars);
 
   private:
     TConfiguration _config;

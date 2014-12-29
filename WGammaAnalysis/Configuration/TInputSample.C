@@ -45,8 +45,8 @@ void TInputSample::Print()
   std::cout<<"sourceName_="<<sourceName_<<std::endl;
   std::cout<<"sourceLatexLabel_="<<sourceLatexLabel_<<std::endl;
   std::cout<<"channel_="<<channel_<<std::endl;
-  std::cout<<"sample_="<<sample_<<", "<<config.GetSampleName(sample_)<<std::endl;
-  std::cout<<"vgamma_="<<vgamma_<<", "<<config.GetVgTypeName(vgamma_)<<std::endl;
+  std::cout<<"sample_="<<sample_<<", "<<config.StrSample(sample_)<<std::endl;
+  std::cout<<"vgamma_="<<vgamma_<<", "<<config.StrVgType(vgamma_)<<std::endl;
   std::cout<<"color_="<<color_<<std::endl;
   std::cout<<"lumiTotal_="<<lumiTotal_<<std::endl;
   std::cout<<"nFiles_="<<nFiles_<<std::endl;

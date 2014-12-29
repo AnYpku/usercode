@@ -7,7 +7,7 @@
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
   FullChain fch;
-  FullChain::FullChainParameters anPars;
+  TConfiguration::AnalysisParameters anPars;
 
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
 //  fch.SetDefaultFullChainParameters(anPars,"phoEtNoPhosphor");
@@ -41,8 +41,8 @@
 //  anPars.analyzedSamples="WWg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
 
   anPars.year=2012;
-  anPars.noPreSelection=1;
-  anPars.noExtraSelection=1;
+  anPars.noPreSelection=0;
+  anPars.noExtraSelection=0;
   anPars.noDDBkgComputation=0;
   anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;

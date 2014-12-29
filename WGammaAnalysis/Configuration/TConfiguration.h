@@ -3,8 +3,10 @@
  
 #include "TString.h" 
 #include "TColor.h" 
+#include "TCut.h" 
   //ROOT class
 #include <vector>
+#include <string>
 
 class TConfiguration
 {
@@ -26,6 +28,36 @@ class TConfiguration
     enum {TEMPL_CHISO, TEMPL_SIHIH};
       // template fits: from I_ch (with random cone isolation method)
       // or with sigmaIEtaIEta
+    enum {PLOTS_TEMPL_FITS, PLOTS_PREPARE_YIELDS, PLOTS_CONSTANTS, 
+          PLOTS_CROSS_SECTION, PLOTS_QUICK_CHECKS};
+
+    struct AnalysisParameters{
+      int year;
+      int channel;
+      int vgamma;
+      int blind;
+      int templFits;
+      TString varKin;
+      int nKinBins;
+      float* kinBinLims;
+      int sampleMode;
+      string analyzedSamples;
+      string configfile;
+      bool doSystTemplateStat;
+      bool isNoPuReweight;
+      bool isDebugMode;
+      int phoWP;
+      TCut cutAdd;
+
+      bool noPreSelection;
+      bool noExtraSelection;
+      bool noDDBkgComputation;
+      bool noPrepareYields;
+      bool noCalcAccAndEff;
+      bool noCalcCrossSection;
+
+      bool noSystDDBkgSidebandVariation;
+    };
 
     TString StrChannel(int channel); 
     TString StrVgType(int vg_type); 
@@ -34,33 +66,37 @@ class TConfiguration
     TString StrEtaBin(int etaBin);
     TString StrCsMode(int csMode);
     TString StrSelectionStage(int sel); 
+    TString StrTempl(int templ);
+    TString StrPlotsType(int plotsType);
 
 
     void Print();
 
-    TString GetOutputDirName(int channel);
-    TString GetSampleName(int sample);
-    TString GetEtaBinName(int etaBin);
-    TString GetCsModeName(int csMode);
-    TString GetBlindModeName(int sample, int blindMode);
-    TString GetVgTypeName(int vgamma);
+    TString GetOutputDirName(int channel, int vgamma);
+    TString GetPlotsDirName(int channel, int vgamma, int plotsType);
+
+//    TString GetSampleName(int sample);
+//    TString GetEtaBinName(int etaBin);
+//    TString GetCsModeName(int csMode);
+//    TString GetBlindModeName(int sample, int blindMode);
+//    TString GetVgTypeName(int vgamma);
 
     TString GetSelectedName(int selectionStage, int channel, int vgamma, int blindType, int sample, TString sourceName="", bool isDebugMode=0, bool isNoPuReweight=0);
     //strSelectionStage
     TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight);
 
-    TString GetYieldsFileName(int channel, int vgamma, TString strKin);
+    TString GetYieldsFileName(int channel, int vgamma, int templ, TString strKin);
     TString GetYieldsSelectedName(int csMode, int etaBin, int sample, TString sourceName="");
     TString GetYieldsSelectedSignalMCGenName(int csMode, int etaBin);
     TString GetYieldsDDTemplateFakeName(int csMode, int etaBin);
     TString GetYieldsDDTemplateTrueName(int csMode, int etaBin);
     TString GetYieldsSignalName(int csMode, int etaBin=COMMON);
 
-    TString GetDDTemplateFileName(int channel, int vgamma, TString strKin);
+    TString GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin);
 
-    TString GetAccFileName(int channel);
+    TString GetAccFileName(int channel, int vgamma);
     TString GetAccName(int csMode);
-    TString GetEffFileName(int channel);
+    TString GetEffFileName(int channel, int vgamma);
     TString GetEffName(int csMode);
 
 //    TString GetUnfoldingFileName(int channel);
@@ -116,8 +152,7 @@ static const float _phoPtBlindThreshold=40.;
 /////////////////////////////////////////
 //general locations
 //
-static const TString _outputDirMu="../WGammaOutput/MUON/";
-static const TString _outputDirEle="../WGammaOutput/ELECTRON/";
+static const TString _outputDir="../WGammaOutput/";
 //all other pathes are relative to one of these two
 
 /////////////////////////////////////////

@@ -515,13 +515,13 @@ void CalcAccAndEff::PlotAndSaveOutput()
   hAccxEff1D->Draw("same");
 
   //save
-  TString fNameAcc=_config.GetAccFileName(_channel) ;
+  TString fNameAcc=_config.GetAccFileName(_channel,_vgamma) ;
   TFile fAcc(fNameAcc,"recreate");
   hAcc1D->Write((_config.GetAccName(_config.ONEDI)) );
   hAccTot->Write((_config.GetAccName(_config.TOTAL)) );
   cAcc->Write("cAcc");
 
-  TString fNameEff=_config.GetEffFileName(_channel) ;
+  TString fNameEff=_config.GetEffFileName(_channel,_vgamma) ;
   TFile fEff(fNameEff,"recreate");  
   hEff1D->Write((_config.GetEffName(_config.ONEDI)) );
   hEffTot->Write((_config.GetEffName(_config.TOTAL)) );

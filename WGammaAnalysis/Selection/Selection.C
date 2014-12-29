@@ -26,65 +26,51 @@ Selection::Selection()
 {
 }
 
-Selection::Selection(int channel, int vgamma, int sampleMode, string configFile, bool isNoPuReweight, bool isDebugMode)
+Selection::Selection(TConfiguration::AnalysisParameters &anPars)
 {
 
-  _INPUT = new TAllInputSamples(channel, vgamma,configFile);
-  _vgamma=vgamma;
-  _channel=channel;
-   std::cout<<"Selection constructor: channel="<<_config.StrChannel(channel)<<", vgamma="<<_config.StrVgType(vgamma)<<", sampleMode="<<StrSampleMode(sampleMode)<<std::endl;
-  _isNoPuReweight=isNoPuReweight;
-  _isDebugMode=isDebugMode;
+  _INPUT = new TAllInputSamples(anPars.channel, anPars.vgamma, anPars.configfile);
+  _vgamma=anPars.vgamma;
+  _channel=anPars.channel;
+   std::cout<<"Selection constructor: channel="<<_config.StrChannel(anPars.channel)<<", vgamma="<<_config.StrVgType(anPars.vgamma)<<", sampleMode="<<StrSampleMode(anPars.sampleMode)<<std::endl;
+  _isNoPuReweight=anPars.isNoPuReweight;
+  _isDebugMode=anPars.isDebugMode;
   _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName(),1);
     //field of this class, Selection
     //in PhosphorCorrectionFunctor class: PhosphorCorrectionFunctor(const char* filename, bool R9Cat);//Bool just used to overload constructor and allow R9 categories inplementation
 
-  _sampleMode=sampleMode;
+  _sampleMode=anPars.sampleMode;
   if (_sampleMode==NOTSPECIFIED){
-    std::cout<<"ERROR in Selection::Selection: _sampleMode is NOTSPECIFIED"<<std::endl;
-    return;
-  }
+    stringstream ss(anPars.analyzedSamples);
+    vector <string> names;
+    string name;
+    while (ss >> name) 
+      names.push_back(name);
+    int nNames = names.size();
+    std::cout<<"1 - will do, 0 - will not do"<<std::endl;
+    for (int i=0; i<_INPUT->nSources_; i++)
+      {
+        _doAnalizeSample.push_back(0);  
+        for (int j=0; j<nNames; j++)
+          {
+            if (names[j]==_INPUT->allInputs_[i].sourceName_)
+              _doAnalizeSample.back()=1; 
+          }
+        std::cout<<_INPUT->allInputs_[i].sourceName_<<": "<<_doAnalizeSample[i]<<std::endl;
+      }  
+    if ((int)_doAnalizeSample.size()!=_INPUT->nSources_)
+      std::cout<<"ERROR in Selection::Selection: wrong _doAnalizeSample.size()"<<std::endl;
+      std::cout<<"ERROR in Selection::Selection: _sampleMode is NOTSPECIFIED"<<std::endl;
+      return;
+    }
   else if (_sampleMode>NOTSPECIFIED){
     std::cout<<"ERROR in Selection::Selection: wrong _sampleMode "<<std::endl;
     return;    
   }
-  for (int i=0; i<_INPUT->nSources_; i++)
-    {
+  else 
+    for (int i=0; i<_INPUT->nSources_; i++)
       _doAnalizeSample.push_back(1);      
-    } 
-}
-
-Selection::Selection(int channel, int vgamma, string analyzedSampleNames, string configFile, bool isNoPuReweight, bool isDebugMode)
-{
-  _INPUT = new TAllInputSamples(channel, vgamma, configFile);
-  _channel=channel;
-  _vgamma=vgamma;
-   std::cout<<"Selection constructor: channel="<<_config.StrChannel(channel)<<", vgamma="<<_config.StrVgType(vgamma)<<std::endl;
-  _isNoPuReweight=isNoPuReweight;
-  _isDebugMode=isDebugMode;
-  _photonCorrector = new zgamma::PhosphorCorrectionFunctor(_config.GetPhosphorConstantFileName());
-    //field of this class, Selection
-  _sampleMode=NOTSPECIFIED;
-  stringstream ss(analyzedSampleNames);
-  vector <string> names;
-  string name;
-  while (ss >> name) 
-    names.push_back(name);
-  int nNames = names.size();
-  std::cout<<"1 - will do, 0 - will not do"<<std::endl;
-  for (int i=0; i<_INPUT->nSources_; i++)
-    {
-      _doAnalizeSample.push_back(0);  
-      for (int j=0; j<nNames; j++)
-        {
-          if (names[j]==_INPUT->allInputs_[i].sourceName_)
-            _doAnalizeSample.back()=1; 
-        }
-      std::cout<<_INPUT->allInputs_[i].sourceName_<<": "<<_doAnalizeSample[i]<<std::endl;
-    }  
-  if ((int)_doAnalizeSample.size()!=_INPUT->nSources_)
-    std::cout<<"ERROR in Selection::Selection: wrong _doAnalizeSample.size()"<<std::endl;
-}
+}// end of Selection::Selection()
 
 Selection::~Selection()
 {
@@ -342,11 +328,11 @@ void Selection::PrintErrorMessageMaxNumberOf(int particle)
        std::cout<<std::endl;
 }
 
-void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode, int wp)
+void Selection::ExtraSelection(TConfiguration::AnalysisParameters &anPars)
 {
   TFullCuts fullCut;
   TConfiguration config;
-  TAllInputSamples INPUT(channel,vgamma,"../Configuration/config.txt");
+  TAllInputSamples INPUT(anPars.channel,anPars.vgamma,anPars.configfile);
   _tr=0;
   _trReduced=0;
   _tr1=0;
@@ -356,18 +342,18 @@ void Selection::ExtraSelection(int year, int channel, int vgamma, int sampleMode
   for (int i=0; i<INPUT.nSources_; i++){
 
     int sample=INPUT.allInputs_[i].sample_;
-    if(sampleMode==ALL);
-    else if(sampleMode==DATA && sample!=config.DATA) continue;
-    else if(sampleMode==SIGMC && sample!=config.SIGMC) continue;
-    else if(sampleMode==BKGMC && sample!=config.BKGMC) continue;
-    else if(sampleMode==MC && sample==config.DATA) continue;
-    else if(sampleMode==NOBKG && sample==config.BKGMC) continue;
+    if(anPars.sampleMode==ALL);
+    else if(anPars.sampleMode==DATA && sample!=config.DATA) continue;
+    else if(anPars.sampleMode==SIGMC && sample!=config.SIGMC) continue;
+    else if(anPars.sampleMode==BKGMC && sample!=config.BKGMC) continue;
+    else if(anPars.sampleMode==MC && sample==config.DATA) continue;
+    else if(anPars.sampleMode==NOBKG && sample==config.BKGMC) continue;
 
     
     std::cout<<"ExtraSelection: sample="<<_config.StrSample(sample)<<std::endl;
-    ExtraSelectionOne(INPUT,i,config,fullCut,year,channel,vgamma,wp,config.UNBLIND);
+    ExtraSelectionOne(INPUT,i,config,fullCut,anPars.year,anPars.channel,anPars.vgamma,anPars.phoWP,config.UNBLIND);
     if (sample==config.DATA)
-      ExtraSelectionOne(INPUT,i, config, fullCut,year,channel,vgamma,wp,config.BLIND_PRESCALE);
+      ExtraSelectionOne(INPUT,i, config, fullCut,anPars.year,anPars.channel,anPars.vgamma,anPars.phoWP,config.BLIND_PRESCALE);
   }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
 
 }

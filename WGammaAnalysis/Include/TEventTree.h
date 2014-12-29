@@ -1241,7 +1241,7 @@ public:
    void GetEntryMuoSpecific(Long64_t entry);
    void GetEntryEleSpecific(Long64_t entry);
    void GetEntryMCSpecific(Long64_t entry);
-   void GetEntryDataSpecific(Long64_t entry);
+   void GetEntryRandCone(Long64_t entry);
    virtual void     Init(TTree *tree);
 //   void SetMCSpecificAddresses();
 };

@@ -59,6 +59,8 @@ class TTemplatesRandCone
       TString strTrueYields1D[3];
       TString strFakeYieldsTot[3];
       TString strFakeYields1D[3];
+      TString strPlotsDir;
+      TString strPlotsBaseName;
     };//end of struct TemplatesRandConePars
     TTemplatesRandCone();
     TTemplatesRandCone(TemplatesRandConePars pars);
