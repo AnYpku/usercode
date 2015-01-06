@@ -6,3 +6,9 @@
 *.pdf
 *.root
 *.nfs000000*
+*.aux
+*.dvi
+*.nav
+*.out
+*.snm
+*.toc

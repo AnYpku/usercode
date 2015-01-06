@@ -24,7 +24,7 @@ void OneVarInBinsOfTheOther(TString canvName, TString axName, TTree* tr, TString
   }
   TH1F* hist[nBinsVar2]; 
   TCanvas* canv = new TCanvas(canvName,canvName);
-  TLegend* leg = new TLegend(0.55,0.65,1.00,1.00);
+  TLegend* leg = new TLegend(0.55,0.55,1.00,0.90);
   float max=0;
   for (int ib=0; ib<nBinsVar2; ib++){
     TString strCutBin = var2+TString(">=");
@@ -39,7 +39,10 @@ void OneVarInBinsOfTheOther(TString canvName, TString axName, TTree* tr, TString
     hist[ib]->SetLineWidth(2);
     //hist[ib]->SetLineStyle(ib+1);
     //hist[ib]->SetLineStyle(1);
-    hist[ib]->SetLineColor(ib+1);
+    int color = ib+1;
+    if (color==5) color=13;
+    if (color==8) color=49;
+    hist[ib]->SetLineColor(color);
     float sum = 0;
     for (int ibh=1; ibh<=hist[ib]->GetNbinsX();ibh++)
       sum+=hist[ib]->GetBinContent(ibh);
@@ -51,7 +54,13 @@ void OneVarInBinsOfTheOther(TString canvName, TString axName, TTree* tr, TString
       hist[ib]->SetBinError(ibh,1.0*err/sum);
     }
     if (max<hist[ib]->GetMaximum()) max=hist[ib]->GetMaximum();
-    TString name=cutBin.GetTitle();
+    TString name="";
+    name+=binLimsVar2[ib];
+    name+=" < ";
+    name+=var2;
+    name+=" < ";
+    name+=binLimsVar2[ib+1];
+   
     int indDot=name.Index(".");
     int length=name.Length();
     int dAfterDot=0;
@@ -68,6 +77,7 @@ void OneVarInBinsOfTheOther(TString canvName, TString axName, TTree* tr, TString
     }
     name.ReplaceAll("Corr","");
     name.ReplaceAll("pho","");    
+    name.ReplaceAll("SigmaIEtaIEta","sihih"); 
     leg->AddEntry(hist[ib],name,"l");
   }
 
@@ -82,5 +92,7 @@ void OneVarInBinsOfTheOther(TString canvName, TString axName, TTree* tr, TString
     else hist[ib]->Draw("EP same");
   }
   leg->Draw("same");
-  canv->SaveAs(canvName+TString(".png"));
+  canv->SaveAs(TString("../WGammaOutput/MUON_WGamma/Plots/QuickChecks/")+canvName+TString(".png"));
+  canv->SaveAs(TString("../WGammaOutput/MUON_WGamma/Plots/QuickChecks/")+canvName+TString(".pdf"));
+  canv->SaveAs(TString("../WGammaOutput/MUON_WGamma/Plots/QuickChecks/")+canvName+TString(".root"));
 }
