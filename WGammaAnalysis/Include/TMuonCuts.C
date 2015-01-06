@@ -24,10 +24,15 @@ bool TMuonCuts::HasMoreMuons(TEventTree::InputTreeLeaves &leaf, int imu)
   return false;
 }
 
-bool TMuonCuts::PassedKinematics(float muPt, float muEta, bool& ifPassedPt, bool& ifPassedEta) 
+bool TMuonCuts::PassedKinematics(int vgamma, bool isLead, float muPt, float muEta, bool& ifPassedPt, bool& ifPassedEta) 
 {
   ifPassedPt=true; ifPassedEta=true;
-  if (muPt<=_muPtCut) ifPassedPt=false; 
+  float muPtCut;
+  if (vgamma==_config.W_GAMMA) muPtCut=_muPtCut;
+  else if (vgamma==_config.Z_GAMMA)
+    if (isLead) muPtCut=20.;
+    else muPtCut=10;
+  if (muPt<=muPtCut) ifPassedPt=false; 
   if (fabs(muEta)>=_muEtaCut) ifPassedEta=false;
   return (ifPassedPt && ifPassedEta); 
 }

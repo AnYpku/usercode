@@ -73,7 +73,7 @@ public:
 private:
 
   int FindGoodPhotons(int channel, int vgamma);
-  int FindGoodLeptons(int channel, int vgamma);
+  int FindGoodLeptonIndex(int channel, int vgamma, bool isLead);
   bool MLeptonLeptonCut(int channel);
   bool ZMassWindowCut( int ipho, int iele);
 
@@ -90,7 +90,10 @@ private:
   PassedLevels _passed;
   Candidate* _cands;
   bool _passedPhoton[TEventTree::kMaxnPho];
-  bool _passedLepton[TEventTree::kMaxnMu+TEventTree::kMaxnEle];
+  int _ilepLead;
+  int _ilepSublead;
+//  bool _passedLeptonLead[TEventTree::kMaxnMu+TEventTree::kMaxnEle];
+//  bool _passedLeptonSublead[TEventTree::kMaxnMu+TEventTree::kMaxnEle];
   bool CheckDRandProceed(int channel, int vgamma, bool isVJets, int& icand);
   bool IsOverlapVJetsVGamma(int channel);
   

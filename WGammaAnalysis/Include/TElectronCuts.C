@@ -13,16 +13,21 @@ bool TElectronCuts::HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele
 {
   for (int iele1=0; iele1<leaf.nEle; iele1++){
     if (iele1==iele) continue;
-    if ( PassedKinematics(leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1)) &&
+    if ( PassedKinematics(_config.W_GAMMA,1,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1)) &&
          EleID2012(leaf,iele1,ELE_VETO)) return 1;
   }
   return 0;
 }
 
-bool TElectronCuts::PassedKinematics(float pt, float eta)
+bool TElectronCuts::PassedKinematics(int vgamma, bool isLead, float pt, float eta)
 {
+  float elePtCut;
+  if (vgamma==_config.W_GAMMA) elePtCut=_elePtCut;
+  else if (vgamma==_config.Z_GAMMA) 
+    if (isLead) elePtCut=20.;
+    else elePtCut=10;
   if (!IsBarrel(eta) && !IsEndcap(eta)) return 0;
-  if (!(pt>_elePtCut)) return 0;
+  if (!(pt>elePtCut)) return 0;
   return 1;
 }
 

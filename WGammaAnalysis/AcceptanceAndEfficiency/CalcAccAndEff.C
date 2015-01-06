@@ -426,7 +426,7 @@ bool CalcAccAndEff::AcceptancePassed(bool** accLeptonPhotonPassed)
 
          bool isPhoAcc = _photonEmpty.PassedKinematics(_eventTree.treeLeaf.mcE->at(iGenPho),_eventTree.treeLeaf.mcEta->at(iGenPho),if1,if2) ;
          bool isLepAcc = (_channel==TConfiguration::MUON && 
-                   _muonEmpty.PassedKinematics(_eventTree.treeLeaf.mcPt->at(iGenLep),_eventTree.treeLeaf.mcEta->at(iGenLep),if1,if2)) ||
+                   _muonEmpty.PassedKinematics(_vgamma, 1, _eventTree.treeLeaf.mcPt->at(iGenLep),_eventTree.treeLeaf.mcEta->at(iGenLep),if1,if2)) ||
                    (_channel==TConfiguration::ELECTRON);
          if (isPhoAcc && isLepAcc) {
            accPassed=1;

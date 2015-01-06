@@ -11,7 +11,7 @@ class TMuonCuts
        TMuonCuts ();
        virtual ~TMuonCuts();
        bool HasMoreMuons(TEventTree::InputTreeLeaves &leaf, int imu);
-       bool PassedKinematics(float muPt, float muEta, bool& ifPassedPt, bool& ifPassedEta);
+       bool PassedKinematics(int vgamma, bool isLead, float muPt, float muEta, bool& ifPassedPt, bool& ifPassedEta);
        float MuIsolation2012(TEventTree::InputTreeLeaves &leaf, int imu);
         //mu Isolation as recommended here:
         //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation

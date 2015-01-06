@@ -11,7 +11,7 @@ class TElectronCuts
        virtual ~TElectronCuts();
        enum {ELE_VETO=0, ELE_LOOSE=1, ELE_MEDIUM=2, ELE_TIGHT=3};
        bool HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele);
-       bool PassedKinematics(float pt, float eta);
+       bool PassedKinematics(int vgamma, bool isLead, float pt, float eta);
        bool EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int wp);
        float GetCorrectedIsolation(TEventTree::InputTreeLeaves& leaf, int iele);
        float GetEffectiveArea(float eta);
