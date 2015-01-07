@@ -209,9 +209,12 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   float max = hist1->GetMaximum();
   if (hist2->GetMaximum()>max)
     max=hist2->GetMaximum();
-  float min = 0.3*hist1->GetMinimum();
-  if (min>0.3*hist2->GetMinimum())
-    min=0.3*hist2->GetMinimum();
+  float min;
+  if (_pyPars.doLogY) min=1;
+  else min=0;
+//  float min = 0.3*hist1->GetMinimum();
+//  if (min>0.3*hist2->GetMinimum())
+//    min=0.3*hist2->GetMinimum();
   if (!_pyPars.doLogX) min=0;
   max=1.2*max;
 
