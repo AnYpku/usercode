@@ -258,7 +258,7 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
     SetElectronValues(leaf,cand,ilMax);
 
   SetPhotonValues(leaf,cand,channel,ilMax);
-  SetPhotonIsoValues(leaf,cand,sample);
+  SetPhotonIsoValues(leaf,cand,sample,channel);
 
 
 
@@ -469,7 +469,7 @@ void TSelectedEventsTree::SetPhotonValues(TEventTree::InputTreeLeaves& leaf, TFu
   _phohasPixelSeed=leaf.phohasPixelSeed->at(cand.ipho);
 }//end of SetPhotonValues
 
-void TSelectedEventsTree::SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int sample)
+void TSelectedEventsTree::SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int sample, int channel)
 {
   //photon isolation corrections 2012
 //  std::cout<<"event="<<_event<<", ipho="<<cand.ipho<<std::endl;
@@ -481,7 +481,7 @@ void TSelectedEventsTree::SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, 
     SetThreeIsolations(leaf, cand, _phoSCRChIso04Corr, _phoSCRNeuIso04Corr, _phoSCRPhoIso04Corr, leaf.phoSCRChIso04->at(cand.ipho), leaf.phoSCRNeuIso04->at(cand.ipho), leaf.phoSCRPhoIso04->at(cand.ipho));
 
 
-  if (sample==_config.DATA) {
+  if (sample==_config.DATA || channel==_config.MUON) {
 
     SetThreeIsolations(leaf, cand, _phoRandConeChIsoCorr, _phoRandConeNeuIsoCorr, _phoRandConePhoIsoCorr, leaf.phoRandConeChIso->at(cand.ipho), leaf.phoRandConeNeuIso->at(cand.ipho), leaf.phoRandConePhoIso->at(cand.ipho));
 

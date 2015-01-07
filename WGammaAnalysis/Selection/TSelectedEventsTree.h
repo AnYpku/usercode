@@ -25,7 +25,7 @@ class TSelectedEventsTree
     void SetMuonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand,int ilMax); 
     void SetElectronValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int ilMax); 
     void SetPhotonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int channel, int ilMax); 
-    void SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int sample); 
+    void SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int sample, int sample); 
     void SetThreeIsolations(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, float &chCorr, float &neuCorr, float &phoCorr, float chOrig, float neuOrig, float phoOrig);
 
 

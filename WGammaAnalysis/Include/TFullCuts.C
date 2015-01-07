@@ -40,7 +40,7 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   // returns 0 otherwise (has no candidates)
 
    _isEvForCheck=0;
-   if (leaf.event==213426400 || leaf.event==20192560) _isEvForCheck=1;
+   if (leaf.event==497487460) _isEvForCheck=1;
    if (_isEvForCheck) {std::cout<<std::endl; std::cout<<"event="<<leaf.event<<std::endl;}
 
    _leaf=leaf;
@@ -287,11 +287,17 @@ bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& ic
 
   for (int ipho=0; ipho<_leaf.nPho; ipho++){
       float dR1=-1, dR2=-1;
-
+      if (_isEvForCheck) {
+        std::cout<<"ipho good: ";
+        for (int ipho=0; ipho<_leaf.nPho; ipho++) 
+          if (_passedPhoton[ipho]) std::cout<<ipho<<", ";
+        std::cout<<std::endl;
+      }//end of (_isEvForCheck)
       if (!_passedPhoton[ipho]) continue;
-//      if (!_passedLepton[ilep]) continue;
+      if (_isEvForCheck)
+        std::cout<<"passed ipho="<<ipho<<std::endl;
       if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON)
-        {  if (!ZMassWindowCut(ipho,_ilepLead)) break; }
+        {  if (!ZMassWindowCut(ipho,_ilepLead)) continue; }
       _passed.zMassWindow++;
       if (_isEvForCheck)
         std::cout<<"passed zMassWindow"<<std::endl;
@@ -302,25 +308,22 @@ bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& ic
       if (channel==_config.ELECTRON)
         { lepPhi=_leaf.elePhi->at(_ilepLead); lepEta=_leaf.eleEta->at(_ilepLead); }
 
-//      if (ilep1==-1){
-        dR1=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-        if (dR1<_lePhoDeltaRPreCut) break;
-        if (vgamma==_config.W_GAMMA && dR1<_lePhoDeltaRCut) break;
-//        ilep1=ilep;
-//      }
+      dR1=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
+      if (_isEvForCheck)
+        std::cout<<"ipho="<<ipho<<", ilep="<<_ilepLead<<", dR1="<<dR1<<std::endl;
+      if (dR1<_lePhoDeltaRPreCut) continue;
+      if (vgamma==_config.W_GAMMA && dR1<_lePhoDeltaRCut) continue;
       else if (vgamma==_config.Z_GAMMA){ // if Z_GAMMA and first dR already found
         if (channel==_config.MUON)
           { lepPhi=_leaf.muPhi->at(_ilepSublead); lepEta=_leaf.muEta->at(_ilepSublead); }
         if (channel==_config.ELECTRON)
           { lepPhi=_leaf.elePhi->at(_ilepSublead); lepEta=_leaf.eleEta->at(_ilepSublead); }
         dR2=_math.DeltaR(lepPhi,lepEta,_leaf.phoPhi->at(ipho),_leaf.phoEta->at(ipho));
-        if (dR2<_lePhoDeltaRPreCut) break;
-//        ilep2=ilep;
+        if (dR2<_lePhoDeltaRPreCut) continue;
       }
       _passed.dR++;
-
-//    if (ilep1==-1) continue;
-//    if (vgamma==_config.Z_GAMMA && ilep2==-1) continue;
+      if (_isEvForCheck)
+        std::cout<<"passed dR"<<std::endl;
 
     _cands[icand].ipho=ipho; 
     if (vgamma==_config.W_GAMMA || dR1<dR2){

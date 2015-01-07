@@ -5,9 +5,9 @@
 
 void CompareTwoSelectedTrees()
 {
-  TFile* f2 = new TFile("../../../usercode_2014_11_24_PresentationOnSidebandVariation/WGammaAnalysis/WGammaOutput/MUON/FullySelected/selected_WGamma_blindPRESCALE_DATA.root");
+  TFile* f1 = new TFile("../../../usercode_2014_11_24_PresentationOnSidebandVariation/WGammaAnalysis/WGammaOutput/MUON/FullySelected/selected_WGamma_blindPRESCALE_DATA.root");
 
-  TFile* f1 = new TFile("../WGammaOutput/MUON/FullySelected/selected_WGamma_blindPRESCALE_DATA.root");
+  TFile* f2 = new TFile("../WGammaOutput/MUON_WGamma/FullySelected/selected_WGamma_blindPRESCALE_DATA.root");
 
   TTree* tr1 = (TTree*)f1->Get("selectedEvents");
 

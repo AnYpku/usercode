@@ -25,7 +25,7 @@ bool TElectronCuts::PassedKinematics(int vgamma, bool isLead, float pt, float et
   if (vgamma==_config.W_GAMMA) elePtCut=_elePtCut;
   else if (vgamma==_config.Z_GAMMA) 
     if (isLead) elePtCut=20.;
-    else elePtCut=10;
+    else elePtCut=20;
   if (!IsBarrel(eta) && !IsEndcap(eta)) return 0;
   if (!(pt>elePtCut)) return 0;
   return 1;
