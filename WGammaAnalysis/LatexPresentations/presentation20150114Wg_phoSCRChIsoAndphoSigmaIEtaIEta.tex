@@ -1,0 +1,199 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{phoSCRChIso and phoSigmaIEtaIEta, bkgr and sign template MC studies; attempt to perform MC closure tests}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{January 14th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}{Introduction}
+%{
+%\begin{itemize}
+% \item Validation of the .db file produced with merged LS1BPixRepair+TrackerCSA14 scenario on Dataset TkAlMinBias ( the location of .db file: /afs/cern.ch/cms/CAF/CMSALCA/ALCA\_TRACKERALIGN/data/commonValidation/alignmentObjects/eavdeeva/Alignments20141118at2129\_TrackerCSA14andBPixRepair.db )
+% \item Also ran on 50ns and 25ns scenarios
+%\end{itemize}
+%}
+%\end{frame}
+
+
+%---------------------------------------------
+
+
+\begin{frame}{sigmaIEtaIEta dependence on photon pt, Barrel}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_sihih_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Barrel_sihih_in_phoEt_bins.pdf}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_sihih_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Barrel_sihih_in_phoEt_bins.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize sigmaIEtaIEta depends on pt for both signal and background templates; but due to lack of statistics for high pt, common templates may be needed for high pt; in Zg analysis by Otto - common template for pt$>$55 GeV 
+\end{frame}
+
+
+\begin{frame}{sigmaIEtaIEta dependence on photon pt, Endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_sihih_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Endcap_sihih_in_phoEt_bins.pdf}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_sihih_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Endcap_sihih_in_phoEt_bins.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize pt dependence in Endcap is even more significant; Wjets distribution for 75$<$pt$<$95 looks strange - maybe errors are not estimated properly  
+\end{frame}
+
+\begin{frame}{phoSCRChIso dependence on photon pt, Barrel}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_Iso_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Barrel_Iso_in_phoEt_bins.pdf}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_Iso_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Barrel_Iso_in_phoEt_bins.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize phoSCRChIso dependens on pt only for background template; signal templates are similar for different pt bins, thus at least for high pt bins common template can be used
+\end{frame}
+
+\begin{frame}{phoSCRChIso dependence on photon pt, Endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_Iso_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Endcap_Iso_in_phoEt_bins.pdf}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_Iso_in_phoEt_bins.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Endcap_Iso_in_phoEt_bins.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize behaivior in endcap is similar
+\end{frame}
+
+\begin{frame}{Bkg templ: phoSCRChIso/phoPFChIso dependence on sigmaIEtaIEta, Barrel}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_Iso_in_sihih_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Barrel_Iso_in_sihih_bins_pt15_20.pdf}
+    \includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_Iso_in_sihih_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Barrel_Iso_in_sihih_bins_pt15_20.pdf}
+  \end{figure}
+  \scriptsize 1st column - phoSCRChIso dependence of sigmaIEtaIEta, 2nd - phoPFChIso dependence of sigmaIEtaIEta for Wjets/DYjets; 3rd - dependence for Wg/Zg. Dependences for Wg/Zg don't matter, they are shown for illustration purpose. Dependences for Wjets/DYjets are very important for template method
+\end{frame}
+
+\begin{frame}{Bkg templ: phoSCRChIso/phoPFChIso dependence on sigmaIEtaIEta, Endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_Iso_in_sihih_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Endcap_Iso_in_sihih_bins_pt15_20.pdf}
+    \includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_Iso_in_sihih_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Endcap_Iso_in_sihih_bins_pt15_20.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize endcap
+\end{frame}
+
+\begin{frame}{Bkg templ: sigmaIEtaIEta dependence on phoSCRChIso/phoPFChIso, Barrel}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_sihih_in_Iso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_sihih_in_PFIso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Barrel_sihih_in_Iso_bins_pt15_20.pdf}
+    \includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_sihih_in_Iso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_sihih_in_PFIso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, height=0.60\textheight, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Barrel_sihih_in_Iso_bins_pt15_20.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize sigmaIEtaIEta distributions depend on ch iso
+\end{frame}
+
+\begin{frame}{Bkg templ: phoSCRChIso/phoPFChIso dependence on sigmaIEtaIEta, Endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.33\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_sihih_in_Iso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_sihih_in_PFIso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zg_MC_Endcap_sihih_in_Iso_bins_pt15_20.pdf}
+    \includegraphics[width=0.33\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_sihih_in_Iso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_sihih_in_PFIso_bins_pt15_20.pdf}\includegraphics[width=0.33\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wg_MC_Endcap_sihih_in_Iso_bins_pt15_20.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize and the dependence is even stronger for endcap
+\end{frame}
+
+\begin{frame}{Sign templ: phoSCRChIso vs phoRandConeChIso}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Zg_Barrel_pt15_20.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Zg_Endcap_pt15_20.pdf}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Wg_Barrel_pt15_20.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Wg_Endcap_pt15_20.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize to construct signal template with random cone isolation method, we need distributions of Vg-SCRChIso, Vg-RandConeIso and Vjets-RandConeIso all three to be the same; but they are not absolutely the same
+\end{frame}
+
+\begin{frame}{Sign templ: phoSigmaIEtaIEta, Wg vs Zg vs ZgFSR}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_sihih_Barrel_pt15_20.pdf}\includegraphics[width=0.5\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_sihih_Endcap_pt15_20.pdf}
+  \end{figure}
+  \scriptsize to construct signal template of sigmaIEtaIEta, we need sigmaIEtaIEta distributions of Zg, Wg and Zg-FSR to be the same; they are similar
+\end{frame}
+
+\begin{frame}{How to proceed with template method}\\*
+  \scriptsize One possibility is to do similar to what was done in Zg analysis:\\*
+  \begin{itemize}
+    \item \scriptsize Apply procedure on MC   
+    \item \scriptsize Make sure it gives right result based on MC truth information
+    \item \scriptsize If not - change fit parameters (sideband range, merge or not templates from different bins, template origin - e.g. bkg template for Wg may be taken from sideband of Zg-selected data rather than Wg-selected if it shows to give better result)
+    \item \scriptsize Find parameters which would give correct result on MC
+    \item \scriptsize Use them for data    
+ \end{itemize} 
+ \scriptsize How to perform MC closure test:\\*
+ \begin{itemize}
+    \item \scriptsize Merge all MC files for given channel together (for Wg, muon: Wg to munu, Wjets, Zg, DYjets, Wg to taunu, WWg)
+    \item \scriptsize Use this merged file as data    
+ \end{itemize} 
+\end{frame}
+
+\begin{frame}{ZGamma, MUON, MC closure test; yields given by chiso vs sigmaIEtaIEta fits}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_CHISO_UNblind__phoEt_TrueDDvsMC_Barrel__MCclosure.pdf}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_SIHIH_UNblind__phoEt_TrueDDvsMC_Barrel__MCclosure.pdf}
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_CHISO_UNblind__phoEt_TrueDDvsMC_Endcap__MCclosure.pdf}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_SIHIH_UNblind__phoEt_TrueDDvsMC_Endcap__MCclosure.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Applied procedure with some set of parameters on Zg-selected MC mixture; some fits didn't converge, some give wrong results - parameters for those bins need to be changed; for other bins MC closure test looks good
+\end{frame}
+
+\begin{frame}{ZGamma, MUON, data, unblinded; yields given by chiso vs sigmaIEtaIEta fits}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_CHISO_UNblind__phoEt_TrueDDvsMC_Barrel_.pdf}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_SIHIH_UNblind__phoEt_TrueDDvsMC_Barrel_.pdf}
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_CHISO_UNblind__phoEt_TrueDDvsMC_Endcap_.pdf}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TEMPL_SIHIH_UNblind__phoEt_TrueDDvsMC_Endcap_.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Applied the same on data
+\end{frame}
+
+\begin{frame}{WGamma, MUON, 5\% of data; yields given by chiso vs sigmaIEtaIEta fits}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TEMPL_CHISO_blindPRESCALE__phoEt_TrueDDvsMC_Barrel_.pdf}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TEMPL_SIHIH_blindPRESCALE__phoEt_TrueDDvsMC_Barrel_.pdf}
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TEMPL_CHISO_blindPRESCALE__phoEt_TrueDDvsMC_Endcap_.pdf}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TEMPL_SIHIH_blindPRESCALE__phoEt_TrueDDvsMC_Endcap_.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize fits on Wg-selected MC mixture didn't converge; the procedure applied on data
+\end{frame}
+
+\begin{frame}{What do I mean "fits didn't converge"?}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Barrel__MCclosure.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Barrel__MCclosure.png}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Endcap__MCclosure.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Endcap__MCclosure.png}
+    %\\Comments here
+  \end{figure}
+  \scriptsize left column - fits of Wg-selected MC mixture; right column - fits of Zg-selected MC mixture
+\end{frame}
+
+%\begin{frame}{Conclusions}
+%{
+%\begin{itemize}
+%\item The validation of LS1BPixRepair+TrackerCSA14 misalignment was ran on TkAlMinBias Dataset
+%\item Plan: to run validation on DYToMuMu M50 Dataset
+%\end{itemize}
+%}
+%\end{frame} 
+
+
+
+\end{document}
+

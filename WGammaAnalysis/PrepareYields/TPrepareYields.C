@@ -231,6 +231,14 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   hist1->Draw("EP same");
   legend->Draw("same");
 
+  plotTitle=canv->GetTitle();
+  plotTitle+=TString(" ")+_pyPars.strPlotsBaseName;
+  plotTitle.ReplaceAll("c_","");
+  plotTitle.ReplaceAll("TEMPL_","");
+  plotTitle.ReplaceAll("UNblind_","");
+  plotTitle.ReplaceAll("blindPRESCALE_","");
+  plotTitle.ReplaceAll("_"," ");
+  plotTitle.ReplaceAll("  "," ");
   TLatex* latexTitle = new TLatex(0.15,0.95,plotTitle);
   latexTitle->SetNDC();
   latexTitle->Draw("same");

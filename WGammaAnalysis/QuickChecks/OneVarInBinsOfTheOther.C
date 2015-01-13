@@ -104,8 +104,10 @@ void PlotSihihInIsoBins(TTree* tr_Zg, TTree* tr_Wg, TTree* tr_Zjets, TTree* tr_W
   // phoSigmaIEtaIEta in phoSCRChIso04Corr  bins
   TString var1 = "phoSigmaIEtaIEta";
   TString var2 = "phoPFChIsoCorr";
-  const int nBinsVar2= 5;
-  float binLimsVar2[nBinsVar2+1]={-0.1,1.5,2.6,5.0,15.0,100.0};
+//  const int nBinsVar2= 5;
+//  float binLimsVar2[nBinsVar2+1]={-0.1,1.5,2.6,5.0,15.0,100.0};
+  const int nBinsVar2= 3;
+  float binLimsVar2[nBinsVar2+1]={-0.1,1.5,5.0,20.0};
 
   int nBinsHist =24;
   float histMin = 0.019;
@@ -222,8 +224,10 @@ void PlotIsoAndSihihInPtBins(TTree* tr_Zg, TTree* tr_Wg, TTree* tr_Zjets, TTree*
 
   TString var1 = "phoSCRChIso04Corr";
   TString var2 = "phoEt";
-  const int nBinsVar2 = 6;
-  float binLimsVar2[nBinsVar2+1]={15,25,35,55,75,95,500};
+//  const int nBinsVar2 = 6;
+//  float binLimsVar2[nBinsVar2+1]={15,25,35,55,75,95,500};
+  const int nBinsVar2 = 4;
+  float binLimsVar2[nBinsVar2+1]={15,35,55,75,95};
   int nBinsHist=21;
   float histMin = -0.9;
   float histMax = 20.1;

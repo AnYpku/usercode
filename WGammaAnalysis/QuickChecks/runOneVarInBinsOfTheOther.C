@@ -16,7 +16,7 @@
   TCut cutWeight="weight";
   TCut cutPtFirstBin="phoEt>15 && phoEt<20";
 
-  //PlotSihihInIsoBins(tr_Zg, tr_Wg, tr_Zjets, tr_Wjets, cutB, cutE, cutPtFirstBin, cutWeight);
+  PlotSihihInIsoBins(tr_Zg, tr_Wg, tr_Zjets, tr_Wjets, cutB, cutE, cutPtFirstBin, cutWeight);
   PlotIsoInSihihBins(tr_Zg, tr_Wg, tr_Zjets, tr_Wjets, cutB, cutE, cutPtFirstBin, cutWeight);
   PlotIsoAndSihihInPtBins(tr_Zg, tr_Wg, tr_Zjets, tr_Wjets, cutB, cutE, cutWeight);
 
