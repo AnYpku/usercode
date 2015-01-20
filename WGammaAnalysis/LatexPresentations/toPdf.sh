@@ -1,2 +1,3 @@
-pdflatex presentation.tex
+pdflatex presentation20150121Wg_UpdatePlusZgClosureTest.tex
+acroread presentation20150121Wg_UpdatePlusZgClosureTest.pdf
 

@@ -175,19 +175,21 @@ void PlotIsoInSihihBins(TTree* tr_Zg, TTree* tr_Wg, TTree* tr_Zjets, TTree* tr_W
   float binLimsVar2B[nBinsVar2B+1]={0.0051,0.0111,0.0141,0.0201};
   const int nBinsVar2E= 3;
   float binLimsVar2E[nBinsVar2B+1]={0.0191,0.0331,0.0411,0.0611};
-  int nBinsHist=21;
-  float histMin = -0.9;
+//  int nBinsHist=21;
+//  float histMin = -0.9;
+  int nBinsHist=20;
+  float histMin = 0.1;
   float histMax = 20.1;
 
-  OneVarInBinsOfTheOther("Zg_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Zjets_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zjets, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Wg_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Wjets_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wjets, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Zg_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Zjets_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zjets, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Wg_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Wjets_MC_Endcap_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wjets, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
 
-  OneVarInBinsOfTheOther("Zg_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Zjets_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zjets, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Wg_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Wjets_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wjets, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Zg_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Zjets_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Zjets, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Wg_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Wjets_MC_Barrel_Iso_in_sihih_bins_pt15_20_PF", "pho _PF ch Iso", tr_Wjets, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
 
   // phoPFChIsoCorr in phoSigmaIEtaIEta  bins
   // end
@@ -200,14 +202,14 @@ void PlotIsoInSihihBins(TTree* tr_Zg, TTree* tr_Wg, TTree* tr_Zjets, TTree* tr_W
   // phoSCRChIso04Corr in phoSigmaIEtaIEta  bins
   var1 = "phoSCRChIso04Corr";
 
-  OneVarInBinsOfTheOther("Zg_MC_Endcap_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Zg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Zg_MC_Endcap_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Zg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
   OneVarInBinsOfTheOther("Zjets_MC_Endcap_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Zjets, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Wg_MC_Endcap_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Wg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Wg_MC_Endcap_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Wg, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
   OneVarInBinsOfTheOther("Wjets_MC_Endcap_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Wjets, var1, cutE && cutPtFirstBin, cutWeight, var2, nBinsVar2E, binLimsVar2E, nBinsHist, histMin, histMax);
 
-  OneVarInBinsOfTheOther("Zg_MC_Barrel_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Zg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Zg_MC_Barrel_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Zg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
   OneVarInBinsOfTheOther("Zjets_MC_Barrel_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Zjets, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
-  OneVarInBinsOfTheOther("Wg_MC_Barrel_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Wg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
+//  OneVarInBinsOfTheOther("Wg_MC_Barrel_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Wg, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
   OneVarInBinsOfTheOther("Wjets_MC_Barrel_Iso_in_sihih_bins_pt15_20", "pho SCR ch Iso", tr_Wjets, var1, cutB && cutPtFirstBin, cutWeight, var2, nBinsVar2B, binLimsVar2B, nBinsHist, histMin, histMax);
 
   // phoSCRChIso04Corr in phoSigmaIEtaIEta  bins

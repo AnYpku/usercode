@@ -15,7 +15,7 @@ MergeMCintoData(){
 
   #move data file for reference (because it will be replaced now)
   mv ${namefiledatafull} ${namefiledataref}
-  echo moved ${namefiledatafull} to ${namefiledataref}
+#  echo moved ${namefiledatafull} to ${namefiledataref}
 
   #merge all MC files to make them look like data
   #make sure there are no debugMode, noPuReweight, etc files
@@ -38,7 +38,7 @@ MoveDataFileBack(){
 
   #move data file back (because it was replaced)
   mv ${namefiledataref} ${namefiledatafull}
-  echo moved ${namefiledataref} to ${namefiledatafull}
+#  echo moved ${namefiledataref} to ${namefiledatafull}
 }
 # end of MoveDataFileBack()
 
@@ -51,7 +51,7 @@ MovePlotNamesToReference(){
       orig=$f
       orig=${orig/$2/${ref}$2}
       mv $f ${orig}
-      echo moved $f to ${orig}
+#      echo moved $f to ${orig}
     done
 }
 # end of MovePlotNamesToReference() 
@@ -73,7 +73,7 @@ MovePlotNamesToClosure(){
       orig=$f
       orig=${orig/$2/${clos}$2}
       mv $f ${orig}
-      echo moved $f to ${orig}
+#      echo moved $f to ${orig}
     done
 }
 # end of MovePlotNamesToClosure()
@@ -95,7 +95,7 @@ MovePlotNamesReferencesBack(){
       orig=$f
       orig=${orig/${ref}$2/$2}
       mv $f ${orig}
-      echo moved $f to ${orig}
+#      echo moved $f to ${orig}
     done
 }
 # end of MovePlotNamesReferencesBack()

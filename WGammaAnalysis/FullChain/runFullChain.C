@@ -32,8 +32,8 @@
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
 //  anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
 //  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
-  anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
+  anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
+  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
   anPars.templFits=TConfiguration::TEMPL_CHISO;//CHISO;//TEMPL_CHISO or TEMPL_SIHIH
   //anPars.cutAdd="1";//"phoEt<40";
   //anPars.cutAdd="phoEt<40"; // for PT_THRESHOLD blinding 
@@ -44,7 +44,7 @@
 
   anPars.year=2012;
   anPars.noPreSelection=1;
-  anPars.noExtraSelection=0;
+  anPars.noExtraSelection=1;
   anPars.noDDBkgComputation=0;
   anPars.noPrepareYields=0;
   anPars.noCalcAccAndEff=1;

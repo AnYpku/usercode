@@ -6,9 +6,7 @@
   fch.SetDefaultFullChainParameters(anPars, "phoEt");
 
   anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
-  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
   anPars.blind=TConfiguration::UNBLIND;
-  anPars.templFits=TConfiguration::TEMPL_SIHIH;
 
   anPars.cutAdd="1";
 
@@ -19,11 +17,23 @@
   anPars.noCalcAccAndEff=1;
   anPars.noCalcCrossSection=1;
 
+  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
+  anPars.templFits=TConfiguration::TEMPL_SIHIH;
+  AuxTemplatesRandCone(anPars);
+  AuxSubtractBackground(anPars);
+
+  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
+  anPars.templFits=TConfiguration::TEMPL_CHISO;
+  AuxTemplatesRandCone(anPars);
+  AuxSubtractBackground(anPars);
+
+  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA, Z_GAMMA
+  anPars.templFits=TConfiguration::TEMPL_SIHIH;
 //  AuxTemplatesRandCone(anPars);
 //  AuxSubtractBackground(anPars);
 
+  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA, Z_GAMMA
   anPars.templFits=TConfiguration::TEMPL_CHISO;
-
-  AuxTemplatesRandCone(anPars);
-  AuxSubtractBackground(anPars);
+//  AuxTemplatesRandCone(anPars);
+//  AuxSubtractBackground(anPars);
 }

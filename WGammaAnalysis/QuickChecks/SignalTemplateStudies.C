@@ -90,14 +90,16 @@ void DrawIsolationTemplates()
   
   TCut cutB="phoSCEta<1.4442 && phoSCEta>-1.4442";
   TCut cutE="(phoSCEta > 1.566 && phoSCEta < 2.5)||(phoSCEta <-1.566 && phoSCEta >-2.5)";
+  TCut cutSihihB="phoSigmaIEtaIEta<0.011";
+  TCut cutSihihE="phoSigmaIEtaIEta<0.033";
   TCut cutWeight="weight";
   TCut cutPtFirstBin="phoEt>15 && phoEt<20";
 
   TFile* f = new TFile("fOut1.root","recreate");
-  DrawIsolationTemplatesOneCase("signalTempl_Iso_Zg_Barrel_pt15_20", tr_Zg, tr_Zjets, cutB && cutPtFirstBin, cutWeight);
-  DrawIsolationTemplatesOneCase("signalTempl_Iso_Zg_Endcap_pt15_20", tr_Zg, tr_Zjets, cutE && cutPtFirstBin, cutWeight);
-  DrawIsolationTemplatesOneCase("signalTempl_Iso_Wg_Barrel_pt15_20", tr_Wg, tr_Wjets, cutB && cutPtFirstBin, cutWeight);
-  DrawIsolationTemplatesOneCase("signalTempl_Iso_Wg_Endcap_pt15_20", tr_Wg, tr_Wjets, cutE && cutPtFirstBin, cutWeight);
+  DrawIsolationTemplatesOneCase("signalTempl_Iso_Zg_Barrel_pt15_20", tr_Zg, tr_Zjets, cutB && cutSihihB && cutPtFirstBin, cutWeight);
+  DrawIsolationTemplatesOneCase("signalTempl_Iso_Zg_Endcap_pt15_20", tr_Zg, tr_Zjets, cutE && cutSihihE && cutPtFirstBin, cutWeight);
+  DrawIsolationTemplatesOneCase("signalTempl_Iso_Wg_Barrel_pt15_20", tr_Wg, tr_Wjets, cutB && cutSihihB && cutPtFirstBin, cutWeight);
+  DrawIsolationTemplatesOneCase("signalTempl_Iso_Wg_Endcap_pt15_20", tr_Wg, tr_Wjets, cutE && cutSihihE && cutPtFirstBin, cutWeight);
 }
 
 void DrawSihihTemplatesOneCase(TString canvName, TTree* trZg, TTree* trWg, TTree* trZgFSR, TCut cutNoWeight, TCut cutWeight, int nbins, float min, float max)

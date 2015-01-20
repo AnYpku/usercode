@@ -123,6 +123,8 @@ class TTemplatesRandCone
     TH1D* _hTrue[nKinBinsMax][3];
     TH1D* _hFake[nKinBinsMax][3];
     TH1D* _hLeak[nKinBinsMax][3];
+    TH1D* _hSign[nKinBinsMax][3];
+    double leakFraction[nKinBinsMax][3];
     TH1D* _hTrueReference[nKinBinsMax][3];
     TH1D* _hFakeReference[nKinBinsMax][3];
     TH1D* _hData[nKinBinsMax][3];

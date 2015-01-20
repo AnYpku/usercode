@@ -218,6 +218,8 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   _hLeak[ikin][ieta]->Sumw2();
   name.ReplaceAll("_Leak","_Data");
   _hData[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
+  name.ReplaceAll("_Data","_Sign");
+  _hSign[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
 //  _hData[ikin][ieta]->Sumw2();
   SetTemplate(0,_hFake[ikin][ieta], cut, noPrint, _hLeak[ikin][ieta]);
   // "0" for fake gamma template
@@ -380,6 +382,8 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
 //  histTemp->SetName(TString("histTemp")+StrLabelKin(ikin)+StrLabelEta(ieta));
   TString varDraw=_pars.varFit+TString(">>")+_hData[ikin][ieta]->GetName();
   _pars.treeData->Draw(varDraw,cut*_pars.cutWeight,"goff");
+  varDraw=_pars.varFit+TString(">>")+_hSign[ikin][ieta]->GetName();
+  _pars.treeSign->Draw(varDraw,cut*_pars.cutWeight,"goff");
 //  for (int ib=1; ib<=_hData[ikin][ieta]->GetNbinsX(); ib++){
 //    _hData[ikin][ieta]->SetBinContent(ib,histTemp->GetBinContent(ib));
 //    _hData[ikin][ieta]->SetBinError(ib,histTemp->GetBinError(ib));
@@ -409,9 +413,10 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   }
 
   //create total pdf
-  int nMax = _pars.treeData->GetEntries(cut);
-  int nTrueStart = 0.5*nMax;
-  int nFakeStart = 0.5*nMax;
+  float nMax = _hData[ikin][ieta]->GetSumOfWeights();
+  float nSign = _hSign[ikin][ieta]->GetSumOfWeights();
+  float nTrueStart = nSign;
+  float nFakeStart = nMax - nSign;
 
   RooRealVar rooVarFit(_pars.varFit,_pars.varFit, varMin, varMax);
   if (nMax<=0){
@@ -452,7 +457,8 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   RooExtendPdf eTruePdf("eTrue","extended True",truePdf,rooNTrue);
   RooRealVar rooNFake("nFake","n Fake",nFakeStart,0,nMax);
   RooExtendPdf eFakePdf("eFake","extended Fake",fakePdf,rooNFake);
-  RooAddPdf fullPdf("fitModel","fit model",RooArgList(eTruePdf,eFakePdf));
+//  RooAddPdf fullPdf("fitModel","fit model",RooArgList(eTruePdf,eFakePdf));
+  RooAddPdf fullPdf("fitModel","fit model",RooArgList(truePdf,fakePdf),RooArgList(rooNTrue,rooNFake));
   //fit
   fullPdf.fitTo(dataHist,SumW2Error(kFALSE),Extended(kTRUE));
 
@@ -608,7 +614,8 @@ void TTemplatesRandCone::PrintYieldsAndChi2()
       std::cout<<_nTrueFromFitVal[ikin][ieta]<<"+-";
       std::cout<<_nTrueFromFitErr[ikin][ieta]<<"; ";
       if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
-        std::cout<<100.0*_hLeak[ikin][ieta]->GetSumOfWeights()/(_hLeak[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights())<<"%; ";
+        leakFraction[ikin][ieta]=100.0*_hLeak[ikin][ieta]->GetSumOfWeights()/(_hLeak[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights());
+        std::cout<<leakFraction[ikin][ieta]<<"%; ";
       }
     }
     std::cout<<std::endl;
