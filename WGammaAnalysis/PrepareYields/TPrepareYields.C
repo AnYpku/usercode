@@ -187,6 +187,13 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
 }// end of CompareTotalDATAvsMC
 
 void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack, THStack* stack)
+{
+  TH1F* hists[1];
+  hists[0]=hist1;
+  CompareStackVsHist(plotTitle, 1, hists, hist2, legend, canv, isStack, stack);
+}
+
+void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hist1[_nHistsMax], TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack, THStack* stack)
 //if isStack then hist2 must be sum of histograms in the stack
 {
   canv->Divide(1,2);
@@ -206,10 +213,13 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
   if (_pyPars.doLogY) pad1->SetLogy();
   pad1->cd();
 
-  float max = hist1->GetMaximum();
-  if (hist2->GetMaximum()>max)
-    max=hist2->GetMaximum();
+  float max = hist2->GetMaximum();
   float min;
+  for (int ih=0; ih<nHists1; ih++){
+    if (hist1[ih]->GetMaximum()>max)
+      max=hist1[ih]->GetMaximum();
+  }
+
   if (_pyPars.doLogY) min=1;
   else min=0;
 //  float min = 0.3*hist1->GetMinimum();
@@ -220,15 +230,17 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
 
   if (isStack) hist2->SetLineColor(2);
   if (isStack) hist2->SetFillStyle(0);
-  hist1->GetYaxis()->SetRangeUser(min,max);
-  hist1->SetStats(0);
-  if (_pyPars.doLogY) {hist1->GetYaxis()->SetMoreLogLabels(); hist1->GetYaxis()->SetNoExponent();}
-  hist1->Draw("P");
+  hist1[0]->GetYaxis()->SetRangeUser(min,max);
+  hist1[0]->SetStats(0);
+  if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(); hist1[0]->GetYaxis()->SetNoExponent();}
+  hist1[0]->Draw("P");
   if (isStack) stack->Draw("HIST same"); 
   else hist2->Draw("HIST same");
-
-  hist1->SetLineWidth(2);
-  hist1->Draw("EP same");
+ 
+  for (int ih=0; ih<nHists1; ih++){
+    hist1[ih]->SetLineWidth(2);
+    hist1[ih]->Draw("EP same");
+  }
   legend->Draw("same");
 
   plotTitle=canv->GetTitle();
@@ -245,37 +257,48 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
 
   pad2->cd();
   if (_pyPars.doLogX) pad2->SetLogx();
-  TString hRName = "hRatio";
-  hRName+=hist1->GetTitle();
-  hRName+=hist2->GetTitle();
-  TH1F* hRatio = (TH1F*)hist1->Clone(hRName);
-  hRatio->Divide(hist2);
+  TH1F* hRatio[nHists1];
+  for (int ih=0; ih<nHists1; ih++){
+    TString hRName = "hRatio";
+    hRName+=hist1[ih]->GetTitle();
+    hRName+=hist2->GetTitle();
+    hRatio[ih] = (TH1F*)hist1[ih]->Clone(hRName);
+    hRatio[ih]->Divide(hist2);
+  }
   //bool isDiv = hRatio->Divide(hist2);
   //if (!isDiv){
   //  std::cout<<"Can't divide histograms"<<std::endl;
   //  return;
  // }
-  max=1;min=1;
-  for (int ib=1; ib<=hRatio->GetNbinsX(); ib++){
-    if (hRatio->GetBinContent(ib)+hRatio->GetBinError(ib)>max) 
-      max=hRatio->GetBinContent(ib)+hRatio->GetBinError(ib);
-    if (hRatio->GetBinContent(ib)-hRatio->GetBinError(ib)<min) 
-      min=hRatio->GetBinContent(ib)-hRatio->GetBinError(ib);
-  }
+  max=1.1;min=0.9;
+
+  for (int ih=0; ih<nHists1; ih++){  
+    for (int ib=1; ib<=hRatio[ih]->GetNbinsX(); ib++){
+      if (hRatio[ih]->GetBinContent(ib)+hRatio[ih]->GetBinError(ib)>max) 
+        max=hRatio[ih]->GetBinContent(ib)+hRatio[ih]->GetBinError(ib);
+      if (hRatio[ih]->GetBinContent(ib)-hRatio[ih]->GetBinError(ib)<min) 
+        min=hRatio[ih]->GetBinContent(ib)-hRatio[ih]->GetBinError(ib);
+    }// end of loop over ib
+  }// end of loop over ih
 
   std::cout<<"ratio min = "<<min<<", ratio max = "<<max<<std::endl;
-  hRatio->GetYaxis()->SetRangeUser(min,max);
-  hRatio->GetYaxis()->SetLabelSize(0.1);
-  hRatio->GetXaxis()->SetLabelSize(0.1);
-  hRatio->GetXaxis()->SetTitleOffset(1.0);
-  hRatio->GetXaxis()->SetTitleSize(0.12);
-  hRatio->GetXaxis()->SetMoreLogLabels();
-  hRatio->GetXaxis()->SetNoExponent();
+  hRatio[0]->GetYaxis()->SetRangeUser(min,max);
+  hRatio[0]->GetYaxis()->SetLabelSize(0.1);
+  hRatio[0]->GetXaxis()->SetLabelSize(0.1);
+  hRatio[0]->GetXaxis()->SetTitleOffset(1.0);
+  hRatio[0]->GetXaxis()->SetTitleSize(0.12);
+  hRatio[0]->GetXaxis()->SetMoreLogLabels();
+  hRatio[0]->GetXaxis()->SetNoExponent();
 
-  hRatio->Draw();
-  hRatio->SetTitle(TString("; ")+_pyPars.varKinLabel+TString(" ;"));
-  int nBins = hRatio->GetNbinsX();
-  TLine* line = new TLine(hRatio->GetBinLowEdge(1),1,hRatio->GetBinLowEdge(nBins)+hRatio->GetBinWidth(nBins),1);
+  hRatio[0]->Draw();
+  hRatio[0]->SetTitle(TString("; ")+_pyPars.varKinLabel+TString(" ;"));
+
+  for (int ih=0; ih<nHists1; ih++){
+    hRatio[ih]->Draw("EP same");
+  }
+
+  int nBins = hRatio[0]->GetNbinsX();
+  TLine* line = new TLine(hRatio[0]->GetBinLowEdge(1),1,hRatio[0]->GetBinLowEdge(nBins)+hRatio[0]->GetBinWidth(nBins),1);
   line->SetLineWidth(2);
   line->SetLineStyle(9);
   line->Draw("same");

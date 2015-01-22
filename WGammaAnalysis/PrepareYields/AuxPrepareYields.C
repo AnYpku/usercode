@@ -18,6 +18,30 @@ void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars)
   
 }
 
+void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::AnalysisParameters &anPars, int templFits)
+{
+  TConfiguration config;
+  TString fileName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,templFits,anPars.varKin);
+  TString strYields1DTrue[3], strYields1DFake[3], strYieldTotTrue[3], strYieldTotFake[3];
+  for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
+   strYields1DFake[ieta]=config.GetYieldsDDTemplateFakeName(config.ONEDI,ieta);
+   strYieldTotFake[ieta]=config.GetYieldsDDTemplateFakeName(config.TOTAL,ieta);
+   strYields1DTrue[ieta]=config.GetYieldsDDTemplateTrueName(config.ONEDI,ieta);
+   strYieldTotTrue[ieta]=config.GetYieldsDDTemplateTrueName(config.TOTAL,ieta);
+  }
+  TString name = TString("DD_true")+config.StrTempl(templFits);
+  name.ReplaceAll("TEMPL_","_");
+  TString label=name;
+  label.ReplaceAll("_"," ");
+  label.ReplaceAll(" SIHIH",", #sigma_{i#etai#eta} fits");
+  label.ReplaceAll(" CHISO",", I_{ch} fits");
+  prep.SetYieldsDataDrivenTrue(name, label, 3, fileName, strYields1DTrue, strYieldTotTrue);
+  name.ReplaceAll("true","fake");
+  label.ReplaceAll("true","fake");
+  prep.SetYieldsDataDrivenFake(name, label, 4, fileName, strYields1DFake, strYieldTotFake);
+  prep.Increase_nDDsources();
+}// end of AuxSubtractBackgroundOneTempl
+
 void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars)
 {
   TSubtractBackground prep;
@@ -26,18 +50,15 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars)
   AuxPrepareYieldsCommon(prep, pars, anPars);
 
   TConfiguration config;
-  TString fileName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,anPars.templFits,anPars.varKin);
-  TString strYields1DTrue[3], strYields1DFake[3], strYieldTotTrue[3], strYieldTotFake[3];
-  for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
-   strYields1DFake[ieta]=config.GetYieldsDDTemplateFakeName(config.ONEDI,ieta);
-   strYieldTotFake[ieta]=config.GetYieldsDDTemplateFakeName(config.TOTAL,ieta);
-   strYields1DTrue[ieta]=config.GetYieldsDDTemplateTrueName(config.ONEDI,ieta);
-   strYieldTotTrue[ieta]=config.GetYieldsDDTemplateTrueName(config.TOTAL,ieta);
-  }
-  prep.SetYieldsDataDrivenTrue("DDtrue", "DD true", 3, fileName, strYields1DTrue, strYieldTotTrue);
-  prep.SetYieldsDataDrivenFake("DDfake", "DD fake", 4, fileName, strYields1DFake, strYieldTotFake);
-  prep.SubtractBackground();
 
+  if (anPars.templFits==config.TEMPL_OVERLAY){
+    AuxSubtractBackgroundOneTempl(prep, anPars, config.TEMPL_SIHIH);
+    AuxSubtractBackgroundOneTempl(prep, anPars, config.TEMPL_CHISO);
+  }
+  else 
+    AuxSubtractBackgroundOneTempl(prep, anPars, anPars.templFits);
+
+  prep.SubtractBackground();
   prep.PlotPrintSave();
 }
 
@@ -48,6 +69,7 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
 
   pars.varKin=anPars.varKin;
   pars.nKinBins=anPars.nKinBins;
+  pars.templFits=anPars.templFits;
   for (int il=0; il<anPars.nKinBins+1; il++)
     pars.kinBinLims[il]=anPars.kinBinLims[il];
   if (anPars.blind==config.UNBLIND) pars.blindFraction=1;
@@ -64,8 +86,8 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   if (anPars.varKin=="phoEt") pars.varKinLabel="Pt_#gamma";
   pars.strFileOut="fOut.root";
 
- pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
- pars.strPlotsBaseName=TString("c_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind)+TString("_");
+  pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
+  pars.strPlotsBaseName=TString("c_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind)+TString("_");
 
   prep.SetPars(pars);
 
@@ -98,8 +120,5 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   prep.SetOneYieldSource(prep.BKGMC_FAKE, "Wjets_to_lnu", "W+jets#rightarrowl#nu+jets", 433, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind,config.BKGMC,"Wjets_to_lnu"), "selectedEvents");
   
   prep.SetOneYieldSource(prep.BKGMC_FAKE, "ttbarjets", "t#bar{t}+jets", 631, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind,config.BKGMC,"ttbarjets") , "selectedEvents");
-
-
-
 
 }// end of AuxPrepareYieldsCommon

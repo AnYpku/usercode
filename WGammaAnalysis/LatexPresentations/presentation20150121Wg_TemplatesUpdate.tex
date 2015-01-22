@@ -1,0 +1,76 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{Update on template studies; MC closure test}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{January 21st, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}{Introduction}
+%{
+%\begin{itemize}
+% \item Validation of the .db file produced with merged LS1BPixRepair+TrackerCSA14 scenario on Dataset TkAlMinBias ( the location of .db file: /afs/cern.ch/cms/CAF/CMSALCA/ALCA\_TRACKERALIGN/data/commonValidation/alignmentObjects/eavdeeva/Alignments20141118at2129\_TrackerCSA14andBPixRepair.db )
+% \item Also ran on 50ns and 25ns scenarios
+%\end{itemize}
+%}
+%\end{frame}
+
+
+%---------------------------------------------
+\begin{frame}{Sign templ: phoSCRChIso vs phoRandConeChIso}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Zg_Barrel_pt15_20.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Zg_Endcap_pt15_20.pdf}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Wg_Barrel_pt15_20.pdf}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/signalTempl_Iso_Wg_Endcap_pt15_20.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize applied all selection cuts except phoPFChIso
+\end{frame}
+
+\begin{frame}{Bkg templ: phoSCRChIso dependence on sigmaIEtaIEta, barrel and endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.50\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Barrel_Iso_in_sihih_bins_pt15_20.pdf}\includegraphics[width=0.50\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Wjets_MC_Endcap_Iso_in_sihih_bins_pt15_20.pdf}
+    \includegraphics[width=0.50\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Barrel_Iso_in_sihih_bins_pt15_20.pdf}\includegraphics[width=0.50\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/Zjets_MC_Endcap_Iso_in_sihih_bins_pt15_20.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize bin with iso=0 skipped
+\end{frame}
+
+\begin{frame}{Regarding Wg MC closure test:}\\*
+  \scriptsize I found the problem why fits on MC closure test on Wg+Wjets always failed: I made the parameters nTrue and nFake to vary in range from 0 to max=treeData-$>$GetEntries(cut). While that's proper definition for fits on real data, for MC mixture where Wjets dominates and is weighted by ~10, such max is too small.\\*
+  \scriptsize Fits still fail sometimes (the same as they do for data or Zg) with the following minuit complain:\\*
+  \scriptsize - - - - - - - - - \\*
+  \scriptsize [#0] WARNING:Minization -- RooFitGlue: Minimized function has error status.
+Returning maximum FCN so far (-1000000000000000019884624838656) to force MIGRAD to back out of this region. Error log follows
+Parameter values: nFake=3494, nTrue=878\\*
+RooAddPdf::fitModel[ nTrue * truePdf + nFake * fakePdf ]\\*
+     getLogVal() top-level p.d.f evaluates to zero @ !refCoefNorm=(), !pdfs=(truePdf = 0/4364.85,fakePdf = 0/2836.69), !coefficients=(nTrue = 877.531,nFake = 3493.76)\\*
+  \scriptsize - - - - - - - - - \\*
+  \scriptsize This can be avoided with changing number of fit bins ar fit range.\\*
+\end{frame}
+
+%\begin{frame}{Conclusions}
+%{
+%\begin{itemize}
+%\item The validation of LS1BPixRepair+TrackerCSA14 misalignment was ran on TkAlMinBias Dataset
+%\item Plan: to run validation on DYToMuMu M50 Dataset
+%\end{itemize}
+%}
+%\end{frame} 
+
+
+
+\end{document}
+

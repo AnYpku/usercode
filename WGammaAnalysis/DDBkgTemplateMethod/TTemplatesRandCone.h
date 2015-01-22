@@ -77,6 +77,8 @@ class TTemplatesRandCone
     //added here to make class independent on TConfiguration  
 
     TemplatesRandConePars _pars;  
+    
+    TFile* _fOutTemp;
 
     void SetPars(TemplatesRandConePars pars);
     void ComputeBackgroundOne(int ikin, int ieta, bool noPrint=0);

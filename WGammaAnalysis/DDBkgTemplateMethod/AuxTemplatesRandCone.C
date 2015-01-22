@@ -130,8 +130,8 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfigu
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
-//  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
+//  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -225,8 +225,8 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-//  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
+//  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -424,16 +424,16 @@ void SetLimsChIsoTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars 
                       11, -2.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//75-95 GeV
                       10, -2.0+0.1, 18.0+0.1, 0.011, 0.014, 1, 1};//95-500 GeV
 
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//15-20 GeV
+    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.032, 0.039, 0, 0,//Total
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.039, 0, 0,//15-20 GeV
                       21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//20-25 GeV
                       11, -2.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//25-30 GeV
                       15, -1.0+0.1, 14.0+0.1, 0.032, 0.043, 0, 0,//30-35 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.032, 0.048, 1, 0,//35-40 GeV
+                      10, -2.0+0.1, 18.0+0.1, 0.030, 0.035, 1, 0,//35-40 GeV
                       21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 1, 0,//40-55 GeV
-                       9, -2.0+0.1, 16.0+0.1, 0.032, 0.043, 1, 0,//55-75 GeV
-                       9, -2.0+0.1, 16.0+0.1, 0.032, 0.043, 1, 1,//75-95 GeV
-                       5, -3.0+0.1, 12.0+0.1, 0.032, 0.043, 1, 1};//95-500 GeV  
+                       9, -2.0+0.1, 16.0+0.1, 0.029, 0.035, 1, 0,//55-75 GeV
+                       9, -2.0+0.1, 16.0+0.1, 0.029, 0.035, 1, 1,//75-95 GeV
+                       5, -3.0+0.1, 12.0+0.1, 0.029, 0.035, 1, 1};//95-500 GeV  
                  
     SetValuesToKinEtaArray(config.BARREL, valsB, pars);
     SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);

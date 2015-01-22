@@ -39,6 +39,7 @@ class TPrepareYields
       TCut cutWeight;//should be set up inside
       TString strPlotsDir;
       TString strPlotsBaseName;
+      int templFits;
     };
 
     struct YieldsSource{
@@ -64,6 +65,7 @@ class TPrepareYields
   protected:
 
     enum {_BARREL=0, _ENDCAP=1, _COMMON=2};
+    enum {_TEMPL_CHISO=0, _TEMPL_SIHIH=1, _TEMPL_OVERLAY=2};
 
     PrepareYieldsPars _pyPars;
     vector <YieldsSource> _sources;
@@ -73,6 +75,8 @@ class TPrepareYields
 
     void CompareTotalDATAvsMC(int ieta);
     void CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
+    const static int _nHistsMax=50;
+    void CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hist1[_nHistsMax], TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
 
     void PrintYieldsOne(TString strYieldType, float totVal, float totErr, TH1F* yieldHist);
 

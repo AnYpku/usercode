@@ -39,6 +39,7 @@ TTemplatesRandCone::TTemplatesRandCone()
 TTemplatesRandCone::TTemplatesRandCone(TemplatesRandConePars pars)
 {
   SetPars(pars);
+  _fOutTemp = new TFile("fOutTemp.root","recreate");
 }
 
 TTemplatesRandCone::~TTemplatesRandCone()
@@ -188,8 +189,8 @@ void TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
     std::cout<<"true template cut=(cutAdd && cutEta && cutKin)*cutWeight="<<cut.GetTitle()<<std::endl;
   }
 
+  _fOutTemp->cd();
 
-  _pars.fOutForSave->cd();
   _hTrue[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hTrue[ikin][ieta]->Sumw2();
 
@@ -327,6 +328,8 @@ TString TTemplatesRandCone::StrLabelKin(int ikin){
 
 void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
 {
+
+  _fOutTemp->cd();
 
   if (!noPrint){
     std::cout<<std::endl;
@@ -688,6 +691,8 @@ void TTemplatesRandCone::PlotTemplates()
 void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
 {
 
+ _fOutTemp->cd();
+
   TString strBin = StrLabelKin(ikin)+StrLabelEta(ieta);
   TString strChi = "#chi^{2}/ndf=";
   float chiFloat=(100*_chi2ToNDF[ikin][ieta]);
@@ -906,7 +911,7 @@ void TTemplatesRandCone::SaveYields()
     }//end of loop over i
   }//end of loop over ieta
 
- // if (_pars.fOutForSave->IsOpen()) _pars.fOutForSave->Close();
+  if (_pars.fOutForSave->IsOpen()) _pars.fOutForSave->Close();
 }
 
 TCut TTemplatesRandCone::CutKinBin(int ikin){

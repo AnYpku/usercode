@@ -11,6 +11,7 @@ class TSubtractBackground: public TPrepareYields
 
     void SetYieldsDataDrivenTrue(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
     void SetYieldsDataDrivenFake(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
+    void Increase_nDDsources();
 
     void SubtractBackground();
 
@@ -20,14 +21,15 @@ class TSubtractBackground: public TPrepareYields
   
   private:
 
-    YieldsSource _sourceDDTrue;
-    YieldsSource _sourceDDFake;
-    YieldsSource _sourceBkgSubtrData;
+    int _nDDsources;
+    YieldsSource _sourceDDTrue[_nHistsMax];
+    YieldsSource _sourceDDFake[_nHistsMax];
+    YieldsSource _sourceBkgSubtrData[_nHistsMax];
 
     void SetYieldsDataDriven(YieldsSource& source, TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
     void CompareFakeDDvsMC(int ieta);
     void CompareTrueDDvsMC(int ieta);
-    void CompareDDvsMC(int ieta, TString strDD, int bkgType, YieldsSource& sourceDD, TCanvas* canv);
+    void CompareDDvsMC(int ieta, TString strDD, int bkgType, YieldsSource sourceDD[_nHistsMax], TCanvas* canv);
     void CompareDATAvsDDsum(int ieta);
 //    void CompareBkgSubtrDATAvsSIGMC(int ieta);
 

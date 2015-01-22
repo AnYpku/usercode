@@ -25,7 +25,7 @@ class TConfiguration
           PRELIMINARY_FOR_UNFOLDING,
           FSR,
           FULLY};//selection stage
-    enum {TEMPL_CHISO, TEMPL_SIHIH, TEMPL_OVERLAY};
+    enum {TEMPL_CHISO=0, TEMPL_SIHIH=1, TEMPL_OVERLAY=2};
       // template fits: from I_ch (with random cone isolation method)
       // or with sigmaIEtaIEta
     enum {PLOTS_TEMPL_FITS, PLOTS_PREPARE_YIELDS, PLOTS_CONSTANTS, 

@@ -5,6 +5,7 @@
 
 TSubtractBackground::TSubtractBackground()
 {
+  _nDDsources=0;
 }
 
 TSubtractBackground::~TSubtractBackground()
@@ -12,18 +13,23 @@ TSubtractBackground::~TSubtractBackground()
   
 }
 
+void TSubtractBackground::Increase_nDDsources(){
+  _nDDsources++;
+}
+
 void TSubtractBackground::SetYieldsDataDrivenTrue(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
 {
-  SetYieldsDataDriven(_sourceDDTrue, name, label, color, fileName,  strYieldsName1D, strYieldsNameTot);
+  SetYieldsDataDriven(_sourceDDTrue[_nDDsources], name, label, color, fileName,  strYieldsName1D, strYieldsNameTot);
 }
 
 void TSubtractBackground::SetYieldsDataDrivenFake(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
 {
-  SetYieldsDataDriven(_sourceDDFake, name, label, color, fileName,  strYieldsName1D, strYieldsNameTot);
+  SetYieldsDataDriven(_sourceDDFake[_nDDsources], name, label, color, fileName,  strYieldsName1D, strYieldsNameTot);
 }
 
 void TSubtractBackground::SetYieldsDataDriven(YieldsSource& source, TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
 {
+  _pyPars.fOut->cd(); 
   source.sourceType=DATA_DRIVEN;
   source.tr=0;
   source.name=name;
@@ -43,7 +49,13 @@ void TSubtractBackground::SetYieldsDataDriven(YieldsSource& source, TString name
 //      source.hist[ieta]->SetBinError(ib,err*_pyPars.blindFraction);
     }
     source.hist[ieta]->SetFillColor(source.color);
-//    source.hist[ieta]->SetLineColor(source.color);
+
+    int linecolor=1;//black
+    if (_nDDsources==1) linecolor=4;//blue
+    if (_nDDsources==2) linecolor=2;//red
+    if (_nDDsources==3) linecolor=3;//green
+    source.hist[ieta]->SetLineColor(linecolor);
+
     TH1F* hTot = (TH1F*)f->Get(strYieldsNameTot[ieta]);
 //    source.yieldTotVal[ieta]=hTot->GetBinContent(1)*_pyPars.blindFraction;
 //    source.yieldTotErr[ieta]=hTot->GetBinError(1)*_pyPars.blindFraction;
@@ -55,20 +67,22 @@ void TSubtractBackground::SubtractBackground()
   std::cout<<"#####################"<<std::endl;
   std::cout<<"Subtract Background"<<std::endl;
 
-  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
-    _sourceBkgSubtrData.hist[ieta] = (TH1F*)_sourceDDTrue.hist[ieta]->Clone(_sourceBkgSubtrData.name);
-    _sourceBkgSubtrData.yieldTotVal[ieta]=_sourceDDTrue.yieldTotVal[ieta];
-    _sourceBkgSubtrData.yieldTotErr[ieta]=_sourceDDTrue.yieldTotErr[ieta]*_sourceDDTrue.yieldTotErr[ieta];
-    _sourceBkgSubtrData.hist[ieta]->SetTitle(_sourceBkgSubtrData.name);
-    int nBins = _sourceBkgSubtrData.hist[ieta]->GetNbinsX();
-    for (int i=0; i<_sources.size(); i++){
-      if (_sources[i].sourceType!=BKGMC_TRUE) continue;
-      _sourceBkgSubtrData.hist[ieta]->Add(_sources[i].hist[ieta],-1);
-      _sourceBkgSubtrData.yieldTotVal[ieta]-=_sources[i].yieldTotVal[ieta];
-      _sourceBkgSubtrData.yieldTotErr[ieta]+=_sources[i].yieldTotErr[ieta]*_sources[i].yieldTotErr[ieta];
-    }//end of loop over i
-    _sourceBkgSubtrData.yieldTotErr[ieta]=sqrt(_sourceBkgSubtrData.yieldTotErr[ieta]);
-  }//end of loop over ieta
+  for (int isDD=0; isDD<_nDDsources; isDD++){
+    for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+      _sourceBkgSubtrData[isDD].hist[ieta] = (TH1F*)_sourceDDTrue[isDD].hist[ieta]->Clone(_sourceBkgSubtrData[isDD].name);
+      _sourceBkgSubtrData[isDD].yieldTotVal[ieta]=_sourceDDTrue[isDD].yieldTotVal[ieta];
+      _sourceBkgSubtrData[isDD].yieldTotErr[ieta]=_sourceDDTrue[isDD].yieldTotErr[ieta]*_sourceDDTrue[isDD].yieldTotErr[ieta];
+      _sourceBkgSubtrData[isDD].hist[ieta]->SetTitle(_sourceBkgSubtrData[isDD].name);
+      int nBins = _sourceBkgSubtrData[isDD].hist[ieta]->GetNbinsX();
+      for (int i=0; i<_sources.size(); i++){
+        if (_sources[i].sourceType!=BKGMC_TRUE) continue;
+        _sourceBkgSubtrData[isDD].hist[ieta]->Add(_sources[i].hist[ieta],-1);
+        _sourceBkgSubtrData[isDD].yieldTotVal[ieta]-=_sources[i].yieldTotVal[ieta];
+        _sourceBkgSubtrData[isDD].yieldTotErr[ieta]+=_sources[i].yieldTotErr[ieta]*_sources[i].yieldTotErr[ieta];
+      }//end of loop over i
+      _sourceBkgSubtrData[isDD].yieldTotErr[ieta]=sqrt(_sourceBkgSubtrData[isDD].yieldTotErr[ieta]);
+    }//end of loop over ieta
+  }//end of loop over isDD
   std::cout<<"#####################"<<std::endl;
 }// end of SubtractBackground
 
@@ -82,8 +96,9 @@ void TSubtractBackground::CompareTrueDDvsMC(int ieta)
   CompareDDvsMC(ieta, "True", BKGMC_TRUE, _sourceDDTrue, _canvTrueDDvsMC[ieta]);
 }// end of CompareTrueDDvsMC
 
-void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, YieldsSource& sourceDD, TCanvas* canv)
+void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, YieldsSource sourceDD[_nHistsMax], TCanvas* canv)
 {
+
   _pyPars.fOut->cd(); 
   TString canvName=strDD+TString("DDvsMC");
   canvName+=StrLabelEta(ieta);
@@ -119,12 +134,17 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
     else hSum->Add(_sources[isSign].hist[ieta]);
   }
 
-  legend->AddEntry(sourceDD.hist[ieta],sourceDD.label,"l");
-  sourceDD.hist[ieta]->SetTitle("");
+  TH1F* hists[_nDDsources];
+  for (int ih=0; ih<_nDDsources; ih++){
+    legend->AddEntry(sourceDD[ih].hist[ieta],sourceDD[ih].label,"l");
+    sourceDD[ih].hist[ieta]->SetTitle("");
+    hists[ih]=sourceDD[ih].hist[ieta];
+  }
 
-  CompareStackVsHist(strDD+TString(" DD vs MC"), sourceDD.hist[ieta], hSum, legend, canv, 1, mcHists);
+  CompareStackVsHist(strDD+TString(" DD vs MC"), _nDDsources, hists, hSum, legend, canv, 1, mcHists);
 
   canv->Write();
+
 }// end of CompareDDvsMC
 
 void TSubtractBackground::CompareDATAvsDDsum(int ieta)
@@ -137,13 +157,13 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
   THStack* mcHists = new THStack("mcHistsTot",TString("DATAvsDDsum"));
   TH1F* hSum;
 
-  mcHists->Add(_sourceDDFake.hist[ieta]);
-  legend->AddEntry(_sourceDDFake.hist[ieta],_sourceDDFake.label,"f");
-  hSum=(TH1F*)_sourceDDFake.hist[ieta]->Clone("hSum_WholeMC");
+  mcHists->Add(_sourceDDFake[0].hist[ieta]);
+  legend->AddEntry(_sourceDDFake[0].hist[ieta],_sourceDDFake[0].label,"f");
+  hSum=(TH1F*)_sourceDDFake[0].hist[ieta]->Clone("hSum_WholeMC");
 
-  mcHists->Add(_sourceDDTrue.hist[ieta]);
-  legend->AddEntry(_sourceDDTrue.hist[ieta],_sourceDDTrue.label,"f");
-  hSum->Add(_sourceDDTrue.hist[ieta]);
+  mcHists->Add(_sourceDDTrue[0].hist[ieta]);
+  legend->AddEntry(_sourceDDTrue[0].hist[ieta],_sourceDDTrue[0].label,"f");
+  hSum->Add(_sourceDDTrue[0].hist[ieta]);
 
   int isData=-1;
 
@@ -155,11 +175,11 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
   
   _sources[isData].hist[ieta]->SetTitle("");
 
-  _sourceDDFake.hist[ieta]->SetLineColor(_sourceDDFake.color);
-  _sourceDDTrue.hist[ieta]->SetLineColor(_sourceDDTrue.color);
+  _sourceDDFake[0].hist[ieta]->SetLineColor(_sourceDDFake[0].color);
+  _sourceDDTrue[0].hist[ieta]->SetLineColor(_sourceDDTrue[0].color);
   CompareStackVsHist(TString("DATA vs DD fake + true"), _sources[isData].hist[ieta], hSum, legend, _canvDATAvsDDsum[ieta], 1, mcHists);
-  _sourceDDFake.hist[ieta]->SetLineColor(1);
-  _sourceDDTrue.hist[ieta]->SetLineColor(1);
+  _sourceDDFake[0].hist[ieta]->SetLineColor(1);
+  _sourceDDTrue[0].hist[ieta]->SetLineColor(1);
 
   _canvDATAvsDDsum[ieta]->Write();
 }// end of CompareDATAvsDDsum
@@ -167,7 +187,19 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
 void TSubtractBackground::PlotPrintSave()
 {
 
+  std::cout<<"_nDDsources="<<_nDDsources<<std::endl;
+
   //Plot
+  if (_nDDsources>1)  {
+    for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+      CompareFakeDDvsMC(ieta);
+      CompareTrueDDvsMC(ieta);
+    }
+    return;
+  }
+
+  // if _nDDsources==1, proceed
+
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     CompareTotalDATAvsMC(ieta);
     CompareFakeDDvsMC(ieta);
