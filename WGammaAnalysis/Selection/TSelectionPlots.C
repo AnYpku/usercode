@@ -117,7 +117,7 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   TCut cutExtra[nCuts];
   TString strDescr[nCuts];
 
-  TCut cut="event==213426400 || event==20192560";
+  TCut cut="event==16135540";
 
   cutExtra[0]=photon.RangeSigmaIEtaIEta(year, wp);
   cutExtra[1]=photon.RangeHoverE(year);
@@ -125,7 +125,7 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   cutExtra[3]=photon.RangeOneIsolation(year,wp,photon.ISO_CHorTRK);
   cutExtra[4]=photon.RangeOneIsolation(year,wp,photon.ISO_NEUorHCAL);
   cutExtra[5]=photon.RangeOneIsolation(year,wp,photon.ISO_PHOorECAL);
-  cutExtra[6]=fullCuts.RangeMetRelatedCut(year,config.MUON);
+  cutExtra[6]=fullCuts.RangeMetRelatedCut(year,config.ELECTRON);
 
 
   for (int ic=0; ic<7; ic++){

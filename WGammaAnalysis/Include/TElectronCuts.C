@@ -1,5 +1,6 @@
 #include "TElectronCuts.h" //class of this package
 #include "TEventTree.h"
+#include <iostream>
 
 TElectronCuts::TElectronCuts()
 {
@@ -31,19 +32,25 @@ bool TElectronCuts::PassedKinematics(int vgamma, bool isLead, float pt, float et
   return 1;
 }
 
-bool TElectronCuts::EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int wp){
+bool TElectronCuts::EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int wp, bool doEventCheck){
   
   int etaBin=0;
   if (IsBarrel(leaf.eleSCEta->at(iele))) etaBin=_config.BARREL;
   else if (IsEndcap(leaf.eleSCEta->at(iele))) etaBin=_config.ENDCAP;
   else return 0;
-
+  if (doEventCheck) std::cout<<"passed eleSCEta"<<std::endl;
   if (!(fabs(leaf.eledEtaAtVtx->at(iele))<_dEtaIn_Cut[etaBin][wp])) return 0;
+  if (doEventCheck) std::cout<<"passed eledEtaAtVtx"<<std::endl;
   if (!(fabs(leaf.eledPhiAtVtx->at(iele))<_dPhiIn_Cut[etaBin][wp])) return 0;
+  if (doEventCheck) std::cout<<"passed eledPhiAtVtx"<<std::endl;
   if (!(leaf.eleSigmaIEtaIEta->at(iele)<_sigmaIEtaIEta_Cut[etaBin])) return 0;
+  if (doEventCheck) std::cout<<"passed eleSigmaIEtaIEta"<<std::endl;
   if (!(leaf.eleHoverE12->at(iele)<_HoverE_Cut[etaBin][wp])) return 0;
+  if (doEventCheck) std::cout<<"passed eleHoverE12"<<std::endl;
   if (!(fabs((leaf.eleD0Vtx->at(iele))[0])<_d0_vtx_Cut[wp])) return 0;
+  if (doEventCheck) std::cout<<"passed eleD0Vtx"<<std::endl;
   if (!(fabs((leaf.eleDzVtx->at(iele))[0])<_dZ_vtx_Cut[wp])) return 0;
+  if (doEventCheck) std::cout<<"passed eleDzVtx"<<std::endl;
 
   if (wp==ELE_VETO);
   else{
@@ -51,9 +58,13 @@ bool TElectronCuts::EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int w
     float oneOverE=1.0/leaf.eleEcalEn->at(iele);
     float oneOverp=1.0/leaf.elePt->at(iele);
     if (!(fabs(oneOverE-oneOverp)<_1ovE_1ovp_Cut)) return 0;
+    if (doEventCheck) std::cout<<"passed oneOverE-oneOverp"<<std::endl;
     if (!(leaf.eleConvVtxFit->at(iele)<_vertex_fit_probability_Cut)) return 0;
-    if (!(leaf.eleMissHits->at(iele)<_missing_hits_Cut[wp])) return 0;
+    if (doEventCheck) std::cout<<"passed eleConvVtxFit"<<std::endl;
+    if (!(leaf.eleMissHits->at(iele)<=_missing_hits_Cut[wp])) return 0;
+    if (doEventCheck) std::cout<<"passed eleMissHits"<<std::endl;
   }
+
 
   if (leaf.elePt->at(iele)==0) return 0;
   float isoCorr = GetCorrectedIsolation(leaf, iele)/leaf.elePt->at(iele);
@@ -63,6 +74,7 @@ bool TElectronCuts::EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int w
   else{
     if (!(isoCorr<_PFisoOvPT03_Cut[wp])) return 0;
   }   
+  if (doEventCheck) std::cout<<"passed electron isolation"<<std::endl;
 
   return 1;
 }

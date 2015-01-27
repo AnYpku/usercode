@@ -40,7 +40,8 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   // returns 0 otherwise (has no candidates)
 
    _isEvForCheck=0;
-   if (leaf.event==497487460) _isEvForCheck=1;
+   if (leaf.event==99010980 || leaf.event==1576073420 || leaf.event==1251424180) _isEvForCheck=1;
+// 16135540 passed but rejected later
    if (_isEvForCheck) {std::cout<<std::endl; std::cout<<"event="<<leaf.event<<std::endl;}
 
    _leaf=leaf;
@@ -152,9 +153,13 @@ int TFullCuts::FindGoodPhotons(int channel, int vgamma)
       _photon.PassedKinematics(_leaf.phoEt->at(ipho),_leaf.phoSCEta->at(ipho),ifPassedPt,ifPassedEta);
       if (ifPassedPt) _passed.phoPt++; else continue;
       if (ifPassedEta) _passed.phoEta++; else continue;
+      if (_isEvForCheck) std::cout<<"passed phoPt and phoEta"<<std::endl;
       if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON){
+        if (_isEvForCheck) std::cout<<"WGamma, Electron cuts:"<<std::endl;
         if (_photon.HasMatchingGSFelectron(_leaf,ipho)) continue;
+        if (_isEvForCheck) std::cout<<"passed HasMatchingGSFelectron"<<std::endl;
         if (_leaf.phohasPixelSeed->at(ipho)) continue;
+        if (_isEvForCheck) std::cout<<"passed phohasPixelSeed"<<std::endl;
       }
       _passedPhoton[ipho]=1;   
       nGoodPhotons++;
@@ -173,17 +178,24 @@ int TFullCuts::FindGoodLeptonIndex(int channel, int vgamma, bool isLead)
     if (channel==_config.MUON){
       bool passKin = _muon.PassedKinematics(vgamma, isLead, _leaf.muPt->at(ilep),_leaf.muEta->at(ilep),ifPassedPt,ifPassedEta);
       if (ifPassedPt) _passed.leptonPt++; else continue;
+      if (_isEvForCheck) std::cout<<"passed lepton Pt"<<std::endl;
       if (ifPassedEta) _passed.leptonEta++; else continue;
+      if (_isEvForCheck) std::cout<<"passed lepton Eta"<<std::endl;
       if (!passKin) continue;
+      if (_isEvForCheck) std::cout<<"passed lepton kin"<<std::endl;
       if (!_muon.MuId(2012,_leaf,ilep)) continue;
+      if (_isEvForCheck) std::cout<<"passed MuId"<<std::endl;
     }
     else if (channel==_config.ELECTRON){
       bool passKin = _electron.PassedKinematics(vgamma, isLead, _leaf.elePt->at(ilep),_leaf.eleSCEta->at(ilep));
       if (!passKin) continue;
-      if (!_electron.EleID2012(_leaf,ilep,_electron.ELE_MEDIUM)) continue;
+      if (_isEvForCheck) std::cout<<"passed lepton kin"<<std::endl;
+      if (!_electron.EleID2012(_leaf,ilep,_electron.ELE_MEDIUM,_isEvForCheck)) continue;
+      if (_isEvForCheck) std::cout<<"passed ele ID MEDIUM"<<std::endl;
     }
     _passed.leptonId++;
     if (!TriggerMatch(channel,vgamma,ilep)) continue;
+    if (_isEvForCheck) std::cout<<"passed trigger match"<<std::endl;
     _passed.leptonTriggerMatch++;
     return ilep;
   }//end of loop over ilep1

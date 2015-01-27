@@ -7,7 +7,7 @@
     //makePresentationPlots();
   
   TSelectionPlots plotter;
-  bool areTrees = plotter.GetTrees(TConfiguration::MUON, TConfiguration::W_GAMMA, TConfiguration::BLIND_PRESCALE, "../Configuration/config.txt");
+  bool areTrees = plotter.GetTrees(TConfiguration::ELECTRON, TConfiguration::W_GAMMA, TConfiguration::UNBLIND, "../Configuration/config.txt");
   std::cout<<"areTrees="<<areTrees<<std::endl;
   int year = 2012;
   int vgamma = TConfiguration::W_GAMMA;

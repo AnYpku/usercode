@@ -20,8 +20,9 @@ TMathTools::~TMathTools()
 float TMathTools::DeltaR (float phi1, float eta1, float phi2, float eta2)
 {
   float deta=fabs(eta1-eta2);
-  float dphi;
-  for (dphi=fabs(phi1-phi2); fabs(dphi)>=2*TMath::Pi(); dphi=dphi-2*TMath::Pi()) ;
+  float dphi=fabs(phi1-phi2);
+  while (dphi>=TMath::Pi()) dphi-=2*TMath::Pi();
+  while (dphi<-TMath::Pi()) dphi+=2*TMath::Pi();
   float dR=sqrt(deta*deta+dphi*dphi);
   return dR;
 }
