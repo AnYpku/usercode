@@ -32,7 +32,6 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
   anPars.year=2012;//2012, 2011
   anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
   anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
-  anPars.blind=TConfiguration::BLIND_PRESCALE;
   anPars.templFits=TConfiguration::TEMPL_CHISO;
 
   anPars.sampleMode=Selection::ALL;
@@ -40,16 +39,8 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
   anPars.configfile="../Configuration/config.txt";
   anPars.isNoPuReweight=0;
   anPars.isDebugMode=0;
-  anPars.doSystTemplateStat=0;
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
   anPars.cutAdd="1";
-
-  anPars.noPreSelection=0;
-  anPars.noExtraSelection=0;
-  anPars.noDDBkgComputation=0;
-  anPars.noPrepareYields=0;
-  anPars.noCalcAccAndEff=0;
-  anPars.noCalcCrossSection=0;
 
   if (varKin=="phoEt")
     SetAnalysisKinParameters(anPars);
@@ -245,57 +236,108 @@ void FullChain::SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters
 void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
 {
 
-  if (!anPars.noPreSelection){
-    //very preliminary selection
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO Preliminary Selection"<<std::endl;
-    Selection selection(anPars);
-    selection.LoopOverInputFiles();
-    std::cout<<"%_%  DONE Preliminary Selection"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+  TConfiguration conf;  
+
+  //very preliminary selection
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      if (anPars.noPreSelection[ich][ivg]) continue;
+      TString strAffix=TString("Preliminary Selection ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
+      std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+      std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+      anPars.channel=ich;
+      anPars.vgamma=ivg;
+      Selection selection(anPars);
+      selection.LoopOverInputFiles();
+      std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+      std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+    }
   }
 
-  if (!anPars.noExtraSelection){
-    //extra selection
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO Extra Selection"<<std::endl;
-    Selection selection;
-    selection.ExtraSelection(anPars);
-    std::cout<<"%_%  DONE Extra Selection"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+  //extra selection
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      if (anPars.noExtraSelection[ich][ivg]) continue;
+      TString strAffix=TString("Extra Selection ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
+      std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+      std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+      anPars.channel=ich;
+      anPars.vgamma=ivg;
+      Selection selection;
+      selection.ExtraSelection(anPars);
+      std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+      std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+    }
   }
 
-  if (!anPars.noDDBkgComputation){
-    //compute fake-gamma background by data-driven template method
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO DataDriven jets->gamma bkg"<<std::endl;
-   //TTemplatesRandCone temp(anPars.channel, anPars.vgamma, anPars.phoWP, anPars.varKin, anPars.nKinBins, anPars.kinBinLims);
-   //temp.ComputeBackground();
-    AuxTemplatesRandCone(anPars);
-    std::cout<<"%_%  DONE DataDriven jets->gamma bkg"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
-  }
 
-  if (!anPars.noSystDDBkgSidebandVariation){
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO Syst DDBkg Sideband Variation "<<std::endl;
-    AuxTemplatesRandConeSystSidebandVariation(anPars);
-    std::cout<<"%_%  DONE Syst DDBkg Sideband Variation"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
-  }
+  //compute fake-gamma background by data-driven template method
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      for (int itp=0; itp<=1; itp++){
+        if (anPars.noDDBkgComputation[ich][ivg][itp]) continue;
+        TString strAffix=TString("DataDriven jets->gamma bkg fits ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg)+TString(" ")+conf.StrTempl(itp);
+        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+        anPars.channel=ich;
+        anPars.vgamma=ivg;
+        anPars.templFits=itp;
+        AuxTemplatesRandCone(anPars);
+        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+      }//end of loop over itp
+    }//end of loop over ivg
+  }//end of loop over ich
 
-  if (!anPars.noPrepareYields){
-    //prepare yields and subtract background
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO Prepare Yields"<<std::endl;
-    if (anPars.noDDBkgComputation) 
-      AuxPrepareYields(anPars);
-    else
-      AuxSubtractBackground(anPars);
-    std::cout<<"%_%  DONE Prepare Yields"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
-  }
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      for (int itp=0; itp<=1; itp++){
+        if (anPars.noSystDDBkgSidebandVariation[ich][ivg][itp]) continue;
+        TString strAffix=TString("Syst DDBkg Sideband Variation ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg)+TString(" ")+conf.StrTempl(itp);
+        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+        anPars.channel=ich;
+        anPars.vgamma=ivg;
+        anPars.templFits=itp;
+        AuxTemplatesRandConeSystSidebandVariation(anPars); 
+       std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
+      }//end of loop over itp
+    }//end of loop over ivg
+  }//end of loop over ich    
 
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+        if (anPars.noPrepareYields[ich][ivg]) continue;
+        TString strAffix=TString("Prepare Yields ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
+        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+        anPars.channel=ich;
+        anPars.vgamma=ivg;
+        AuxPrepareYields(anPars); 
+       std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
+    }//end of loop over ivg
+  }//end of loop over ich   
+
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      for (int itp=0; itp<=2; itp++){
+        if (anPars.noSubtractBackground[ich][ivg][itp]) continue;
+        TString strAffix=TString("Subtract Background ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg)+TString(" ")+conf.StrTempl(itp);
+        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+        anPars.channel=ich;
+        anPars.vgamma=ivg;
+        anPars.templFits=itp;
+        AuxSubtractBackground(anPars); 
+       std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
+      }//end of loop over itp
+    }//end of loop over ivg
+  }//end of loop over ich  
+
+/*
   if (!anPars.noCalcAccAndEff){
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
@@ -306,7 +348,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
   }
 
-/*
+
   if (!anPars.noCalcCrossSection){
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;

@@ -35,7 +35,6 @@ class TConfiguration
       int year;
       int channel;
       int vgamma;
-      int blind;
       int templFits;
       TString varKin;
       int nKinBins;
@@ -43,20 +42,22 @@ class TConfiguration
       int sampleMode;
       string analyzedSamples;
       string configfile;
-      bool doSystTemplateStat;
       bool isNoPuReweight;
       bool isDebugMode;
       int phoWP;
       TCut cutAdd;
 
-      bool noPreSelection;
-      bool noExtraSelection;
-      bool noDDBkgComputation;
-      bool noPrepareYields;
-      bool noCalcAccAndEff;
-      bool noCalcCrossSection;
+      int blind[2][2];//channel, vgamma
 
-      bool noSystDDBkgSidebandVariation;
+      bool noPreSelection[2][2];//channel, vgamma
+      bool noExtraSelection[2][2];//channel, vgamma
+      bool noDDBkgComputation[2][2][2];//channel, vgamma, different templates
+      bool noPrepareYields[2][2];//channel, vgamma
+      bool noSubtractBackground[2][2][3];//channel, vgamma, different templates
+      bool noCalcAccAndEff[2][2];//channel, vgamma
+      bool noCalcCrossSection[2][2];//channel, vgamma
+
+      bool noSystDDBkgSidebandVariation[2][2][2];//channel, vgamma, different templates
     };
 
     TString StrChannel(int channel); 
@@ -134,8 +135,8 @@ class TConfiguration
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.};
 //static const int _nPhoPtBins = 5;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
-static const int _nPhoPtBins = 9;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,55.,75.,95.,500.};
+static const int _nPhoPtBins = 8;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,500.};
 //static const int _nPhoPtBins = 8;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,55.,75.,95.};
 //static const int _nPhoPtBins = 5;

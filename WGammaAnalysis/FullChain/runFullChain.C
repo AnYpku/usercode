@@ -27,30 +27,76 @@
 
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
-
-  anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
+  TConfiguration conf;
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
-//  anPars.blind=TConfiguration::BLIND_PRESCALE;//BLIND_PRESCALE or UNBLIND
-//  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA or Z_GAMMA
-  anPars.blind=TConfiguration::UNBLIND;//BLIND_PRESCALE or UNBLIND
-  anPars.vgamma=TConfiguration::Z_GAMMA;//W_GAMMA or Z_GAMMA
-  anPars.templFits=TConfiguration::TEMPL_CHISO;//CHISO;//TEMPL_CHISO or TEMPL_SIHIH
-  //anPars.cutAdd="1";//"phoEt<40";
-  //anPars.cutAdd="phoEt<40"; // for PT_THRESHOLD blinding 
   anPars.isDebugMode=0;
-  anPars.doSystTemplateStat=0;
   anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
-//  anPars.analyzedSamples="WWg"; anPars.sampleMode=Selection::NOTSPECIFIED; 
+  anPars.cutAdd="1";//"phoEt<40";
 
-  anPars.year=2012;
-  anPars.noPreSelection=1;
-  anPars.noExtraSelection=1;
-  anPars.noDDBkgComputation=0;
-  anPars.noPrepareYields=0;
-  anPars.noCalcAccAndEff=1;
-  anPars.noCalcCrossSection=1;
+  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.BLIND_PRESCALE;
+  anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
+  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_PRESCALE;
+  anPars.blind[conf.ELECTRON][conf.Z_GAMMA]=conf.UNBLIND;
 
-  anPars.noSystDDBkgSidebandVariation=1;
+  // [conf.MUON][conf.W_GAMMA]
+  anPars.noPreSelection[conf.MUON][conf.W_GAMMA]=1;
+  anPars.noExtraSelection[conf.MUON][conf.W_GAMMA]=1;
+  anPars.noDDBkgComputation[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noDDBkgComputation[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noPrepareYields[conf.MUON][conf.W_GAMMA]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;
+  anPars.noCalcAccAndEff[conf.MUON][conf.W_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.MUON][conf.W_GAMMA]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+
+  // [conf.MUON][conf.Z_GAMMA]
+  anPars.noPreSelection[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noPrepareYields[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_OVERLAY]=1;
+  anPars.noCalcAccAndEff[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+
+  // [conf.ELECTRON][conf.W_GAMMA]
+  anPars.noPreSelection[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noExtraSelection[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noPrepareYields[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;
+  anPars.noCalcAccAndEff[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+
+  // [conf.ELECTRON][conf.Z_GAMMA]
+  anPars.noPreSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noExtraSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noDDBkgComputation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noDDBkgComputation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noPrepareYields[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_OVERLAY]=1;
+  anPars.noCalcAccAndEff[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+
+
+
+
 
   fch.RunAnalysis(anPars);
 
