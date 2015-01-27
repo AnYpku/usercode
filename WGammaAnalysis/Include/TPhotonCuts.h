@@ -46,12 +46,12 @@ class TPhotonCuts
 
     bool HasMatchingGSFelectron(TEventTree::InputTreeLeaves &leaf, int ipho);
 
-
+    enum {_BARREL, _ENDCAP, _COMMON};
     TCut RangeBarrel();
     TCut RangeEndcap();
-    TCut RangeSigmaIEtaIEta(int year, int wp);
+    TCut RangeSigmaIEtaIEta(int year, int wp, int ieta=_COMMON);
     TCut SidebandSigmaIEtaIEta();
-    TCut RangeOneIsolation(int year, int wp, int isoType);
+    TCut RangeOneIsolation(int year, int wp, int isoType, int ieta=_COMMON);
     TCut RangeHoverE(int year);
     TCut RangePhoEleVeto();
     TCut RangePhoHasPixelSeed();

@@ -113,11 +113,11 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfigu
     //for barrel, endcap and common(barrel+endcap)
 
  pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_TEMPL_FITS);
- pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_CHISO)+TString("_")+config.StrBlindType(anPars.blind)+TString("_");
+ pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_CHISO)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
 
   std::cout<<std::endl;
 
-  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind,config.DATA);
+  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA);
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
@@ -142,13 +142,14 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfigu
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
-  pars.cutNominal=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut; 
-  pars.cutNominalExceptSidebandVar=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK);//TCut; 
-    //charged isolation cut as applied during selection procedure;
-    //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-  pars.cutSidebandVarNominalRange=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut;
-    //phoSigmaIEtaIEta cut as applied during selection procedure;
-    //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
+  for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
+    pars.cutNominal[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta) 
+                    && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
+    pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut; 
+      //charged isolation cut as applied during selection procedure;
+    pars.cutSidebandVarNominalRange[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut;
+      //phoSigmaIEtaIEta cut as applied during selection procedure;
+  }
 //  pars.cutWeight="weight";//TCut; weight for signal MC tree
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
@@ -208,11 +209,11 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
     //for barrel, endcap and common(barrel+endcap)
 
  pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_TEMPL_FITS);
- pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_SIHIH)+TString("_")+config.StrBlindType(anPars.blind)+TString("_");
+ pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_SIHIH)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
 
   std::cout<<std::endl;
 
-  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind,config.DATA);
+  TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA);
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
@@ -237,14 +238,14 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
-  pars.cutNominal=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK) && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut; 
-  pars.cutNominalExceptSidebandVar=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP);//TCut; 
+  for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
+    pars.cutNominal[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK,ieta) 
+                    && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
+    pars.cutNominalExceptSidebandVar[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
     //charged isolation cut as applied during selection procedure;
-    //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-  pars.cutSidebandVarNominalRange=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK);//TCut;
+    pars.cutSidebandVarNominalRange[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut;
     //phoSigmaIEtaIEta cut as applied during selection procedure;
-    //must include barrel and endcap ((cutB && Barrel) || (cutE && Endcap))
-//  pars.cutWeight="weight";//TCut; weight for signal MC tree
+  }
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
@@ -272,53 +273,11 @@ void SetLimsSihihTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars 
 {
     TConfiguration config;
     // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp, combTrue, combFake
-/*
-    float valsB[250]={32, 0.005, 0.021, 1.5,  5.0, 0, 0,//Total
-                      32, 0.005, 0.021, 1.5,  5.0, 0, 0,//15-20 GeV
-                      32, 0.005, 0.021, 1.5,  5.0, 0, 0,//20-25 GeV
-                      24, 0.006, 0.018, 1.2,  2.0, 0, 0,//25-30 GeV
-                      10, 0.006, 0.016, 1.5,  2.5, 0, 0,//30-35 GeV
-                       6, 0.005, 0.017, 1.5,  2.5, 0, 0,//35-40 GeV
-                      10, 0.006, 0.016, 1.2,  2.5, 0, 0,//40-55 GeV
-                       5, 0.005, 0.015, 1.2,  6.0, 1, 0,//55-75 GeV
-                       5, 0.005, 0.015, 1.2,  6.0, 1, 1,//75-95 GeV
-                       5, 0.005, 0.015, 1.2,  6.0, 1, 1};//95-500 GeV
 
-    float valsE[250]={23, 0.019, 0.065, 1.2,  5.0, 0, 0,//Total
-                      23, 0.019, 0.065, 1.2,  2.5, 0, 0,//15-20 GeV
-                      21, 0.019, 0.061, 1.0,  2.0, 0, 0,//20-25 GeV
-                      18, 0.019, 0.055, 1.2,  5.0, 0, 0,//25-30 GeV
-                      18, 0.019, 0.055, 1.0,  5.0, 0, 0,//30-35 GeV
-                      18, 0.019, 0.055, 1.0,  5.0, 0, 0,//35-40 GeV
-                      13, 0.019, 0.045, 1.2,  5.0, 0, 0,//40-55 GeV
-                       8, 0.021, 0.045, 1.0,  6.0, 1, 0,//55-75 GeV
-                       6, 0.021, 0.045, 1.0,  6.0, 1, 1,//75-95 GeV
-                       5, 0.018, 0.043, 1.0,  6.0, 1, 1};//95-500 GeV  
-*/
-    float valsB[250]={32, 0.005, 0.021, 1.5, 15.0, 0, 0,//Total
-                      32, 0.005, 0.021, 1.5, 10.0, 0, 0,//15-20 GeV
-                      32, 0.005, 0.021, 1.5, 15.0, 0, 0,//20-25 GeV
-                      24, 0.006, 0.018, 1.5, 15.0, 0, 0,//25-30 GeV
-                      12, 0.006, 0.018, 1.5, 15.0, 0, 0,//30-35 GeV
-                       6, 0.005, 0.017, 1.5, 15.0, 0, 0,//35-40 GeV
-                       6, 0.005, 0.017, 1.7, 15.0, 0, 0,//40-55 GeV
-                       4, 0.005, 0.017, 1.7, 10.0, 1, 1,//55-75 GeV
-                       3, 0.005, 0.014, 1.2, 10.0, 1, 1,//75-95 GeV
-                       3, 0.005, 0.014, 1.2, 10.0, 1, 1};//95-500 GeV
-
-    float valsE[250]={20, 0.019, 0.059, 1.2, 15.0, 0, 0,//Total
-                      20, 0.019, 0.059, 1.2, 10.0, 0, 0,//15-20 GeV
-                      18, 0.019, 0.055, 1.2, 15.0, 0, 0,//20-25 GeV
-                      18, 0.019, 0.055, 1.2, 15.0, 0, 0,//25-30 GeV
-                       9, 0.021, 0.039, 1.2, 15.0, 0, 0,//30-35 GeV
-                       7, 0.018, 0.039, 1.2, 16.0, 0, 0,//35-40 GeV
-                      13, 0.019, 0.045, 1.2, 15.0, 0, 0,//40-55 GeV
-                       4, 0.023, 0.043, 1.2, 15.0, 1, 1,//55-75 GeV
-                       4, 0.023, 0.043, 1.2, 15.0, 1, 1,//75-95 GeV
-                       4, 0.023, 0.043, 1.2, 15.0, 1, 1};//95-500 GeV 
+    SetLimsSihihTempl_phoEt_Zg_MUON(pars);
                  
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
+//    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
+//    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
 }//end  of SetLimsSihihTempl_phoEt_Wg_MUON
 
 void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
@@ -329,24 +288,30 @@ void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars 
     float valsB[250]={32, 0.005, 0.021, 1.5, 15.0, 0, 0,//Total
                       32, 0.005, 0.021, 1.5, 10.0, 0, 0,//15-20 GeV
                       32, 0.005, 0.021, 1.5, 15.0, 0, 0,//20-25 GeV
-                      24, 0.006, 0.018, 1.5, 15.0, 0, 0,//25-30 GeV
-                      12, 0.006, 0.018, 1.5, 15.0, 0, 0,//30-35 GeV
-                       6, 0.005, 0.017, 1.5, 15.0, 0, 0,//35-40 GeV
-                       6, 0.005, 0.017, 1.7, 15.0, 0, 0,//40-55 GeV
-                       4, 0.005, 0.017, 1.7, 10.0, 1, 1,//55-75 GeV
-                       3, 0.005, 0.014, 1.2, 10.0, 1, 1,//75-95 GeV
-                       3, 0.005, 0.014, 1.2, 10.0, 1, 1};//95-500 GeV
+                      32, 0.005, 0.021, 1.5, 15.0, 0, 0,//25-30 GeV
+                      32, 0.005, 0.021, 1.5, 15.0, 0, 0,//30-35 GeV
+                      32, 0.005, 0.012, 1.5, 15.0, 0, 0,//35-45 GeV
+                      32, 0.005, 0.021, 1.7, 15.0, 0, 0,//45-55 GeV
+                      32, 0.005, 0.021, 1.7, 10.0, 1, 1,//55-65 GeV
+                      32, 0.005, 0.021, 1.2, 10.0, 1, 1,//65-75 GeV
+                      32, 0.005, 0.012, 1.2, 10.0, 1, 1,//75-85 GeV
+                      32, 0.005, 0.021, 1.2, 10.0, 1, 1,//85-95 GeV
+                      32, 0.005, 0.021, 1.2, 10.0, 1, 1,//95-120 GeV
+                      32, 0.005, 0.021, 1.2, 10.0, 1, 1};//120-500 GeV
 
-    float valsE[250]={20, 0.019, 0.059, 1.2, 15.0, 0, 0,//Total
-                      20, 0.019, 0.059, 1.2, 10.0, 0, 0,//15-20 GeV
-                      18, 0.019, 0.055, 1.2, 15.0, 0, 0,//20-25 GeV
-                      18, 0.019, 0.055, 1.2, 15.0, 0, 0,//25-30 GeV
-                       9, 0.021, 0.039, 1.2, 15.0, 0, 0,//30-35 GeV
-                       7, 0.018, 0.039, 1.2, 16.0, 0, 0,//35-40 GeV
-                      13, 0.019, 0.045, 1.2, 15.0, 0, 0,//40-55 GeV
-                       4, 0.023, 0.043, 1.2, 15.0, 1, 1,//55-75 GeV
-                       4, 0.023, 0.043, 1.2, 15.0, 1, 1,//75-95 GeV
-                       4, 0.023, 0.043, 1.2, 15.0, 1, 1};//95-500 GeV 
+    float valsE[250]={48, 0.019, 0.067, 1.2, 15.0, 0, 0,//Total
+                      48, 0.019, 0.067, 1.2, 10.0, 0, 0,//15-20 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 0, 0,//20-25 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 0, 0,//25-30 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 0, 0,//30-35 GeV
+                      48, 0.019, 0.067, 1.2, 16.0, 0, 0,//35-45 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 0, 0,//45-55 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 1, 1,//55-65 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 1, 1,//65-75 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 1, 1,//75-85 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 1, 1,//85-95 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 1, 1,//95-120 GeV
+                      48, 0.019, 0.067, 1.2, 15.0, 1, 1};//120-500 GeV 
                  
     SetValuesToKinEtaArray(config.BARREL, valsB, pars);
     SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
@@ -358,53 +323,10 @@ void SetLimsChIsoTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars 
     TConfiguration config;
     // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
 
+    SetLimsChIsoTempl_phoEt_Zg_MUON(pars);
 
-    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.013, 0.014, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.013, 0.014, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.014, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 0, 0,//30-35 GeV
-                       8, -2.0+0.1, 14.0+0.1, 0.011, 0.014, 1, 0,//35-40 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//40-55 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//55-75 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//75-95 GeV
-                      10, -2.0+0.1, 18.0+0.1, 0.011, 0.014, 1, 1};//95-500 GeV
-
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//20-25 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//25-30 GeV
-                      15, -1.0+0.1, 14.0+0.1, 0.032, 0.043, 0, 0,//30-35 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.032, 0.048, 1, 0,//35-40 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 1, 0,//40-55 GeV
-                       9, -2.0+0.1, 16.0+0.1, 0.032, 0.043, 1, 0,//55-75 GeV
-                       9, -2.0+0.1, 16.0+0.1, 0.032, 0.043, 1, 1,//75-95 GeV
-                       5, -3.0+0.1, 12.0+0.1, 0.032, 0.043, 1, 1};//95-500 GeV  
-/*
-    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//35-40 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//40-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.018, 0, 0,//55-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0,//75-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.018, 0, 0};//95-500 GeV
-
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//35-40 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//40-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//55-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0,//75-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.053, 0, 0};//95-500 GeV  
-                 */
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars); 
+//    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
+//    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars); 
                  
 }//end  of SetLimsChIsoTempl_phoEt_Wg_MUON
 
@@ -418,22 +340,28 @@ void SetLimsChIsoTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars 
                       21, -1.0+0.1, 20.0+0.1, 0.012, 0.014, 0, 0,//20-25 GeV
                       21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 0, 0,//25-30 GeV
                       21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 0, 0,//30-35 GeV
-                       8, -2.0+0.1, 14.0+0.1, 0.011, 0.014, 1, 0,//35-40 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//40-55 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//55-75 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//75-95 GeV
-                      10, -2.0+0.1, 18.0+0.1, 0.011, 0.014, 1, 1};//95-500 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//35-45 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//45-55 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 0,//55-65 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//65-75 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//75-85 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//85-95 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1,//95-120 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 1, 1};//120-500 GeV
 
     float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.032, 0.039, 0, 0,//Total
                       21, -1.0+0.1, 20.0+0.1, 0.032, 0.039, 0, 0,//15-20 GeV
                       21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//20-25 GeV
-                      11, -2.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//25-30 GeV
-                      15, -1.0+0.1, 14.0+0.1, 0.032, 0.043, 0, 0,//30-35 GeV
-                      10, -2.0+0.1, 18.0+0.1, 0.030, 0.035, 1, 0,//35-40 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 1, 0,//40-55 GeV
-                       9, -2.0+0.1, 16.0+0.1, 0.029, 0.035, 1, 0,//55-75 GeV
-                       9, -2.0+0.1, 16.0+0.1, 0.029, 0.035, 1, 1,//75-95 GeV
-                       5, -3.0+0.1, 12.0+0.1, 0.029, 0.035, 1, 1};//95-500 GeV  
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//25-30 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 0, 0,//30-35 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.030, 0.035, 1, 0,//35-40 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.032, 0.043, 1, 0,//45-55 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.035, 1, 0,//55-65 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.035, 1, 1,//65-75 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.035, 1, 1,//75-85 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.035, 1, 1,//85-95 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.035, 1, 1,//95-120 GeV
+                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.035, 1, 1};//120-500 GeV  
                  
     SetValuesToKinEtaArray(config.BARREL, valsB, pars);
     SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);

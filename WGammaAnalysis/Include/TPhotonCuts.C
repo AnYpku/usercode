@@ -195,7 +195,7 @@ TCut TPhotonCuts::RangeEndcap()
   return cut;
 }
 
-TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp)
+TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp, int ieta)
 {
   float sigmaCutB;
   float sigmaCutE;
@@ -222,6 +222,8 @@ TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp)
   cutEStr+=_phoSigmaIEtaIEtaEndcapCutLeft;
   TCut cutE(cutEStr);
   TCut cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
+  if (ieta==_BARREL) return cutB;
+  if (ieta==_ENDCAP) return cutE;
   return cut;
 }
 
@@ -239,7 +241,7 @@ TCut TPhotonCuts::SidebandSigmaIEtaIEta()
   return cut;
 }
 
-TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
+TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType, int ieta)
 {
 //  if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
@@ -281,6 +283,8 @@ TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType)
   cutIsoEStr+=cutBEndcap;
   TCut cutIsoE(cutIsoEStr); 
   TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
+  if (ieta==_BARREL) return cutB;
+  if (ieta==_ENDCAP) return cutE;
   return cut;
 }
 

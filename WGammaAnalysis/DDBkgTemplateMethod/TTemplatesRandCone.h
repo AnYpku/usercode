@@ -48,11 +48,14 @@ class TTemplatesRandCone
       TCut cutAdd;
       TCut cutBarrel;
       TCut cutEndcap;
-      TCut cutNominal;
-      TCut cutNominalExceptSidebandVar;
-      TCut cutSidebandVarNominalRange;
+      TCut cutNominal[2];
+      TCut cutNominalExceptSidebandVar[2];
+      TCut cutSidebandVarNominalRange[2];
       TCut cutWeight;
       bool noLeakSubtr;
+      bool sumOverHist;
+        // the method how to extract yields from fit:
+        // sum over histogram or apply efficiency
       TFile* fOutForSave;
       TString strFileOutName;
       TString strTrueYieldsTot[3];
@@ -81,7 +84,7 @@ class TTemplatesRandCone
     TFile* _fOutTemp;
 
     void SetPars(TemplatesRandConePars pars);
-    void ComputeBackgroundOne(int ikin, int ieta, bool noPrint=0);
+    bool ComputeBackgroundOne(int ikin, int ieta, bool noPrint=0);
 
     double _nFakeYieldsVal[nKinBinsMax][3];
     double _nFakeYieldsErr[nKinBinsMax][3];
@@ -94,9 +97,8 @@ class TTemplatesRandCone
   private:
 
 
-    void SetHists(int kinBin, int etaBin, bool noPrint=0);
+    bool SetHists(int kinBin, int etaBin, bool noPrint=0);
     void RandomizeTemplates(int ikin, int ieta);
-    void DeleteHists(int kinBin, int etaBin);
 
     void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
     void PrintYieldsAndChi2();
@@ -109,13 +111,21 @@ class TTemplatesRandCone
 
     void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
 
+    void NewHistograms(int ikin, int ieta, bool noPrint);
+    void SetFakeTemplate(int ikin, int ieta, bool noPrint);
+    void SetTrueTemplate(int ikin, int ieta, bool noPrint);
+    void SetDataAndSignHists(int ikin, int ieta, bool noPrint);
+    bool CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPrint);
+    bool RebinTemplates(int ikin, int ieta, bool badBins[150], bool noPrint);
+    void DeleteHistograms(int ikin, int ieta);
+
     void PlotTemplates();
     void PlotOneTemplate(int kinBin, int etaBin);
 
     void SaveYields();
 
     TCut SidebandCut(int ikin, int ieta);
-    TCut SidebandVarNominalCut();
+    TCut SidebandVarNominalCut(int ieta1);
     TCut FitVarFitRangeCut(int ikin, int ieta);
     TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
