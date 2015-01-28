@@ -149,6 +149,11 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfigu
       //charged isolation cut as applied during selection procedure;
     pars.cutSidebandVarNominalRange[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut;
       //phoSigmaIEtaIEta cut as applied during selection procedure;
+    std::cout<<"in AuxTemplatesRandomCone"<<std::endl;
+    std::cout<<"ieta="<<config.StrEtaBin(ieta)<<std::endl;
+    std::cout<<"cutNominal="<<pars.cutNominal[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutNominalExceptSidebandVar="<<pars.cutNominalExceptSidebandVar[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutSidebandVarNominalRange="<<pars.cutSidebandVarNominalRange[ieta].GetTitle()<<std::endl;
   }
 //  pars.cutWeight="weight";//TCut; weight for signal MC tree
 
@@ -231,7 +236,7 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
-  pars.varSideband="phoPFChIsoCorr";//TString
+  pars.varSideband="phoSCRChIsoCorr";//TString
   pars.varTrueTempl="phoSigmaIEtaIEta";//TString
   pars.varFakeTempl="phoSigmaIEtaIEta";//TString
   pars.varFit="phoSigmaIEtaIEta"; //TString
@@ -245,6 +250,11 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
     //charged isolation cut as applied during selection procedure;
     pars.cutSidebandVarNominalRange[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut;
     //phoSigmaIEtaIEta cut as applied during selection procedure;
+    std::cout<<"in AuxTemplatesRandomCone"<<std::endl;
+    std::cout<<"ieta="<<config.StrEtaBin(ieta)<<std::endl;
+    std::cout<<"cutNominal="<<pars.cutNominal[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutNominalExceptSidebandVar="<<pars.cutNominalExceptSidebandVar[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutSidebandVarNominalRange="<<pars.cutSidebandVarNominalRange[ieta].GetTitle()<<std::endl;
   }
 
   pars.cutBarrel=photon.RangeBarrel();//TCut

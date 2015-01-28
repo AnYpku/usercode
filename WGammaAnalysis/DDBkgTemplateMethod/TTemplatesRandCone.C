@@ -294,6 +294,15 @@ void TTemplatesRandCone::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
   }
   varDraw=_pars.varFit+TString(">>")+_hSign[ikin][ieta]->GetName();
   _pars.treeSign->Draw(varDraw,cut*_pars.cutWeight,"goff");
+  if (!noPrint){
+    std::cout<<"varDraw="<<varDraw<<std::endl;
+    std::cout<<"_hSign bin lims: ";
+    for (int ib=1; ib<=_hSign[ikin][ieta]->GetNbinsX(); ib++)
+      std::cout<<_hSign[ikin][ieta]->GetBinLowEdge(ib)<<", ";
+    std::cout<<_hSign[ikin][ieta]->GetBinLowEdge(_hSign[ikin][ieta]->GetNbinsX())+_hSign[ikin][ieta]->GetBinWidth(_hSign[ikin][ieta]->GetNbinsX());
+    std::cout<<std::endl;
+    _hSign[ikin][ieta]->Print();
+  }
 
   TH1F* histTemp = new TH1F("histTemp","histTemp",1,_pars.treeData->GetMinimum(_pars.varWeight)-1,_pars.treeData->GetMaximum(_pars.varWeight)+1);
   histTemp->Sumw2();
@@ -523,8 +532,11 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   //create total pdf
   float nMax = _hData[ikin][ieta]->GetSumOfWeights();
   float nSign = _hSign[ikin][ieta]->GetSumOfWeights();
+//  if (TString(_pars.fData->GetName()).Contains("blindPRESCALE")) nSign=nSign*0.05;
   float nTrueStart = nSign;
   float nFakeStart = nMax - nSign;
+  if (nTrueStart<=0 || nFakeStart<=0){nTrueStart=0.5*nMax; nFakeStart=0.5*nMax;}
+  std::cout<<"some true and fake parameters: nTrueStart="<<nTrueStart<<", nFakeStart="<<nFakeStart<<", nSign="<<nSign<<", nMax="<<nMax<<std::endl;
 
   RooRealVar rooVarFit(_pars.varFit,_pars.varFit, varMin, varMax);
   if (nMax<=0){
@@ -641,11 +653,26 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
     TCut cutTot = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta1);
     TCut cutPassed = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta1) && CutKinBin(ikin) && _pars.cutNominalExceptSidebandVar[ieta1];
 
+      std::cout<<setprecision(2)<<std::endl;
+      std::cout<<StrLabelEta(ieta1)<<": "<<std::endl;
+      std::cout<<"cutAdd="<<_pars.cutAdd.GetTitle()<<std::endl;
+      std::cout<<"cutEta="<<CutEtaBin(ieta1).GetTitle()<<std::endl;
+      std::cout<<"cutKin="<<CutKinBin(ikin).GetTitle()<<std::endl;
+      std::cout<<"_pars.cutSidebandVarNominalRange[ieta1]="<<_pars.cutSidebandVarNominalRange[ieta1].GetTitle()<<std::endl;
+      std::cout<<"SidebandCut(ikin,ieta1)="<<SidebandCut(ikin,ieta1).GetTitle()<<std::endl;
+      std::cout<<"cutSidebandVar="<<cutSidebandVar.GetTitle()<<std::endl;
+      std::cout<<"cutNominalExceptSidebandVar="<<_pars.cutNominalExceptSidebandVar[ieta1].GetTitle()<<std::endl;
+      std::cout<<"FitVarFitRangeCut(ikin,ieta1)="<<FitVarFitRangeCut(ikin,ieta1).GetTitle()<<std::endl;
+      std::cout<<"cutPassed="<<cutPassed.GetTitle()<<std::endl;
+      std::cout<<"cutTot="<<cutTot.GetTitle()<<std::endl;
+
     if (isTrueGamma){
-      TH1F* hSignPassed = new TH1F("histPassed","histPassed",1,-3.0,3.0);
-      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histPassed"),cutPassed*_pars.cutWeight,"goff");
-      TH1F* hSignTot = new TH1F("histTot","histTot",1,-3.0,3.0);
-      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histTot"),cutTot*_pars.cutWeight,"goff");
+      TString nameHistT=TString("histPassedT")+StrLabelKin(ikin)+StrLabelEta(ieta1);
+      TH1F* hSignPassed = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
+      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutPassed*_pars.cutWeight,"goff");
+      nameHistT=TString("histTotT")+StrLabelKin(ikin)+StrLabelEta(ieta1);
+      TH1F* hSignTot = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
+      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutTot*_pars.cutWeight,"goff");
       TH1F* hEff = (TH1F*)hSignPassed->Clone();
       hEff->Divide(hSignTot);
       eff[ieta1]=hEff->GetBinContent(1);
@@ -653,16 +680,20 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
       delete hSignTot;
     }// end of isTrueGamma
     else{
-      TH1F* hFakePassed = new TH1F("histPassedF","histPassedF",1,-3.0,3.0);
-      _pars.treeFake->Draw(_pars.varPhoEta+TString(">>histPassedF"),cutPassed*_pars.cutWeight,"goff");
-      TH1F* hFakeTot = new TH1F("histTotF","histTotF",1,-3.0,3.0);
-      _pars.treeFake->Draw(_pars.varPhoEta+TString(">>histTotF"),cutTot*_pars.cutWeight,"goff");
+      TString nameHistF=TString("histPassedF")+StrLabelKin(ikin)+StrLabelEta(ieta1);
+      TH1F* hFakePassed = new TH1F(nameHistF,nameHistF,1,-3.0,3.0);
+      _pars.treeFake->Draw(_pars.varPhoEta+TString(">>")+nameHistF,cutPassed*_pars.cutWeight,"goff");
+      nameHistF=TString("histTotF")+StrLabelKin(ikin)+StrLabelEta(ieta1);
+      TH1F* hFakeTot = new TH1F(nameHistF,nameHistF,1,-3.0,3.0);
+      _pars.treeFake->Draw(_pars.varPhoEta+TString(">>")+nameHistF,cutTot*_pars.cutWeight,"goff");
 
       if (!_pars.noLeakSubtr){
-        TH1F* hSignPassed = new TH1F("histPassed","histPassed",1,-3.0,3.0);
-        _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histPassed"),cutPassed*_pars.cutWeight,"goff");
-        TH1F* hSignTot = new TH1F("histTot","histTot",1,-3.0,3.0);
-        _pars.treeSign->Draw(_pars.varPhoEta+TString(">>histTot"),cutTot*_pars.cutWeight,"goff");
+        TString nameHistL=TString("histPassedL")+StrLabelKin(ikin)+StrLabelEta(ieta1);
+        TH1F* hSignPassed = new TH1F(nameHistL,nameHistL,1,-3.0,3.0);
+        _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistL,cutPassed*_pars.cutWeight,"goff");
+        nameHistL=TString("histTotL")+StrLabelKin(ikin)+StrLabelEta(ieta1);
+        TH1F* hSignTot = new TH1F(nameHistL,nameHistL,1,-3.0,3.0);
+        _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistL,cutTot*_pars.cutWeight,"goff");
         hFakePassed->Add(hSignPassed,-1);
         hFakeTot->Add(hSignTot,-1);
         delete hSignPassed;
@@ -689,12 +720,6 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
   if (!noPrint){
     for (int ieta1=_BARREL; ieta1<=_ENDCAP; ieta1++){
       if (ieta!=_COMMON && ieta!=ieta1) continue;
-      std::cout<<setprecision(2)<<std::endl;
-      std::cout<<StrLabelEta(ieta1)<<": "<<std::endl;
-      std::cout<<"cutEta="<<CutEtaBin(ieta1).GetTitle()<<std::endl;
-      std::cout<<"cutKin="<<CutKinBin(ikin).GetTitle()<<std::endl;
-      std::cout<<"cutSidebandVar="<<cutSidebandVar.GetTitle()<<std::endl;
-      std::cout<<"cutNominal="<<_pars.cutNominal[ieta1].GetTitle()<<std::endl;
       TString strTrueOrFake;
       if (isTrueGamma) strTrueOrFake="nTrue";
       else strTrueOrFake="nFake";
@@ -957,8 +982,8 @@ TCut TTemplatesRandCone::SidebandCut(int ikin, int ieta)
   strCut+="<";
   strCut+=limUp;
   TCut cut(strCut);
-  if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
-  if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;
+//  if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
+//  if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;
   return ( cut ); 
 }
 
@@ -974,8 +999,8 @@ TCut TTemplatesRandCone::FitVarFitRangeCut(int ikin, int ieta)
   strCut+="<";
   strCut+=lim;
   TCut cut(strCut);
-  if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
-  if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;
+//  if (ieta==_BARREL) cut = cut && _pars.cutBarrel;
+//  if (ieta==_ENDCAP) cut = cut && _pars.cutEndcap;
   return ( cut );
 }
 

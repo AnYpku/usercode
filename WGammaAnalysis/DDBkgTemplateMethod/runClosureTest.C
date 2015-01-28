@@ -3,9 +3,9 @@
   TConfiguration conf;
 
   bool noClosure[2][2][2]; //channel, vgamma, templ
-  noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=0;
   noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
-  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=0;
+  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;

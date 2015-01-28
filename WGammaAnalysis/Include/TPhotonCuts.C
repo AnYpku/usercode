@@ -221,23 +221,11 @@ TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp, int ieta)
   cutEStr+="&& phoSigmaIEtaIEta>=";
   cutEStr+=_phoSigmaIEtaIEtaEndcapCutLeft;
   TCut cutE(cutEStr);
-  TCut cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
-  if (ieta==_BARREL) return cutB;
-  if (ieta==_ENDCAP) return cutE;
-  return cut;
-}
-
-TCut TPhotonCuts::SidebandSigmaIEtaIEta()
-{
-  TString cutBStr="phoSigmaIEtaIEta";
-  cutBStr+=">=";
-  cutBStr+=_phoSigmaIEtaIEtaBarrelSideband;
-  TCut cutB(cutBStr);
-  TString cutEStr="phoSigmaIEtaIEta";
-  cutEStr+=">=";
-  cutEStr+=_phoSigmaIEtaIEtaEndcapSideband;
-  TCut cutE(cutEStr);
-  TCut cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
+  TCut cut; 
+  if (ieta==_BARREL) cut=cutB;
+  else if (ieta==_ENDCAP) cut=cutE;
+  else cut = (cutB && RangeBarrel()) || (cutE && RangeEndcap());
+  std::cout<<"TPhotonCuts: year="<<year<<", wp="<<wp<<", ieta="<<ieta<<", cut="<<cut.GetTitle()<<std::endl;
   return cut;
 }
 
@@ -283,8 +271,10 @@ TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType, int ieta)
   cutIsoEStr+=cutBEndcap;
   TCut cutIsoE(cutIsoEStr); 
   TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
-  if (ieta==_BARREL) return cutB;
-  if (ieta==_ENDCAP) return cutE;
+  if (ieta==_BARREL) cut=cutB;
+  if (ieta==_ENDCAP) cut=cutE;
+  cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
+  std::cout<<"TPhotonCuts: year="<<year<<", wp="<<wp<<", isoType="<<isoType<<", ieta="<<ieta<<", cut="<<cut.GetTitle()<<std::endl;
   return cut;
 }
 

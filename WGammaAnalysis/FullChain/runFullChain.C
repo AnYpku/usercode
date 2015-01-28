@@ -95,9 +95,6 @@
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
 
 
-
-
-
   fch.RunAnalysis(anPars);
 
   time.Stop("time");

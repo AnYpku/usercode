@@ -50,7 +50,6 @@ class TPhotonCuts
     TCut RangeBarrel();
     TCut RangeEndcap();
     TCut RangeSigmaIEtaIEta(int year, int wp, int ieta=_COMMON);
-    TCut SidebandSigmaIEtaIEta();
     TCut RangeOneIsolation(int year, int wp, int isoType, int ieta=_COMMON);
     TCut RangeHoverE(int year);
     TCut RangePhoEleVeto();
