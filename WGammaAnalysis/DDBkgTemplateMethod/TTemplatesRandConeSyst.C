@@ -2,10 +2,12 @@
 
 #include "TGraph.h"
 #include "TGraphErrors.h"
+#include "TGraph2D.h"
 #include "TString.h"
 #include "TCanvas.h"
 #include "TLine.h"
 #include "TLegend.h"
+#include "TPaletteAxis.h"
 
 #include <iostream>
 #include <iomanip>
@@ -14,12 +16,13 @@ TTemplatesRandConeSyst::TTemplatesRandConeSyst()
 {
 }
 
-TTemplatesRandConeSyst::TTemplatesRandConeSyst(TemplatesRandConePars pars)
+TTemplatesRandConeSyst::TTemplatesRandConeSyst(TemplatesRandConePars pars, TemplatesSidebandVariationPars variationPars)
 {
   SetPars(pars);
   _pars.fOutForSave->Close();
   _pars.strFileOutName.ReplaceAll(".root","_Syst.root");
   _pars.fOutForSave = new TFile(_pars.strFileOutName,"recreate");
+  _variationPars=variationPars;
 }
 
 TTemplatesRandConeSyst::~TTemplatesRandConeSyst()
@@ -44,17 +47,14 @@ void TTemplatesRandConeSyst::SidebandVariation()
 void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
 {
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
-    if (_nPoints[ieta]>_nPointsMax) {
+    if (_variationPars.nPoints[ieta]>_nPointsMax) {
       std::cout<<"ERROR in TTemplatesRandConeSyst::SidebandVariationOneKinBin, ikin="<<StrLabelKin(ikin)<<std::endl;
-      std::cout<<"_nPoints["<<StrLabelEta(ieta)<<"]="<<_nPoints[ieta]<<" > _nPointsMax="<<_nPointsMax<<std::endl;
+      std::cout<<"_variationPars.nPoints["<<StrLabelEta(ieta)<<"]="<<_variationPars.nPoints[ieta]<<" > _nPointsMax="<<_nPointsMax<<std::endl;
       std::cout<<"no sideband variation will be done"<<std::endl;
       return;
     }
   }//end of loop over ieta
 
-  // set the sidebands used in analysis for reference
-  for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++)
-    _sidebandRef[ieta]=_pars.sideband[ikin][ieta]; 
 
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
 
@@ -62,8 +62,6 @@ void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
    //for _BARREL or _ENDCAP
    VarySidebandKinEtaBin(ikin,ieta);
 
-   //put sideband to the original value
-   _pars.sideband[ikin][ieta]=_sidebandRef[ieta];
 
    //prepare graphs for plotting
    PrepareGraphsKinEtaBin(ikin,ieta);
@@ -77,96 +75,108 @@ void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
 
 void TTemplatesRandConeSyst::PlotOneKinBin(int ikin)
 {
+
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
 
-    SetPlottingStyles(_grTrue[ikin][ieta],_lineRefTrue[ikin][ieta]);
-    SetPlottingStyles(_grFake[ikin][ieta],_lineRefFake[ikin][ieta]);
-
-    TString canvName="canv_SidebandVariation_";
+    TString canvName="canv_SidebandVariation_TrueVal_";
     canvName+=StrLabelKin(ikin);
     canvName+=StrLabelEta(ieta);
-    TCanvas* c = new TCanvas(canvName,canvName,1200,600);
-    c->Divide(2,1);
-    c->cd(1);
-    _grEmptTrue[ikin][ieta]->Draw("AP");
-
-    _grTrue[ikin][ieta]->Draw("P"); 
-    _lineRefTrue[ikin][ieta]->Draw("same"); 
-
-    c->cd(2);
-    TLegend* leg = new TLegend(0.70,0.10,0.95,0.30);
-    _grEmptFake[ikin][ieta]->Draw("AP");
-
-      _grFake[ikin][ieta]->Draw("P");
-      _lineRefFake[ikin][ieta]->Draw("same"); 
-      leg->AddEntry(_grFake[ikin][ieta],StrLabelEta(ieta),"lpf");
-      leg->Draw("same");
+    _grTrueVal[ikin][ieta]->SetTitle(TString("sbVar: trueVal, ")+StrLabelKin(ikin)+StrLabelEta(ieta)); 
+    TCanvas* c = new TCanvas(canvName,canvName,900,600);
+ //   c->Divide(1,2);
+ //   c->cd(1);
+    _grTrueVal[ikin][ieta]->Draw("COLZ");
+ //   TPaletteAxis *palette = (TPaletteAxis*)_grTrueVal[ikin][ieta]->GetListOfFunctions()->FindObject("palette");
+ //   c->cd(2);
+ //   palette->Draw();
 
     canvName+=".png";
     c->SaveAs(canvName);
   } // end of loop over ieta
+
 }// end of PlotOneKinBin(int ikin)
 
 void TTemplatesRandConeSyst::VarySidebandKinEtaBin(int ikin, int ieta)
 {
-    for (int is=0; is<_nPoints[ieta]; is++){
-      _sidebandsVal[is]=_minSideband[ieta]+_unit[ieta]*is;
-      _sidebandsErr[is]=0.01*_unit[ieta];
-      _pars.sideband[ikin][ieta]=_sidebandsVal[is];
+    float unit=(_variationPars.upperSidebandCut[ieta]-_variationPars.lowerSidebandCut[ieta])/_variationPars.nPoints[ieta];
 
-      // the longest part: performs fits
-      // implemented in TTemplatesRandCone
-      std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<", sideband="<<_sidebandsVal[is]<<std::endl;
-      ComputeBackgroundOne(ikin,ieta,0);
+    for (int isL=0; isL<=_variationPars.nPoints[ieta]; isL++){
+      _sidebandLowerVal[isL]=_variationPars.lowerSidebandCut[ieta]+unit*isL;
+      _sidebandLowerErr[isL]=0.01*_sidebandLowerVal[isL];
 
-      _yieldsTrueVal[is]=_nTrueYieldsVal[ikin][ieta];
-      _yieldsTrueErr[is]=_nTrueYieldsErr[ikin][ieta];
-      _yieldsFakeVal[is]=_nFakeYieldsVal[ikin][ieta];
-      _yieldsFakeErr[is]=_nFakeYieldsErr[ikin][ieta];
+    }//end of loop over isL, lower sideband cut
+    for (int isU=0; isU<=_variationPars.nPoints[ieta]; isU++){
+      _sidebandUpperVal[isU]=_variationPars.lowerSidebandCut[ieta]+unit*isU;
+      _sidebandUpperErr[isU]=0.01*_sidebandUpperVal[isU];
 
-    }//end of loop over is
+    }//end of loop over isU, upper sideband cut
+
+    for (int isL=0; isL<_variationPars.nPoints[ieta]; isL++){
+
+      for (int isU=0; isU<isL+1; isU++){
+        _yieldsTrueVal[isL][isU]=-1;
+        _yieldsTrueErr[isL][isU]=0.001;
+        _yieldsFakeVal[isL][isU]=-1;
+        _yieldsFakeErr[isL][isU]=0.001;
+      }//end of loop over isU, upper sideband cut
+
+      for (int isU=isL+1; isU<=_variationPars.nPoints[ieta]; isU++){
+        _pars.sideband[ikin][ieta]=_sidebandLowerVal[isL];
+        _pars.sidebandUp[ikin][ieta]=_sidebandUpperVal[isU];
+        // the longest part: performs fits
+        // implemented in TTemplatesRandCone
+        std::cout<<"SIDEBAND VARIATION"<<std::endl;
+        std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<", ";
+        std::cout<<"isL="<<isL<<", isU="<<isU;
+        std::cout<<", sideband: ";
+        std::cout<<std::setprecision(4)<<_sidebandLowerVal[isL]<<"-"<<_sidebandUpperVal[isU]<<"; "<<std::endl;
+        ComputeBackgroundOne(ikin,ieta,0);
+        _yieldsTrueVal[isL][isU]=_nTrueYieldsVal[ikin][ieta];
+        _yieldsTrueErr[isL][isU]=_nTrueYieldsErr[ikin][ieta];
+        _yieldsFakeVal[isL][isU]=_nFakeYieldsVal[ikin][ieta];
+        _yieldsFakeErr[isL][isU]=_nFakeYieldsErr[ikin][ieta];
+      }//end of loop over isU, upper sideband cut
+
+    }//end of loop over isL, lower sideband cut
+
+
+    for (int isL=_variationPars.nPoints[ieta]; isL<=_variationPars.nPoints[ieta]; isL++){
+      for (int isU=0; isU<=_variationPars.nPoints[ieta]; isU++){
+        _yieldsTrueVal[isL][isU]=-1;
+        _yieldsTrueErr[isL][isU]=0.001;
+        _yieldsFakeVal[isL][isU]=-1;
+        _yieldsFakeErr[isL][isU]=0.001;
+      }//end of loop over isU, upper sideband cut
+    }//end of loop over isL, lower sideband cut
+
 }// end of VarySidebandKinEtaBin(int ikin, int ieta)
 
 void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
 {
-  float maxTrue=-1;
-  float minTrue=1000000;
-  float maxFake=-1;
-  float minFake=1000000;
-  
-  float yieldRefTrue=0;
-  float yieldRefFake=0;
+  int nP1D=_variationPars.nPoints[ieta]+1;
+  int nP=0;
+  float sbL[nP1D*nP1D];
+  float sbU[nP1D*nP1D];
+  float yTrueVal[nP1D*nP1D];
+  std::cout<<std::endl;
+  std::cout<<"Prepare Graphs for "<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
+  for (int isL=0; isL<nP1D; isL++){ 
+    for (int isU=0; isU<nP1D; isU++){ 
+      if (_yieldsTrueVal[isL][isU]<0) continue;
+      sbL[nP]=_sidebandLowerVal[isL];
+      sbU[nP]=_sidebandUpperVal[isU];
+      yTrueVal[nP]=_yieldsTrueVal[isL][isU];
+      std::cout<<"isL="<<isL<<", isU="<<isU<<", nP="<<nP;
+      std::cout<<std::setprecision(4)<<", sbL="<<sbL[nP]<<", sbU="<<sbU[nP];
+      std::cout<<std::setprecision(0)<<", yTrueVal="<<yTrueVal[nP]<<std::endl;
+      nP++;
+    }//end of loop over isU
+  }//end of loop over isL
 
-  for (int is=0; is<_nPoints[ieta]; is++){ 
-      CheckMinAndMax(_yieldsTrueVal[is],_yieldsTrueErr[is],minTrue,maxTrue);
-      CheckMinAndMax(_yieldsFakeVal[is],_yieldsFakeErr[is],minFake,maxFake);
-      if (fabs(_sidebandRef[ieta]-_sidebandsVal[is])<0.0001){
-        yieldRefTrue=_yieldsTrueVal[is];
-        yieldRefFake=_yieldsFakeVal[is];
-      }
-  }//end of loop over is
+  _grTrueVal[ikin][ieta]=new TGraph2D(nP,sbL,sbU,yTrueVal);
+  _grTrueVal[ikin][ieta]->GetXaxis()->SetTitle("lower sb cut");
+  _grTrueVal[ikin][ieta]->GetYaxis()->SetTitle("upper sb cut");
 
-  _grTrue[ikin][ieta]=new TGraphErrors(_nPoints[ieta],_sidebandsVal,_yieldsTrueVal,_sidebandsErr,_yieldsTrueErr);
-  _grFake[ikin][ieta]=new TGraphErrors(_nPoints[ieta],_sidebandsVal,_yieldsFakeVal,_sidebandsErr,_yieldsFakeErr);
-  _lineRefTrue[ikin][ieta]=new TLine(_sidebandsVal[0],yieldRefTrue,_sidebandsVal[_nPoints[ieta]-1],yieldRefTrue);
-  _lineRefFake[ikin][ieta]=new TLine(_sidebandsVal[0],yieldRefFake,_sidebandsVal[_nPoints[ieta]-1],yieldRefFake);
-
-
-  float emptX[2]={_sidebandsVal[0], _sidebandsVal[_nPoints[ieta]-1]};
-
-  if (minTrue>0) minTrue=0;
-  float emptYTrue[2]={0,maxTrue};
-  _grEmptTrue[ikin][ieta] = new TGraph(2, emptX, emptYTrue);
-  _grEmptTrue[ikin][ieta]->SetTitle(TString("true gamma yields, ")+StrLabelEta(ieta)+TString(" variation, ")+StrLabelKin(ikin));
-  _grEmptTrue[ikin][ieta]->SetLineColor(0);
-  _grEmptTrue[ikin][ieta]->SetMarkerColor(0);
-
-  if (minFake>0) minFake=0;
-  float emptYFake[2]={minFake,maxFake};
-  _grEmptFake[ikin][ieta] = new TGraph(2, emptX, emptYFake);
-  _grEmptFake[ikin][ieta]->SetTitle(TString("fake gamma yields, ")+StrLabelEta(ieta)+TString(" variation, ")+StrLabelKin(ikin));
-  _grEmptFake[ikin][ieta]->SetLineColor(0);
-  _grEmptFake[ikin][ieta]->SetMarkerColor(0);
 
 }// end of PrepareGraphsKinEtaBin(int ikin, int ieta)
 
@@ -178,19 +188,24 @@ void TTemplatesRandConeSyst::CheckMinAndMax(float val, float err, float& min, fl
 
 void TTemplatesRandConeSyst::PrintOutKinEtaBin(int ikin, int ieta)
 {
+
     std::cout<<std::endl;
+    std::cout<<"PRINT TRUE AND FAKE YIELDS FOR GIVEN BIN"<<std::endl;
     std::cout<<"ikin="<<StrLabelKin(ikin);
     std::cout<<", ieta="<<StrLabelEta(ieta)<<std::endl;
-    for (int is=0; is<_nPoints[ieta]; is++){
+    for (int isL=0; isL<_variationPars.nPoints[ieta]; isL++){
+      for (int isU=isL+1; isU<_variationPars.nPoints[ieta]+1; isU++){
       std::cout<<std::setprecision(3)<<std::endl;
-      std::cout<<"is="<<is<<", sideband="<<_sidebandsVal[is]<<"+-"<<_sidebandsErr[is]<<std::endl;
+      std::cout<<"isL="<<isL<<", isU="<<isU<<", sideband="<<_sidebandLowerVal[isL]<<"-"<<_sidebandUpperVal[isU]<<std::endl;
       std::cout<<"true yield : ";
-      std::cout<<std::setprecision(0)<<" "<<_yieldsTrueVal[is]<<"+-"<<_yieldsTrueErr[is]<<", ";
+      std::cout<<std::setprecision(0)<<" "<<_yieldsTrueVal[isL][isU]<<"+-"<<_yieldsTrueErr[isL][isU]<<", ";
       std::cout<<"fake yield : ";
-      std::cout<<std::setprecision(0)<<" "<<_yieldsFakeVal[is]<<"+-"<<_yieldsFakeErr[is];
+      std::cout<<std::setprecision(0)<<" "<<_yieldsFakeVal[isL][isU]<<"+-"<<_yieldsFakeErr[isL][isU];
       std::cout<<std::endl;
-    }//end of loop over is
-}// end of SetPlottingStyles
+      }//end of loop over isU
+    }//end of loop over isL
+
+}// end of PrintOutKinEtaBin
 
 
 

@@ -32,15 +32,18 @@ class TTemplatesRandCone
       TFile* fFake;
       TFile* fData;
       TFile* fSign;//treeSign has to be consistent with treeFake
+      TFile* fFakeRef;
       TTree* treeTrue;
       TTree* treeFake;
       TTree* treeData;
       TTree* treeSign;//treeSign has to be consistent with treeFake
+      TTree* treeFakeRef;
       int nKinBins;
       float kinBinLims[nKinBinsMax];
       int nFitBins[nKinBinsMax][2];
       float minVarFit[nKinBinsMax][2];
       float maxVarFit[nKinBinsMax][2];
+      float unitOrigFit[nKinBinsMax][2];
       float sideband[nKinBinsMax][2];
       float sidebandUp[nKinBinsMax][2];
       bool combineTrueTempl[nKinBinsMax][2];
@@ -56,6 +59,7 @@ class TTemplatesRandCone
       bool sumOverHist;
         // the method how to extract yields from fit:
         // sum over histogram or apply efficiency
+      bool showTreeRef;
       TFile* fOutForSave;
       TString strFileOutName;
       TString strTrueYieldsTot[3];
@@ -105,7 +109,9 @@ class TTemplatesRandCone
     void PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]);
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
     void ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint=0);
-    void ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma,double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
+    void ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
+    float EffFromTree(int ikin, int ieta, bool noPrint, bool isTrueGamma);
+    float EffFromSum(int ikin, int ieta, bool noPrint, TH1D* hist);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
 //    float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
 
@@ -134,6 +140,7 @@ class TTemplatesRandCone
 
     TH1D* _hTrue[nKinBinsMax][3];
     TH1D* _hFake[nKinBinsMax][3];
+    TH1D* _hFakeMCtruth[nKinBinsMax][3];
     TH1D* _hLeak[nKinBinsMax][3];
     TH1D* _hSign[nKinBinsMax][3];
     double leakFraction[nKinBinsMax][3];

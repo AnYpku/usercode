@@ -271,9 +271,9 @@ TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType, int ieta)
   cutIsoEStr+=cutBEndcap;
   TCut cutIsoE(cutIsoEStr); 
   TCut cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
-  if (ieta==_BARREL) cut=cutB;
-  if (ieta==_ENDCAP) cut=cutE;
-  cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
+  if (ieta==_BARREL) cut=cutIsoBStr;
+  else if (ieta==_ENDCAP) cut=cutIsoEStr;
+  else cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
   std::cout<<"TPhotonCuts: year="<<year<<", wp="<<wp<<", isoType="<<isoType<<", ieta="<<ieta<<", cut="<<cut.GetTitle()<<std::endl;
   return cut;
 }

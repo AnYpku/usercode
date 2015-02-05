@@ -5,20 +5,29 @@
 
 #include "TGraphErrors.h"
 #include "TGraph.h"
+#include "TGraph2D.h"
 #include "TLine.h"
 
 class TTemplatesRandConeSyst: public TTemplatesRandCone
 {
   public:
 
+    struct TemplatesSidebandVariationPars{
+      int nPoints[2];// _BARREL and _ENDCAP
+      float lowerSidebandCut[2];
+      float upperSidebandCut[2];
+    };
+
     TTemplatesRandConeSyst();
-    TTemplatesRandConeSyst(TemplatesRandConePars pars);
+    TTemplatesRandConeSyst(TemplatesRandConePars pars, TemplatesSidebandVariationPars variationPars);
     virtual ~TTemplatesRandConeSyst();
 
-    void SidebandVariation();   
+    void SidebandVariation(); 
+
 
   private:
 
+    TemplatesSidebandVariationPars _variationPars;
 
     void SidebandVariationOneKinBin(int ikin); 
     void PlotOneKinBin(int ikin);
@@ -30,25 +39,24 @@ class TTemplatesRandConeSyst: public TTemplatesRandCone
 
 
     const static int _nPointsMax=50;//larger or equal to the largest out of _nPoints[2]
-    float _sidebandRef[2];
-    float _sidebandsVal[_nPointsMax];
-    float _sidebandsErr[_nPointsMax];
-    float _yieldsTrueVal[_nPointsMax];
-    float _yieldsTrueErr[_nPointsMax];
-    float _yieldsFakeVal[_nPointsMax];
-    float _yieldsFakeErr[_nPointsMax];
+//    float _sidebandRef[2];
+    float _sidebandLowerVal[_nPointsMax];
+    float _sidebandLowerErr[_nPointsMax];
+    float _sidebandUpperVal[_nPointsMax];
+    float _sidebandUpperErr[_nPointsMax];
+    float _yieldsTrueVal[_nPointsMax][_nPointsMax];
+    float _yieldsTrueErr[_nPointsMax][_nPointsMax];
+    float _yieldsFakeVal[_nPointsMax][_nPointsMax];
+    float _yieldsFakeErr[_nPointsMax][_nPointsMax];
 
-    TGraphErrors* _grTrue[nKinBinsMax][2];
-    TGraphErrors* _grFake[nKinBinsMax][2];
-    TLine* _lineRefTrue[nKinBinsMax][2];
-    TLine* _lineRefFake[nKinBinsMax][2];
-    TGraph* _grEmptTrue[nKinBinsMax][2];
-    TGraph* _grEmptFake[nKinBinsMax][2];
+    TGraph2D* _grTrueVal[nKinBinsMax][2];
+    TGraph2D* _grFakeVal[nKinBinsMax][2];
+    TGraph2D* _grTrueErr[nKinBinsMax][2];
+    TGraph2D* _grFakeErr[nKinBinsMax][2];
+//    TLine* _lineRefTrue[nKinBinsMax][2];
+//    TLine* _lineRefFake[nKinBinsMax][2];
+//    TGraph* _grEmptTrue[nKinBinsMax][2];
+//    TGraph* _grEmptFake[nKinBinsMax][2];
 };
-
-
-    const static int _nPoints[2]={15,19};// _BARREL and _ENDCAP
-    const static float _minSideband[2]={0.006,0.020};
-    const static float _unit[2]={0.001,0.002};
 
 #endif //TTemplatesRandConeSyst
