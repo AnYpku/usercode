@@ -1,0 +1,151 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{First look at 2D Sideband Variation Plots}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{February 11th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+{
+  \begin{itemize}
+  \item Template fit systematics in approved CMS Zg analysis 
+  \item Sideband variation 2D plots for Zg and Wg, muon, pt 15-20 GeV
+  \item Conclusions and plans
+  \end{itemize}
+}
+\end{frame}
+
+
+%---------------------------------------------
+\begin{frame}{Template fit systematics in approved CMS Zg analysis}\\*
+  \scriptsize ==============================\\*
+  \scriptsize http://cms.cern.ch/iCMS/jsp/db\_notes/noteInfo.jsp?cmsnoteid=CMS\%20AN-2013/280\\*
+  \scriptsize ==============================\\*
+  \scriptsize Results of Ipho and sihih template fits are treated as separate measurements and combined after cross sections for both of them as computed\\*
+  \scriptsize ==============================\\*
+  \scriptsize Uncerntainties for each fit template are estimated in\\*
+  \scriptsize ==============================\\*
+  \scriptsize Section 7.1.4 (Uncertainty due to Background Templates)\\*
+  \scriptsize ==============================\\*
+  \scriptsize and Appendix C (Extracted Signal Fraction in Jet Data and QCD MC)\\*
+\end{frame}
+
+\begin{frame}{Template fit systematics for sihih fits (to be specific)}\\*
+  \scriptsize Section 7.1.4 (Uncertainty due to Background Templates):\\*
+    \begin{itemize}
+      \item For each $I_{ch}$ range fit MC mixture and determine $b_{i}=f_{i}^{MC}/f^{MC}$, where $f^{MC}$ is MC-truth signal fraction and $f_{i}^{MC}$ - signal fraction determined from fit for the i-th Ich range
+      \item Determine $U_{i}=f_{i}^{d}-b_{i}f^{d}$ where $f^{d}$ is signal fraction determined from data fit with fake template obtained from $I_{ch}$ range selected from MC closure test and $f_{i}^{d}$ is signal fraction determined from data fit with fake template obtained from i-th $I_{ch}$ range
+      \item Fit $U_{i}$ distribution with Gaussian and assign sigma as systematic uncerntainty
+    \end{itemize}
+  \scriptsize Appendix C. (Extracted Signal Fraction in Jet Data and QCD MC):\\*
+    \begin{itemize}
+      \item Select all possible Ich ranges where QCD MC sihih template is in good agreement with MC-truth fake template taken from Drell-Yan MC ("good" means Kolmogorov-Smirnov test probability > 30\%)  
+      \item Apply each of selected Ich ranges on jet-enriched dataset, use it as fake sihih template, fit data and get signal yields   
+      \item Fit distribution of obtained signal yields and assign sigma as syst ucerntainty 
+    \end{itemize}
+  \scriptsize Same approach used for Ipho template fits with sihih ranges\\*
+\end{frame}
+
+%---------------------------------------------
+
+\begin{frame}{True gamma yields for Zg, muon, Barrel}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Zg_Closure_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Zg_Closure_SIHIH.png}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Zg_Data_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Zg_Data_SIHIH.png}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Upper: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of MC mixture; lower: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of data.\\*
+  \scriptsize MC truth yield: $5969{\pm}53$; \\*
+  \scriptsize chiso fits: sideband=0.010-0.020, MC:  $6089{\pm}106$; data: $5931{\pm}105$\\*
+  \scriptsize sihih fits: sideband=0.100-2.100, MC:  $6295{\pm}104$; data: $6396{\pm}103$;\\*
+  \scriptsize 8\% difference between chiso and sihih fits \\*
+\end{frame}
+
+\begin{frame}{True gamma yields for Zg, muon, Endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Zg_Closure_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Zg_Closure_SIHIH.png}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Zg_Data_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Zg_Data_SIHIH.png}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Upper: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of MC mixture; lower: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of data.\\*
+  \scriptsize MC truth yield: $2010{\pm}31$;\\*
+  \scriptsize chiso fits: sideband=0.027-0.040, MC:  $2084{\pm}97$; data: $2103{\pm}95$\\*
+  \scriptsize sihih fits: sideband=0.100-3.100, MC:  $2474{\pm}72$; data: $2592{\pm}73$;\\*
+  \scriptsize 20\% difference between chiso and sihih fits \\*
+\end{frame}
+
+\begin{frame}{True gamma yields for Wg, muon, Barrel}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Wg_Closure_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Wg_Closure_SIHIH.png}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Wg_Data_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Barrel_Wg_Data_SIHIH.png}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Upper: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of MC mixture; lower: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of data.\\*
+  \scriptsize MC truth yield: $12080{\pm}160$, with blinding: $604{\pm}8$\\*
+  \scriptsize chiso fits: sideband=0.011-0.018, MC: $11211{\pm}260$; data: $643{\pm}58$\\*
+  \scriptsize sihih fits: sideband=0.100-2.100, MC: $11621{\pm}240$; data: $678{\pm}56$;\\*
+  \scriptsize 5\% difference between chiso and sihih fits \\*
+\end{frame}
+
+\begin{frame}{True gamma yields for Wg, muon, Endcap}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Wg_Closure_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../DDBkgTemplateMethod/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Wg_Closure_SIHIH.png}
+    \includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Wg_Data_CHISO.png}\includegraphics[width=0.4\textwidth, keepaspectratio=true]{../FullChain/canv_SidebandVariation_TrueVal__phoEt15to20__Endcap_Wg_Data_SIHIH.png}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Upper: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of MC mixture; lower: from $I_{ch}$ and $\sigma_{i{\eta}i{\eta}}$ fits of data.\\*
+  \scriptsize MC truth yield: $6580{\pm}100$, with blinding: $329{\pm}5$\\*
+  \scriptsize chiso fits: sideband=0.025-0.038, MC:  $6246{\pm}314$; data: $287{\pm}62$;\\*
+  \scriptsize sihih fits: sideband=0.100-2.100, MC:  $7620{\pm}206$; data: $458{\pm}44$;\\*
+  \scriptsize 45\% difference between chiso and sihih fits \\*
+\end{frame}
+
+
+
+
+\begin{frame}{Conclusions}
+{
+  \begin{itemize}
+    \item Zg Ich fit results for barrel look good
+    \item sihih fits for all cases show bad performance: 
+    \item unreasonable sideband range; bad agreement to MC truth for closure tests; big difference from chiso fits for endcap
+    \item but sihih fits still not synchronized with Yutaro's closure test 
+    \item Wg fits for all cases are much less stable to sideband variation than Zg fits
+    \item Wg data fits depends on sideband differently than MC-closure fits thus the systematic studies which were performed for Zg analysis may give larger contribution to Wg
+    \item good agreement for Wg between chiso and sihih fits for barrel looks like a coincidence
+  \end{itemize}
+}
+\end{frame} 
+
+\begin{frame}{Plans}
+{
+  \begin{itemize}
+    \item try to syncronize closure test with Yutaro
+    \item probably, exclude sideband ranges with high signal-to-sideband leakage from the consideration
+    \item do the sideband ranges selection for all pt bins
+    \item proceed to cross section calculation with selected sideband ranges with Ich fits
+    \item complete Zg check: see how Zg cross section compares to approved CMS result
+  \end{itemize}
+}
+\end{frame} 
+
+
+
+\end{document}
+

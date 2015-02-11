@@ -3,6 +3,7 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TGraph2D.h"
+#include "TH2D.h"
 #include "TString.h"
 #include "TCanvas.h"
 #include "TLine.h"
@@ -47,9 +48,10 @@ void TTemplatesRandConeSyst::SidebandVariation()
 void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
 {
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
-    if (_variationPars.nPoints[ieta]>_nPointsMax) {
+    if (_variationPars.nPointsLower[ieta]>_nPointsMax || _variationPars.nPointsUpper[ieta]>_nPointsMax) {
       std::cout<<"ERROR in TTemplatesRandConeSyst::SidebandVariationOneKinBin, ikin="<<StrLabelKin(ikin)<<std::endl;
-      std::cout<<"_variationPars.nPoints["<<StrLabelEta(ieta)<<"]="<<_variationPars.nPoints[ieta]<<" > _nPointsMax="<<_nPointsMax<<std::endl;
+      std::cout<<"_variationPars.nPointsLower["<<StrLabelEta(ieta)<<"]="<<_variationPars.nPointsLower[ieta]<<" > _nPointsMax="<<_nPointsMax<<" or ";
+      std::cout<<"_variationPars.nPointsUpper["<<StrLabelEta(ieta)<<"]="<<_variationPars.nPointsUpper[ieta]<<" > _nPointsMax="<<_nPointsMax<<" or ";
       std::cout<<"no sideband variation will be done"<<std::endl;
       return;
     }
@@ -75,7 +77,7 @@ void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
 
 void TTemplatesRandConeSyst::PlotOneKinBin(int ikin)
 {
-
+  _pars.fOutForSave->cd();
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
 
     TString canvName="canv_SidebandVariation_TrueVal_";
@@ -90,37 +92,47 @@ void TTemplatesRandConeSyst::PlotOneKinBin(int ikin)
  //   c->cd(2);
  //   palette->Draw();
 
+    TString canvNameH=canvName+TString("H");
+    TCanvas* c1 = new TCanvas(canvNameH,canvNameH,900,600);
+    _histTrueVal[ikin][ieta]->Draw("COLZ");
+
     canvName+=".png";
     c->SaveAs(canvName);
+    canvNameH+=".png";
+    c1->SaveAs(canvNameH);
+
   } // end of loop over ieta
 
 }// end of PlotOneKinBin(int ikin)
 
 void TTemplatesRandConeSyst::VarySidebandKinEtaBin(int ikin, int ieta)
 {
-    float unit=(_variationPars.upperSidebandCut[ieta]-_variationPars.lowerSidebandCut[ieta])/_variationPars.nPoints[ieta];
+    float unitUpper=(_variationPars.upperSidebandCutTo[ieta]-_variationPars.upperSidebandCutFrom[ieta])/_variationPars.nPointsUpper[ieta];
+    float unitLower=(_variationPars.lowerSidebandCutTo[ieta]-_variationPars.lowerSidebandCutFrom[ieta])/_variationPars.nPointsLower[ieta];
 
-    for (int isL=0; isL<=_variationPars.nPoints[ieta]; isL++){
-      _sidebandLowerVal[isL]=_variationPars.lowerSidebandCut[ieta]+unit*isL;
+
+    for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
+      _sidebandLowerVal[isL]=_variationPars.lowerSidebandCutFrom[ieta]+unitLower*isL;
       _sidebandLowerErr[isL]=0.01*_sidebandLowerVal[isL];
 
     }//end of loop over isL, lower sideband cut
-    for (int isU=0; isU<=_variationPars.nPoints[ieta]; isU++){
-      _sidebandUpperVal[isU]=_variationPars.lowerSidebandCut[ieta]+unit*isU;
+    for (int isU=0; isU<_variationPars.nPointsUpper[ieta]; isU++){
+      _sidebandUpperVal[isU]=_variationPars.upperSidebandCutFrom[ieta]+unitUpper*isU;
       _sidebandUpperErr[isU]=0.01*_sidebandUpperVal[isU];
 
     }//end of loop over isU, upper sideband cut
 
-    for (int isL=0; isL<_variationPars.nPoints[ieta]; isL++){
+    for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
 
-      for (int isU=0; isU<isL+1; isU++){
-        _yieldsTrueVal[isL][isU]=-1;
-        _yieldsTrueErr[isL][isU]=0.001;
-        _yieldsFakeVal[isL][isU]=-1;
-        _yieldsFakeErr[isL][isU]=0.001;
-      }//end of loop over isU, upper sideband cut
-
-      for (int isU=isL+1; isU<=_variationPars.nPoints[ieta]; isU++){
+      for (int isU=0; isU<_variationPars.nPointsUpper[ieta]; isU++){
+        if (_sidebandLowerVal[isL]>=_sidebandUpperVal[isU] || 
+            (_sidebandUpperVal[isU]-_sidebandLowerVal[isL])<0.005*(_sidebandUpperVal[isU]+_sidebandLowerVal[isL])){
+          _yieldsTrueVal[isL][isU]=-1;
+          _yieldsTrueErr[isL][isU]=0.001;
+          _yieldsFakeVal[isL][isU]=-1;
+          _yieldsFakeErr[isL][isU]=0.001;
+          continue;
+        }
         _pars.sideband[ikin][ieta]=_sidebandLowerVal[isL];
         _pars.sidebandUp[ikin][ieta]=_sidebandUpperVal[isU];
         // the longest part: performs fits
@@ -139,30 +151,30 @@ void TTemplatesRandConeSyst::VarySidebandKinEtaBin(int ikin, int ieta)
 
     }//end of loop over isL, lower sideband cut
 
-
-    for (int isL=_variationPars.nPoints[ieta]; isL<=_variationPars.nPoints[ieta]; isL++){
-      for (int isU=0; isU<=_variationPars.nPoints[ieta]; isU++){
-        _yieldsTrueVal[isL][isU]=-1;
-        _yieldsTrueErr[isL][isU]=0.001;
-        _yieldsFakeVal[isL][isU]=-1;
-        _yieldsFakeErr[isL][isU]=0.001;
-      }//end of loop over isU, upper sideband cut
-    }//end of loop over isL, lower sideband cut
-
 }// end of VarySidebandKinEtaBin(int ikin, int ieta)
 
 void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
 {
-  int nP1D=_variationPars.nPoints[ieta]+1;
+  _pars.fOutForSave->cd();
+  int nPL=_variationPars.nPointsLower[ieta];
+  int nPU=_variationPars.nPointsUpper[ieta];
   int nP=0;
-  float sbL[nP1D*nP1D];
-  float sbU[nP1D*nP1D];
-  float yTrueVal[nP1D*nP1D];
+  float sbL[nPL*nPU];
+  float sbU[nPL*nPU];
+  float yTrueVal[nPL*nPU];
   std::cout<<std::endl;
   std::cout<<"Prepare Graphs for "<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
-  for (int isL=0; isL<nP1D; isL++){ 
-    for (int isU=0; isU<nP1D; isU++){ 
-      if (_yieldsTrueVal[isL][isU]<0) continue;
+  TString histName=TString("histTrueVal")+StrLabelKin(ikin)+StrLabelEta(ieta);
+  _histTrueVal[ikin][ieta]=new TH2D(histName,histName,nPU,_sidebandLowerVal,nPL,_sidebandUpperVal);
+  for (int isL=0; isL<nPL; isL++){ 
+    for (int isU=0; isU<nPU; isU++){ 
+      if (_yieldsTrueVal[isL][isU]<0){
+        _histTrueVal[ikin][ieta]->SetBinContent(isL+1,isU+1,0);
+        _histTrueVal[ikin][ieta]->SetBinError(isL+1,isU+1,0.001);
+        continue;
+      }
+      _histTrueVal[ikin][ieta]->SetBinContent(isL+1,isU+1,_yieldsTrueVal[isL][isU]);
+      _histTrueVal[ikin][ieta]->SetBinError(isL+1,isU+1,_yieldsTrueErr[isL][isU]);
       sbL[nP]=_sidebandLowerVal[isL];
       sbU[nP]=_sidebandUpperVal[isU];
       yTrueVal[nP]=_yieldsTrueVal[isL][isU];
@@ -170,6 +182,15 @@ void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
       std::cout<<std::setprecision(4)<<", sbL="<<sbL[nP]<<", sbU="<<sbU[nP];
       std::cout<<std::setprecision(0)<<", yTrueVal="<<yTrueVal[nP]<<std::endl;
       nP++;
+    }//end of loop over isU
+  }//end of loop over isL
+
+  std::cout<<"_histTrueVal:"<<std::endl;
+  for (int isL=1; isL<=_histTrueVal[ikin][ieta]->GetNbinsX(); isL++){ 
+    for (int isU=1; isU<=_histTrueVal[ikin][ieta]->GetNbinsY(); isU++){ 
+      std::cout<<"isL="<<isL<<", isU="<<isU;
+      std::cout<<std::setprecision(0)<<", ="<< _histTrueVal[ikin][ieta]->GetBinContent(isL,isU)<<"+-";
+      std::cout<< _histTrueVal[ikin][ieta]->GetBinError(isL,isU)<<std::endl;
     }//end of loop over isU
   }//end of loop over isL
 
@@ -193,8 +214,8 @@ void TTemplatesRandConeSyst::PrintOutKinEtaBin(int ikin, int ieta)
     std::cout<<"PRINT TRUE AND FAKE YIELDS FOR GIVEN BIN"<<std::endl;
     std::cout<<"ikin="<<StrLabelKin(ikin);
     std::cout<<", ieta="<<StrLabelEta(ieta)<<std::endl;
-    for (int isL=0; isL<_variationPars.nPoints[ieta]; isL++){
-      for (int isU=isL+1; isU<_variationPars.nPoints[ieta]+1; isU++){
+    for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
+      for (int isU=isL+1; isU<_variationPars.nPointsUpper[ieta]+1; isU++){
       std::cout<<std::setprecision(3)<<std::endl;
       std::cout<<"isL="<<isL<<", isU="<<isU<<", sideband="<<_sidebandLowerVal[isL]<<"-"<<_sidebandUpperVal[isU]<<std::endl;
       std::cout<<"true yield : ";

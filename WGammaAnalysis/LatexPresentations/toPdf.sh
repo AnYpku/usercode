@@ -1,3 +1,3 @@
-pdflatex presentation20150121Wg_UpdatePlusZgClosureTest.tex
-acroread presentation20150121Wg_UpdatePlusZgClosureTest.pdf
+pdflatex presentation20150211Wg_sidebandVariation2Dplots.tex
+acroread presentation20150211Wg_sidebandVariation2Dplots.pdf
 

@@ -6,6 +6,7 @@
 #include "TGraphErrors.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TH2D.h"
 #include "TLine.h"
 
 class TTemplatesRandConeSyst: public TTemplatesRandCone
@@ -13,9 +14,12 @@ class TTemplatesRandConeSyst: public TTemplatesRandCone
   public:
 
     struct TemplatesSidebandVariationPars{
-      int nPoints[2];// _BARREL and _ENDCAP
-      float lowerSidebandCut[2];
-      float upperSidebandCut[2];
+      int nPointsLower[2];// _BARREL and _ENDCAP
+      int nPointsUpper[2];// _BARREL and _ENDCAP
+      float lowerSidebandCutFrom[2];
+      float lowerSidebandCutTo[2];
+      float upperSidebandCutFrom[2];
+     float upperSidebandCutTo[2];
     };
 
     TTemplatesRandConeSyst();
@@ -49,6 +53,7 @@ class TTemplatesRandConeSyst: public TTemplatesRandCone
     float _yieldsFakeVal[_nPointsMax][_nPointsMax];
     float _yieldsFakeErr[_nPointsMax][_nPointsMax];
 
+    TH2D* _histTrueVal[nKinBinsMax][2];
     TGraph2D* _grTrueVal[nKinBinsMax][2];
     TGraph2D* _grFakeVal[nKinBinsMax][2];
     TGraph2D* _grTrueErr[nKinBinsMax][2];
