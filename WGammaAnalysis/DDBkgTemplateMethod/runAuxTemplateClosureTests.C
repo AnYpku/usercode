@@ -1,6 +1,6 @@
 {
   gROOT->ProcessLine(".x ../Include/rootlogon.C");
-  gROOT->ProcessLine(".L AuxTemplatesRandConeClosureTests.C+");
+  gROOT->ProcessLine(".L AuxTemplatesClosureTests.C+");
 
   TString varKin="phoEt";
   const int nKinBins=5;
@@ -10,7 +10,7 @@
   int blind = TConfiguration::UNBLIND;
   int phoWP=TPhotonCuts::WP_MEDIUM;
 
-  AuxTemplatesRandConeClosure(channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
-//  AuxTemplatesRandConeClosureSystSidebandVariation(varKin, nKinBins, kinBinLims);
+  AuxTemplatesClosure(channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
+//  AuxTemplatesClosureSystSidebandVariation(varKin, nKinBins, kinBinLims);
 }
 

@@ -1,15 +1,16 @@
-#ifndef TTemplatesRandConeSyst_h
-#define TTemplatesRandConeSyst_h
+#ifndef TTemplatesSyst_h
+#define TTemplatesSyst_h
 
-#include "TTemplatesRandCone.h"
+#include "TTemplates.h"
 
 #include "TGraphErrors.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
-#include "TH2D.h"
+//#include "TH2D.h"
+#include "TVectorD.h"
 #include "TLine.h"
 
-class TTemplatesRandConeSyst: public TTemplatesRandCone
+class TTemplatesSyst: public TTemplates
 {
   public:
 
@@ -22,9 +23,9 @@ class TTemplatesRandConeSyst: public TTemplatesRandCone
      float upperSidebandCutTo[2];
     };
 
-    TTemplatesRandConeSyst();
-    TTemplatesRandConeSyst(TemplatesRandConePars pars, TemplatesSidebandVariationPars variationPars);
-    virtual ~TTemplatesRandConeSyst();
+    TTemplatesSyst();
+    TTemplatesSyst(TemplatesPars pars, TemplatesSidebandVariationPars variationPars);
+    virtual ~TTemplatesSyst();
 
     void SidebandVariation(); 
 
@@ -53,15 +54,21 @@ class TTemplatesRandConeSyst: public TTemplatesRandCone
     float _yieldsFakeVal[_nPointsMax][_nPointsMax];
     float _yieldsFakeErr[_nPointsMax][_nPointsMax];
 
-    TH2D* _histTrueVal[nKinBinsMax][2];
     TGraph2D* _grTrueVal[nKinBinsMax][2];
     TGraph2D* _grFakeVal[nKinBinsMax][2];
     TGraph2D* _grTrueErr[nKinBinsMax][2];
     TGraph2D* _grFakeErr[nKinBinsMax][2];
+
+    TVectorD* _vecSidebandLower[nKinBinsMax][2];
+    TVectorD* _vecSidebandUpper[nKinBinsMax][2];
+    TVectorD* _vecTrueVal[nKinBinsMax][2];
+    TVectorD* _vecTrueErr[nKinBinsMax][2];
+    TVectorD* _vecFakeVal[nKinBinsMax][2];
+    TVectorD* _vecFakeErr[nKinBinsMax][2];
 //    TLine* _lineRefTrue[nKinBinsMax][2];
 //    TLine* _lineRefFake[nKinBinsMax][2];
 //    TGraph* _grEmptTrue[nKinBinsMax][2];
 //    TGraph* _grEmptFake[nKinBinsMax][2];
 };
 
-#endif //TTemplatesRandConeSyst
+#endif //TTemplatesSyst

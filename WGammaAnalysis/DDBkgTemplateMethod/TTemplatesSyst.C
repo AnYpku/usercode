@@ -1,4 +1,4 @@
-#include "TTemplatesRandConeSyst.h"
+#include "TTemplatesSyst.h"
 
 #include "TGraph.h"
 #include "TGraphErrors.h"
@@ -13,11 +13,11 @@
 #include <iostream>
 #include <iomanip>
 
-TTemplatesRandConeSyst::TTemplatesRandConeSyst()
+TTemplatesSyst::TTemplatesSyst()
 {
 }
 
-TTemplatesRandConeSyst::TTemplatesRandConeSyst(TemplatesRandConePars pars, TemplatesSidebandVariationPars variationPars)
+TTemplatesSyst::TTemplatesSyst(TemplatesPars pars, TemplatesSidebandVariationPars variationPars)
 {
   SetPars(pars);
   _pars.fOutForSave->Close();
@@ -26,12 +26,12 @@ TTemplatesRandConeSyst::TTemplatesRandConeSyst(TemplatesRandConePars pars, Templ
   _variationPars=variationPars;
 }
 
-TTemplatesRandConeSyst::~TTemplatesRandConeSyst()
+TTemplatesSyst::~TTemplatesSyst()
 {
   
 }
 
-void TTemplatesRandConeSyst::SidebandVariation()
+void TTemplatesSyst::SidebandVariation()
 {
 
   //  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
@@ -45,11 +45,11 @@ void TTemplatesRandConeSyst::SidebandVariation()
 
 }// end of SidebandVariation()
 
-void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
+void TTemplatesSyst::SidebandVariationOneKinBin(int ikin)
 {
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
     if (_variationPars.nPointsLower[ieta]>_nPointsMax || _variationPars.nPointsUpper[ieta]>_nPointsMax) {
-      std::cout<<"ERROR in TTemplatesRandConeSyst::SidebandVariationOneKinBin, ikin="<<StrLabelKin(ikin)<<std::endl;
+      std::cout<<"ERROR in TTemplatesSyst::SidebandVariationOneKinBin, ikin="<<StrLabelKin(ikin)<<std::endl;
       std::cout<<"_variationPars.nPointsLower["<<StrLabelEta(ieta)<<"]="<<_variationPars.nPointsLower[ieta]<<" > _nPointsMax="<<_nPointsMax<<" or ";
       std::cout<<"_variationPars.nPointsUpper["<<StrLabelEta(ieta)<<"]="<<_variationPars.nPointsUpper[ieta]<<" > _nPointsMax="<<_nPointsMax<<" or ";
       std::cout<<"no sideband variation will be done"<<std::endl;
@@ -75,7 +75,7 @@ void TTemplatesRandConeSyst::SidebandVariationOneKinBin(int ikin)
 
 }// end of SidebandVariationOneKinBin(int ikin)
 
-void TTemplatesRandConeSyst::PlotOneKinBin(int ikin)
+void TTemplatesSyst::PlotOneKinBin(int ikin)
 {
   _pars.fOutForSave->cd();
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
@@ -92,20 +92,15 @@ void TTemplatesRandConeSyst::PlotOneKinBin(int ikin)
  //   c->cd(2);
  //   palette->Draw();
 
-    TString canvNameH=canvName+TString("H");
-    TCanvas* c1 = new TCanvas(canvNameH,canvNameH,900,600);
-    _histTrueVal[ikin][ieta]->Draw("COLZ");
 
     canvName+=".png";
     c->SaveAs(canvName);
-    canvNameH+=".png";
-    c1->SaveAs(canvNameH);
 
   } // end of loop over ieta
 
 }// end of PlotOneKinBin(int ikin)
 
-void TTemplatesRandConeSyst::VarySidebandKinEtaBin(int ikin, int ieta)
+void TTemplatesSyst::VarySidebandKinEtaBin(int ikin, int ieta)
 {
     float unitUpper=(_variationPars.upperSidebandCutTo[ieta]-_variationPars.upperSidebandCutFrom[ieta])/_variationPars.nPointsUpper[ieta];
     float unitLower=(_variationPars.lowerSidebandCutTo[ieta]-_variationPars.lowerSidebandCutFrom[ieta])/_variationPars.nPointsLower[ieta];
@@ -136,7 +131,7 @@ void TTemplatesRandConeSyst::VarySidebandKinEtaBin(int ikin, int ieta)
         _pars.sideband[ikin][ieta]=_sidebandLowerVal[isL];
         _pars.sidebandUp[ikin][ieta]=_sidebandUpperVal[isU];
         // the longest part: performs fits
-        // implemented in TTemplatesRandCone
+        // implemented in TTemplates
         std::cout<<"SIDEBAND VARIATION"<<std::endl;
         std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<", ";
         std::cout<<"isL="<<isL<<", isU="<<isU;
@@ -153,7 +148,7 @@ void TTemplatesRandConeSyst::VarySidebandKinEtaBin(int ikin, int ieta)
 
 }// end of VarySidebandKinEtaBin(int ikin, int ieta)
 
-void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
+void TTemplatesSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
 {
   _pars.fOutForSave->cd();
   int nPL=_variationPars.nPointsLower[ieta];
@@ -164,17 +159,11 @@ void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
   float yTrueVal[nPL*nPU];
   std::cout<<std::endl;
   std::cout<<"Prepare Graphs for "<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
-  TString histName=TString("histTrueVal")+StrLabelKin(ikin)+StrLabelEta(ieta);
-  _histTrueVal[ikin][ieta]=new TH2D(histName,histName,nPU,_sidebandLowerVal,nPL,_sidebandUpperVal);
   for (int isL=0; isL<nPL; isL++){ 
     for (int isU=0; isU<nPU; isU++){ 
       if (_yieldsTrueVal[isL][isU]<0){
-        _histTrueVal[ikin][ieta]->SetBinContent(isL+1,isU+1,0);
-        _histTrueVal[ikin][ieta]->SetBinError(isL+1,isU+1,0.001);
         continue;
       }
-      _histTrueVal[ikin][ieta]->SetBinContent(isL+1,isU+1,_yieldsTrueVal[isL][isU]);
-      _histTrueVal[ikin][ieta]->SetBinError(isL+1,isU+1,_yieldsTrueErr[isL][isU]);
       sbL[nP]=_sidebandLowerVal[isL];
       sbU[nP]=_sidebandUpperVal[isU];
       yTrueVal[nP]=_yieldsTrueVal[isL][isU];
@@ -185,15 +174,6 @@ void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
     }//end of loop over isU
   }//end of loop over isL
 
-  std::cout<<"_histTrueVal:"<<std::endl;
-  for (int isL=1; isL<=_histTrueVal[ikin][ieta]->GetNbinsX(); isL++){ 
-    for (int isU=1; isU<=_histTrueVal[ikin][ieta]->GetNbinsY(); isU++){ 
-      std::cout<<"isL="<<isL<<", isU="<<isU;
-      std::cout<<std::setprecision(0)<<", ="<< _histTrueVal[ikin][ieta]->GetBinContent(isL,isU)<<"+-";
-      std::cout<< _histTrueVal[ikin][ieta]->GetBinError(isL,isU)<<std::endl;
-    }//end of loop over isU
-  }//end of loop over isL
-
   _grTrueVal[ikin][ieta]=new TGraph2D(nP,sbL,sbU,yTrueVal);
   _grTrueVal[ikin][ieta]->GetXaxis()->SetTitle("lower sb cut");
   _grTrueVal[ikin][ieta]->GetYaxis()->SetTitle("upper sb cut");
@@ -201,13 +181,13 @@ void TTemplatesRandConeSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
 
 }// end of PrepareGraphsKinEtaBin(int ikin, int ieta)
 
-void TTemplatesRandConeSyst::CheckMinAndMax(float val, float err, float& min, float& max)
+void TTemplatesSyst::CheckMinAndMax(float val, float err, float& min, float& max)
 {
   if (val+err>max) max=val+err;
   if (val-err<min) min=val-err;
 }// end of CheckMinAndMax(float val, float err, float& min, float& max)
 
-void TTemplatesRandConeSyst::PrintOutKinEtaBin(int ikin, int ieta)
+void TTemplatesSyst::PrintOutKinEtaBin(int ikin, int ieta)
 {
 
     std::cout<<std::endl;
@@ -230,7 +210,7 @@ void TTemplatesRandConeSyst::PrintOutKinEtaBin(int ikin, int ieta)
 
 
 
-void TTemplatesRandConeSyst::SetPlottingStyles(TGraphErrors* gr, TLine* line)
+void TTemplatesSyst::SetPlottingStyles(TGraphErrors* gr, TLine* line)
 {
    gr->SetMarkerColor(1);
    gr->SetLineColor(1);

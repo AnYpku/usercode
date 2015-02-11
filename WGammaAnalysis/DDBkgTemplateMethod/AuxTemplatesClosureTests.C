@@ -1,5 +1,5 @@
-#include "TTemplatesRandCone.h"
-#include "TTemplatesRandConeSyst.h"
+#include "TTemplates.h"
+#include "TTemplatesSyst.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
 //this package
@@ -13,46 +13,46 @@
 #include "TCut.h"
 //ROOT
 
-void SetParsRegularCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+void SetParsRegularCasesClosure(TTemplates::TemplatesPars &pars, int channel, 
 	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims);
 
-void SetParsSpecialCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma);
+void SetParsSpecialCasesClosure(TTemplates::TemplatesPars &pars, int vgamma);
 
-void AuxTemplatesRandConeClosure(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplatesClosure(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
 {
   //this function is called in FullChain
 
-  TTemplatesRandCone::TemplatesRandConePars pars;
+  TTemplates::TemplatesPars pars;
 
   SetParsRegularCasesClosure(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
   SetParsSpecialCasesClosure(pars, vgamma);
 
-  TTemplatesRandCone temp(pars);
+  TTemplates temp(pars);
   temp.ComputeBackground();
 }
 
-void AuxTemplatesRandConeClosureSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplatesClosureSystSidebandVariation(int channel, int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
 {
   //this function is called in FullChain
 
-  TTemplatesRandCone::TemplatesRandConePars pars;
+  TTemplates::TemplatesPars pars;
 
   SetParsRegularCasesClosure(pars, channel, vgamma, blind, phoWP, varKin, nKinBins, kinBinLims);
   SetParsSpecialCasesClosure(pars, vgamma);
 
-  TTemplatesRandConeSyst temp(pars);
+  TTemplatesSyst temp(pars);
   temp.SidebandVariation();
 }
 
-void SetParsRegularCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int channel, 
+void SetParsRegularCasesClosure(TTemplates::TemplatesPars &pars, int channel, 
 	int vgamma, int blind, int phoWP, TString varKin, int nKinBins, float* kinBinLims)
 {
   TConfiguration config;
   TPhotonCuts photon;
   pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
-  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
-  if (nKinBins>TTemplatesRandCone::nKinBinsMax){
-    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplates.h)
+  if (nKinBins>TTemplates::nKinBinsMax){
+    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplates::nKinBinsMax<<std::endl;
     return;
   }
   for (int ikb=0; ikb<=nKinBins; ikb++){
@@ -149,7 +149,7 @@ void SetParsRegularCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars,
   pars.noLeakSubtr=1;
 }
 
-void SetParsSpecialCasesClosure(TTemplatesRandCone::TemplatesRandConePars &pars, int vgamma)
+void SetParsSpecialCasesClosure(TTemplates::TemplatesPars &pars, int vgamma)
 {
   TConfiguration config;
 

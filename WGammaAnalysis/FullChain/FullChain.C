@@ -5,8 +5,8 @@
 #include "../Configuration/TAllInputSamples.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Selection/Selection.h"
-#include "../DDBkgTemplateMethod/TTemplatesRandCone.h"
-#include "../DDBkgTemplateMethod/AuxTemplatesRandCone.C"
+#include "../DDBkgTemplateMethod/TTemplates.h"
+#include "../DDBkgTemplateMethod/AuxTemplates.C"
 #include "../PrepareYields/TPrepareYields.h"
 #include "../PrepareYields/AuxPrepareYields.C"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
@@ -282,7 +282,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         anPars.templFits=itp;
-        AuxTemplatesRandCone(anPars);
+        AuxTemplates(anPars);
         std::cout<<"%_%  DONE "<<strAffix<<std::endl;
         std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
       }//end of loop over itp
@@ -299,7 +299,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         anPars.templFits=itp;
-        AuxTemplatesRandConeSystSidebandVariation(anPars); 
+        AuxTemplatesSystSidebandVariation(anPars); 
        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
       }//end of loop over itp

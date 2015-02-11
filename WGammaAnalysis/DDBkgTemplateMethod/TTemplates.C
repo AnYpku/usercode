@@ -1,4 +1,4 @@
-#include "TTemplatesRandCone.h"
+#include "TTemplates.h"
   //this class
 //#include "../Include/TPhotonCuts.h"
 //#include "../Include/TMathTools.h"
@@ -32,22 +32,22 @@
 
 using namespace RooFit ;
 
-TTemplatesRandCone::TTemplatesRandCone()
+TTemplates::TTemplates()
 {
 }
 
-TTemplatesRandCone::TTemplatesRandCone(TemplatesRandConePars pars)
+TTemplates::TTemplates(TemplatesPars pars)
 {
   SetPars(pars);
   _fOutTemp = new TFile("fOutTemp.root","recreate");
 }
 
-TTemplatesRandCone::~TTemplatesRandCone()
+TTemplates::~TTemplates()
 {
   //if (_pars.fOutForSave->IsOpen()) _pars.fOutForSave->Close();
 }
 
-void TTemplatesRandCone::SetPars(TemplatesRandConePars pars)
+void TTemplates::SetPars(TemplatesPars pars)
 {
   _pars=pars;
   _pars.cutWeight=_pars.varWeight;
@@ -55,7 +55,7 @@ void TTemplatesRandCone::SetPars(TemplatesRandConePars pars)
   _pars.fOutForSave = new TFile(_pars.strFileOutName,"recreate");
 }
 
-void TTemplatesRandCone::ComputeBackground(bool noPrint, bool noPlot)
+void TTemplates::ComputeBackground(bool noPrint, bool noPlot)
 {
   if (!noPrint) PrintPars();
   for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
@@ -68,10 +68,10 @@ void TTemplatesRandCone::ComputeBackground(bool noPrint, bool noPlot)
   SaveYields();
 }
 
-void TTemplatesRandCone::PrintPars()
+void TTemplates::PrintPars()
 {
   std::cout<<"==============================="<<std::endl;
-  std::cout<<"||||========== TemplatesRandcone parameters"<<std::endl;
+  std::cout<<"||||========== Templates parameters"<<std::endl;
   std::cout<<"varKin: "<<_pars.varKin<<std::endl;
   std::cout<<"varTrueTempl: "<<_pars.varTrueTempl<<std::endl;
   std::cout<<"varFakeTempl: "<<_pars.varFakeTempl<<std::endl;
@@ -109,11 +109,11 @@ void TTemplatesRandCone::PrintPars()
     std::cout<<"strFakeYieldsTot="<<_pars.strFakeYieldsTot[ieta]<<std::endl;
     std::cout<<"strFakeYields1D="<<_pars.strFakeYields1D[ieta]<<std::endl;
   }//end of loop over ieta
-  std::cout<<"|||| end of TemplatesRandcone parameters"<<std::endl;
+  std::cout<<"|||| end of Templates parameters"<<std::endl;
   std::cout<<"==============================="<<std::endl;
-}// end of TTemplatesRandCone::PrintPars()
+}// end of TTemplates::PrintPars()
 
-bool TTemplatesRandCone::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
+bool TTemplates::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
 {
   // if ieta == _COMMON - compute BARREL, ENDCAP and SUM
   // otherwise compute just for ieta
@@ -143,7 +143,7 @@ bool TTemplatesRandCone::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
   return 1;
 }// end of ComputeBackgroundOne
 
-bool TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
+bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
 
   if (!noPrint){
     std::cout<<std::endl;
@@ -184,7 +184,7 @@ bool TTemplatesRandCone::SetHists(int ikin, int ieta, bool noPrint){
   return 1;
 }//end of SetHists()
 
-void TTemplatesRandCone::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint, TH1D* hLeak)
+void TTemplates::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint, TH1D* hLeak)
 {
   TString name=hTemplate->GetName();
 
@@ -232,7 +232,7 @@ void TTemplatesRandCone::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut
   }
 }
 
-void TTemplatesRandCone::SetFakeTemplate(int ikin, int ieta, bool noPrint)
+void TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
 {
   if (!noPrint){ 
     std::cout<<std::endl;
@@ -256,7 +256,7 @@ void TTemplatesRandCone::SetFakeTemplate(int ikin, int ieta, bool noPrint)
   // "0" for fake gamma template
 }// end of SetFakeTemplate
 
-void TTemplatesRandCone::SetTrueTemplate(int ikin, int ieta, bool noPrint)
+void TTemplates::SetTrueTemplate(int ikin, int ieta, bool noPrint)
 {
   if (!noPrint){ 
     std::cout<<std::endl;
@@ -284,7 +284,7 @@ void TTemplatesRandCone::SetTrueTemplate(int ikin, int ieta, bool noPrint)
   // "1" for true gamma template
 }//end of SetTrueTemplate
 
-void TTemplatesRandCone::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
+void TTemplates::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
   if (!noPrint){ 
     std::cout<<std::endl;
     std::cout<<"Will SetDataAndSignHists:"<<std::endl;
@@ -347,7 +347,7 @@ void TTemplatesRandCone::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
 
 }//end of SetDataAndSignHists
 
-bool TTemplatesRandCone::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPrint){
+bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPrint){
   if (!noPrint){ 
     std::cout<<std::endl;
     std::cout<<"Will CheckTemplates:"<<std::endl;
@@ -372,7 +372,7 @@ bool TTemplatesRandCone::CheckTemplates(int ikin, int ieta, bool badBins[150], b
   return hasBadBin;
 }//end of CheckTemplates
 
-bool TTemplatesRandCone::RebinTemplates(int ikin, int ieta, bool badBins[150], bool noPrint){
+bool TTemplates::RebinTemplates(int ikin, int ieta, bool badBins[150], bool noPrint){
   if (!noPrint){ 
     std::cout<<std::endl;
     std::cout<<"Will RebinTemplates:"<<std::endl;
@@ -421,7 +421,7 @@ bool TTemplatesRandCone::RebinTemplates(int ikin, int ieta, bool badBins[150], b
   return rebinningFound;
 }//end of RebinTemplates
 
-void TTemplatesRandCone::NewHistograms(int ikin, int ieta, bool noPrint){
+void TTemplates::NewHistograms(int ikin, int ieta, bool noPrint){
 
   if (!noPrint){ 
     std::cout<<std::endl;
@@ -483,7 +483,7 @@ void TTemplatesRandCone::NewHistograms(int ikin, int ieta, bool noPrint){
   _hFakeMCtruth[ikin][ieta]->Sumw2();
 }// end of NewHistograms
 
-void TTemplatesRandCone::DeleteHistograms(int ikin, int ieta){
+void TTemplates::DeleteHistograms(int ikin, int ieta){
 
     std::cout<<std::endl;
     std::cout<<"Will do DeleteHistograms:"<<std::endl;
@@ -497,7 +497,7 @@ void TTemplatesRandCone::DeleteHistograms(int ikin, int ieta){
   delete  _hFakeMCtruth[ikin][ieta];
 }// end of DeleteHistograms
 
-void TTemplatesRandCone::RandomizeTemplates(int ikin, int ieta)
+void TTemplates::RandomizeTemplates(int ikin, int ieta)
 {
   for (int ib=1; ib<_hTrueReference[ikin][ieta]->GetNbinsX(); ib++){
     float mean = _hTrueReference[ikin][ieta]->GetBinContent(ib);
@@ -513,14 +513,14 @@ void TTemplatesRandCone::RandomizeTemplates(int ikin, int ieta)
   }
 }
 
-TString TTemplatesRandCone::StrLabelEta(int ieta){
+TString TTemplates::StrLabelEta(int ieta){
   if (ieta==_BARREL) return "_Barrel_";
   else if (ieta==_ENDCAP) return "_Endcap_";
   else if (ieta==_COMMON) return "_EtaCommon_";
   return "_EtaUnknown_";
 }
 
-TString TTemplatesRandCone::StrLabelKin(int ikin){
+TString TTemplates::StrLabelKin(int ikin){
   if (ikin<0 || ikin>_pars.nKinBins) return TString("_")+_pars.varKin+TString("Unknown_");
   if (ikin==0) return TString("_")+_pars.varKin+TString("Total_");
   TString str="_";
@@ -532,7 +532,7 @@ TString TTemplatesRandCone::StrLabelKin(int ikin){
   return str;
 }
 
-void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
+void TTemplates::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
 {
   if (!noPrint){
     std::cout<<std::endl;
@@ -674,7 +674,7 @@ void TTemplatesRandCone::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
 
 }// end of FitOne
 
-void TTemplatesRandCone::ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint)
+void TTemplates::ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint)
 {
 
     ComputeOneYield(ikin, ieta, noPrint, 1, _hTrue[ikin],
@@ -694,7 +694,7 @@ void TTemplatesRandCone::ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint)
   }//end of if (!noPrint)
 }
 
-void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma,TH1D* hist[2],
+void TTemplates::ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma,TH1D* hist[2],
 	double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr)
 {
   float eff[2];
@@ -731,7 +731,7 @@ void TTemplatesRandCone::ComputeOneYield(int ikin, int ieta, bool noPrint, bool 
 }
 
 
-float TTemplatesRandCone::EffFromTree(int ikin, int ieta, bool noPrint, bool isTrueGamma)
+float TTemplates::EffFromTree(int ikin, int ieta, bool noPrint, bool isTrueGamma)
 {
 //  int nPassed;
 //  int nPassedFitVar;
@@ -799,7 +799,7 @@ float TTemplatesRandCone::EffFromTree(int ikin, int ieta, bool noPrint, bool isT
   return eff;
 }// end of EffFromTree
 
-float TTemplatesRandCone::EffFromSum(int ikin, int ieta, bool noPrint, TH1D* hist)
+float TTemplates::EffFromSum(int ikin, int ieta, bool noPrint, TH1D* hist)
 {
   float lim=0;
   if (ieta==_BARREL) lim=0.011;
@@ -819,7 +819,7 @@ float TTemplatesRandCone::EffFromSum(int ikin, int ieta, bool noPrint, TH1D* his
   return 1.0*histCut/histInt;
 }// end of ComputeOneYieldWithSum
 
-void TTemplatesRandCone::PrintYieldsAndChi2()
+void TTemplates::PrintYieldsAndChi2()
 {
 
   std::cout<<"Histograms:"<<std::endl;
@@ -882,7 +882,7 @@ void TTemplatesRandCone::PrintYieldsAndChi2()
 
 }
 
-void TTemplatesRandCone::PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]){
+void TTemplates::PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]){
   std::cout<<"TH1D* hists "<<hist[0][0]->GetTitle()<<": "<<std::endl;
   std::cout<<std::setprecision(0)<<std::fixed;
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
@@ -891,7 +891,7 @@ void TTemplatesRandCone::PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]){
   }
 }
 
-void TTemplatesRandCone::PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta){
+void TTemplates::PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta){
   std::cout<<hist[ikin][ieta]->GetTitle()<<": ";
 //  std::cout<<StrLabelEta(ieta)<<StrLabelKin(ikin)<<": ";
   float sum=0;
@@ -903,7 +903,7 @@ void TTemplatesRandCone::PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], i
   std::cout<<"sum="<<sum<<std::endl;
 }
 
-void TTemplatesRandCone::PlotTemplates()
+void TTemplates::PlotTemplates()
 {
 
   for (int ikin=0; ikin<_pars.nKinBins+1; ikin++){
@@ -915,7 +915,7 @@ void TTemplatesRandCone::PlotTemplates()
 }
 
 
-void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
+void TTemplates::PlotOneTemplate(int ikin, int ieta)
 {
 
  _fOutTemp->cd();
@@ -1081,7 +1081,7 @@ void TTemplatesRandCone::PlotOneTemplate(int ikin, int ieta)
 //  _plotter[ikin][ieta]->Draw();
 }// end of plotOneTemplate
 
-TCut TTemplatesRandCone::SidebandCut(int ikin, int ieta)
+TCut TTemplates::SidebandCut(int ikin, int ieta)
 {
   float lim=_pars.sideband[ikin][ieta]; 
   float limUp=_pars.sidebandUp[ikin][ieta]; 
@@ -1098,12 +1098,12 @@ TCut TTemplatesRandCone::SidebandCut(int ikin, int ieta)
   return ( cut ); 
 }
 
-TCut TTemplatesRandCone::SidebandVarNominalCut(int ieta1)
+TCut TTemplates::SidebandVarNominalCut(int ieta1)
 {
   return _pars.cutSidebandVarNominalRange[ieta1];
 }
 
-TCut TTemplatesRandCone::FitVarFitRangeCut(int ikin, int ieta)
+TCut TTemplates::FitVarFitRangeCut(int ikin, int ieta)
 {
   float lim=_pars.maxVarFit[ikin][ieta]; 
   TString strCut=_pars.varFit;
@@ -1115,7 +1115,7 @@ TCut TTemplatesRandCone::FitVarFitRangeCut(int ikin, int ieta)
   return ( cut );
 }
 
-void TTemplatesRandCone::SaveYields()
+void TTemplates::SaveYields()
 {
   _pars.fOutForSave->cd();
 
@@ -1161,7 +1161,7 @@ void TTemplatesRandCone::SaveYields()
   if (_pars.fOutForSave->IsOpen()) _pars.fOutForSave->Close();
 }
 
-TCut TTemplatesRandCone::CutKinBin(int ikin){
+TCut TTemplates::CutKinBin(int ikin){
 
   if (ikin<0 || ikin>_pars.nKinBins){
     TCut cut("0");
@@ -1190,7 +1190,7 @@ TCut TTemplatesRandCone::CutKinBin(int ikin){
   return cut;
 }
 
-TCut TTemplatesRandCone::CutEtaBin(int ieta){
+TCut TTemplates::CutEtaBin(int ieta){
   if (ieta==_BARREL)      return _pars.cutBarrel;
   else if (ieta==_ENDCAP) return _pars.cutEndcap;
   else if (ieta==_COMMON) return (_pars.cutBarrel || _pars.cutEndcap);

@@ -59,7 +59,7 @@ The FullChain runs the analysis in the following order:
 2.1) with class Selection (in Selection directory)
      Preliminary Selection (can be skipped with anPars.noPreSelection=1)
      Extra Selection (can be skipped with anPars.noExtraSelection)
-2.2) with class TTemplatesRandCone (in DDBkgTemplateMethod directory)
+2.2) with class TTemplates (in DDBkgTemplateMethod directory)
      Data Driven Background Estimation (jets to gamma only) (can be skipped with anPars.noDDBkgComputation)
 2.3) with class PrepareYields
      Prepare Yields (anPars.noPrepareYields)
@@ -89,9 +89,9 @@ right now only muon channel is being actively worked on in this framework
 
 ##############################
 2.2) DDBkgTemplateMethod
-- class TTemplatesRandCone estimates background using data driven template method
+- class TTemplates estimates background using data driven template method
 - is capable to to estimate background not only for analysis binning but for any binning (phoSCEta, WMt etc). However it only can be used for DDBkgEstimation and PrepareYields) 
-  the class is developed to be independent from the rest of the framework and is initiated from FullChain with AuxTemplatesRandCone.C
+  the class is developed to be independent from the rest of the framework and is initiated from FullChain with AuxTemplates.C
 
 ##############################
 2.3) PrepareYields

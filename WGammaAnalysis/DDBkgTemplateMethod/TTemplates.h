@@ -1,5 +1,5 @@
-#ifndef TTemplatesRandCone_h
-#define TTemplatesRandCone_h
+#ifndef TTemplates_h
+#define TTemplates_h
 
 #include "TFile.h"
 #include "TTree.h"
@@ -16,11 +16,11 @@
 //#include "../Configuration/TAllInputSamples.h"
 //#include "../Include/TPhotonCuts.h"
 
-class TTemplatesRandCone
+class TTemplates
 {
   public:
     const static int nKinBinsMax=50;
-    struct TemplatesRandConePars{
+    struct TemplatesPars{
       TString varKin;
       TString varTrueTempl;
       TString varFakeTempl;
@@ -68,10 +68,10 @@ class TTemplatesRandCone
       TString strFakeYields1D[3];
       TString strPlotsDir;
       TString strPlotsBaseName;
-    };//end of struct TemplatesRandConePars
-    TTemplatesRandCone();
-    TTemplatesRandCone(TemplatesRandConePars pars);
-    virtual ~TTemplatesRandCone();
+    };//end of struct TemplatesPars
+    TTemplates();
+    TTemplates(TemplatesPars pars);
+    virtual ~TTemplates();
 
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
@@ -83,11 +83,11 @@ class TTemplatesRandCone
     // should properly match the enum in TConfiguration.h
     //added here to make class independent on TConfiguration  
 
-    TemplatesRandConePars _pars;  
+    TemplatesPars _pars;  
     
     TFile* _fOutTemp;
 
-    void SetPars(TemplatesRandConePars pars);
+    void SetPars(TemplatesPars pars);
     bool ComputeBackgroundOne(int ikin, int ieta, bool noPrint=0);
 
     double _nFakeYieldsVal[nKinBinsMax][3];
@@ -163,4 +163,4 @@ class TTemplatesRandCone
 };
 
 
-#endif //TTemplatesRandCone_h
+#endif //TTemplates_h

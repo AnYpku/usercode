@@ -1,5 +1,5 @@
-#include "TTemplatesRandCone.h"
-#include "TTemplatesRandConeSyst.h"
+#include "TTemplates.h"
+#include "TTemplatesSyst.h"
 //this package
 
 #include <iostream>
@@ -11,33 +11,33 @@
 #include "TCut.h"
 //ROOT
 
-void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, TString varKin, int nKinBins, float* kinBinLims);
+void SetParsRegularCases(TTemplates::TemplatesPars &pars, TString varKin, int nKinBins, float* kinBinLims);
 
-void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars);
+void SetParsSpecialCases(TTemplates::TemplatesPars &pars);
 
-void AuxTemplatesRandCone(TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplates(TString varKin, int nKinBins, float* kinBinLims)
 {
   //this function is called in FullChain
 
-  TTemplatesRandCone::TemplatesRandConePars pars;
+  TTemplates::TemplatesPars pars;
 
   SetParsRegularCases(pars, varKin, nKinBins, kinBinLims);
   SetParsSpecialCases(pars);
 
-  TTemplatesRandCone temp(pars);
+  TTemplates temp(pars);
   temp.ComputeBackground();
 }
 
-void AuxTemplatesRandConeSystSidebandVariation(TString varKin, int nKinBins, float* kinBinLims)
+void AuxTemplatesSystSidebandVariation(TString varKin, int nKinBins, float* kinBinLims)
 {
   //this function is called in FullChain
 
-  TTemplatesRandCone::TemplatesRandConePars pars;
+  TTemplates::TemplatesPars pars;
 
   SetParsRegularCases(pars, varKin, nKinBins, kinBinLims);
   SetParsSpecialCases(pars);
 
-  TTemplatesRandConeSyst temp(pars);
+  TTemplatesSyst temp(pars);
   temp.SidebandVariation();
 }
 
@@ -45,19 +45,19 @@ TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
 {
   f = new TFile(strFileName);
   if (!f->IsOpen()){
-    std::cout<<"ERROR in AuxTemplatesRandCone, SetParsRegularCases: file with "<<strFileWithWhat<<": "<<strFileName<<" can't be open"<<std::endl;
+    std::cout<<"ERROR in AuxTemplates, SetParsRegularCases: file with "<<strFileWithWhat<<": "<<strFileName<<" can't be open"<<std::endl;
     return 0;
   }
   else std::cout<<"file with "<<strFileWithWhat<<": "<<strFileName<<std::endl;
   return (TTree*)f->Get("selectedEvents");
 }
 
-void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, TString varKin, int nKinBins, float* kinBinLims)
+void SetParsRegularCases(TTemplates::TemplatesPars &pars, TString varKin, int nKinBins, float* kinBinLims)
 {
   pars.varKin=varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
-  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
-  if (nKinBins>TTemplatesRandCone::nKinBinsMax){
-    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+  pars.nKinBins=nKinBins;// number of analysis bins, max=50 (determined in TTemplates.h)
+  if (nKinBins>TTemplates::nKinBinsMax){
+    std::cout<<"nKinsBins="<<nKinBins<<", shouldn't exceed "<<TTemplates::nKinBinsMax<<std::endl;
     return;
   }
   for (int ikb=0; ikb<=nKinBins; ikb++){
@@ -132,7 +132,7 @@ void SetParsRegularCases(TTemplatesRandCone::TemplatesRandConePars &pars, TStrin
   pars.noLeakSubtr=0;
 }
 
-void SetParsSpecialCases(TTemplatesRandCone::TemplatesRandConePars &pars)
+void SetParsSpecialCases(TTemplates::TemplatesPars &pars)
 {
   for (int ikin=0; ikin<=pars.nKinBins; ikin++){
     if (ikin==0) continue;//0 is for Total yield

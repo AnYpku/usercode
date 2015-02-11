@@ -1,5 +1,5 @@
-#include "TTemplatesRandCone.h"
-#include "TTemplatesRandConeSyst.h"
+#include "TTemplates.h"
+#include "TTemplatesSyst.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
 //this package
@@ -13,22 +13,22 @@
 #include "TCut.h"
 //ROOT
 
-void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars);
+void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars);
 
-void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars);
+void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars);
 
-void SetLimsChIsoTempl_phoEt_Wg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
-void SetLimsChIsoTempl_phoEt_Zg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
-void SetLimsSihihTempl_phoEt_Wg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
-void SetLimsSihihTempl_phoEt_Zg_MUON(TTemplatesRandCone::TemplatesRandConePars &pars);
+void SetLimsChIsoTempl_phoEt_Wg_MUON(TTemplates::TemplatesPars &pars);
+void SetLimsChIsoTempl_phoEt_Zg_MUON(TTemplates::TemplatesPars &pars);
+void SetLimsSihihTempl_phoEt_Wg_MUON(TTemplates::TemplatesPars &pars);
+void SetLimsSihihTempl_phoEt_Zg_MUON(TTemplates::TemplatesPars &pars);
 
-void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplatesRandCone::TemplatesRandConePars &pars);
+void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars);
 
-void AuxTemplatesRandCone(TConfiguration::AnalysisParameters &anPars)
+void AuxTemplates(TConfiguration::AnalysisParameters &anPars)
 {
   //this function is called in FullChain
 
-  TTemplatesRandCone::TemplatesRandConePars pars;
+  TTemplates::TemplatesPars pars;
 
 
   if (anPars.templFits==TConfiguration::TEMPL_SIHIH) 
@@ -38,16 +38,16 @@ void AuxTemplatesRandCone(TConfiguration::AnalysisParameters &anPars)
     SetParsChIsoTempl(pars, anPars);
 
 
-  TTemplatesRandCone temp(pars);
+  TTemplates temp(pars);
   temp.ComputeBackground();
 }
 
-void AuxTemplatesRandConeSystSidebandVariation(TConfiguration::AnalysisParameters &anPars)
+void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPars)
 {
   //this function is called in FullChain
   TConfiguration conf;
-  TTemplatesRandCone::TemplatesRandConePars pars;
-  TTemplatesRandConeSyst::TemplatesSidebandVariationPars variationPars;
+  TTemplates::TemplatesPars pars;
+  TTemplatesSyst::TemplatesSidebandVariationPars variationPars;
 
   if (anPars.templFits==TConfiguration::TEMPL_SIHIH) {
 
@@ -83,7 +83,7 @@ void AuxTemplatesRandConeSystSidebandVariation(TConfiguration::AnalysisParameter
   }
 
 
-  TTemplatesRandConeSyst temp(pars,variationPars);
+  TTemplatesSyst temp(pars,variationPars);
   temp.SidebandVariation();
 }
 
@@ -91,22 +91,22 @@ TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
 {
   f = new TFile(strFileName);
   if (!f->IsOpen()){
-    std::cout<<"ERROR in AuxTemplatesRandCone, SetParsRegularCases: file with "<<strFileWithWhat<<": "<<strFileName<<" can't be open"<<std::endl;
+    std::cout<<"ERROR in AuxTemplates, SetParsRegularCases: file with "<<strFileWithWhat<<": "<<strFileName<<" can't be open"<<std::endl;
     return 0;
   }
   else std::cout<<"file with "<<strFileWithWhat<<": "<<strFileName<<std::endl;
   return (TTree*)f->Get("selectedEvents");
 }
 
-void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars)
+void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars)
 {
 
   TConfiguration config;
   TPhotonCuts photon;
   pars.varKin=anPars.varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
-  pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
-  if (anPars.nKinBins>TTemplatesRandCone::nKinBinsMax){
-    std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+  pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplates.h)
+  if (anPars.nKinBins>TTemplates::nKinBinsMax){
+    std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplates::nKinBinsMax<<std::endl;
     return;
   }
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
@@ -213,15 +213,15 @@ void SetParsChIsoTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfigu
 
 
 
-void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, TConfiguration::AnalysisParameters &anPars)
+void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars)
 {
 
   TConfiguration config;
   TPhotonCuts photon;
   pars.varKin=anPars.varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
-  pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplatesRandCone.h)
-  if (anPars.nKinBins>TTemplatesRandCone::nKinBinsMax){
-    std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplatesRandCone::nKinBinsMax<<std::endl;
+  pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplates.h)
+  if (anPars.nKinBins>TTemplates::nKinBinsMax){
+    std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplates::nKinBinsMax<<std::endl;
     return;
   }
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
@@ -322,7 +322,7 @@ void SetParsSigmaIEtaIEtaTempl(TTemplatesRandCone::TemplatesRandConePars &pars, 
 
 }
 
-void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplatesRandCone::TemplatesRandConePars &pars)
+void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars)
 {
   TConfiguration config;
   for (int ik=0; ik<=pars.nKinBins; ik++){
@@ -337,7 +337,7 @@ void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplatesRandCone::Templ
   }
 }// end of SetValuesToKinEtaArray
 
-void SetLimsSihihTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+void SetLimsSihihTempl_phoEt_Wg_MUON( TTemplates::TemplatesPars &pars)
 {
     TConfiguration config;
     // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp, combTrue, combFake
@@ -375,7 +375,7 @@ void SetLimsSihihTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars 
     SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
 }//end  of SetLimsSihihTempl_phoEt_Wg_MUON
 
-void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplates::TemplatesPars &pars)
 {
     TConfiguration config;
     // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
@@ -413,7 +413,7 @@ void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars 
 }//end  of SetLimsSihihTempl_phoEt_Zg_MUON
 
 
-void SetLimsChIsoTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+void SetLimsChIsoTempl_phoEt_Wg_MUON( TTemplates::TemplatesPars &pars)
 {
     TConfiguration config;
     // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
@@ -451,7 +451,7 @@ void SetLimsChIsoTempl_phoEt_Wg_MUON( TTemplatesRandCone::TemplatesRandConePars 
                  
 }//end  of SetLimsChIsoTempl_phoEt_Wg_MUON
 
-void SetLimsChIsoTempl_phoEt_Zg_MUON( TTemplatesRandCone::TemplatesRandConePars &pars)
+void SetLimsChIsoTempl_phoEt_Zg_MUON( TTemplates::TemplatesPars &pars)
 {
     TConfiguration config;
     // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake

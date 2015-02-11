@@ -36,8 +36,8 @@
           anPars.channel=ch;//MUON, ELECTRON
           anPars.vgamma=vg;//W_GAMMA, Z_GAMMA
           anPars.templFits=tm;
-          AuxTemplatesRandConeSystSidebandVariation(anPars);
-          //AuxTemplatesRandCone(anPars);
+          AuxTemplatesSystSidebandVariation(anPars);
+          //AuxTemplates(anPars);
 	  //  AuxSubtractBackground(anPars);
         }//end of if (!noClosure[ch][vg][tm])
       }// end of loop over tm
