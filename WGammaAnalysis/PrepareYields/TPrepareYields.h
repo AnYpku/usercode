@@ -73,6 +73,8 @@ class TPrepareYields
     TString StrLabelEta(int ieta);
     TCut CutEta(int ieta);
 
+    void PrepareMCtruth(int ieta, int bkgType);
+
     void CompareTotalDATAvsMC(int ieta);
     void CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
     const static int _nHistsMax=50;

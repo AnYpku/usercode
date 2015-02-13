@@ -54,10 +54,10 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
     SetParsSigmaIEtaIEtaTempl(pars, anPars);
     
     for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
-      variationPars.nPointsLower[ieta]=6;//30;
+      variationPars.nPointsLower[ieta]=2+1;//6;//30;
       variationPars.lowerSidebandCutFrom[ieta]=0.1;
       variationPars.lowerSidebandCutTo[ieta]=3.1;
-      variationPars.nPointsUpper[ieta]=14;//30; 
+      variationPars.nPointsUpper[ieta]=2+1;//14;//30; 
       variationPars.upperSidebandCutFrom[ieta]=1.1;
       variationPars.upperSidebandCutTo[ieta]=15.1;
     }            
@@ -67,17 +67,17 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
 
     SetParsChIsoTempl(pars, anPars);
 
-    variationPars.nPointsLower[conf.BARREL]=10;//10;//16;
+    variationPars.nPointsLower[conf.BARREL]=2+1;//10;//10;//16;
     variationPars.lowerSidebandCutFrom[conf.BARREL]=0.005;
     variationPars.lowerSidebandCutTo[conf.BARREL]=0.015;
-    variationPars.nPointsUpper[conf.BARREL]=10;//10;//16;
-    variationPars.upperSidebandCutFrom[conf.BARREL]=0.011;
+    variationPars.nPointsUpper[conf.BARREL]=2+1;//10;//10;//16;
+    variationPars.upperSidebandCutFrom[conf.BARREL]=0.012;
     variationPars.upperSidebandCutTo[conf.BARREL]=0.021;
 
-    variationPars.nPointsLower[conf.ENDCAP]=12;//12;//16;
+    variationPars.nPointsLower[conf.ENDCAP]=2+1;//12;//12;//16;
     variationPars.lowerSidebandCutFrom[conf.ENDCAP]=0.019;
-    variationPars.lowerSidebandCutTo[conf.ENDCAP]=0.043;
-    variationPars.nPointsUpper[conf.ENDCAP]=15;//15;//16;
+    variationPars.lowerSidebandCutTo[conf.ENDCAP]=0.049;
+    variationPars.nPointsUpper[conf.ENDCAP]=2+1;//15;//15;//16;
     variationPars.upperSidebandCutFrom[conf.ENDCAP]=0.027;
     variationPars.upperSidebandCutTo[conf.ENDCAP]=0.067;
   }

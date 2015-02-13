@@ -8,9 +8,11 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
 
 void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars)
 {
-
+  TConfiguration conf;
   TPrepareYields prep;
   TPrepareYields::PrepareYieldsPars pars;
+
+  pars.strFileOut=conf.GetYieldsMCtruthFileName(anPars.channel, anPars.vgamma, anPars.varKin);
 
   AuxPrepareYieldsCommon(prep, pars, anPars);
 
@@ -44,8 +46,11 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
 
 void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars)
 {
+  TConfiguration conf;
   TSubtractBackground prep;
   TPrepareYields::PrepareYieldsPars pars;
+
+  pars.strFileOut=conf.GetYieldsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin);
 
   AuxPrepareYieldsCommon(prep, pars, anPars);
 
@@ -84,7 +89,6 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   }
   pars.varKinLabel=anPars.varKin;
   if (anPars.varKin=="phoEt") pars.varKinLabel="Pt_#gamma";
-  pars.strFileOut="fOut.root";
 
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
   pars.strPlotsBaseName=TString("c_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");

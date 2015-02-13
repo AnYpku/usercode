@@ -87,6 +87,7 @@ class TConfiguration
     TString GetSpecialModeName(bool isDebugMode, bool isNoPuReweight);
 
     TString GetYieldsFileName(int channel, int vgamma, int templ, TString strKin);
+    TString GetYieldsMCtruthFileName(int channel, int vgamma, TString strKin);
     TString GetYieldsSelectedName(int csMode, int etaBin, int sample, TString sourceName="");
     TString GetYieldsSelectedSignalMCGenName(int csMode, int etaBin);
     TString GetYieldsDDTemplateFakeName(int csMode, int etaBin);
@@ -135,12 +136,10 @@ class TConfiguration
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.};
 //static const int _nPhoPtBins = 5;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
-static const int _nPhoPtBins = 8;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,500.};
+static const int _nPhoPtBins = 2;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
 //static const int _nPhoPtBins = 8;
-//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.,55.,75.,95.};
-//static const int _nPhoPtBins = 5;
-//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
+//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,500.};
 static const float _phoPtMin=15.;
 static const float _phoPtMax=2000.;
   //minimum value for total CS

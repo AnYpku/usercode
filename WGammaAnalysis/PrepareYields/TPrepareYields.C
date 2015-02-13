@@ -39,10 +39,8 @@ void TPrepareYields::SetPars(PrepareYieldsPars pars)
   _pyPars.cutKin=strCutKin;
   std::cout<<"_cutKin="<<_pyPars.cutKin.GetTitle()<<std::endl;
 
-
-
   _pyPars.fOut=new TFile(_pyPars.strFileOut,"recreate");
-}
+}// end of SetPars
 
 bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString label, int color, TString fileName, TString treeName)
 {
@@ -54,7 +52,7 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
   }
   bool isOk = SetOneYieldSource(sourceType, name, label, color, fileName, treeName, strYields1D, strYieldsTot);
   return isOk;
-}
+}// end of SetOneYieldSource
 
 bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString label, int color, TString fileName, TString treeName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
 {
@@ -117,6 +115,12 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
 
 void TPrepareYields::PlotPrintSave()
 {
+
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    PrepareMCtruth(ieta, BKGMC_TRUE);
+    PrepareMCtruth(ieta, BKGMC_FAKE);
+  }
+
 
   //Plot
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
@@ -343,3 +347,34 @@ void TPrepareYields::PrintYieldsOne(TString strYieldType, float totVal, float to
   }
   std::cout<<hist->GetSumOfWeights()<<std::endl;
 }
+
+void TPrepareYields::PrepareMCtruth(int ieta, int bkgType)
+{
+
+  _pyPars.fOut->cd(); 
+
+  TH1F* hSum;
+  bool hSumStarted=0;
+  TString hSumName="hSum_MCtruth_";
+  hSumName+=StrLabelEta(ieta);
+  if (bkgType==BKGMC_TRUE) hSumName+="TrueGamma";
+  if (bkgType==BKGMC_FAKE) hSumName+="FakeGamma";
+
+  for (int is=0; is<_sources.size(); is++){
+    if (bkgType==BKGMC_TRUE)
+      if (_sources[is].sourceType!=BKGMC_TRUE 
+            && _sources[is].sourceType!=SIGMC) continue;
+    if (bkgType==BKGMC_FAKE)
+      if (_sources[is].sourceType!=BKGMC_FAKE) continue;
+    if (!hSumStarted){
+      hSum=(TH1F*)_sources[is].hist[ieta]->Clone(hSumName);
+      hSumStarted=1;
+    }
+    else hSum->Add(_sources[is].hist[ieta]);
+  }//end of loop over is
+
+  hSum->SetTitle(hSumName);
+  hSum->Write(hSumName);
+
+}// end of PrepareTrueGammaMCtruth
+

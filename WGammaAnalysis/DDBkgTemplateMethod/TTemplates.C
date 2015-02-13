@@ -532,6 +532,19 @@ TString TTemplates::StrLabelKin(int ikin){
   return str;
 }
 
+TString TTemplates::StrLabelKin(int ikin, int nKinBins, float* kinBinLims, TString varKin)
+{
+  if (ikin<0 || ikin>nKinBins) return TString("_")+varKin+TString("Unknown_");
+  if (ikin==0) return TString("_")+varKin+TString("Total_");
+  TString str="_";
+  str+=varKin;
+  str+=kinBinLims[ikin-1];
+  str+="to";
+  str+=kinBinLims[ikin];
+  str+="_";
+  return str;
+}
+
 void TTemplates::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
 {
   if (!noPrint){

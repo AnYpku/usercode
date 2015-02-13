@@ -4,6 +4,7 @@
 #include "TGraphErrors.h"
 #include "TGraph2D.h"
 #include "TH2D.h"
+#include "TVectorD.h"
 #include "TString.h"
 #include "TCanvas.h"
 #include "TLine.h"
@@ -34,12 +35,12 @@ TTemplatesSyst::~TTemplatesSyst()
 void TTemplatesSyst::SidebandVariation()
 {
 
-  //  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
-  for (int ikin=1; ikin<=1; ikin++){
+  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
+  // for (int ikin=1; ikin<=1; ikin++){
     SidebandVariationOneKinBin(ikin);
   }
-  //  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
-  for (int ikin=1; ikin<=1; ikin++){
+  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
+  // for (int ikin=1; ikin<=1; ikin++){
     PlotOneKinBin(ikin);
   }
 
@@ -102,8 +103,8 @@ void TTemplatesSyst::PlotOneKinBin(int ikin)
 
 void TTemplatesSyst::VarySidebandKinEtaBin(int ikin, int ieta)
 {
-    float unitUpper=(_variationPars.upperSidebandCutTo[ieta]-_variationPars.upperSidebandCutFrom[ieta])/_variationPars.nPointsUpper[ieta];
-    float unitLower=(_variationPars.lowerSidebandCutTo[ieta]-_variationPars.lowerSidebandCutFrom[ieta])/_variationPars.nPointsLower[ieta];
+    float unitUpper=(_variationPars.upperSidebandCutTo[ieta]-_variationPars.upperSidebandCutFrom[ieta])/(_variationPars.nPointsUpper[ieta]-1);
+    float unitLower=(_variationPars.lowerSidebandCutTo[ieta]-_variationPars.lowerSidebandCutFrom[ieta])/(_variationPars.nPointsLower[ieta]-1);
 
 
     for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
@@ -154,9 +155,9 @@ void TTemplatesSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
   int nPL=_variationPars.nPointsLower[ieta];
   int nPU=_variationPars.nPointsUpper[ieta];
   int nP=0;
-  float sbL[nPL*nPU];
-  float sbU[nPL*nPU];
-  float yTrueVal[nPL*nPU];
+  double sbL[nPL*nPU];
+  double sbU[nPL*nPU];
+  double yTrueVal[nPL*nPU];
   std::cout<<std::endl;
   std::cout<<"Prepare Graphs for "<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
   for (int isL=0; isL<nPL; isL++){ 
@@ -177,6 +178,14 @@ void TTemplatesSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
   _grTrueVal[ikin][ieta]=new TGraph2D(nP,sbL,sbU,yTrueVal);
   _grTrueVal[ikin][ieta]->GetXaxis()->SetTitle("lower sb cut");
   _grTrueVal[ikin][ieta]->GetYaxis()->SetTitle("upper sb cut");
+
+  _vecSidebandLower[ikin][ieta]=new TVectorD(nP,sbL);
+  _vecSidebandUpper[ikin][ieta]=new TVectorD(nP,sbU);
+  _vecTrueVal[ikin][ieta]=new TVectorD(nP,yTrueVal);
+  _pars.fOutForSave->cd();
+  _vecSidebandLower[ikin][ieta]->Write(TString("vec_sbL")+StrLabelKin(ikin)+StrLabelEta(ieta));
+  _vecSidebandUpper[ikin][ieta]->Write(TString("vec_sbU")+StrLabelKin(ikin)+StrLabelEta(ieta));
+  _vecTrueVal[ikin][ieta]->Write(TString("vec_trueVal")+StrLabelKin(ikin)+StrLabelEta(ieta));  
 
 
 }// end of PrepareGraphsKinEtaBin(int ikin, int ieta)

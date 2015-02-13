@@ -76,6 +76,9 @@ class TTemplates
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
     void PrintPars();
+    TString StrLabelEta(int etaBin);
+    TString StrLabelKin(int ikin, int nKinBins, float* kinBinLims, TString varKin);
+
 
   protected:
 
@@ -87,6 +90,8 @@ class TTemplates
     
     TFile* _fOutTemp;
 
+    TString StrLabelKin(int kinBin);
+
     void SetPars(TemplatesPars pars);
     bool ComputeBackgroundOne(int ikin, int ieta, bool noPrint=0);
 
@@ -94,9 +99,6 @@ class TTemplates
     double _nFakeYieldsErr[nKinBinsMax][3];
     double _nTrueYieldsVal[nKinBinsMax][3];
     double _nTrueYieldsErr[nKinBinsMax][3];
-
-    TString StrLabelEta(int etaBin);
-    TString StrLabelKin(int kinBin);
 
   private:
 

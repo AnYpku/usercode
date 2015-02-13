@@ -152,6 +152,11 @@ TString TConfiguration::GetYieldsFileName(int channel, int vgamma, int templ, TS
   return GetOutputDirName(channel,vgamma)+_yieldsFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");
 }
 
+TString TConfiguration::GetYieldsMCtruthFileName(int channel, int vgamma, TString strKin)
+{
+  return GetOutputDirName(channel,vgamma)+_yieldsFileName+TString("_MCtruth_")+StrVgType(vgamma)+TString("_")+strKin+TString("_.root");
+}
+
 
 TString TConfiguration::GetYieldsSelectedName(int csMode, int etaBin,int sample, TString sourceName)
 {
