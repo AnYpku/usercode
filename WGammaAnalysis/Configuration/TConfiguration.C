@@ -40,6 +40,7 @@ TString TConfiguration::StrSample(int sample){
   if (sample==DATA) return "DATA";
   if (sample==SIGMC) return "SIGMC";
   if (sample==BKGMC) return "BKGMC";
+  if (sample==SIGMC_UNSKIMMED) return "SIGMC_UNSKIMMED";
   return "";
 }
  
@@ -85,6 +86,7 @@ TString TConfiguration::StrPlotsType(int plotsType)
   if (plotsType==PLOTS_CONSTANTS) return "Constants";
   if (plotsType==PLOTS_CROSS_SECTION) return "CrossSection";
   if (plotsType==PLOTS_QUICK_CHECKS) return "QuickChecks";
+  if (plotsType==PLOTS_TEMPL_FITS_SYST) return "TemplateFitsSyst";
   return "";
 }
 

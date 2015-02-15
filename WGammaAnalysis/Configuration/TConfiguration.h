@@ -16,7 +16,7 @@ class TConfiguration
 
     enum {MUON, ELECTRON, BOTH_CHANNELS};//channel
     enum {W_GAMMA, Z_GAMMA, V_GAMMA};//vg_type
-    enum {DATA, SIGMC, BKGMC};//sample
+    enum {DATA=0, SIGMC=1, BKGMC=2, SIGMC_UNSKIMMED=5};//sample
     enum {UNBLIND, BLIND_PRESCALE, BLIND_DECRACC};//blinding type
     enum {BARREL=0, ENDCAP=1, COMMON=2};//eta bin, must match enum in TTemplateRandCone.h
     enum {TOTAL, ONEDI, TWODI};//csMode
@@ -29,7 +29,7 @@ class TConfiguration
       // template fits: from I_ch (with random cone isolation method)
       // or with sigmaIEtaIEta
     enum {PLOTS_TEMPL_FITS, PLOTS_PREPARE_YIELDS, PLOTS_CONSTANTS, 
-          PLOTS_CROSS_SECTION, PLOTS_QUICK_CHECKS};
+          PLOTS_CROSS_SECTION, PLOTS_QUICK_CHECKS, PLOTS_TEMPL_FITS_SYST};
 
     struct AnalysisParameters{
       int year;
@@ -136,10 +136,10 @@ class TConfiguration
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.};
 //static const int _nPhoPtBins = 5;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
-static const int _nPhoPtBins = 2;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
-//static const int _nPhoPtBins = 8;
-//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,500.};
+//static const int _nPhoPtBins = 2;
+//static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
+static const int _nPhoPtBins = 8;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,500.};
 static const float _phoPtMin=15.;
 static const float _phoPtMax=2000.;
   //minimum value for total CS

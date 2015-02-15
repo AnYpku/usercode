@@ -35,11 +35,11 @@ TTemplatesSyst::~TTemplatesSyst()
 void TTemplatesSyst::SidebandVariation()
 {
 
-  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
+  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
   // for (int ikin=1; ikin<=1; ikin++){
     SidebandVariationOneKinBin(ikin);
   }
-  for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
+  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
   // for (int ikin=1; ikin<=1; ikin++){
     PlotOneKinBin(ikin);
   }
@@ -81,7 +81,7 @@ void TTemplatesSyst::PlotOneKinBin(int ikin)
   _pars.fOutForSave->cd();
   for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
 
-    TString canvName="canv_SidebandVariation_TrueVal_";
+    TString canvName=_pars.strPlotsBaseName+TString("_SbVar_True_");
     canvName+=StrLabelKin(ikin);
     canvName+=StrLabelEta(ieta);
     _grTrueVal[ikin][ieta]->SetTitle(TString("sbVar: trueVal, ")+StrLabelKin(ikin)+StrLabelEta(ieta)); 
@@ -93,9 +93,13 @@ void TTemplatesSyst::PlotOneKinBin(int ikin)
  //   c->cd(2);
  //   palette->Draw();
 
-
-    canvName+=".png";
-    c->SaveAs(canvName);
+    TString saveName=_pars.strPlotsDir+canvName;
+    saveName+=".png";
+    c->SaveAs(saveName);
+    saveName.ReplaceAll(".png",".pdf");
+    c->SaveAs(saveName);
+    saveName.ReplaceAll(".pdf",".root");
+    c->SaveAs(saveName);
 
   } // end of loop over ieta
 

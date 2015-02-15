@@ -144,6 +144,8 @@ int TAllInputSamples::SampleNumber (string sampleStr)
     return TConfiguration::SIGMC;
   else if (sampleStr=="BKGMC") 
     return TConfiguration::BKGMC;
+  else if (sampleStr=="SIGMC_UNSKIMMED") 
+    return TConfiguration::SIGMC_UNSKIMMED;
   return -1;
 }
 

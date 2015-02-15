@@ -115,7 +115,7 @@ void CalcAccAndEff::LoopOverInputFiles()
   int nSources = _INPUT->nSources_;
   for (int iSource=0; iSource<nSources; iSource++){
     int sample = _INPUT->allInputs_[iSource].sample_;
-    if (sample!=_config.SIGMC) continue;
+    if (sample!=_config.SIGMC_UNSKIMMED) continue;
       // acceptance and efficiency are calculated only through signal MC
 
     TTree* tree;

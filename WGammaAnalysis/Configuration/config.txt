@@ -43,6 +43,9 @@ $ DATA  WGAMMA   MUON    1    lumiTotal 19593.0
 $ SIGMC  WGAMMA    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634     
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wg_munu_MuPhoSkim.root   553.92  
 
+$ SIGMC_UNSKIMMED  WGAMMA    MUON   Wg_to_munu  W#gamma#rightarrow#mu#nu#gamma    634     
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_munu.root   553.92 
+
 $ BKGMC WGAMMA   MUON   Wg_to_taunu     W#gamma#rightarrow#tau#nu#gamma      401    
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wg_taunu_MuPhoSkim.root    553.92  
 
@@ -88,6 +91,9 @@ $ DATA  ZGAMMA   MUON    1    lumiTotal 19593.0
 $ SIGMC ZGAMMA   MUON   Zg     Z#gamma#rightarrow#mu#bar{#mu}      879    
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Zg_MuMuPhoSkim.root   159.12
 
+$ SIGMC_UNSKIMMED ZGAMMA   MUON   Zg     Z#gamma#rightarrow#mu#bar{#mu}      879    
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Zg_mumu.root   159.12
+
 $ BKGMC   ZGAMMA  MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_DYToLL_MuMuPhoSkim.root   3503.7
 
@@ -106,12 +112,15 @@ $ BKGMC   ZGAMMA  MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418
 ###################################################################
 $   DATA   WGAMMA    ELECTRON    1    lumiTotal 19593.0        
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012a_Jan22rereco_ElePhoSkim.root
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012b_Jan22rereco_ElePhoSkim.root
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012c_Jan2012rereco_ElePhoSkim.root
-#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012d_Jan22rereco_ElePhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012b_Jan22rereco_ElePhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012c_Jan2012rereco_ElePhoSkim.root
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012d_Jan22rereco_ElePhoSkim.root
 
 $   SIGMC  WGAMMA    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    634         
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wg_enu_ElePhoSkim.root   553.92  
+
+$   SIGMC_UNSKIMMED  WGAMMA    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    634         
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Wg_enu.root   553.92 
 
 $ BKGMC   WGAMMA ELECTRON    Wjets_to_lnu  W+jets#rightarrowl#nu+jets  433  
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wjets_ElePhoSkim.root 36257.2
@@ -142,6 +151,9 @@ $   DATA   ZGAMMA    ELECTRON    1    lumiTotal 19593.0
 
 $ SIGMC ZGAMMA   ELECTRON   Zg     Z#gamma#rightarrow#l#bar{#l}      879    
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Zg_EleElePhoSkim.root   159.12
+
+$ SIGMC_UNSKIMMED ZGAMMA   ELECTRON   Zg     Z#gamma#rightarrow#l#bar{#l}      879    
+- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/job_summer12_Zg_ee.root   159.12
 
 $ BKGMC   ZGAMMA  ELECTRON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418  
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_DYToLL_EleElePhoSkim.root   3503.7

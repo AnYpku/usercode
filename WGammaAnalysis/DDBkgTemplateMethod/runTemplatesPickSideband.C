@@ -6,9 +6,9 @@
   TConfiguration conf;
 
   bool noPickSb[2][2][2]; //channel, vgamma, templ
-  noPickSb[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
-  noPickSb[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
-  noPickSb[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  noPickSb[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=0;
+  noPickSb[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=0;
+  noPickSb[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=0;
   noPickSb[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=0;
   noPickSb[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   noPickSb[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;

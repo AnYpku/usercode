@@ -361,7 +361,7 @@ bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPr
     float contT=_hTrue[ikin][ieta]->GetBinContent(i);
     float contF=_hFake[ikin][ieta]->GetBinContent(i);
     badBins[i]=0;
-//    if (contD<0 || contT<0 || contF<0) {badBins[i]=1; hasBadBin=1;}
+    if (contD<0 || contT<0 || contF<0) {badBins[i]=1; hasBadBin=1;}
 //    if (contD==0 && (contT+contF)>0) {badBins[i]=1; hasBadBin=1;}
     if (contD>0 && (contT+contF)==0) {badBins[i]=1; hasBadBin=1;}
   }//end of loop over i

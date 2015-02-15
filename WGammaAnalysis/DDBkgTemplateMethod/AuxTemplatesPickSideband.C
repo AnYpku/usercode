@@ -18,6 +18,13 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
   TConfiguration conf;
   TTemplates temp;
 
+  std::cout<<std::endl;
+  std::cout<<"AuxTemplatesPickSideband for"<<std::endl;
+  std::cout<<conf.StrChannel(anPars.channel)<<" ";
+  std::cout<<conf.StrVgType(anPars.vgamma)<<" ";
+  std::cout<<conf.StrTempl(anPars.templFits)<<std::endl;
+  std::cout<<std::endl;
+
   TString strMCtruth = conf.GetYieldsMCtruthFileName(anPars.channel, anPars.vgamma, anPars.varKin);
   TFile fMCtruth(strMCtruth);
   TH1F* hTrueMCtruth[2];
@@ -41,6 +48,11 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
   double selSbU[anPars.nKinBins][2];
   double selTrueVal[anPars.nKinBins][2];
   std::cout<<"True Vals based on MC closure:"<<std::endl;
+  float scale=1.0;
+  if (anPars.vgamma==conf.W_GAMMA){
+    scale=conf.GetBlindPrescale();
+  }
+  std::cout<<"scale="<<scale<<", channel="<<conf.StrChannel(anPars.channel)<<std::endl;
   for (int ikin=1; ikin<=anPars.nKinBins; ikin++){
 //  for (int ikin=1; ikin<=1; ikin++){
     for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
@@ -55,7 +67,7 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
         std::cout<<"sb = "<<vecSbL[ikin][ieta]->operator()(ival)<<" - "<<vecSbU[ikin][ieta]->operator()(ival)<<", ";
         std::cout<<"true yield = "<<vecTrueVal[ikin][ieta]->operator()(ival);
         std::cout<<std::endl;
-        float diff1 = fabs(vecTrueVal[ikin][ieta]->operator()(ival)-hTrueMCtruth[ieta]->GetBinContent(ikin));
+        float diff1 = fabs(vecTrueVal[ikin][ieta]->operator()(ival)-scale*hTrueMCtruth[ieta]->GetBinContent(ikin));
         if (diff1<diff){
           selSbL[ikin][ieta]=vecSbL[ikin][ieta]->operator()(ival);
           selSbU[ikin][ieta]=vecSbU[ikin][ieta]->operator()(ival);
@@ -64,7 +76,7 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
         }
       }// end of loop over ival
 
-      std::cout<<"MC truth = "<<hTrueMCtruth[ieta]->GetBinContent(ikin);
+      std::cout<<"MC truth = "<<scale*hTrueMCtruth[ieta]->GetBinContent(ikin);
       std::cout<<", bin="<<hTrueMCtruth[ieta]->GetBinLowEdge(ikin);
       std::cout<<"-"<<hTrueMCtruth[ieta]->GetBinLowEdge(ikin)+hTrueMCtruth[ieta]->GetBinWidth(ikin);
       std::cout<<std::endl;
@@ -72,16 +84,19 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
     }// end of loop over ieta
   }// end of loop over ikin
 
-  for (int ikin=1; ikin<=anPars.nKinBins; ikin++){
+  std::cout<<std::endl;
+
+  for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
+    std::cout<<temp.StrLabelEta(ieta)<<std::endl;
+    for (int ikin=1; ikin<=anPars.nKinBins; ikin++){
 //  for (int ikin=1; ikin<=1; ikin++){
-    for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
       TString strLabelKin=temp.StrLabelKin(ikin,anPars.nKinBins,  anPars.kinBinLims, anPars.varKin);
-      std::cout<<strLabelKin+temp.StrLabelEta(ieta)<<std::endl;
-      std::cout<<"MC truth = "<<hTrueMCtruth[ieta]->GetBinContent(ikin);
+      std::cout<<strLabelKin<<": ";
+      std::cout<<"sb="<<selSbL[ikin][ieta]<<"-"<<selSbU[ikin][ieta]<<", true yield = "<<selTrueVal[ikin][ieta];
+      std::cout<<" ( MC truth = "<<scale*hTrueMCtruth[ieta]->GetBinContent(ikin);
       std::cout<<", bin="<<hTrueMCtruth[ieta]->GetBinLowEdge(ikin);
-      std::cout<<"-"<<hTrueMCtruth[ieta]->GetBinLowEdge(ikin)+hTrueMCtruth[ieta]->GetBinWidth(ikin);
+      std::cout<<"-"<<hTrueMCtruth[ieta]->GetBinLowEdge(ikin)+hTrueMCtruth[ieta]->GetBinWidth(ikin)<<" ) ";
       std::cout<<std::endl;
-      std::cout<<"true yield = "<<selTrueVal[ikin][ieta]<<", sb="<<selSbL[ikin][ieta]<<"-"<<selSbU[ikin][ieta]<<std::endl;
-    }// end of loop over ieta
-  }// end of loop over ikin
+    }// end of loop over ikin
+  }// end of loop over ieta
 }//end  of SetLimsChIsoTempl_phoEt_Zg_MUON

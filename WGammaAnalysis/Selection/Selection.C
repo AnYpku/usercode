@@ -105,6 +105,9 @@ void Selection::LoopOverInputFiles()
        if (!_doAnalizeSample[iSource])
          continue;
        _sample = _INPUT->allInputs_[iSource].sample_;
+       if (_sample==_config.SIGMC_UNSKIMMED){
+           continue; //SIGMC_UNSKIMMED is for accXeff, not for selection
+       }
        if (_sample==_config.DATA){
            _lumiData=_INPUT->allInputs_[iSource].lumiTotal_;
            if (_sampleMode==ALL || _sampleMode==DATA || _sampleMode==NOBKG || _sampleMode==NOTSPECIFIED);

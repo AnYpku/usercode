@@ -100,7 +100,7 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
 {
 
   _pyPars.fOut->cd(); 
-  TString canvName=strDD+TString("DDvsMC");
+  TString canvName=strDD+TString("DDvsMC_")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
   canv= new TCanvas(canvName,canvName,800,800);
   TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
