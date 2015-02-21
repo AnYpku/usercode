@@ -1,0 +1,58 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{Yields with Selected Sidebands}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{February 11th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}{Outline}
+%{
+%  \begin{itemize}
+%  \item Template fit systematics in approved CMS Zg analysis 
+%  \item Sideband variation 2D plots for Zg and Wg, muon, pt 15-20 GeV
+%  \item Conclusions and plans
+%  \end{itemize}
+%}
+%\end{frame}
+
+
+%---------------------------------------------
+
+\begin{frame}{True gamma yields for Zg and Wg, muon and electron}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_MUON_WGamma__blindPRESCALE__phoEt_TrueDDvsMC_c_MUON_WGamma__blindPRESCALE__EtaCommon_.png}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_MUON_ZGamma__UNblind__phoEt_TrueDDvsMC_c_MUON_ZGamma__UNblind__EtaCommon_.png}
+    \includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/c_ELECTRON_WGamma__blindPRESCALE__phoEt_TrueDDvsMC_c_ELECTRON_WGamma__blindPRESCALE__EtaCommon_.png}\includegraphics[width=0.3\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/c_ELECTRON_ZGamma__UNblind__phoEt_TrueDDvsMC_c_ELECTRON_ZGamma__UNblind__EtaCommon_.png}
+    %\\Comments here
+  \end{figure}
+  \scriptsize Sideband ranges were selected based on sideband variations on MC-mixture fits and then selected sideband ranges applied on data. 
+  \scriptsize NOTE: The RandCone isolation variable was not stored for MC files thus the MC-mixture fits of $I_{ch}$ for electron channel were not done properly 
+  \scriptsize Reskimming of electron MC files will be done soon
+\end{frame}
+
+\begin{frame}{acc X eff calculation}\\*
+  \scriptsize Computed as combined value; Based on signal MC\\*
+  \scriptsize Numerator:\\*
+  \scriptsize For total cross section: selected signal MC yields with PU weight applied\\*
+  \scriptsize For differential cross section: selected signal MC yields with PU weight applied in phoEt GEN bins 15-20-25... Transition to phoEt RECO bins performed with unfolding\\*
+  \scriptsize Denominator:\\*
+  \scriptsize For each event in unskimmed signal MC file, photon and lepton (two leptons for Zg) which refer to Wg (Zg) and determine dR GEN and phoEt GEN\\*
+  \scriptsize For total CS: calculate number of events for which $dR_{gen}>0.7$ and $phoEt_{gen}>15$ GeV\\*
+  \scriptsize For differential CS: calculate number of events for which $dR_{gen}>0.7$ in 15-20-25... $phoEt_{gen}$ bins\\*
+\end{frame}
+
+
+\end{document}
+

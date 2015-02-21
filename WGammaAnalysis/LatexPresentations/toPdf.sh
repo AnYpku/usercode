@@ -1,3 +1,3 @@
-pdflatex presentation20150211Wg_sidebandVariation2Dplots.tex
-acroread presentation20150211Wg_sidebandVariation2Dplots.pdf
+pdflatex presentation20150218Wg_yieldsWithSelectedSidebands.tex
+acroread presentation20150218Wg_yieldsWithSelectedSidebands.pdf
 

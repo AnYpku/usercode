@@ -79,11 +79,14 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
 
   
   TString strWeight=_pyPars.varWeight;
-  if (source.sourceType!=DATA){
-    strWeight+="*";
-    strWeight+=_pyPars.blindFraction;//0.05 if blinded, 1 if unblinded
-  }
   TCut cutW(strWeight);
+
+  TString strWeightBlind=strWeight;
+  if (source.sourceType!=DATA){
+    strWeightBlind+="*";
+    strWeightBlind+=_pyPars.blindFraction;//0.05 if blinded, 1 if unblinded
+  }
+  TCut cutWblind(strWeightBlind);
 
   _pyPars.fOut->cd();
 
@@ -92,11 +95,29 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
     source.hist[ieta] = new TH1F(source.strYieldsName1D[ieta],source.strYieldsName1D[ieta],_pyPars.nKinBins,_pyPars.kinBinLims);
     source.hist[ieta]->Sumw2();
     source.tr->Draw(_pyPars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta) && _pyPars.cutAdd)*cutW,"goff");
+
+    TString blindName=source.strYieldsName1D[ieta]+TString("_blind");
+    source.histBlind[ieta] = new TH1F(blindName,blindName,_pyPars.nKinBins,_pyPars.kinBinLims);
+    source.histBlind[ieta]->Sumw2();
+    source.tr->Draw(_pyPars.varKin+TString(">>")+blindName,(CutEta(ieta) && _pyPars.cutAdd)*cutWblind,"goff");
+
     source.hist[ieta]->SetLineColor(source.color);
     source.hist[ieta]->SetFillColor(source.color);
     if (source.sourceType==DATA) source.hist[ieta]->SetFillColor(0);
     source.hist[ieta]->SetMarkerColor(source.color);
     source.hist[ieta]->SetStats(0);
+
+    source.histBlind[ieta]->SetLineColor(source.color);
+    source.histBlind[ieta]->SetFillColor(source.color);
+    if (source.sourceType==DATA) source.hist[ieta]->SetFillColor(0);
+    source.histBlind[ieta]->SetMarkerColor(source.color);
+    source.histBlind[ieta]->SetStats(0);
+
+    if (source.sourceType==SIGMC){
+      _sigMCGenYields[ieta]=new TH1F(_pyPars.strYieldsName1D_SignalMCGenBins[ieta],_pyPars.strYieldsName1D_SignalMCGenBins[ieta],_pyPars.nKinBins,_pyPars.kinBinLims);
+      _sigMCGenYields[ieta]->Sumw2();
+      source.tr->Draw(_pyPars.varKinGen+TString(">>")+_pyPars.strYieldsName1D_SignalMCGenBins[ieta],(CutEta(ieta) && _pyPars.cutAdd)*cutW,"goff");
+    }
 
     //Set total yield
     TH1F* floatingHist = new TH1F("floatingHist","hist for temprorary storage of total yields",1,source.tr->GetMinimum(_pyPars.varKin)-1,source.tr->GetMaximum(_pyPars.varKin)+1);//inputFileNumber
@@ -131,6 +152,7 @@ void TPrepareYields::PlotPrintSave()
   for (int is=0; is<_sources.size(); is++){
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
       PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].hist[ieta]);
+      PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].histBlind[ieta]);
     }
   }//end of loop over is
 
@@ -158,23 +180,23 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   for (int is=0; is<_sources.size(); is++){
      std::cout<<"CompareTotalDATAvsMC: processing isource "<<_sources[is].name<<std::endl;
     if (is==isData || is==isSign) continue;
-    mcHists->Add(_sources[is].hist[ieta]);
+    mcHists->Add(_sources[is].histBlind[ieta]);
     if (!hSumStarted){
-      hSum=(TH1F*)_sources[is].hist[ieta]->Clone("hSum_WholeMC");
+      hSum=(TH1F*)_sources[is].histBlind[ieta]->Clone("hSum_WholeMC");
       hSumStarted=1;
     }
-    else hSum->Add(_sources[is].hist[ieta]);
-    legend->AddEntry(_sources[is].hist[ieta],_sources[is].label);
+    else hSum->Add(_sources[is].histBlind[ieta]);
+    legend->AddEntry(_sources[is].histBlind[ieta],_sources[is].label);
   }//end of loop over is
 
   if (isSign!=-1) {
-    mcHists->Add(_sources[isSign].hist[ieta]);  
-    legend->AddEntry(_sources[isSign].hist[ieta],_sources[isSign].label);  
+    mcHists->Add(_sources[isSign].histBlind[ieta]);  
+    legend->AddEntry(_sources[isSign].histBlind[ieta],_sources[isSign].label);  
     if (!hSumStarted){
-      hSum=(TH1F*)_sources[isSign].hist[ieta]->Clone("hSum_WholeMC");
+      hSum=(TH1F*)_sources[isSign].histBlind[ieta]->Clone("hSum_WholeMC");
       hSumStarted=1;
     }
-    else hSum->Add(_sources[isSign].hist[ieta]);
+    else hSum->Add(_sources[isSign].histBlind[ieta]);
   }
 
   if (isData==-1){

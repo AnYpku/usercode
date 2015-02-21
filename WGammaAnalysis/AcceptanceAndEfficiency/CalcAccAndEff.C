@@ -1,17 +1,11 @@
 #include "CalcAccAndEff.h" 
   //this class
 #include "../Include/TMathTools.h"
-#include "../Include/TMetTools.h" 
-#include "../Include/TMuonCuts.h" 
-#include "../Include/TElectronCuts.h" 
-#include "../Include/TPhotonCuts.h" 
 #include "../Include/TFullCuts.h" 
-#include "../Include/TPuReweight.h" 
 #include "../Configuration/TConfiguration.h" 
 #include "../Configuration/TInputSample.h"
 #include "../Configuration/TAllInputSamples.h"
-  //this package
-#include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
+
   //taken from git
 #include "TMath.h" 
 #include "TH1F.h" 
@@ -24,82 +18,19 @@
 #include <iostream> 
 #include <string>
 #include <sstream>  
+#include <vector>
   //standard C++ class
 
-CalcAccAndEff::CalcAccAndEff(int year, int channel, int vgamma, int phoWP, string configFile, bool isNoPuReweight, bool isDebugMode)
+CalcAccAndEff::CalcAccAndEff(int channel, int vgamma, bool isDebugMode, string configFile)
 {
 
+  _channel = channel;
+  _vgamma = vgamma;
+  _isDebugMode = isDebugMode;
   _INPUT = new TAllInputSamples(channel, vgamma, configFile);
+  std::cout<<_config.StrChannel(channel)<<", "<<_config.StrVgType(vgamma)<<std::endl;
+//  _INPUT->Print();
 
-  _year=year;
-  _channel=channel;
-  _vgamma=vgamma;
-  _phoWP=phoWP;
-  _isDebugMode=isDebugMode;
-  _isNoPuReweight=isNoPuReweight;
-  _photonCorrector = new zgamma::PhosphorCorrectionFunctor((_config.GetPhosphorConstantFileName()) );
-    //field of this class
-
-  _nAccTotEvents=0;
-  _nAccTotEventsErr=0;
-  _nAccTotPassed=0;
-  _nAccTotPassedErr=0;
-  _accTot=-1;
-  _accTotErr=-1;
-
-  _nEffTotEvents=0;
-  _nEffTotEventsErr=0;
-  _nEffTotPrePassed=0;
-  _nEffTotPrePassedErr=0;
-  _nEffTotPrePassed2=0;
-  _nEffTotPrePassed2Err=0;
-  _nEffTotPassed=0;
-  _nEffTotPassedErr=0;
-  _effTot=-1;
-  _effTotErr=-1;
-
-  _nAcc1DEvents=new float[_config.GetNPhoPtBins()];
-  _nAcc1DEventsErr=new float[_config.GetNPhoPtBins()];
-  _nAcc1DPassed=new float[_config.GetNPhoPtBins()];
-  _nAcc1DPassedErr=new float[_config.GetNPhoPtBins()];
-  _acc1D=new float[_config.GetNPhoPtBins()];
-  _acc1DErr=new float[_config.GetNPhoPtBins()];
-
-  _nEff1DEvents=new float[_config.GetNPhoPtBins()];
-  _nEff1DEventsErr=new float[_config.GetNPhoPtBins()];
-  _nEff1DPrePassed=new float[_config.GetNPhoPtBins()];
-  _nEff1DPrePassedErr=new float[_config.GetNPhoPtBins()];
-  _nEff1DPrePassed2=new float[_config.GetNPhoPtBins()];
-  _nEff1DPrePassed2Err=new float[_config.GetNPhoPtBins()];
-  _nEff1DPassed=new float[_config.GetNPhoPtBins()];
-  _nEff1DPassedErr=new float[_config.GetNPhoPtBins()];
-  _eff1D=new float[_config.GetNPhoPtBins()];
-  _eff1DErr=new float[_config.GetNPhoPtBins()];
-
-  _accXeff1D=new float[_config.GetNPhoPtBins()];
-  _accXeff1DErr=new float[_config.GetNPhoPtBins()];
-
-  for (int i=0; i<_config.GetNPhoPtBins(); i++){
-    _nAcc1DEvents[i]=0;
-    _nAcc1DEventsErr[i]=0;
-    _nAcc1DPassed[i]=0;
-    _nAcc1DPassedErr[i]=0;
-    _acc1D[i]=-1;
-    _acc1DErr[i]=-1;
-    _nEff1DEvents[i]=0;
-    _nEff1DEventsErr[i]=0;
-    _nEff1DPrePassed[i]=0;
-    _nEff1DPrePassedErr[i]=0;
-    _nEff1DPrePassed2[i]=0;
-    _nEff1DPrePassed2Err[i]=0;
-    _nEff1DPassed[i]=0;
-    _nEff1DPassedErr[i]=0;
-    _eff1D[i]=-1;
-    _eff1DErr[i]=-1;
-  }
-
-  _phoPtLimits = new float[_config.GetNPhoPtBins()+1];
-  _config.GetPhoPtBinsLimits(_phoPtLimits);
 
 }
 
@@ -107,7 +38,6 @@ CalcAccAndEff::~CalcAccAndEff()
 {
    _eventTree.fChain = 0;
    //field of TEventTree 
-   delete _photonCorrector;
 }
 
 void CalcAccAndEff::LoopOverInputFiles()
@@ -118,12 +48,13 @@ void CalcAccAndEff::LoopOverInputFiles()
     if (sample!=_config.SIGMC_UNSKIMMED) continue;
       // acceptance and efficiency are calculated only through signal MC
 
+
     TTree* tree;
     int inputFileNMax = _INPUT->allInputs_[iSource].nFiles_;
 
     for (int inputFileN=0; inputFileN<inputFileNMax; inputFileN++){
-      _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[inputFileN];
       TFile f((_INPUT->allInputs_[iSource].fileNames_[inputFileN]) );
+      _lumiWeight=_INPUT->allInputs_[iSource].lumiWeights_[inputFileN];
       if (f.IsOpen()) 
         std::cout<<std::endl<<"processing file "<<_INPUT->allInputs_[iSource].fileNames_[inputFileN]<<std::endl;
       else{
@@ -132,6 +63,10 @@ void CalcAccAndEff::LoopOverInputFiles()
       } 
       f.cd("ggNtuplizer");
       tree = (TTree*)gDirectory->Get("EventTree");
+
+      TH1F* hEvents = (TH1F*)gDirectory->Get("hEvents");
+      _Nentries = hEvents->GetBinContent(1);
+      _csWholeMCfile = _INPUT->allInputs_[iSource].cs_[inputFileN];
 
       if (tree){
         _eventTree.Init(tree);
@@ -142,170 +77,89 @@ void CalcAccAndEff::LoopOverInputFiles()
         return;
       }  
 
-      bool isSkimmed = gDirectory->GetListOfKeys()->Contains("hskim");
-
-      if (isSkimmed){
-        std::cout<<"ERROR detected in CalcAccAndEff::LoopOverInputFiles: file"<<_INPUT->allInputs_[iSource].fileNames_[inputFileN]<<" is skimmed; skimmed signal MC file can't be used for acceptance and efficiency calculation; please, use the full signal MC file"<<std::endl;
-        return;
-      }
-
-      _puWeight=new TPuReweight(_config.GetPileupDataFileName(),_INPUT->allInputs_[iSource].fileNames_[inputFileN]);
-
       LoopOverTreeEvents();
         //method of this class (CalcAccAndEff)
       _eventTree.fChain=0;
         //field of TEventTree
 
-      delete _puWeight;
-
     }//loop over inputFileN_ ends
-
-    //Acceptance
-    ComputeAcceptance();
-
-    //Efficiency
-    ComputeEfficiency();
-
-    //Acc X Eff together
-    ComputeAccTimesEff();
-
-    PlotAndSaveOutput();
-
-    PrintAccAndEffSummary();
 
     std::cout<<std::endl;
     std::cout<<"the output will be saved to "<<std::endl<<std::endl;
   } //loop over iSource ends
-}
-
-void CalcAccAndEff::ComputeAcceptance()
-{
-    if (_nAccTotEventsErr>0) _nAccTotEventsErr=sqrt(_nAccTotEventsErr);
-    if (_nAccTotPassedErr>0) _nAccTotPassedErr=sqrt(_nAccTotPassedErr);
-    for (int i=0; i<_config.GetNPhoPtBins(); i++){
-      if (_nAcc1DEventsErr[i]>0) _nAcc1DEventsErr[i]=sqrt(_nAcc1DEventsErr[i]);
-      if (_nAcc1DPassedErr[i]>0) _nAcc1DPassedErr[i]=sqrt(_nAcc1DPassedErr[i]);
-    }
-    if (_nAccTotEvents!=0){ 
-      _accTot=_nAccTotPassed/_nAccTotEvents;
-      _accTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nAccTotPassed,_nAccTotEvents,_nAccTotPassedErr,_nAccTotEventsErr);
-    }
-    for (int i=0; i<_config.GetNPhoPtBins(); i++){
-      if (_nAcc1DEvents[i]!=0){
-        _acc1D[i]=_nAcc1DPassed[i]/_nAcc1DEvents[i];
-        _acc1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nAcc1DPassed[i],_nAcc1DEvents[i],_nAcc1DPassedErr[i],_nAcc1DEventsErr[i]);
-      }
-    }
-}
-
-void CalcAccAndEff::ComputeEfficiency()
-{
-    if (_nEffTotEventsErr!=0) _nEffTotEventsErr=sqrt(_nEffTotEventsErr);
-    if (_nEffTotPassedErr!=0) _nEffTotPrePassedErr=sqrt(_nEffTotPrePassedErr);
-    for (int i=0; i<_config.GetNPhoPtBins(); i++){
-      if (_nEff1DEventsErr[i]!=0) _nEff1DEventsErr[i]=sqrt(_nEff1DEventsErr[i]);
-      if (_nEff1DPassedErr[i]!=0) _nEff1DPrePassedErr[i]=sqrt(_nEff1DPrePassedErr[i]);
-    }
-
-    TFile* fVeryPreliminary = new TFile(_config.GetSelectedName(_config.VERY_PRELIMINARY, _channel,_vgamma,_config.UNBLIND, _config.SIGMC));
-    TTree* tr = (TTree*)fVeryPreliminary->Get("selectedEvents");
-    TH1F* hTot = new TH1F("hTot","hTot",1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
-    TH1F* h1D = new TH1F("h1D","h1D",_config.GetNPhoPtBins(),_phoPtLimits);
-    TCut cutWeight="PUweight";//"weight";
-    TCut cut = cutWeight*_fullCuts.RangeFullCut(_year,_channel,_vgamma,_config.UNBLIND,_phoWP);
-    tr->Draw("phoGenEt>>hTot",cutWeight,"goff");
-    tr->Draw("phoGenEt>>h1D",cutWeight,"goff");
-    std::cout<<"file for efficiency selection: "<<_config.GetSelectedName(_config.VERY_PRELIMINARY,_channel,_vgamma,_config.UNBLIND,_config.SIGMC)<<std::endl;
-    std::cout<<"preselected tree has "<<tr->GetEntries()<<" events"<<std::endl;
-    std::cout<<"tree with full cut has "<<tr->GetEntries(cut)<<"  events"<<std::endl;
-    std::cout<<"Print histograms:"<<std::endl;
-    h1D->Print();
-    hTot->Print();
-    _nEffTotPrePassed2=hTot->GetBinContent(1);
-    _nEffTotPrePassed2Err=hTot->GetBinError(1);
-    for (int i=1; i<=_config.GetNPhoPtBins(); i++){
-      _nEff1DPrePassed2[i-1]=h1D->GetBinContent(i);
-      _nEff1DPrePassed2Err[i-1]=h1D->GetBinError(i);
-    }
-    tr->Draw("phoGenEt>>hTot",cut,"goff");
-    tr->Draw("phoGenEt>>h1D",cut,"goff");
-    _nEffTotPassed=hTot->GetBinContent(1);
-    _nEffTotPassedErr=hTot->GetBinError(1);
-    for (int i=1; i<=_config.GetNPhoPtBins(); i++){
-      _nEff1DPassed[i-1]=h1D->GetBinContent(i);
-      _nEff1DPassedErr[i-1]=h1D->GetBinError(i);
-    }
-
-//     if (_nEffTotEvents!=0){ 
-//       _effTot=(double)_nEffTotPassed/_nEffTotEvents;
-//       _effTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEffTotPassed,_nEffTotEvents,_nEffTotPassedErr,_nEffTotEventsErr);
-//     }
-
-//     for (int i=0; i<_config.GetNPhoPtBins(); i++){
-//       _eff1D[i]=_nEff1DPassed[i]/_nEff1DEvents[i];
-//       _eff1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEff1DPassed[i],_nEff1DEvents[i],_nEff1DPassedErr[i],_nEff1DEventsErr[i]);
-//     }
-
-    if (_nEffTotPrePassed2==0){
-      _effTot=-1;
-      _effTotErr=1;      
-    }
-    else{
-      _effTot=(double)_nEffTotPassed/_nEffTotPrePassed2;
-      _effTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEffTotPassed,_nEffTotPrePassed2,_nEffTotPassedErr,_nEffTotPrePassed2Err);
-    }
-
-    for (int i=0; i<_config.GetNPhoPtBins(); i++){
-      if (_nEff1DPrePassed2[i]==0){
-        _eff1D[i]=-1;
-        _eff1DErr[i]=1;
-      }
-      else{
-        _eff1D[i]=_nEff1DPassed[i]/_nEff1DPrePassed2[i];
-        _eff1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEff1DPassed[i],_nEff1DPrePassed2[i],_nEff1DPassedErr[i],_nEff1DPrePassed2Err[i]);
-      }
-    }
-}
+}// end of LoopOverInputFiles
 
 void CalcAccAndEff::ComputeAccTimesEff()
 {
-    if (_nAccTotEvents!=0){ 
-      _accXeffTot=1.0*_nEffTotPassed/_nAccTotEvents;
-      _accXeffTotErr=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEffTotPassed,_nAccTotEvents,_nEffTotPassedErr,_nAccTotEventsErr);
-    }
-    for (int i=0; i<_config.GetNPhoPtBins(); i++){
-      if (_nAcc1DEvents[i]!=0){
-        _accXeff1D[i]=1.0*_nEff1DPassed[i]/_nAcc1DEvents[i];
-        _accXeff1DErr[i]=_math.ErrOfTwoIndependent("x1/(x1+x2)",_nEff1DPassed[i],_nAcc1DEvents[i],_nEff1DPassedErr[i],_nAcc1DEventsErr[i]);
-      }
-    }
-}
+
+  _fOut=new TFile(_config.GetAccXEffFileName(_channel, _vgamma),"recreate");
+
+  ComputeNumerator();
+  std::cout<<"numerator computed"<<std::endl;
+  ComputeDenominator();
+  std::cout<<"denominator computed"<<std::endl;
+  
+  if (_denTot!=0){
+    _accXeffTot=_numTot/_denTot;
+    TMathTools math;
+    _accXeffTotErr=math.ErrOfTwoIndependent("x1/(x1+x2)",_numTot,_denTot,_numTotErr,_denTotErr);
+    std::cout<<"accXeff Tot="<<"("<<_numTot<<"+-"<<_numTotErr;
+    std::cout<<")/("<<_denTot<<"+-"<<_denTotErr<<")="<<_accXeffTot<<"+-"<<_accXeffTotErr<<std::endl;
+
+    _csTheoryTot = _csWholeMCfile*_denNoWeightTot/_Nentries;
+  }// end of _denTot!=0
+
+  int nHbins = _Hnumerator1D->GetNbinsX();
+  if (_Hdenominator1D->GetNbinsX()!=nHbins){
+    std::cout<<"_Hdenominator->GetNbinsX()!=_Hnumerator->GetNbinsX()"<<std::endl;
+    return;    
+  }
+  _fOut->cd();
+  std::cout<<"accXeff 1D"<<std::endl;
+  _HaccXeff1D=(TH1F*)_Hnumerator1D->Clone(_config.GetAccXEffName(_config.ONEDI));
+  _HaccXeff1D->SetTitle(_config.GetAccXEffName(_config.ONEDI)+TString("_")+_config.StrChannel(_channel)+TString("_")+_config.StrVgType(_vgamma));
+  if (_Hdenominator1D->GetSumOfWeights()!=0){
+    _HaccXeff1D->Divide(_Hdenominator1D);
+  }
+  for (int ib=1; ib<=nHbins; ib++){
+    std::cout<<_Hnumerator1D->GetBinLowEdge(ib)<<"-";
+    std::cout<<_Hnumerator1D->GetBinLowEdge(ib)+_Hnumerator1D->GetBinWidth(ib)<<" ";
+    if (_Hdenominator1D->GetBinContent(ib)!=0){
+      std::cout<<"("<<_Hnumerator1D->GetBinContent(ib)<<"+-"<<_Hnumerator1D->GetBinError(ib);
+      std::cout<<")/("<<_Hdenominator1D->GetBinContent(ib)<<"+-"<<_Hdenominator1D->GetBinError(ib)<<")=";
+      std::cout<<_HaccXeff1D->GetBinContent(ib)<<"+-"<<_HaccXeff1D->GetBinError(ib);
+    }    
+    std::cout<<std::endl;
+
+    long neventsVal =  _HdenominatorNoWeight1D->GetBinContent(ib);
+    long neventsErr =  _HdenominatorNoWeight1D->GetBinError(ib);
+    float binWidth = _HcsTheory1D->GetBinWidth(ib);
+
+    _HcsTheory1D->SetBinContent(ib,_csWholeMCfile*neventsVal/(_Nentries*binWidth));
+    _HcsTheory1D->SetBinError(ib,_csWholeMCfile*neventsErr/(_Nentries*binWidth));
+  }// end of loop over ib
+
+  std::cout<<"denTot = "<<_denTot<<", ";
+  std::cout<<"denNoWeightTot = "<<_denNoWeightTot<<", ";
+  std::cout<<"csTheoryTot = "<<_csTheoryTot<<std::endl;
+
+  _fOut->cd();
+  std::cout<<"den, denNoWeight, csTheory 1D"<<std::endl;
+  for (int ib=1; ib<=nHbins; ib++){
+    std::cout<<_Hdenominator1D->GetBinContent(ib)<<", ";
+    std::cout<<_HdenominatorNoWeight1D->GetBinContent(ib)<<", ";
+    std::cout<<_HcsTheory1D->GetBinContent(ib);      
+    std::cout<<std::endl;
+  }// end of loop over ib
+
+
+  PlotAndSaveOutput();
+}// end of ComputeAccTimesEff
 
 void CalcAccAndEff::PrintAccAndEffSummary()
 {
-    std::cout<<"Summary:"<<std::endl;
-    std::cout<<"Acc: nEvents="<<_nAccTotEvents<<"+-"<<_nAccTotEventsErr;
-    std::cout<<", nPassed="<<_nAccTotPassed<<"+-"<<_nAccTotPassedErr<<", acc="<<_accTot<<"+-"<<_accTotErr<<std::endl;
-    std::cout<<"Eff: nEvents="<<_nEffTotEvents<<"+-"<<_nEffTotEventsErr;
-    std::cout<<", nPrePassed="<<_nEffTotPrePassed<<"+-"<<_nEffTotPrePassedErr;
-    std::cout<<", nPrePassed2="<<_nEffTotPrePassed2<<"+-"<<_nEffTotPrePassed2Err;
-    std::cout<<", nPassed="<<_nEffTotPassed<<"+-"<<_nEffTotPassedErr;
-    std::cout<<", eff="<<_effTot<<"+-"<<_effTotErr;
-    std::cout<<", acc x eff="<<_accTot*_effTot<<", accXeff="<<_accXeffTot<<"+-"<<_accXeffTotErr<<std::endl;
-    std::cout<<std::endl;
 
-    for (int i=0; i<_config.GetNPhoPtBins(); i++){
-      std::cout<<"pho Pt: "<<_phoPtLimits[i]<<" - "<<_phoPtLimits[i+1]<<std::endl;
-      std::cout<<"Acc: nEvents="<<_nAcc1DEvents[i]<<"+-"<<_nAcc1DEventsErr[i];
-      std::cout<<", nPassed="<<_nAcc1DPassed[i]<<"+-"<<_nAcc1DPassedErr[i]<<", acc="<<_acc1D[i]<<"+-"<<_acc1DErr[i]<<std::endl;
-      std::cout<<"Eff: nEvents="<<_nEff1DEvents[i]<<"+-"<<_nEff1DEventsErr[i];
-      std::cout<<", nPrePassed="<<_nEff1DPrePassed[i]<<"+-"<<_nEff1DPrePassedErr[i];
-      std::cout<<", nPrePassed2="<<_nEff1DPrePassed2[i]<<"+-"<<_nEff1DPrePassed2Err[i];
-      std::cout<<", nPassed="<<_nEff1DPassed[i]<<"+-"<<_nEff1DPassedErr[i];
-      std::cout<<", eff="<<_eff1D[i]<<"+-"<<_eff1DErr[i];
-      std::cout<<", acc x eff="<<_acc1D[i]*_eff1D[i]<<", accXeff="<<_accXeff1D[i]<<"+-"<<_accXeff1DErr[i]<<std::endl;
-   }
-}
+}// end of PrintAccAndEffSummary
 
 void CalcAccAndEff::LoopOverTreeEvents()
 {
@@ -327,207 +181,200 @@ void CalcAccAndEff::LoopOverTreeEvents()
      return;
    }
 
-   float** lePhoDeltaR = new float*[nLeptonMax];
-   for (int ile=0; ile<nLeptonMax; ile++)
-     lePhoDeltaR[ile]=new float[_eventTree.kMaxnPho];
-   
-   bool** effLeptonPhotonPassed = new bool*[nLeptonMax];
-   for (int ile=0; ile<nLeptonMax; ile++)
-     effLeptonPhotonPassed[ile]=new bool[_eventTree.kMaxnPho];
-
-   bool** accLeptonPhotonPassed = new bool*[_eventTree.kMaxnMC];
-   for (int imc=0; imc<_eventTree.kMaxnMC; imc++)
-     accLeptonPhotonPassed[imc]=new bool[_eventTree.kMaxnMC];
-
    CheckMaxNumbersInTree();
   
    //nentries=20;
    std::cout<<"n entries in MC tree: "<<_eventTree.fChain->GetEntries()<<std::endl;
    for (Long64_t entry=0; entry<nentries; entry++) {
 
-   //loop over events in the tree{
-     _eventTree.GetEntryNeededBranchesOnly(_channel,TConfiguration::SIGMC,entry);
+      //loop over events in the tree{
+     //_eventTree.GetEntryNeededBranchesOnly(_channel,TConfiguration::SIGMC,entry);
           //method of TEventTree class
 
-     if (!_eventTree.treeLeaf.isData) _eventTree.GetEntryMCSpecific(entry);
+     _eventTree.GetEntryMCSpecific(entry);
           //method of TEventTree class
-
-     float weightPU;
-     if (_isNoPuReweight)
-       weightPU = _puWeight->GetPuWeightMc(_eventTree.treeLeaf.puTrue->at(1));
-     else weightPU=1;
-
-     if (_channel==TConfiguration::MUON) _nLe=_eventTree.treeLeaf.nMu;
-     else if (_channel==TConfiguration::ELECTRON) _nLe=_eventTree.treeLeaf.nEle;
-     else{
-       std::cout<<"Error detected in  CalcAccAndEff::LoopOverTreeEvents: channel must be either MUON or ELECTRON."<<std::cout;
-       return;
-     }  
-
-     bool accPassed = AcceptancePassed(accLeptonPhotonPassed);
+     float dR=-1;
+     float phoPt=-1;
+     int mcPattern=-1;
+     mcPattern=FindDeltaRandPhoPt(_eventTree.treeLeaf, dR, phoPt);
+     if (mcPattern==-1) _mcPatternNeg++;
+     if (mcPattern>=0) _mcPatternPos[mcPattern]++;
+     
+     if (dR>0.7 && phoPt>15){
+       _denTot+=_lumiWeight;
+       _Hdenominator1D->Fill(phoPt,_lumiWeight);
+       _denNoWeightTot+=1;
+       _HdenominatorNoWeight1D->Fill(phoPt);
+     } 
 
   } //end of loop over events in the tree
-
-  //memory release:
-
-  for (int ile=0; ile<nLeptonMax; ile++)
-    delete effLeptonPhotonPassed[ile];
-  delete[] effLeptonPhotonPassed;
-
-  for (int imc=0; imc<_eventTree.kMaxnMC; imc++)
-    delete accLeptonPhotonPassed[imc];
-  delete[] accLeptonPhotonPassed;
-
-  for (int ile=0; ile<nLeptonMax; ile++)
-    delete lePhoDeltaR[ile];
-  delete[] lePhoDeltaR;
  
-}
+}// end of LoopOverTreeEvents
 
-bool CalcAccAndEff::AcceptancePassed(bool** accLeptonPhotonPassed)
+int CalcAccAndEff::FindDeltaRandPhoPt(TEventTree::InputTreeLeaves &leaf, float& dR, float& phoPt)
 {
-   bool accPassed=0;
-   int bin=-1;
+  int photonID=22;
+  int bosonID;
+  if (_vgamma==_config.Z_GAMMA) bosonID=23;
+  if (_vgamma==_config.W_GAMMA) bosonID=24;
+  int lepID;
+  if (_channel==_config.MUON) lepID=13;
+  if (_channel==_config.ELECTRON) lepID=11;
 
-   bool genPhotons[_eventTree.kMaxnMC];
-   bool genLeptons[_eventTree.kMaxnMC];
-   for (int iMC=0; iMC<_eventTree.treeLeaf.nMC; iMC++){
-     genPhotons[iMC]=0;
-     genLeptons[iMC]=0;
-     if (_eventTree.treeLeaf.mcPID->at(iMC)==22)
-       genPhotons[iMC]=1;
-     else if (_channel==TConfiguration::MUON && fabs(_eventTree.treeLeaf.mcPID->at(iMC)==13))
-       genLeptons[iMC]=1;
-     else if (_channel==TConfiguration::ELECTRON && fabs(_eventTree.treeLeaf.mcPID->at(iMC)==11))
-       genLeptons[iMC]=1; 
-   } // loop over iMC; search for gen level photons and leptons
+  vector <int> vec_imc_pho;
+  vector <int> vec_imc_lep;
+  for (int imc=0; imc<leaf.nMC; imc++){
+    if (leaf.mcPID->at(imc)==photonID &&
+         (IsFSR(leaf,imc,lepID,bosonID) || IsTGC(leaf,imc,bosonID) || IsISR(leaf,imc,bosonID)) 
+       ) vec_imc_pho.push_back(imc);
+    if (fabs(leaf.mcPID->at(imc))==lepID && fabs(leaf.mcMomPID->at(imc))==bosonID) vec_imc_lep.push_back(imc);
+  }// end of loop over imc
 
-   for (int iGenLep=0; iGenLep<_eventTree.treeLeaf.nMC; iGenLep++)
-     for (int iGenPho=0; iGenPho<_eventTree.treeLeaf.nMC; iGenPho++){
-       if (!(genLeptons[iGenLep] && genPhotons[iGenPho])) continue;
-         float dR = _math.DeltaR(_eventTree.treeLeaf.mcEta->at(iGenLep),_eventTree.treeLeaf.mcPhi->at(iGenLep),_eventTree.treeLeaf.mcEta->at(iGenPho),_eventTree.treeLeaf.mcPhi->at(iGenPho));
-         if (dR<=_config.GetLePhoDeltaRMin()) continue;
+  int imcPho=-1;
+  int imcLep1=-1;
+  int imcLep2=-1;// ZGamma only
+  int patt=-1;
 
-         /////////////////////////////////////////////////
-         // count number of events 
-         if (_eventTree.treeLeaf.mcEt->at(iGenPho)>_config.GetPhoPtMin()){
-            _nAccTotEvents+=_lumiWeight;
-            _nAccTotEventsErr+=_lumiWeight*_lumiWeight;
-         }
-         bin = _config.FindPhoPtBinByPhoPt(_eventTree.treeLeaf.mcEt->at(iGenPho));
-         if (bin<(int)_config.GetNPhoPtBins() && bin!=-1){
-           _nAcc1DEvents[bin]+=_lumiWeight;
-           _nAcc1DEventsErr[bin]+=_lumiWeight*_lumiWeight;
-         }
+  if (vec_imc_pho.size()==0 && vec_imc_lep.size()==0) {patt=0; _strPattern[0]="0 photons, 0 leptons";}
+  if (vec_imc_pho.size()==0 && vec_imc_lep.size()!=0) {patt=1; _strPattern[1]="0 photons, >0 leptons";}
+  if (vec_imc_pho.size()!=0 && vec_imc_lep.size()==0) {patt=2; _strPattern[2]="0 leptons, >0 photons";}
+  if (vec_imc_pho.size()==1 && vec_imc_lep.size()==1) {patt=3; _strPattern[3]="1 lepton, 1 photon";}
+  if (vec_imc_pho.size()==2 && vec_imc_lep.size()==1) {patt=4; _strPattern[4]="1 lepton, 2 photons";}
+  if (vec_imc_pho.size()==1 && vec_imc_lep.size()==2) {patt=5; _strPattern[5]="2 leptons, 1 photon";}
+  if (vec_imc_pho.size()==2 && vec_imc_lep.size()==2) {patt=6; _strPattern[6]="2 photons, 2 leptons";}
+  if (vec_imc_pho.size()<=2 && vec_imc_lep.size()>=3) {patt=7; _strPattern[7]="1-2 photons, >2 leptons";}
+  if (vec_imc_pho.size()>=3 && vec_imc_lep.size()==1) {patt=8; _strPattern[8]="1 lepton, >2 photons";}
+  if (vec_imc_pho.size()>=3 && vec_imc_lep.size()==2) {patt=9; _strPattern[9]="2 leptons, >2 photons";}
 
-         /////////////////////////////////////////////////
-         // count number of events within acceptance
-         bool if1, if2;
+  if (vec_imc_pho.size()==0 || vec_imc_lep.size()==0 ||
+       (_channel==_config.Z_GAMMA && vec_imc_lep.size()==1)){
+    dR=-1; phoPt=-1; return patt;
+  }
 
-         bool isPhoAcc = _photonEmpty.PassedKinematics(_eventTree.treeLeaf.mcE->at(iGenPho),_eventTree.treeLeaf.mcEta->at(iGenPho),if1,if2) ;
-         bool isLepAcc = (_channel==TConfiguration::MUON && 
-                   _muonEmpty.PassedKinematics(_vgamma, 1, _eventTree.treeLeaf.mcPt->at(iGenLep),_eventTree.treeLeaf.mcEta->at(iGenLep),if1,if2)) ||
-                   (_channel==TConfiguration::ELECTRON);
-         if (isPhoAcc && isLepAcc) {
-           accPassed=1;
-           accLeptonPhotonPassed[iGenLep][iGenPho]=1;
-           if (_eventTree.treeLeaf.mcEt->at(iGenPho)>_config.GetPhoPtMin()){
-             _nAccTotPassed+=_lumiWeight;
-             _nAccTotPassedErr+=_lumiWeight*_lumiWeight;
-           }
-           bin = _config.FindPhoPtBinByPhoPt(_eventTree.treeLeaf.mcEt->at(iGenPho));
-           if (bin<(int)_config.GetNPhoPtBins() && bin!=-1){
-             _nAcc1DPassed[bin]+=_lumiWeight;
-             _nAcc1DPassedErr[bin]+=_lumiWeight*_lumiWeight;
-            }
-          }  //end of if (isPhoAcc && isLepAcc)
-        }//end of loops over iGenPho and iGenLep
-  return accPassed;
+  imcLep1=vec_imc_lep[0];
+  if (_vgamma==_config.Z_GAMMA) imcLep2=vec_imc_lep[1];
+
+  if (vec_imc_pho.size()==1) {imcPho=vec_imc_pho[0]; phoPt=leaf.mcEt->at(imcPho);}
+  else{
+    float phoPt=-1;
+    for (int iv=0; iv<vec_imc_pho.size(); iv++){
+      if (leaf.mcEt->at(vec_imc_pho[iv])>phoPt){
+        imcPho=vec_imc_pho[iv]; phoPt=leaf.mcEt->at(imcPho);
+      }
+    }// end of loop over iv
+  }// end of else
+
+  if (imcPho==-1 || imcLep1==-1){dR=-1; phoPt=-1; return patt;}
+  if (_vgamma==_config.Z_GAMMA && imcLep1==-1){dR=-1; phoPt=-1; return patt;}
+
+  TMathTools math;
+  dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
+  if (_vgamma==_config.Z_GAMMA){
+    float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
+    if (dR2<dR) dR=dR2;
+  }
+
+  return patt;
 }
 
+bool CalcAccAndEff::IsFSR(TEventTree::InputTreeLeaves &leaf, int imcPho, int lepID, int bosonID)
+{
+  if (leaf.mcPID->at(imcPho)!=22) return 0;
+  if (fabs(leaf.mcMomPID->at(imcPho))!=lepID) return 0;
+  if (fabs(leaf.mcGMomPID->at(imcPho))!=bosonID) return 0;
+  return 1;
+}// end of IsFSR
+
+bool CalcAccAndEff::IsTGC(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID)
+{
+  if (leaf.mcPID->at(imcPho)!=22) return 0;
+  if (fabs(leaf.mcMomPID->at(imcPho))!=bosonID) return 0;
+  return 1;
+}// end of IsTGC
+
+bool CalcAccAndEff::IsISR(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID)
+{
+  if (leaf.mcPID->at(imcPho)!=22) return 0;
+  for (int imc=0; imc<leaf.nMC; imc++){
+    if (fabs(leaf.mcPID->at(imc))==bosonID && leaf.mcMomPID->at(imc)==leaf.mcMomPID->at(imcPho))
+      if (fabs(leaf.mcMomPID->at(imc))<=6 || fabs(leaf.mcMomPID->at(imc))==21)
+        return 1;
+      // PID 1-6 - quarks, 21 - gluon 
+      // (sometimes photon Mom is gluon even though gluon physically can't radiate photon)
+  }// end of loop over imc
+  return 0;
+}// end of IsISR
+
+void CalcAccAndEff::ComputeNumerator()
+{
+  TString fName = _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_CHISO, "phoEt");
+  TFile* fYields = new TFile(fName);
+  _Hnumerator1D = (TH1F*)fYields->Get(_config.GetYieldsSignalMCGenBinsName(_config.ONEDI, _config.COMMON));
+  TH1F* hTemp = (TH1F*)fYields->Get(_config.GetYieldsSelectedName(_config.ONEDI, _config.COMMON, _config.SIGMC));
+  _numTot=0;
+  _numTotErr=0;
+  for (int ib=1; ib<=hTemp->GetNbinsX(); ib++){
+    _numTot += hTemp->GetBinContent(ib);
+    _numTotErr = hTemp->GetBinError(ib)*hTemp->GetBinError(ib);
+  }
+  _numTotErr=sqrt(_numTotErr);
+
+}// end of ComputeNumerator
+
+void CalcAccAndEff::ComputeDenominator()
+{
+  _mcPatternNeg=0;
+  for (int ip=0; ip<_nPosPatts; ip++){
+    _mcPatternPos[ip]=0;
+  }
+
+  _Hdenominator1D = (TH1F*)_Hnumerator1D->Clone(_Hnumerator1D->GetName()+TString("_PhaseSpaceOnly"));
+  _denTot=0;
+  _denTotErr=0;
+  _Hdenominator1D->Sumw2();
+
+  _HdenominatorNoWeight1D = (TH1F*)_Hnumerator1D->Clone(_Hnumerator1D->GetName()+TString("_denNoWeight"));
+  _denNoWeightTot=0;
+  _denNoWeightTotErr=0;
+
+  _HcsTheory1D = (TH1F*)_Hnumerator1D->Clone(_Hnumerator1D->GetName()+TString("_csTheory"));
+  _csTheoryTot=0;
+  _csTheoryTotErr=0;
+
+  for (int ib=1; ib<=_Hdenominator1D->GetNbinsX(); ib++){
+    _Hdenominator1D->SetBinContent(ib,0);
+    _Hdenominator1D->SetBinError(ib,0);
+    _HdenominatorNoWeight1D->SetBinContent(ib,0);
+    _HdenominatorNoWeight1D->SetBinError(ib,0);
+    _HcsTheory1D->SetBinContent(ib,0);
+    _HcsTheory1D->SetBinError(ib,0);
+  }
+  LoopOverInputFiles();
+  _denTotErr=sqrt(_denTot);
+  std::cout<<"_mcPatternNeg="<<_mcPatternNeg<<std::endl;
+  for (int ip=0; ip<_nPosPatts; ip++){
+    std::cout<<"_mcPatternPos["<<ip<<"]="<<_mcPatternPos[ip]<<", ("<<_strPattern[ip]<<")"<<std::endl;
+  }
+}// end of ComputeDenominator
 
 void CalcAccAndEff::PlotAndSaveOutput()
 {
-  int nBins = _config.GetNPhoPtBins();
+  _fOut->cd();
+  TString cName="C_accXeff_";
+  cName+=_config.StrChannel(_channel);
+  cName+="_";
+  cName+=_config.StrVgType(_vgamma);
+  TCanvas* canv = new TCanvas(cName,cName);
+  canv->SetLogx();
+  _HaccXeff1D->SetLineWidth(2);
+  _HaccXeff1D->GetXaxis()->SetMoreLogLabels(); 
+  _HaccXeff1D->GetXaxis()->SetNoExponent();
+  _HaccXeff1D->Draw();
 
-  TH1D* hAcc1D = new TH1D(_config.GetAccName(_config.ONEDI),_config.GetAccName(_config.ONEDI),nBins,_phoPtLimits);
-  TH1D* hEff1D = new TH1D(_config.GetEffName(_config.ONEDI),_config.GetEffName(_config.ONEDI),nBins,_phoPtLimits);
-  TH1D* hAccTot = new TH1D(_config.GetAccName(_config.TOTAL),_config.GetAccName(_config.TOTAL),1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
-  TH1D* hEffTot = new TH1D(_config.GetEffName(_config.TOTAL),_config.GetEffName(_config.TOTAL),1,_config.GetPhoPtMin(),_config.GetPhoPtMax());
+  _HaccXeff1D->Write();
+  _HcsTheory1D->Write();
 
-  TH1D* hAccXEff1D = new TH1D("hAccXEff","hAccXEff",nBins,_phoPtLimits);
-  TH1D* hAccxEff1D = new TH1D("hAccxEff","hAccxEff",nBins,_phoPtLimits);
-
-  for (int i=0; i<_config.GetNPhoPtBins(); i++){
-    hAcc1D->SetBinContent(i+1,_acc1D[i]);
-    hAcc1D->SetBinError(i+1,_acc1DErr[i]);
-    hEff1D->SetBinContent(i+1,_eff1D[i]);
-    hEff1D->SetBinError(i+1,_eff1DErr[i]);
-
-    hAccXEff1D->SetBinContent(i+1,_accXeff1D[i]);
-    hAccXEff1D->SetBinError(i+1,_accXeff1DErr[i]);
-  }
-  hAccxEff1D->Multiply(hAcc1D,hEff1D);
- 
-  hAccTot->SetBinContent(1,_accTot);
-  hAccTot->SetBinError(1,_accTotErr);
-  hEffTot->SetBinContent(1,_effTot);
-  hEffTot->SetBinError(1,_effTotErr);
-
-  hAcc1D->SetLineWidth(2);
-  hEff1D->SetLineWidth(2);
-  hAccTot->SetLineWidth(2);
-  hEffTot->SetLineWidth(2);
-
-  hAcc1D->SetLineColor(2);
-  hEff1D->SetLineColor(4);
-  hAccTot->SetLineColor(2);
-  hEffTot->SetLineColor(4);
-
-
-  //Draw
-  TCanvas* cAcc = new TCanvas("cAcc","cAcc");
-  cAcc->SetLogx();
-  hAcc1D->SetStats(0);
-  hAcc1D->SetTitle("Acceptance");
-  hAcc1D->GetXaxis()->SetMoreLogLabels();
-  hAcc1D->GetXaxis()->SetNoExponent();
-  hAcc1D->Draw();
-  hAccTot->Draw("same");
-
-  TCanvas* cEff = new TCanvas("cEff","cEff");
-  cEff->SetLogx();
-  hEff1D->SetStats(0);
-  hEff1D->SetTitle("Efficiency");
-  hEff1D->GetXaxis()->SetMoreLogLabels();
-  hEff1D->GetXaxis()->SetNoExponent();
-  hEff1D->Draw();
-  hEffTot->Draw("same");
-
-  TCanvas* cAccXEff = new TCanvas("cAccXEff","cAccXEff");
-  cAccXEff->SetLogx();
-  hAccXEff1D->SetStats(0);
-  hAccXEff1D->SetTitle("AccXEff");
-  hAccXEff1D->GetXaxis()->SetMoreLogLabels();
-  hAccXEff1D->GetXaxis()->SetNoExponent();
-  hAccXEff1D->Draw();
-  hAccxEff1D->SetLineColor(3);
-  hAccxEff1D->Draw("same");
-
-  //save
-  TString fNameAcc=_config.GetAccFileName(_channel,_vgamma) ;
-  TFile fAcc(fNameAcc,"recreate");
-  hAcc1D->Write((_config.GetAccName(_config.ONEDI)) );
-  hAccTot->Write((_config.GetAccName(_config.TOTAL)) );
-  cAcc->Write("cAcc");
-
-  TString fNameEff=_config.GetEffFileName(_channel,_vgamma) ;
-  TFile fEff(fNameEff,"recreate");  
-  hEff1D->Write((_config.GetEffName(_config.ONEDI)) );
-  hEffTot->Write((_config.GetEffName(_config.TOTAL)) );
-  cEff->Write("cEff");
-
-}
+}// end of PlotAndSaveOutput
 
 bool CalcAccAndEff::CheckMaxNumbersInTree()
 {
@@ -548,4 +395,4 @@ bool CalcAccAndEff::CheckMaxNumbersInTree()
      return 0;
    }
   return 1;
-}
+}// end of CheckMaxNumbersInTree

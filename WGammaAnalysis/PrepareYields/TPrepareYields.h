@@ -23,6 +23,7 @@ class TPrepareYields
 
     struct PrepareYieldsPars{
       TString varKin;
+      TString varKinGen;
       int nKinBins; 
       float kinBinLims[100];
       float blindFraction;
@@ -40,6 +41,10 @@ class TPrepareYields
       TString strPlotsDir;
       TString strPlotsBaseName;
       int templFits;
+      TString strYieldsName1D_BkgSubtrData[3];
+      TString strYieldsNameTot_BkgSubtrData[3];
+      TString strYieldsName1D_SignalMCGenBins[3];
+      TString strYieldsNameTot_SignalMCGenBins[3];
     };
 
     struct YieldsSource{
@@ -49,6 +54,7 @@ class TPrepareYields
       TString label;
       int color;
       TH1F* hist[3];//_BARREL, _ENDCAP, _COMMON
+      TH1F* histBlind[3];//_BARREL, _ENDCAP, _COMMON
       float yieldTotVal[3];//_BARREL, _ENDCAP, _COMMON
       float yieldTotErr[3];
       TString strYieldsName1D[3];//must have default values

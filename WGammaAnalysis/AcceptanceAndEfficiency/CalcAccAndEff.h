@@ -20,97 +20,73 @@
 class CalcAccAndEff
   {
      public:
-       CalcAccAndEff (int year, int channel, int vgamma, int phoWP, string configfile="../Configuration/config.txt", bool isNoPuReweight=0, bool isDebugMode=0);
+       CalcAccAndEff (int channel, int vgamma, bool isDebugMode=0, string configfile="../Configuration/config.txt");
 
        virtual ~CalcAccAndEff();
        void    LoopOverInputFiles();
 
      private:
 
-       void    LoopOverTreeEvents();
-       bool    AcceptancePassed(bool** accLeptonPhotonPassed);    
-       void    ComputeAcceptance();
-       void    ComputeEfficiency();
+       void    LoopOverTreeEvents(); 
+       void    ComputeNumerator();
+       void    ComputeDenominator();
+       int     FindDeltaRandPhoPt(TEventTree::InputTreeLeaves &leaf, float& dR, float& phoPt);
+       bool    IsFSR(TEventTree::InputTreeLeaves &leaf, int imcPho, int lepID, int bosonID);
+       bool    IsTGC(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);
+       bool    IsISR(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);
        void    ComputeAccTimesEff();
+
        void    PrintAccAndEffSummary();
        void    PlotAndSaveOutput();
        bool    CheckMaxNumbersInTree();
 
-       TFile* _fSelectedVeryPreliminary;
-       int _year;
-
        TAllInputSamples* _INPUT;
        TEventTree _eventTree;
 
+       bool _isDebugMode;
        int _channel;
        int _vgamma;
-       int _phoWP;
-
-       bool _isDebugMode;
-       bool _isNoPuReweight;
-
        float _lumiWeight;
-       float _debugModeWeight;
-       float _totalWeight;
+       long _Nentries;
+       float _csWholeMCfile;
 
-       TFullCuts::PassedLevels _passed;
-
-       int _nLe;
-       float* _phoPtLimits;
-
-       //Acceptance:
-       float  _nAccTotEvents;
-       float  _nAccTotEventsErr;
-       float  _nAccTotPassed;
-       float  _nAccTotPassedErr;
-       float* _nAcc1DEvents;
-       float* _nAcc1DEventsErr;
-       float* _nAcc1DPassed;
-       float* _nAcc1DPassedErr;
-
-       float  _accTot;
-       float  _accTotErr;
-       float* _acc1D;
-       float* _acc1DErr;
-
-       //Efficiency:
-       float  _nEffTotEvents;
-       float  _nEffTotEventsErr;
-       float  _nEffTotPrePassed;
-       float  _nEffTotPrePassedErr;
-       float  _nEffTotPrePassed2;
-       float  _nEffTotPrePassed2Err;
-       float  _nEffTotPassed;
-       float  _nEffTotPassedErr;
-       float* _nEff1DEvents;
-       float* _nEff1DEventsErr;
-       float* _nEff1DPrePassed;
-       float* _nEff1DPrePassedErr;
-       float* _nEff1DPrePassed2;
-       float* _nEff1DPrePassed2Err;
-       float* _nEff1DPassed;
-       float* _nEff1DPassedErr;
-       float  _effTot;
-       float  _effTotErr;
-       float* _eff1D;
-       float* _eff1DErr;
+       TFile* _fOut;
 
        //Acc times Eff
        float  _accXeffTot;
        float  _accXeffTotErr;
-       float* _accXeff1D;
-       float* _accXeff1DErr;
+       TH1F* _HaccXeff1D;
+
+       // numerator used to compute Acc x Eff
+       // comes as output of PrepareYields (signal MC yields in phoGenEt bins)
+       float _numTot;
+       float _numTotErr;
+       TH1F* _Hnumerator1D;
+
+       // denominator used to compute Acc x Eff
+       float _denTot;
+       float _denTotErr;
+       TH1F* _Hdenominator1D;
+
+       // same as denominator but without lumiWeight
+       float _denNoWeightTot;
+       float _denNoWeightTotErr;
+       TH1F* _HdenominatorNoWeight1D;
+
+       // is computed from denominator without lumiWeight
+       float _csTheoryTot;
+       float _csTheoryTotErr;
+       TH1F* _HcsTheory1D;
 
        TFullCuts _fullCuts;
        TMathTools _math;
-       TPhotonCuts _photonEmpty;
-       TMuonCuts _muonEmpty;
-//     TElectronCuts electronEmpty_;
+
+       const static int _nPosPatts=10;
+       int _mcPatternNeg;
+       int _mcPatternPos[_nPosPatts];
+       TString _strPattern[_nPosPatts];
 
        const static int _debugModeNEntries=100000;
-
-       zgamma::PhosphorCorrectionFunctor* _photonCorrector;
-       TPuReweight* _puWeight;
        TConfiguration _config;
   };
 

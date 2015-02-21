@@ -51,6 +51,7 @@
   anPars.noCalcCrossSection[conf.MUON][conf.W_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noCalcAccAndEff[conf.MUON][conf.W_GAMMA]=1;
 
   // [conf.MUON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.MUON][conf.Z_GAMMA]=1;
@@ -65,6 +66,7 @@
   anPars.noCalcCrossSection[conf.MUON][conf.Z_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noCalcAccAndEff[conf.MUON][conf.Z_GAMMA]=1;
 
   // [conf.ELECTRON][conf.W_GAMMA]
   anPars.noPreSelection[conf.ELECTRON][conf.W_GAMMA]=1;
@@ -79,6 +81,7 @@
   anPars.noCalcCrossSection[conf.ELECTRON][conf.W_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noCalcAccAndEff[conf.ELECTRON][conf.W_GAMMA]=1;
 
   // [conf.ELECTRON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
@@ -93,6 +96,7 @@
   anPars.noCalcCrossSection[conf.ELECTRON][conf.Z_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  anPars.noCalcAccAndEff[conf.ELECTRON][conf.Z_GAMMA]=1;
 
 
   fch.RunAnalysis(anPars);

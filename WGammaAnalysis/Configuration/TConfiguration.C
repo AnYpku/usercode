@@ -107,14 +107,12 @@ void TConfiguration::Print()
 
 }
 
-TString TConfiguration::GetOutputDirName(int channel, int vgamma)
-{
+TString TConfiguration::GetOutputDirName(int channel, int vgamma){
   TString strDir=_outputDir+StrChannel(channel)+TString("_")+StrVgType(vgamma)+TString("/");
   return strDir;
 } 
 
-TString TConfiguration::GetPlotsDirName(int channel, int vgamma, int plotsType)
-{
+TString TConfiguration::GetPlotsDirName(int channel, int vgamma, int plotsType){
   TString strDir=GetOutputDirName(channel, vgamma)+TString("Plots/")+StrPlotsType(plotsType)+TString("/");
   return strDir;
 }
@@ -141,79 +139,54 @@ TString TConfiguration::GetSelectedName(int selectionStage, int channel, int vga
   return name;
 }
 
-TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight)
-{
+TString TConfiguration::GetSpecialModeName(bool isDebugMode, bool isNoPuReweight){
   TString name="";
   if (isDebugMode) name+=nameDebugMode_;
   if (isNoPuReweight) name+=nameNoPuReweight_;
   return name;
 }
 
-TString TConfiguration::GetYieldsFileName(int channel, int vgamma, int templ, TString strKin)
-{
+TString TConfiguration::GetYieldsFileName(int channel, int vgamma, int templ, TString strKin){
   return GetOutputDirName(channel,vgamma)+_yieldsFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");
 }
 
-TString TConfiguration::GetYieldsMCtruthFileName(int channel, int vgamma, TString strKin)
-{
+TString TConfiguration::GetYieldsMCtruthFileName(int channel, int vgamma, TString strKin){
   return GetOutputDirName(channel,vgamma)+_yieldsFileName+TString("_MCtruth_")+StrVgType(vgamma)+TString("_")+strKin+TString("_.root");
 }
 
 
-TString TConfiguration::GetYieldsSelectedName(int csMode, int etaBin,int sample, TString sourceName)
-{
-  TString name = _yieldsSelectedName+StrSample(sample);
+TString TConfiguration::GetYieldsSelectedName(int csMode, int etaBin,int sample, TString sourceName){
+  TString name = _yieldsSelectedName+TString("_")+StrSample(sample)+TString("_");
   if (sample==BKGMC) name+=sourceName;
-  return name+StrCsMode(csMode)+StrEtaBin(etaBin);
+  return name+TString("_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
 }
 
-TString TConfiguration::GetYieldsSelectedSignalMCGenName(int csMode, int etaBin)
-{
-  return _yieldsSelectedSignalMCGenName+StrCsMode(csMode)+StrEtaBin(etaBin);
-}
-
-TString TConfiguration::GetYieldsDDTemplateFakeName(int csMode, int etaBin)
-{
+TString TConfiguration::GetYieldsDDTemplateFakeName(int csMode, int etaBin){
   return _yieldsDDTemplateFakeName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
-TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode, int etaBin)
-{
+TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode, int etaBin){
   return _yieldsDDTemplateTrueName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
-TString TConfiguration::GetYieldsSignalName(int csMode, int etaBin)
-{
-  return _yieldsSignalName+StrCsMode(csMode)+StrEtaBin(etaBin);
+TString TConfiguration::GetYieldsBkgSubtrDataName(int csMode, int etaBin){
+  return TString("yieldsBkgSubtrData_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
 }
 
-TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin)
-{
+TString TConfiguration::GetYieldsSignalMCGenBinsName(int csMode, int etaBin){
+  return TString("yieldsSignalMCGenBins_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
+}
+
+TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin){
   return GetOutputDirName(channel,vgamma)+_DDTemplateFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");
 }
 
-
-TString TConfiguration::GetAccFileName(int channel, int vgamma)
-{
-  return GetOutputDirName(channel, vgamma)+_accFileName;
+TString TConfiguration::GetAccXEffFileName(int channel, int vgamma){
+  return GetOutputDirName(channel, vgamma)+_accXeffFileName;
 }
 
-TString TConfiguration::GetAccName(int csMode)
-{
-  return _accName+StrCsMode(csMode);
-}
-
-TString TConfiguration::GetEffFileName(int channel, int vgamma)
-{
-  return GetOutputDirName(channel, vgamma)+_effFileName;
-}
-
-TString TConfiguration::GetEffName(int csMode)
-{
-  return _effName+StrCsMode(csMode);
-}
-
-
+TString TConfiguration::GetAccXEffName(int csMode){
+  return _accXeffName+StrCsMode(csMode);}
 
 //TString TConfiguration::GetUnfoldingFileName(int channel)
 //{
@@ -240,78 +213,64 @@ TString TConfiguration::GetEffName(int csMode)
 //  return yieldsGen1DName_;
 //}
 
-TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV()
-{
+TString TConfiguration::GetPhotonScaleFactorsFileNamePt15to20GeV(){
   return _certifiedConstantsDir+_photonScaleFactorsFileNamePt15to20GeV;
 }
 
-TString TConfiguration::GetPhotonScaleFactorsFileNamePt20toInfGeV()
-{
+TString TConfiguration::GetPhotonScaleFactorsFileNamePt20toInfGeV(){
   return _certifiedConstantsDir+_photonScaleFactorsFileNamePt20toInfGeV;
 }
 
-TString TConfiguration::GetPileupDataFileName()
-{
+TString TConfiguration::GetPileupDataFileName(){
   return _certifiedConstantsDir+_pileupDataFileName;
 }
 
-TString TConfiguration::GetPhosphorConstantFileName()
-{
+TString TConfiguration::GetPhosphorConstantFileName(){
   return (_phosphorConstantsFile);
 }
 
-int TConfiguration::GetNPhoPtBins()
-{
+int TConfiguration::GetNPhoPtBins(){
   return _nPhoPtBins;
 }
 
-void TConfiguration::GetPhoPtBinsLimits(float* lims)
-{
+void TConfiguration::GetPhoPtBinsLimits(float* lims){
   for (int i=0; i<_nPhoPtBins+1; i++)
     lims[i]=_phoPtBinsLimits[i];
 }
 
-int TConfiguration::FindPhoPtBinByPhoPt(float pt)
-{
+int TConfiguration::FindPhoPtBinByPhoPt(float pt){
   for (int i=0; i<_nPhoPtBins+1; i++)
     if (pt>=_phoPtBinsLimits[i] && pt<_phoPtBinsLimits[i+1])
       return i;
   return -1; 
 }
 
-float TConfiguration::GetPhoPtMin()
-{
+float TConfiguration::GetPhoPtMin(){
   return _phoPtMin;
 }
 
-float TConfiguration::GetPhoPtMax()
-{
+float TConfiguration::GetPhoPtMax(){
   return _phoPtMax;
 }
 
-float TConfiguration::GetLePhoDeltaRMin()
-{
+float TConfiguration::GetLePhoDeltaRMin(){
   return _lePhoDeltaRMin;
 }
 
-int TConfiguration::GetBlindPrescale()
-{
+int TConfiguration::GetBlindPrescale(){
   return _blindPrescale;
 }
 
-int TConfiguration::GetPhoPtBlindThreshold()
-{
+int TConfiguration::GetPhoPtBlindThreshold(){
   return _phoPtBlindThreshold;
 }
 
-int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed)
-{ 
+int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed){ 
   if (isOverflowUsed) return GetNPhoPtBins()+2;
   return GetNPhoPtBins()+1;
 }
 
-void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed)
-{
+void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed){
   lims[0]=0.0;
   for (int i=0; i<_nPhoPtBins+2; i++)
     lims[i+1]=_phoPtBinsLimits[i];
@@ -319,8 +278,7 @@ void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed)
     lims[_nPhoPtBins+2]=_phoPtMax;
 }
 
-int TConfiguration::FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed)
-{
+int TConfiguration::FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed){
   if (pt<_phoPtBinsLimits[0]) return 0;
   for (int i=0; i<GetNPhoPtBins()+1; i++)
     if (pt>=_phoPtBinsLimits[i] && pt<_phoPtBinsLimits[i+1])

@@ -119,6 +119,12 @@ MergeMCintoData $namedir $namevgamma
 namedir=../WGammaOutput/MUON_WGamma/FullySelected/
 MergeMCintoData $namedir $namevgamma
 
+namedir=../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/
+MergeMCintoData $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_WGamma/FullySelected/
+MergeMCintoData $namedir $namevgamma
+
 namevgamma=ZGamma
 
 namedir=../WGammaOutput/MUON_ZGamma/PreliminaryForTemplateMethodSelected/
@@ -130,6 +136,15 @@ MergeMCintoData $namedir $namevgamma
 namedir=../WGammaOutput/MUON_ZGamma/FsrSelected/
 MergeMCintoData $namedir $namevgamma
 
+namedir=../WGammaOutput/ELECTRON_ZGamma/PreliminaryForTemplateMethodSelected/
+MergeMCintoData $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_ZGamma/FullySelected/
+MergeMCintoData $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_ZGamma/FsrSelected/
+MergeMCintoData $namedir $namevgamma
+
 ## end of Merge MC files into data
 ##################################
 
@@ -137,6 +152,11 @@ MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
 MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
 MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
 MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
+
+MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
+MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
+MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
+MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
 
 #root -l -b -q runClosureTest.C
 root -l runClosureTest.C
@@ -147,11 +167,20 @@ MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
 MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
 MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
 
+MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
+MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
+MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
+MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
 
 MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
 MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
 MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
 MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
+
+MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
+MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
+MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
+MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
 
 ##################################
 ## Move data files back
@@ -164,6 +193,12 @@ MoveDataFileBack $namedir $namevgamma
 namedir=../WGammaOutput/MUON_WGamma/FullySelected/
 MoveDataFileBack $namedir $namevgamma
 
+namedir=../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/
+MoveDataFileBack $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_WGamma/FullySelected/
+MoveDataFileBack $namedir $namevgamma
+
 namevgamma=ZGamma
 
 namedir=../WGammaOutput/MUON_ZGamma/PreliminaryForTemplateMethodSelected/
@@ -173,6 +208,15 @@ namedir=../WGammaOutput/MUON_ZGamma/FullySelected/
 MoveDataFileBack $namedir $namevgamma
 
 namedir=../WGammaOutput/MUON_ZGamma/FsrSelected/
+MoveDataFileBack $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_ZGamma/PreliminaryForTemplateMethodSelected/
+MoveDataFileBack $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_ZGamma/FullySelected/
+MoveDataFileBack $namedir $namevgamma
+
+namedir=../WGammaOutput/ELECTRON_ZGamma/FsrSelected/
 MoveDataFileBack $namedir $namevgamma
 
 ## end of Move data files back

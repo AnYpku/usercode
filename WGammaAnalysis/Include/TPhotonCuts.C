@@ -22,7 +22,7 @@ TPhotonCuts::~TPhotonCuts()
 bool TPhotonCuts::PassedKinematics(float phoPt, float phoEta, bool& ifPassedPt, bool& ifPassedEta)
 {
   ifPassedPt=true; ifPassedEta=true;
-  if (phoPt<_phoPtCut) ifPassedPt=false;
+//  if (phoPt<_phoPtCut) ifPassedPt=false;
   if (!IsBarrel(phoEta) && !IsEndcap(phoEta)) ifPassedEta=false;
   return (ifPassedPt && ifPassedEta);
 }

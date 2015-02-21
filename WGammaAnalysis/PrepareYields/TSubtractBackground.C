@@ -69,14 +69,15 @@ void TSubtractBackground::SubtractBackground()
 
   for (int isDD=0; isDD<_nDDsources; isDD++){
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
-      _sourceBkgSubtrData[isDD].hist[ieta] = (TH1F*)_sourceDDTrue[isDD].hist[ieta]->Clone(_sourceBkgSubtrData[isDD].name);
+      _sourceBkgSubtrData[isDD].hist[ieta] = (TH1F*)_sourceDDTrue[isDD].hist[ieta]->Clone(_pyPars.strYieldsName1D_BkgSubtrData[ieta]);
       _sourceBkgSubtrData[isDD].yieldTotVal[ieta]=_sourceDDTrue[isDD].yieldTotVal[ieta];
       _sourceBkgSubtrData[isDD].yieldTotErr[ieta]=_sourceDDTrue[isDD].yieldTotErr[ieta]*_sourceDDTrue[isDD].yieldTotErr[ieta];
-      _sourceBkgSubtrData[isDD].hist[ieta]->SetTitle(_sourceBkgSubtrData[isDD].name);
+      _sourceBkgSubtrData[isDD].hist[ieta]->SetTitle(_pyPars.strYieldsName1D_BkgSubtrData[ieta]);
+      _sourceBkgSubtrData[isDD].hist[ieta]->SetName(_pyPars.strYieldsName1D_BkgSubtrData[ieta]);
       int nBins = _sourceBkgSubtrData[isDD].hist[ieta]->GetNbinsX();
       for (int i=0; i<_sources.size(); i++){
         if (_sources[i].sourceType!=BKGMC_TRUE) continue;
-        _sourceBkgSubtrData[isDD].hist[ieta]->Add(_sources[i].hist[ieta],-1);
+        _sourceBkgSubtrData[isDD].hist[ieta]->Add(_sources[i].histBlind[ieta],-1);
         _sourceBkgSubtrData[isDD].yieldTotVal[ieta]-=_sources[i].yieldTotVal[ieta];
         _sourceBkgSubtrData[isDD].yieldTotErr[ieta]+=_sources[i].yieldTotErr[ieta]*_sources[i].yieldTotErr[ieta];
       }//end of loop over i
@@ -115,23 +116,23 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
     if (_sources[is].sourceType==SIGMC) isSign=is;
     if (_sources[is].sourceType!=bkgType) continue;
     std::cout<<TString("Compare")+strDD+TString("DDvsMC: processing isource ")<<_sources[is].name<<std::endl;
-    mcHists->Add(_sources[is].hist[ieta]);
+    mcHists->Add(_sources[is].histBlind[ieta]);
     if (!hSumStarted){
-      hSum=(TH1F*)_sources[is].hist[ieta]->Clone("hSum_WholeMC");
+      hSum=(TH1F*)_sources[is].histBlind[ieta]->Clone("hSum_WholeMC");
       hSumStarted=1;
     }
-    else hSum->Add(_sources[is].hist[ieta]);
-    legend->AddEntry(_sources[is].hist[ieta],_sources[is].label);
+    else hSum->Add(_sources[is].histBlind[ieta]);
+    legend->AddEntry(_sources[is].histBlind[ieta],_sources[is].label);
   }//end of loop over is
 
   if (isSign!=-1 && bkgType==BKGMC_TRUE) {
-    mcHists->Add(_sources[isSign].hist[ieta]);  
-    legend->AddEntry(_sources[isSign].hist[ieta],_sources[isSign].label);  
+    mcHists->Add(_sources[isSign].histBlind[ieta]);  
+    legend->AddEntry(_sources[isSign].histBlind[ieta],_sources[isSign].label);  
     if (!hSumStarted){
-      hSum=(TH1F*)_sources[isSign].hist[ieta]->Clone("hSum_WholeMC");
+      hSum=(TH1F*)_sources[isSign].histBlind[ieta]->Clone("hSum_WholeMC");
       hSumStarted=1;
     }
-    else hSum->Add(_sources[isSign].hist[ieta]);
+    else hSum->Add(_sources[isSign].histBlind[ieta]);
   }
 
   TH1F* hists[_nDDsources];
@@ -208,10 +209,40 @@ void TSubtractBackground::PlotPrintSave()
   }
 
   //Print Yields
-  for (int is=0; is<_sources.size(); is++){
-    for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+  std::cout<<std::endl;
+  std::cout<<"Print Yields:"<<std::endl;
+  std::cout<<std::endl;
+
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    std::cout<<StrLabelEta(ieta)<<std::endl;
+    for (int is=0; is<_sources.size(); is++){
       PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].hist[ieta]);
-    }
-  }//end of loop over is
+    }//end of loop over is
+    for (int is=0; is<_nDDsources; is++){
+      PrintYieldsOne(_sourceDDFake[is].name+TString(": "), _sourceDDFake[is].yieldTotVal[ieta], _sourceDDFake[is].yieldTotErr[ieta], _sourceDDFake[is].hist[ieta]);
+      PrintYieldsOne(_sourceDDTrue[is].name+TString(": "), _sourceDDTrue[is].yieldTotVal[ieta], _sourceDDTrue[is].yieldTotErr[ieta], _sourceDDTrue[is].hist[ieta]);
+      PrintYieldsOne(_sourceBkgSubtrData[is].name+TString(": "), _sourceBkgSubtrData[is].yieldTotVal[ieta], _sourceBkgSubtrData[is].yieldTotErr[ieta], _sourceBkgSubtrData[is].hist[ieta]);
+    }//end of loop over is   
+    std::cout<<std::endl; 
+  }//end of loop over ieta
+  std::cout<<std::endl;
+  //Save Yields
+  int isSign=-1;
+  for (int is=0; is<_sources.size(); is++){
+    if (_sources[is].sourceType==SIGMC) isSign=is;
+  }
+  _pyPars.fOut->cd(); 
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++)
+    _sourceBkgSubtrData[0].hist[ieta]->Write();
+      //let's say "0" corresponds to result of CHISO fits
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    _sources[isSign].hist[ieta]->Write(_sources[isSign].strYieldsName1D[ieta]);
+    _sources[isSign].histBlind[ieta]->Write(_sources[isSign].strYieldsName1D[ieta]);
+  }
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    _sigMCGenYields[ieta]->Print();
+    _sigMCGenYields[ieta]->Write(_pyPars.strYieldsName1D_SignalMCGenBins[ieta]);
+  }
+
 
 }

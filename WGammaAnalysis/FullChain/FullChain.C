@@ -337,18 +337,23 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
     }//end of loop over ivg
   }//end of loop over ich  
 
+
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      if (anPars.noCalcAccAndEff[ich][ivg]) continue;
+        TString strAffix=TString("Compute Acceptance and Efficiency ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
+      std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+      std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+      anPars.channel=ich;
+      anPars.vgamma=ivg;
+      CalcAccAndEff accAndEff(anPars.channel, anPars.vgamma, anPars.isDebugMode, anPars.configfile);
+      accAndEff.ComputeAccTimesEff();
+      std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+      std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+    }// end of loop over ivg
+  }// end of loop over ich
+
 /*
-  if (!anPars.noCalcAccAndEff){
-    //compute acceptance and efficiency constants
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO Compute Acceptance and Efficiency"<<std::endl;
-    CalcAccAndEff accAndEff(anPars.year, anPars.channel, anPars.vgamma, anPars.phoWP, anPars.configfile, anPars.isNoPuReweight, anPars.isDebugMode);
-    accAndEff.LoopOverInputFiles();
-    std::cout<<"%_%  DONE Compute Acceptance and Efficiency"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
-  }
-
-
   if (!anPars.noCalcCrossSection){
     //compute acceptance and efficiency constants
     std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;

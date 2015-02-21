@@ -88,18 +88,17 @@ class TConfiguration
 
     TString GetYieldsFileName(int channel, int vgamma, int templ, TString strKin);
     TString GetYieldsMCtruthFileName(int channel, int vgamma, TString strKin);
+
     TString GetYieldsSelectedName(int csMode, int etaBin, int sample, TString sourceName="");
-    TString GetYieldsSelectedSignalMCGenName(int csMode, int etaBin);
     TString GetYieldsDDTemplateFakeName(int csMode, int etaBin);
     TString GetYieldsDDTemplateTrueName(int csMode, int etaBin);
-    TString GetYieldsSignalName(int csMode, int etaBin=COMMON);
+    TString GetYieldsBkgSubtrDataName(int csMode, int etaBin=COMMON);
+    TString GetYieldsSignalMCGenBinsName(int csMode, int etaBin=COMMON);
 
     TString GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin);
 
-    TString GetAccFileName(int channel, int vgamma);
-    TString GetAccName(int csMode);
-    TString GetEffFileName(int channel, int vgamma);
-    TString GetEffName(int csMode);
+    TString GetAccXEffFileName(int channel, int vgamma);
+    TString GetAccXEffName(int csMode);
 
 //    TString GetUnfoldingFileName(int channel);
 //    TString GetMatrUnfo1DName();
@@ -168,8 +167,8 @@ static const TString _yieldsFileName="YieldsAndBackground/yields";
 static const TString _yieldsSelectedName="yieldsSelected";
 static const TString _yieldsDDTemplateFakeName="yieldsDDFake";
 static const TString _yieldsDDTemplateTrueName="yieldsDDTrue";
-static const TString _yieldsSignalName="yieldsSignal";
-static const TString _yieldsSelectedSignalMCGenName="yieldsSelectedSignalMCGen";
+//static const TString _yieldsSignalName="yieldsSignal";
+//static const TString _yieldsSelectedSignalMCGenName="yieldsSelectedSignalMCGen";
 
 
 //////////////////////////////////////////
@@ -181,10 +180,8 @@ static const TString _DDTemplateFileName="YieldsAndBackground/DDTemplate";
 //////////////////////////////////////////
 //acceptance and efficiency
 //
-static const TString _accFileName="Constants/Acc.root";
-static const TString _accName="acc"; 
-static const TString _effFileName="Constants/Eff.root";
-static const TString _effName="eff"; 
+static const TString _accXeffFileName="Constants/AccXEff.root";
+static const TString _accXeffName="accXeff"; 
 
 //////////////////////////////////////////
 //unfolding
