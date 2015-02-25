@@ -14,6 +14,7 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TLegend.h"
+#include "TLorentzVector.h"
   // ROOT class
 #include <iostream> 
 #include <string>
@@ -196,22 +197,24 @@ void CalcAccAndEff::LoopOverTreeEvents()
      float dR=-1;
      float phoPt=-1;
      int mcPattern=-1;
-     mcPattern=FindDeltaRandPhoPt(_eventTree.treeLeaf, dR, phoPt);
+     int imcPho, imcLep1, imcLep2;
+     mcPattern=FindMCparticles(_eventTree.treeLeaf, imcPho, imcLep1, imcLep2);
+     //mcPattern=FindDeltaRandPhoPt(_eventTree.treeLeaf, dR, phoPt);
      if (mcPattern==-1) _mcPatternNeg++;
      if (mcPattern>=0) _mcPatternPos[mcPattern]++;
      
-     if (dR>0.7 && phoPt>15){
+     if (PassedPhaseSpaceCut(_eventTree.treeLeaf, imcPho, imcLep1, imcLep2)){
        _denTot+=_lumiWeight;
-       _Hdenominator1D->Fill(phoPt,_lumiWeight);
+       _Hdenominator1D->Fill(_eventTree.treeLeaf.mcEt->at(imcPho),_lumiWeight);
        _denNoWeightTot+=1;
-       _HdenominatorNoWeight1D->Fill(phoPt);
+       _HdenominatorNoWeight1D->Fill(_eventTree.treeLeaf.mcEt->at(imcPho));
      } 
 
   } //end of loop over events in the tree
  
 }// end of LoopOverTreeEvents
 
-int CalcAccAndEff::FindDeltaRandPhoPt(TEventTree::InputTreeLeaves &leaf, float& dR, float& phoPt)
+int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPho, int &imcLep1, int &imcLep2)
 {
   int photonID=22;
   int bosonID;
@@ -230,9 +233,9 @@ int CalcAccAndEff::FindDeltaRandPhoPt(TEventTree::InputTreeLeaves &leaf, float& 
     if (fabs(leaf.mcPID->at(imc))==lepID && fabs(leaf.mcMomPID->at(imc))==bosonID) vec_imc_lep.push_back(imc);
   }// end of loop over imc
 
-  int imcPho=-1;
-  int imcLep1=-1;
-  int imcLep2=-1;// ZGamma only
+  imcPho=-1;
+  imcLep1=-1;
+  imcLep2=-1;// ZGamma only
   int patt=-1;
 
   if (vec_imc_pho.size()==0 && vec_imc_lep.size()==0) {patt=0; _strPattern[0]="0 photons, 0 leptons";}
@@ -248,34 +251,70 @@ int CalcAccAndEff::FindDeltaRandPhoPt(TEventTree::InputTreeLeaves &leaf, float& 
 
   if (vec_imc_pho.size()==0 || vec_imc_lep.size()==0 ||
        (_channel==_config.Z_GAMMA && vec_imc_lep.size()==1)){
-    dR=-1; phoPt=-1; return patt;
+    return patt;
   }
 
   imcLep1=vec_imc_lep[0];
   if (_vgamma==_config.Z_GAMMA) imcLep2=vec_imc_lep[1];
 
-  if (vec_imc_pho.size()==1) {imcPho=vec_imc_pho[0]; phoPt=leaf.mcEt->at(imcPho);}
+  if (vec_imc_pho.size()==1) {imcPho=vec_imc_pho[0]; }
   else{
     float phoPt=-1;
     for (int iv=0; iv<vec_imc_pho.size(); iv++){
       if (leaf.mcEt->at(vec_imc_pho[iv])>phoPt){
-        imcPho=vec_imc_pho[iv]; phoPt=leaf.mcEt->at(imcPho);
+        imcPho=vec_imc_pho[iv]; //phoPt=leaf.mcEt->at(imcPho);
       }
     }// end of loop over iv
   }// end of else
 
-  if (imcPho==-1 || imcLep1==-1){dR=-1; phoPt=-1; return patt;}
-  if (_vgamma==_config.Z_GAMMA && imcLep1==-1){dR=-1; phoPt=-1; return patt;}
+  //  if (imcPho==-1 || imcLep1==-1){return patt;}
+  //  if (_vgamma==_config.Z_GAMMA && imcLep1==-1){return patt;}
 
-  TMathTools math;
-  dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
-  if (_vgamma==_config.Z_GAMMA){
-    float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
-    if (dR2<dR) dR=dR2;
-  }
+  //  TMathTools math;
+  //  dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
+  // if (_vgamma==_config.Z_GAMMA){
+  //   float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
+  //   if (dR2<dR) dR=dR2;
+  // }
 
   return patt;
-}
+}// end of FindMCparticles
+
+bool CalcAccAndEff::PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int imcPho, int imcLep1, int imcLep2)
+{
+  if (imcPho==-1 || imcLep1==-1) return 0;
+  if (_vgamma==_config.Z_GAMMA && imcLep2==-1) return 0;
+
+  TMathTools math;
+  float dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
+  if (!(dR>0.7)) return 0;
+  if (!(fabs(leaf.mcEta->at(imcPho))<2.5)) return 0;
+  if (!(fabs(leaf.mcEta->at(imcLep1))<2.5)) return 0;
+  if (!(leaf.mcPt->at(imcLep1)>20)) return 0;
+
+  if (_vgamma==_config.Z_GAMMA){
+     float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
+     if (!(dR2>0.7)) return 0;
+     if (!(fabs(leaf.mcEta->at(imcLep2))<2.5)) return 0;
+     if (!(leaf.mcPt->at(imcLep2)>20)) return 0;
+     TLorentzVector vlep1, vlep2;
+     vlep1.SetPtEtaPhiM(leaf.mcPt->at(imcLep1),leaf.mcEta->at(imcLep1),leaf.mcPhi->at(imcLep1),0);
+     vlep2.SetPtEtaPhiM(leaf.mcPt->at(imcLep2),leaf.mcEta->at(imcLep2),leaf.mcPhi->at(imcLep2),0);
+     if(!((vlep1 + vlep2).M() > 50)) return 0;
+  }// end of if (_vgamma==_config.Z_GAMMA)
+
+  //I_gen03 < 5 GeV for photon
+  float Igen=0;
+  for (int imc=0; imc<leaf.nMC; imc++){
+    if (imc==imcPho) continue;
+    float dRIgen = math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imc), leaf.mcEta->at(imc));
+    if (dRIgen<0.3) Igen+=leaf.mcPt->at(imc);
+  }// end of imc  
+  if (!(Igen<5)) return 0;
+
+  return 1;
+}// end of 
+
 
 bool CalcAccAndEff::IsFSR(TEventTree::InputTreeLeaves &leaf, int imcPho, int lepID, int bosonID)
 {
@@ -337,7 +376,8 @@ void CalcAccAndEff::ComputeDenominator()
   _denNoWeightTot=0;
   _denNoWeightTotErr=0;
 
-  _HcsTheory1D = (TH1F*)_Hnumerator1D->Clone(_Hnumerator1D->GetName()+TString("_csTheory"));
+  _HcsTheory1D = (TH1F*)_Hnumerator1D->Clone(_config.GetTheoryCSname(_config.ONEDI));
+  _HcsTheory1D->SetTitle(_config.GetTheoryCSname(_config.ONEDI));
   _csTheoryTot=0;
   _csTheoryTotErr=0;
 
@@ -374,6 +414,15 @@ void CalcAccAndEff::PlotAndSaveOutput()
   _HaccXeff1D->Write();
   _HcsTheory1D->Write();
 
+  TMathTools math;
+  TH1F* HaccXeffTot = math.ComputeHistTotal(_config.GetAccXEffName(_config.TOTAL), _HaccXeff1D);
+  TH1F* HcsTheoryTot = math.ComputeHistTotal(_config.GetTheoryCSname(_config.TOTAL),_HcsTheory1D);
+  HaccXeffTot->SetBinContent(1,_accXeffTot);
+  HaccXeffTot->SetBinError(1,_accXeffTotErr);
+  HcsTheoryTot->SetBinContent(1,_csTheoryTot);
+  HcsTheoryTot->SetBinError(1,_csTheoryTotErr);
+  HaccXeffTot->Write();
+  HcsTheoryTot->Write();
 }// end of PlotAndSaveOutput
 
 bool CalcAccAndEff::CheckMaxNumbersInTree()

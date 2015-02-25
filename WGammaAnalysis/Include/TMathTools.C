@@ -2,6 +2,8 @@
   //this class
 
 #include "TMath.h"
+#include "TString.h"
+#include "TH1F.h"
  //root class
 
 #include <string>
@@ -62,4 +64,22 @@ float TMathTools::ErrOfThreeIndependent(string type, float x1, float x2, float x
   }
   std::cout<<"unknown expression type "<<type<<"; value -1 will be returned"<<std::endl;
   return -1;
+}
+
+TH1F* TMathTools::ComputeHistTotal(TString hName, TH1F* h1D)
+{
+  float lowEdge =  h1D->GetBinLowEdge(1);
+  int nBins = h1D->GetNbinsX();
+  float upEdge = h1D->GetBinLowEdge(nBins)+ h1D->GetBinWidth(nBins);
+  TH1F* hTot = new TH1F(hName, hName, 1, lowEdge, upEdge);
+  float totVal=0;
+  float totErr=0;
+  for (int ib=1; ib<=nBins; ib++){
+    totVal+= h1D->GetBinContent(ib);
+    totErr+= h1D->GetBinError(ib)*h1D->GetBinError(ib);
+  }// end of loop over ib
+  totErr = sqrt(totErr);
+  hTot->SetBinContent(1,totVal);
+  hTot->SetBinError(1,totErr);
+  return hTot;
 }

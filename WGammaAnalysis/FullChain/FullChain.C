@@ -10,7 +10,7 @@
 #include "../PrepareYields/TPrepareYields.h"
 #include "../PrepareYields/AuxPrepareYields.C"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
-//#include "../CrossSection/CalcCrossSection.h"
+#include "../CrossSection/CalcCrossSection.h"
 
 #include <iostream>
 
@@ -353,16 +353,20 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
     }// end of loop over ivg
   }// end of loop over ich
 
-/*
-  if (!anPars.noCalcCrossSection){
-    //compute acceptance and efficiency constants
-    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-    std::cout<<"%^%  WILL DO Compute Cross Section"<<std::endl;
-    CalcCrossSection calcCS(anPars.channel, anPars.blind, anPars.configfile);
-    calcCS.Calc();
-    std::cout<<"%_%  DONE Compute Cross Section"<<std::endl;
-    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
-  }
-*/
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      if (anPars.noCalcCrossSection[ich][ivg]) continue;
+        TString strAffix=TString("Compute Cross Section ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
+      std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+      std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+      anPars.channel=ich;
+      anPars.vgamma=ivg;
+      CalcCrossSection cs(anPars.channel, anPars.vgamma, anPars.blind[ich][ivg], anPars.configfile);
+      cs.Calc();
+      std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+      std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+    }// end of loop over ivg
+  }// end of loop over ich
+
 }
 

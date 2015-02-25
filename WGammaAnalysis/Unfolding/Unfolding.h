@@ -37,6 +37,7 @@ class Unfolding
 
 //       TAllInputSamples* _INPUT;
        int _channel;
+       int _vgamma;
 
        TConfiguration _config;
 

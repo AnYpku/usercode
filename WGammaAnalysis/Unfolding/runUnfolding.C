@@ -1,7 +1,7 @@
 {
   gROOT->ProcessLine(".x ../Include/rootlogon.C");
-  Unfolding unf(TConfiguration::MUON);
-  unf.PrepareMigrationMatrix();
-  unf.TestDifferentMethods();
-  unf.PlotAndStore();
+  Unfolding unf(TConfiguration::MUON, TConfiguration::Z_GAMMA);
+    unf.PrepareMigrationMatrix();
+    unf.TestDifferentMethods();
+    unf.PlotAndStore();
 }

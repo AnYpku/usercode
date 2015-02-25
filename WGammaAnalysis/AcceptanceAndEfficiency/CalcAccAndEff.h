@@ -30,7 +30,8 @@ class CalcAccAndEff
        void    LoopOverTreeEvents(); 
        void    ComputeNumerator();
        void    ComputeDenominator();
-       int     FindDeltaRandPhoPt(TEventTree::InputTreeLeaves &leaf, float& dR, float& phoPt);
+       int     FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPho, int &imcLep1, int &imcLep2);
+       bool    PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int imcPho, int imcLep1, int imcLep2);
        bool    IsFSR(TEventTree::InputTreeLeaves &leaf, int imcPho, int lepID, int bosonID);
        bool    IsTGC(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);
        bool    IsISR(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);

@@ -188,6 +188,9 @@ TString TConfiguration::GetAccXEffFileName(int channel, int vgamma){
 TString TConfiguration::GetAccXEffName(int csMode){
   return _accXeffName+StrCsMode(csMode);}
 
+TString TConfiguration::GetTheoryCSname(int csMode){
+  return TString("csTheory_")+StrCsMode(csMode);}
+
 //TString TConfiguration::GetUnfoldingFileName(int channel)
 //{
 //  return GetOutputDirName(channel)+unfoldingFileName_;
@@ -266,17 +269,25 @@ int TConfiguration::GetPhoPtBlindThreshold(){
 }
 
 int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed){ 
+  std::cout<<"TConfiguration::GetNPhoPtUnfBins:"<<std::endl;
+  std::cout<<"isOverflowUsed="<<isOverflowUsed<<std::endl;
+  std::cout<<" GetNPhoPtBins()="<< GetNPhoPtBins()<<std::endl;
   if (isOverflowUsed) return GetNPhoPtBins()+2;
   return GetNPhoPtBins()+1;
 }
 
 void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed){
   lims[0]=0.0;
-  for (int i=0; i<_nPhoPtBins+2; i++)
+  std::cout<<"TConfiguration::GetPhoPtUnfBinsLimits:"<<std::endl;
+  std::cout<<"isOverflowUsed="<<isOverflowUsed<<std::endl;
+  std::cout<<"_nPhoPtBins="<<_nPhoPtBins<<std::endl;
+  for (int i=0; i<_nPhoPtBins+1; i++){
     lims[i+1]=_phoPtBinsLimits[i];
+    std::cout<<"lims["<<i+1<<"]="<<lims[i+1]<<std::endl;
+  }
   if (isOverflowUsed) 
     lims[_nPhoPtBins+2]=_phoPtMax;
-}
+}// end of TConfiguration::GetPhoPtUnfBinsLimits
 
 int TConfiguration::FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed){
   if (pt<_phoPtBinsLimits[0]) return 0;

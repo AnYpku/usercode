@@ -19,7 +19,7 @@ void TEventTree::GetEntryNeededBranchesOnly(int channel, int sample, Long64_t en
   GetEntryCommon(entry);
   if (channel==config.MUON || channel==config.BOTH_CHANNELS) GetEntryMuoSpecific(entry);
   if (channel==config.ELECTRON || channel==config.BOTH_CHANNELS) GetEntryEleSpecific(entry);
-  if (sample==config.DATA || channel==config.MUON || channel==config.BOTH_CHANNELS) GetEntryRandCone(entry);
+  GetEntryRandCone(entry);
   if (sample!=config.DATA) GetEntryMCSpecific(entry);
 }
 

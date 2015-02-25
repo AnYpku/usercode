@@ -99,6 +99,7 @@ class TConfiguration
 
     TString GetAccXEffFileName(int channel, int vgamma);
     TString GetAccXEffName(int csMode);
+    TString GetTheoryCSname(int csMode);
 
 //    TString GetUnfoldingFileName(int channel);
 //    TString GetMatrUnfo1DName();

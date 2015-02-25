@@ -66,7 +66,6 @@ void TSubtractBackground::SubtractBackground()
 {
   std::cout<<"#####################"<<std::endl;
   std::cout<<"Subtract Background"<<std::endl;
-
   for (int isDD=0; isDD<_nDDsources; isDD++){
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
       _sourceBkgSubtrData[isDD].hist[ieta] = (TH1F*)_sourceDDTrue[isDD].hist[ieta]->Clone(_pyPars.strYieldsName1D_BkgSubtrData[ieta]);
@@ -232,9 +231,27 @@ void TSubtractBackground::PlotPrintSave()
     if (_sources[is].sourceType==SIGMC) isSign=is;
   }
   _pyPars.fOut->cd(); 
-  for (int ieta=_BARREL; ieta<=_COMMON; ieta++)
+  TH1F* hBkgSubtrDataTot[3];
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     _sourceBkgSubtrData[0].hist[ieta]->Write();
       //let's say "0" corresponds to result of CHISO fits
+    TString hTotName =  _pyPars.strYieldsNameTot_BkgSubtrData[ieta];
+    float lowEdge =  _sourceBkgSubtrData[0].hist[ieta]->GetBinLowEdge(1);
+    int nBins = _sourceBkgSubtrData[0].hist[ieta]->GetNbinsX();
+    float upEdge = _sourceBkgSubtrData[0].hist[ieta]->GetBinLowEdge(nBins)+ _sourceBkgSubtrData[0].hist[ieta]->GetBinWidth(nBins);
+    hBkgSubtrDataTot[ieta] = new TH1F(hTotName, hTotName, 1, lowEdge, upEdge);
+    float totVal=0;
+    float totErr=0;
+    for (int ib=1; ib<=nBins; ib++){
+      totVal+= _sourceBkgSubtrData[0].hist[ieta]->GetBinContent(ib);
+      totErr+= _sourceBkgSubtrData[0].hist[ieta]->GetBinError(ib)*_sourceBkgSubtrData[0].hist[ieta]->GetBinError(ib);
+    }// end of loop over ib
+    totErr = sqrt(totErr);
+    hBkgSubtrDataTot[ieta]->SetBinContent(1,totVal);
+    hBkgSubtrDataTot[ieta]->SetBinError(1,totErr);
+    hBkgSubtrDataTot[ieta]->Write();
+  }// end of loop over ieta
+
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     _sources[isSign].hist[ieta]->Write(_sources[isSign].strYieldsName1D[ieta]);
     _sources[isSign].histBlind[ieta]->Write(_sources[isSign].strYieldsName1D[ieta]);
@@ -245,4 +262,4 @@ void TSubtractBackground::PlotPrintSave()
   }
 
 
-}
+}// end of PlotPrintSave()

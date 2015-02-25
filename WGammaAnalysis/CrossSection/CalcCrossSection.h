@@ -13,14 +13,13 @@
 class CalcCrossSection
   {
      public:
-       CalcCrossSection (int channel, int blind, string configfile="../Configuration/config.txt");
+    CalcCrossSection (int channel, int vgamma, int blind, string configfile="../Configuration/config.txt");
 
        virtual ~CalcCrossSection();
        void    Calc();
        void    GetSignalYields();
-       void    ApplyEfficiency();
        void    ApplyUnfolding();
-       void    ApplyAcceptance();
+       void    ApplyAccXEff();
        void    DivideOverLumi();
        void    DivideOverBinWidth();
        void    Plot();
@@ -31,6 +30,8 @@ class CalcCrossSection
      private:
 
        int _channel;
+       int _vgamma;
+       int _blind;
        TAllInputSamples* _INPUT;
        TConfiguration _config;
        TFile* _fOut;

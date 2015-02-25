@@ -399,4 +399,3 @@ void TPrepareYields::PrepareMCtruth(int ieta, int bkgType)
   hSum->Write(hSumName);
 
 }// end of PrepareTrueGammaMCtruth
-
