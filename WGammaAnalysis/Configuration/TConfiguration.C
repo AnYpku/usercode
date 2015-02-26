@@ -178,18 +178,22 @@ TString TConfiguration::GetYieldsSignalMCGenBinsName(int csMode, int etaBin){
 }
 
 TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin){
-  return GetOutputDirName(channel,vgamma)+_DDTemplateFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");
-}
+  return GetOutputDirName(channel,vgamma)+_DDTemplateFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");}
 
 TString TConfiguration::GetAccXEffFileName(int channel, int vgamma){
-  return GetOutputDirName(channel, vgamma)+_accXeffFileName;
-}
+  return GetOutputDirName(channel, vgamma)+_accXeffFileName;}
 
 TString TConfiguration::GetAccXEffName(int csMode){
   return _accXeffName+StrCsMode(csMode);}
 
 TString TConfiguration::GetTheoryCSname(int csMode){
   return TString("csTheory_")+StrCsMode(csMode);}
+
+TString TConfiguration::GetCrossSectionFileName(int channel, int vgamma){
+  return  GetOutputDirName(channel, vgamma)+TString("Constants/CS.root");}
+
+TString TConfiguration::GetCSname(int channel, int csMode){
+  return TString("csMeasured_")+StrChannel(channel)+TString("_")+StrCsMode(csMode);}
 
 //TString TConfiguration::GetUnfoldingFileName(int channel)
 //{

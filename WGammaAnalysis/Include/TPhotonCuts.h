@@ -38,8 +38,8 @@ class TPhotonCuts
 
     float GetPhoSigmaIEtaIEtaCutB(int year, int wp);
     float GetPhoSigmaIEtaIEtaCutE(int year, int wp);
-    float GetPhoSigmaIEtaIEtaCutLeftB();
-    float GetPhoSigmaIEtaIEtaCutLeftE();
+    //    float GetPhoSigmaIEtaIEtaCutLeftB();
+    //   float GetPhoSigmaIEtaIEtaCutLeftE();
     float GetOneIsolationCutB(int year, int wp, int isoType, float phoEt);
     float GetOneIsolationCutE(int year, int wp, int isoType, float phoEt);
     float GetPhoSCRChIsoCorrCut();
@@ -95,8 +95,8 @@ class TPhotonCuts
     const static float _phoSigmaIEtaIEtaEndcapCut2012[TPhotonCuts::_nWP]={0.034,0.033,0.031};
     const static float _phoSigmaIEtaIEtaBarrelCut2011=0.011;
     const static float _phoSigmaIEtaIEtaEndcapCut2011=0.030;
-    const static float _phoSigmaIEtaIEtaBarrelCutLeft=0.005;
-    const static float _phoSigmaIEtaIEtaEndcapCutLeft=0.019;
+//    const static float _phoSigmaIEtaIEtaBarrelCutLeft=0.005;
+//    const static float _phoSigmaIEtaIEtaEndcapCutLeft=0.019;
       //left phoSigmaIEtaIEta cuts are not recommended by POG
       //and are introduced for DD template bkg estimation
       //they cut less than 0.5% of events (in Signal MC)

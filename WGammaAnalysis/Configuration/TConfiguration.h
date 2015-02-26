@@ -101,6 +101,9 @@ class TConfiguration
     TString GetAccXEffName(int csMode);
     TString GetTheoryCSname(int csMode);
 
+    TString GetCrossSectionFileName(int channel, int vgamma);
+    TString GetCSname(int channel, int csMode);
+
 //    TString GetUnfoldingFileName(int channel);
 //    TString GetMatrUnfo1DName();
 //    TString GetMatrMigr1DName();

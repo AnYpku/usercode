@@ -28,7 +28,7 @@ CalcCrossSection::CalcCrossSection(int channel, int vgamma, int blind, string co
   _channel=channel;
   _vgamma=vgamma;
   _blind=blind;
-  _fOut = new TFile("fCrossSection.root","recreate");
+  _fOut = new TFile(_config.GetCrossSectionFileName(_channel,_vgamma),"recreate");
   for (int iSource=0; iSource<_INPUT->nSources_; iSource++){
        if (_INPUT->allInputs_[iSource].sample_==_config.DATA){
            _lumi=_INPUT->allInputs_[iSource].lumiTotal_;
@@ -63,8 +63,8 @@ void CalcCrossSection::GetSignalYields()
   _signalYieldTotal=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
   _signalYields1D=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
   _fOut->cd();
-  _signalYieldTotal->Write("signalYieldTotal"); 
-  _signalYields1D->Write("signalYield1D");
+  //  _signalYieldTotal->Write(_config.GetCSname(_channel,_config.TOTAL)); 
+  // _signalYields1D->Write(_config.GetCSname(_channel,_config.ONEDI));
   Print("Signal Yields:");
 }// end of GetSignalYields()
 
@@ -229,6 +229,11 @@ void CalcCrossSection::Plot()
   canv->SaveAs(nameSave);
   nameSave.ReplaceAll(".pdf",".root");
   canv->SaveAs(nameSave);
+
+  _fOut->cd();
+  _signalYieldTotal->Write(_config.GetCSname(_channel,_config.TOTAL)); 
+  _signalYields1D->Write(_config.GetCSname(_channel,_config.ONEDI));
+  hTheory->Write(_config.GetTheoryCSname(_config.ONEDI));
   
 }// end of Plot()
 

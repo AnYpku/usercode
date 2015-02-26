@@ -27,6 +27,24 @@ class CalcAccAndEff
 
      private:
 
+       struct PassedPhaseSpaceLevels{
+         long imcPho;
+         long imcLep1;
+         long imcLep2;
+         long dR;
+         long phoEta;
+         long lep1Eta;
+         long lep1Pt;
+         long dR2;
+         long lep2Eta;
+         long lep2Pt;
+         long Mll;
+         long phoIgen;
+         long phoPt;
+       };
+
+       PassedPhaseSpaceLevels _passed;
+
        void    LoopOverTreeEvents(); 
        void    ComputeNumerator();
        void    ComputeDenominator();
@@ -36,6 +54,9 @@ class CalcAccAndEff
        bool    IsTGC(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);
        bool    IsISR(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);
        void    ComputeAccTimesEff();
+
+       void SetNullPassedLevels();
+       void PrintPassedLevels();
 
        void    PrintAccAndEffSummary();
        void    PlotAndSaveOutput();

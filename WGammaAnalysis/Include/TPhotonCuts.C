@@ -138,20 +138,20 @@ float TPhotonCuts::GetPhoSigmaIEtaIEtaCutE(int year, int wp)
   return _phoSigmaIEtaIEtaEndcapCut2012[wp];
 }
 
-float TPhotonCuts::GetPhoSigmaIEtaIEtaCutLeftB()
-{
-  return _phoSigmaIEtaIEtaBarrelCutLeft;
-}
+//float TPhotonCuts::GetPhoSigmaIEtaIEtaCutLeftB()
+//{
+//  return _phoSigmaIEtaIEtaBarrelCutLeft;
+//}
 
 float TPhotonCuts::GetPhoSCRChIsoCorrCut()
 {
   return _phoSCRChIsoCorrCut;
 }
 
-float TPhotonCuts::GetPhoSigmaIEtaIEtaCutLeftE()
-{
-  return _phoSigmaIEtaIEtaEndcapCutLeft;
-}
+//float TPhotonCuts::GetPhoSigmaIEtaIEtaCutLeftE()
+//{
+//  return _phoSigmaIEtaIEtaEndcapCutLeft;
+//}
 
 
 float TPhotonCuts::GetOneIsolationCutB(int year, int wp, int isoType, float phoEt)
@@ -213,13 +213,13 @@ TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp, int ieta)
 
   TString cutBStr="phoSigmaIEtaIEta<=";
   cutBStr+=sigmaCutB;
-  cutBStr+="&& phoSigmaIEtaIEta>=";
-  cutBStr+=_phoSigmaIEtaIEtaBarrelCutLeft;
+  //  cutBStr+="&& phoSigmaIEtaIEta>=";
+  // cutBStr+=_phoSigmaIEtaIEtaBarrelCutLeft;
   TCut cutB(cutBStr);
   TString cutEStr="phoSigmaIEtaIEta<=";
   cutEStr+=sigmaCutE;
-  cutEStr+="&& phoSigmaIEtaIEta>=";
-  cutEStr+=_phoSigmaIEtaIEtaEndcapCutLeft;
+  //  cutEStr+="&& phoSigmaIEtaIEta>=";
+  // cutEStr+=_phoSigmaIEtaIEtaEndcapCutLeft;
   TCut cutE(cutEStr);
   TCut cut; 
   if (ieta==_BARREL) cut=cutB;

@@ -20,6 +20,7 @@
 #include <string>
 #include <sstream>  
 #include <vector>
+#include <iomanip>
   //standard C++ class
 
 CalcAccAndEff::CalcAccAndEff(int channel, int vgamma, bool isDebugMode, string configFile)
@@ -99,7 +100,7 @@ void CalcAccAndEff::ComputeAccTimesEff()
   std::cout<<"numerator computed"<<std::endl;
   ComputeDenominator();
   std::cout<<"denominator computed"<<std::endl;
-  
+   
   if (_denTot!=0){
     _accXeffTot=_numTot/_denTot;
     TMathTools math;
@@ -142,19 +143,22 @@ void CalcAccAndEff::ComputeAccTimesEff()
 
   std::cout<<"denTot = "<<_denTot<<", ";
   std::cout<<"denNoWeightTot = "<<_denNoWeightTot<<", ";
-  std::cout<<"csTheoryTot = "<<_csTheoryTot<<std::endl;
+  std::cout<<std::setprecision(3)<<"csTheoryTot = "<<_csTheoryTot<<std::endl;
+  std::cout<<std::setprecision(0);
 
   _fOut->cd();
   std::cout<<"den, denNoWeight, csTheory 1D"<<std::endl;
   for (int ib=1; ib<=nHbins; ib++){
     std::cout<<_Hdenominator1D->GetBinContent(ib)<<", ";
     std::cout<<_HdenominatorNoWeight1D->GetBinContent(ib)<<", ";
-    std::cout<<_HcsTheory1D->GetBinContent(ib);      
+    std::cout<<std::setprecision(3)<<_HcsTheory1D->GetBinContent(ib);
+    std::cout<<std::setprecision(0);
     std::cout<<std::endl;
   }// end of loop over ib
 
 
   PlotAndSaveOutput();
+  
 }// end of ComputeAccTimesEff
 
 void CalcAccAndEff::PrintAccAndEffSummary()
@@ -186,6 +190,7 @@ void CalcAccAndEff::LoopOverTreeEvents()
   
    //nentries=20;
    std::cout<<"n entries in MC tree: "<<_eventTree.fChain->GetEntries()<<std::endl;
+   
    for (Long64_t entry=0; entry<nentries; entry++) {
 
       //loop over events in the tree{
@@ -249,8 +254,8 @@ int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPh
   if (vec_imc_pho.size()>=3 && vec_imc_lep.size()==1) {patt=8; _strPattern[8]="1 lepton, >2 photons";}
   if (vec_imc_pho.size()>=3 && vec_imc_lep.size()==2) {patt=9; _strPattern[9]="2 leptons, >2 photons";}
 
-  if (vec_imc_pho.size()==0 || vec_imc_lep.size()==0 ||
-       (_channel==_config.Z_GAMMA && vec_imc_lep.size()==1)){
+   if (vec_imc_pho.size()==0 || vec_imc_lep.size()==0 ||
+       (_vgamma==_config.Z_GAMMA && vec_imc_lep.size()==1)){
     return patt;
   }
 
@@ -282,25 +287,26 @@ int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPh
 
 bool CalcAccAndEff::PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int imcPho, int imcLep1, int imcLep2)
 {
-  if (imcPho==-1 || imcLep1==-1) return 0;
-  if (_vgamma==_config.Z_GAMMA && imcLep2==-1) return 0;
+  if (imcPho==-1) return 0; _passed.imcPho++;
+  if (imcLep1==-1) return 0; _passed.imcLep1++;
+  if (_vgamma==_config.Z_GAMMA && imcLep2==-1) return 0; _passed.imcLep2++;
 
   TMathTools math;
   float dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
-  if (!(dR>0.7)) return 0;
-  if (!(fabs(leaf.mcEta->at(imcPho))<2.5)) return 0;
-  if (!(fabs(leaf.mcEta->at(imcLep1))<2.5)) return 0;
-  if (!(leaf.mcPt->at(imcLep1)>20)) return 0;
+  if (!(dR>0.7)) return 0; _passed.dR++;
+  if (!(fabs(leaf.mcEta->at(imcPho))<2.5)) return 0; _passed.phoEta++;
+  if (!(fabs(leaf.mcEta->at(imcLep1))<2.5)) return 0; _passed.lep1Eta++;
+  if (!(leaf.mcPt->at(imcLep1)>20)) return 0; _passed.lep2Eta++;
 
   if (_vgamma==_config.Z_GAMMA){
      float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
-     if (!(dR2>0.7)) return 0;
-     if (!(fabs(leaf.mcEta->at(imcLep2))<2.5)) return 0;
-     if (!(leaf.mcPt->at(imcLep2)>20)) return 0;
+     if (!(dR2>0.7)) return 0; _passed.dR2++;
+     if (!(fabs(leaf.mcEta->at(imcLep2))<2.5)) return 0; _passed.lep2Eta++;
+     if (!(leaf.mcPt->at(imcLep2)>20)) return 0; _passed.lep2Pt++;
      TLorentzVector vlep1, vlep2;
      vlep1.SetPtEtaPhiM(leaf.mcPt->at(imcLep1),leaf.mcEta->at(imcLep1),leaf.mcPhi->at(imcLep1),0);
      vlep2.SetPtEtaPhiM(leaf.mcPt->at(imcLep2),leaf.mcEta->at(imcLep2),leaf.mcPhi->at(imcLep2),0);
-     if(!((vlep1 + vlep2).M() > 50)) return 0;
+     if(!((vlep1 + vlep2).M() > 50)) return 0; _passed.Mll++;
   }// end of if (_vgamma==_config.Z_GAMMA)
 
   //I_gen03 < 5 GeV for photon
@@ -310,10 +316,11 @@ bool CalcAccAndEff::PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int i
     float dRIgen = math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imc), leaf.mcEta->at(imc));
     if (dRIgen<0.3) Igen+=leaf.mcPt->at(imc);
   }// end of imc  
-  if (!(Igen<5)) return 0;
+  if (!(Igen<5)) return 0; _passed.phoIgen++;
+  if (!(leaf.mcEt->at(imcPho)>15)) return 0; _passed.phoPt++;
 
   return 1;
-}// end of 
+}// end of PassedPhaseSpaceCut()
 
 
 bool CalcAccAndEff::IsFSR(TEventTree::InputTreeLeaves &leaf, int imcPho, int lepID, int bosonID)
@@ -389,7 +396,13 @@ void CalcAccAndEff::ComputeDenominator()
     _HcsTheory1D->SetBinContent(ib,0);
     _HcsTheory1D->SetBinError(ib,0);
   }
+
+  SetNullPassedLevels();
+
   LoopOverInputFiles();
+
+  PrintPassedLevels();
+
   _denTotErr=sqrt(_denTot);
   std::cout<<"_mcPatternNeg="<<_mcPatternNeg<<std::endl;
   for (int ip=0; ip<_nPosPatts; ip++){
@@ -445,3 +458,40 @@ bool CalcAccAndEff::CheckMaxNumbersInTree()
    }
   return 1;
 }// end of CheckMaxNumbersInTree
+
+void CalcAccAndEff::SetNullPassedLevels()
+{
+  _passed.imcPho=0;
+  _passed.imcLep1=0;
+  _passed.imcLep2=0;
+  _passed.dR=0;
+  _passed.phoEta=0;
+  _passed.lep1Eta=0;
+  _passed.lep2Eta=0;
+  _passed.lep2Pt=0;
+  _passed.dR2=0;
+  _passed.lep2Eta=0;
+  _passed.Mll=0;
+  _passed.phoIgen=0;
+  _passed.phoPt=0;
+}// end of SetNullPassedLevels()
+
+void CalcAccAndEff::PrintPassedLevels()
+{
+  std::cout<<std::endl;
+  std::cout<<"_passed:"<<std::endl;
+  std::cout<<"imcPho="<<_passed.imcPho<<", ";
+  std::cout<<"imcLep1="<< _passed.imcLep1<<", ";
+  std::cout<<"imcLep2="<< _passed.imcLep2<<", ";
+  std::cout<<"dR="<<_passed.dR<<", ";
+  std::cout<<"phoEta="<<_passed.phoEta<<", ";
+  std::cout<<"lep1Eta="<<_passed.lep1Eta<<", ";
+  std::cout<<"dR="<<_passed.dR2<<", ";
+  std::cout<<"lep2Eta="<<_passed.lep2Eta<<", ";
+  std::cout<<"lep2Pt="<<_passed.lep2Pt<<", ";
+  std::cout<<"Mll="<<_passed.Mll<<", ";
+  std::cout<<"phoIgen="<<_passed.phoIgen<<", ";
+  std::cout<<"phoPt="<<_passed.phoPt;
+  std::cout<<std::endl;
+  std::cout<<std::endl;
+}// end of PrintPassedLevels()
