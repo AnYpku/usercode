@@ -6,10 +6,10 @@
   TConfiguration conf;
 
   bool noClosure[2][2][2]; //channel, vgamma, templ
-  noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=0;
+  noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=0;
-  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=0;
-  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=0;
+  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
+  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   noClosure[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
@@ -36,8 +36,8 @@
           anPars.channel=ch;//MUON, ELECTRON
           anPars.vgamma=vg;//W_GAMMA, Z_GAMMA
           anPars.templFits=tm;
-          AuxTemplatesSystSidebandVariation(anPars);
-          //AuxTemplates(anPars);
+          AuxTemplatesSystSidebandVariation(anPars,1);// 1 - isMCclosure
+          //AuxTemplates(anPars,1);// 1 - isMCclosure
 	  //  AuxSubtractBackground(anPars);
         }//end of if (!noClosure[ch][vg][tm])
       }// end of loop over tm

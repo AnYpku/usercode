@@ -42,70 +42,70 @@ MoveDataFileBack(){
 }
 # end of MoveDataFileBack()
 
-MovePlotNamesToReference(){
-  # $1 - ${namedir}, $2 - ${fileextension}
-  star=*_
-  ref=_Ref
-  for f in $1${star}$2
-    do
-      orig=$f
-      orig=${orig/$2/${ref}$2}
-      mv $f ${orig}
+#MovePlotNamesToReference(){
+# # $1 - ${namedir}, $2 - ${fileextension}
+#  star=*_
+#  ref=_Ref
+#  for f in $1${star}$2
+#    do
+#      orig=$f
+#      orig=${orig/$2/${ref}$2}
+#      mv $f ${orig}
 #      echo moved $f to ${orig}
-    done
-}
+#    done
+#}
 # end of MovePlotNamesToReference() 
 
-MovePlotNamesToReferenceAllExt(){
-  # $1 - ${namedir}
-  MovePlotNamesToReference $1 .png
-  MovePlotNamesToReference $1 .pdf
-  MovePlotNamesToReference $1 .root
-}
+#MovePlotNamesToReferenceAllExt(){
+#  # $1 - ${namedir}
+#  MovePlotNamesToReference $1 .png
+#  MovePlotNamesToReference $1 .pdf
+#  MovePlotNamesToReference $1 .root
+#}
 # end of MovePlotNamesToReferenceAllExt()
 
-MovePlotNamesToClosure(){
-  # $1 - ${namedir}, $2 - ${fileextension}
-  star=*_
-  clos=_MCclosure
-  for f in $1${star}$2
-    do
-      orig=$f
-      orig=${orig/$2/${clos}$2}
-      mv $f ${orig}
+#MovePlotNamesToClosure(){
+#  # $1 - ${namedir}, $2 - ${fileextension}
+#  star=*_
+#  clos=_MCclosure
+#  for f in $1${star}$2
+#    do
+#      orig=$f
+#      orig=${orig/$2/${clos}$2}
+#      mv $f ${orig}
 #      echo moved $f to ${orig}
-    done
-}
+#    done
+#}
 # end of MovePlotNamesToClosure()
 
-MovePlotNamesToClosureAllExt(){
-  # $1 - ${namedir}
-  MovePlotNamesToClosure $1 .png
-  MovePlotNamesToClosure $1 .pdf
-  MovePlotNamesToClosure $1 .root
-}
+#MovePlotNamesToClosureAllExt(){
+#  # $1 - ${namedir}
+#  MovePlotNamesToClosure $1 .png
+#  MovePlotNamesToClosure $1 .pdf
+#  MovePlotNamesToClosure $1 .root
+#}
 # end of MovePlotNamesToClosureAllExt()
 
-MovePlotNamesReferencesBack(){
-  # $1 - ${namedir}, $2 - ${fileextension}
-  star=*_Ref
-  ref=_Ref
-  for f in $1${star}$2
-    do
-      orig=$f
-      orig=${orig/${ref}$2/$2}
-      mv $f ${orig}
+#MovePlotNamesReferencesBack(){
+#  # $1 - ${namedir}, $2 - ${fileextension}
+#  star=*_Ref
+#  ref=_Ref
+#  for f in $1${star}$2
+#    do
+#      orig=$f
+#      orig=${orig/${ref}$2/$2}
+#      mv $f ${orig}
 #      echo moved $f to ${orig}
-    done
-}
+#    done
+#}
 # end of MovePlotNamesReferencesBack()
 
-MovePlotNamesReferencesBackAllExt(){
-  # $1 - ${namedir}
-  MovePlotNamesReferencesBack $1 .png
-  MovePlotNamesReferencesBack $1 .pdf
-  MovePlotNamesReferencesBack $1 .root
-}
+#MovePlotNamesReferencesBackAllExt(){
+#  # $1 - ${namedir}
+#  MovePlotNamesReferencesBack $1 .png
+#  MovePlotNamesReferencesBack $1 .pdf
+#  MovePlotNamesReferencesBack $1 .root
+#}
 # end of MovePlotNamesReferencesBackAllExt()
 
 ##################################
@@ -148,39 +148,39 @@ MergeMCintoData $namedir $namevgamma
 ## end of Merge MC files into data
 ##################################
 
-MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
-MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
-MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
-MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
 
-MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
-MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
-MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
-MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
+#MovePlotNamesToReferenceAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
 
 #root -l -b -q runClosureTest.C
 root -l runClosureTest.C
 
 
-MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
-MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
-MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
-MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
 
-MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
-MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
-MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
-MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
+#MovePlotNamesToClosureAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
 
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_ZGamma/Plots/TemplateFits/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_WGamma/Plots/TemplateFits/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/MUON_WGamma/Plots/PrepareYields/
 
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
-MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/TemplateFits/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/
+#MovePlotNamesReferencesBackAllExt ../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/
 
 ##################################
 ## Move data files back

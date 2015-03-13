@@ -1,3 +1,3 @@
-pdflatex presentation20150218Wg_yieldsWithSelectedSidebands.tex
-acroread presentation20150218Wg_yieldsWithSelectedSidebands.pdf
+pdflatex presentation20150304Wg_FullChain.tex
+acroread presentation20150304Wg_FullChain.pdf
 

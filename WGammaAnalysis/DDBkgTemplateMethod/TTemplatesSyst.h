@@ -53,6 +53,7 @@ class TTemplatesSyst: public TTemplates
     float _yieldsTrueErr[_nPointsMax][_nPointsMax];
     float _yieldsFakeVal[_nPointsMax][_nPointsMax];
     float _yieldsFakeErr[_nPointsMax][_nPointsMax];
+    float _MCtruthKolmogorov[_nPointsMax][_nPointsMax];
 
     TGraph2D* _grTrueVal[nKinBinsMax][2];
     TGraph2D* _grFakeVal[nKinBinsMax][2];
@@ -65,6 +66,7 @@ class TTemplatesSyst: public TTemplates
     TVectorD* _vecTrueErr[nKinBinsMax][2];
     TVectorD* _vecFakeVal[nKinBinsMax][2];
     TVectorD* _vecFakeErr[nKinBinsMax][2];
+    TVectorD* _vecMCtruthKolmogorov[nKinBinsMax][2];
 //    TLine* _lineRefTrue[nKinBinsMax][2];
 //    TLine* _lineRefFake[nKinBinsMax][2];
 //    TGraph* _grEmptTrue[nKinBinsMax][2];

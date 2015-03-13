@@ -59,7 +59,8 @@ class TTemplates
       bool sumOverHist;
         // the method how to extract yields from fit:
         // sum over histogram or apply efficiency
-      bool showTreeRef;
+ //     bool showTreeRef;
+      bool isMCclosureMode;
       TFile* fOutForSave;
       TString strFileOutName;
       TString strTrueYieldsTot[3];
@@ -76,6 +77,7 @@ class TTemplates
 
     void ComputeBackground(bool noPrint=0, bool noPlot=0);
     void PrintPars();
+    void PrintLatex();
     TString StrLabelEta(int etaBin);
     TString StrLabelKin(int ikin, int nKinBins, float* kinBinLims, TString varKin);
 
@@ -120,7 +122,7 @@ class TTemplates
     void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
 
     void NewHistograms(int ikin, int ieta, bool noPrint);
-    void SetFakeTemplate(int ikin, int ieta, bool noPrint);
+    bool SetFakeTemplate(int ikin, int ieta, bool noPrint);
     void SetTrueTemplate(int ikin, int ieta, bool noPrint);
     void SetDataAndSignHists(int ikin, int ieta, bool noPrint);
     bool CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPrint);
@@ -145,7 +147,9 @@ class TTemplates
     TH1D* _hFakeMCtruth[nKinBinsMax][3];
     TH1D* _hLeak[nKinBinsMax][3];
     TH1D* _hSign[nKinBinsMax][3];
-    double leakFraction[nKinBinsMax][3];
+    double _leakFraction[nKinBinsMax][3];
+    double _testMCtruthKolmogorov[nKinBinsMax][3];
+    double _testMCtruthChi2[nKinBinsMax][3];
     TH1D* _hTrueReference[nKinBinsMax][3];
     TH1D* _hFakeReference[nKinBinsMax][3];
     TH1D* _hData[nKinBinsMax][3];
@@ -160,9 +164,22 @@ class TTemplates
     double _nTrueFromFitErr[nKinBinsMax][3];
 
     const static int _nToys=100;
-
-
 };
+
+    float _acceptableLeakFraction[TTemplates::nKinBinsMax][2] = 
+                                                    { { 5.0,  7.5},  //Total
+                                                      { 5.0,  7.5},  //15-20
+                                                      { 5.0,  7.5},  //20-25
+                                                      { 5.0,  7.5},  //25-30
+                                                      { 5.0,  7.5},  //30-35
+                                                      { 5.0,  7.5},  //35-45
+                                                      {10.0, 15.0},  //45-55
+                                                      {10.0, 15.0},  //55-65
+                                                      {10.0, 15.0},  //65-75
+                                                      {10.0, 15.0},  //75-85
+                                                      {10.0, 15.0},  //85-95
+                                                      {10.0, 15.0},  //95-120
+                                                      {10.0, 15.0}}; //120-500
 
 
 #endif //TTemplates_h

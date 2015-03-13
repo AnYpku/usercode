@@ -17,7 +17,7 @@ class TConfiguration
     enum {MUON, ELECTRON, BOTH_CHANNELS};//channel
     enum {W_GAMMA, Z_GAMMA, V_GAMMA};//vg_type
     enum {DATA=0, SIGMC=1, BKGMC=2, SIGMC_UNSKIMMED=5};//sample
-    enum {UNBLIND, BLIND_PRESCALE, BLIND_DECRACC};//blinding type
+    enum {UNBLIND, BLIND_PRESCALE, BLIND_COMBINED};//blinding type
     enum {BARREL=0, ENDCAP=1, COMMON=2};//eta bin, must match enum in TTemplateRandCone.h
     enum {TOTAL, ONEDI, TWODI};//csMode
     enum {VERY_PRELIMINARY,
@@ -97,6 +97,12 @@ class TConfiguration
 
     TString GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin);
 
+    TString GetSidebandsFileName(int channel, int vgamma, int templ, TString strKin);
+    TString GetSidebandsLowerHistName(int ieta);
+    TString GetSidebandsUpperHistName(int ieta);
+    TString GetMCtruthTrueHistName(int ieta);
+    TString GetFromMCfitTrueHistName(int ieta);
+
     TString GetAccXEffFileName(int channel, int vgamma);
     TString GetAccXEffName(int csMode);
     TString GetTheoryCSname(int csMode);
@@ -150,7 +156,7 @@ static const float _lePhoDeltaRMin=0.7;
   //minimum value for total and differential cross section; 
   //cut value may be bigger or equal to this value
 static const int _blindPrescale=20;//13;
-static const float _phoPtBlindThreshold=40.;
+static const float _phoPtBlindThreshold=45.;
 
 /////////////////////////////////////////
 //general locations

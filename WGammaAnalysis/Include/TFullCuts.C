@@ -154,13 +154,18 @@ int TFullCuts::FindGoodPhotons(int channel, int vgamma)
       if (ifPassedPt) _passed.phoPt++; else continue;
       if (ifPassedEta) _passed.phoEta++; else continue;
       if (_isEvForCheck) std::cout<<"passed phoPt and phoEta"<<std::endl;
-      if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON){
-        if (_isEvForCheck) std::cout<<"WGamma, Electron cuts:"<<std::endl;
-        if (_photon.HasMatchingGSFelectron(_leaf,ipho)) continue;
-        if (_isEvForCheck) std::cout<<"passed HasMatchingGSFelectron"<<std::endl;
-        if (_leaf.phohasPixelSeed->at(ipho)) continue;
-        if (_isEvForCheck) std::cout<<"passed phohasPixelSeed"<<std::endl;
-      }
+//      if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON){
+//        if (_isEvForCheck) std::cout<<"WGamma, Electron cuts:"<<std::endl;
+//        if (_photon.HasMatchingGSFelectron(_leaf,ipho)) continue;
+//        if (_isEvForCheck) std::cout<<"passed HasMatchingGSFelectron"<<std::endl;
+//        if (_leaf.phohasPixelSeed->at(ipho)) continue;
+//        if (_isEvForCheck) std::cout<<"passed phohasPixelSeed"<<std::endl;
+//      }
+//      we decided to remove pixel seed veto in order to be able to use 
+//      centrally provided scale factors which 
+//      were computed for the standard photon ID
+//      e -> gamma data driven background estimation 
+//      will be done for the electron channel of Wgamma
       _passedPhoton[ipho]=1;   
       nGoodPhotons++;
   } //end of loop over ipho
@@ -416,14 +421,27 @@ TCut TFullCuts::RangePhoEt()
 TCut TFullCuts::RangeBlinding(int blind)
 {
   TCut cut="1";
+  if (blind==_config.UNBLIND) return cut;
+  TString strCut=" (event % ";
+  strCut+=_config.GetBlindPrescale();
+  strCut+=")==0";
+  TCut cutPRESCALE(strCut);
   if (blind==_config.BLIND_PRESCALE){
-    TString strCut=" (event % ";
-    strCut+=_config.GetBlindPrescale();
-    strCut+=")==0";
-    cut=strCut;
+    // (event % N) == 0
+    cut=cutPRESCALE;
+  }
+  if (blind==_config.BLIND_COMBINED){
+    // pt<=PTc || (pt>PTc && (event % N) == 0)
+    TString strLOWPT="phoEt<=";
+    strLOWPT+=_config.GetPhoPtBlindThreshold();
+    TCut cutLOWPT(strLOWPT);
+    TString strHIGHPT="phoEt>";
+    strHIGHPT+=_config.GetPhoPtBlindThreshold();
+    TCut cutHIGHPT(strHIGHPT);
+    cut = cutLOWPT || (cutHIGHPT && cutPRESCALE);
   }
   return cut;
-}
+}// end of RangeBlinding(int blind)
 
 TCut TFullCuts::RangeExtraLeptonPt2011()
 {

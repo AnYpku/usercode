@@ -351,12 +351,13 @@ void Selection::ExtraSelection(TConfiguration::AnalysisParameters &anPars)
     else if(anPars.sampleMode==BKGMC && sample!=config.BKGMC) continue;
     else if(anPars.sampleMode==MC && sample==config.DATA) continue;
     else if(anPars.sampleMode==NOBKG && sample==config.BKGMC) continue;
-
     
     std::cout<<"ExtraSelection: sample="<<_config.StrSample(sample)<<std::endl;
     ExtraSelectionOne(INPUT,i,config,fullCut,anPars.year,anPars.channel,anPars.vgamma,anPars.phoWP,config.UNBLIND);
-    if (sample==config.DATA)
+    if (sample==config.DATA){
       ExtraSelectionOne(INPUT,i, config, fullCut,anPars.year,anPars.channel,anPars.vgamma,anPars.phoWP,config.BLIND_PRESCALE);
+      ExtraSelectionOne(INPUT,i, config, fullCut,anPars.year,anPars.channel,anPars.vgamma,anPars.phoWP,config.BLIND_COMBINED);
+    }
   }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
 
 }
@@ -385,7 +386,7 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
       _tr2 = new TTree("selectedEvents","selected events, one candidate per event");
       _trReduced = _tr->CopyTree(fullCut.RangeForTemplateMethodCut(year,channel,vgamma,blind,wp));
 
-      PickHardestPhotonInEvent(_tr2, _trReduced);
+      PickHardestPhotonInEvent(_tr2, _trReduced, blind);
 
       _tr2->Write();
       std::cout<<"Will be saved to file:      "<<fOutName2<<std::endl;
@@ -401,7 +402,7 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
       std::cout<<"full Selection cut:      "<<fullCut.RangeFullCut(year,channel,vgamma,blind,wp).GetTitle()<<std::endl;
       std::cout<<std::endl;
       
-      PickHardestPhotonInEvent(_tr3, _trReduced);
+      PickHardestPhotonInEvent(_tr3, _trReduced, blind);
 
       _tr3->Write();
       if (INPUT.allInputs_[iSource].sample_==_config.DATA && blind==_config.UNBLIND);
@@ -426,9 +427,9 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
 
       _tr4->Write();
 
-}
+}// end of ExtraSelectionOne
 
-void Selection::PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced)
+void Selection::PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced, int blind)
 {
       TSelectedEventsTree selEvTree;
       selEvTree.SetAsInputTree(trReduced);
@@ -441,7 +442,9 @@ void Selection::PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced)
         eventPrev=eventCurr;
         eventCurr = selEvTree._event;
         if (eventCurr==eventPrev) continue;
+        if (blind==_config.BLIND_COMBINED){
+          if (selEvTree._phoEt>_config.GetPhoPtBlindThreshold()) selEvTree._weight=_config.GetBlindPrescale();
+        }
         trToBeWritten->Fill();
-      }
-
-}
+      }//end of loop over ientry
+}//end of PickHardestPhotonInEvent

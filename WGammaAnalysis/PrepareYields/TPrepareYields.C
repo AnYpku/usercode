@@ -275,6 +275,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   plotTitle.ReplaceAll("TEMPL_","");
   plotTitle.ReplaceAll("UNblind_","");
   plotTitle.ReplaceAll("blindPRESCALE_","");
+  plotTitle.ReplaceAll("blindCOMBINED_","");
   plotTitle.ReplaceAll("_"," ");
   plotTitle.ReplaceAll("  "," ");
   TLatex* latexTitle = new TLatex(0.15,0.95,plotTitle);

@@ -3,10 +3,19 @@ RemoveOneChannelOneVgamma(){
   # $2 - _WGamma or _ZGamma
 #  rm WGammaOutput/$1$2/VeryPreliminarySelected/*.root
 #  rm WGammaOutput/$1$2/PreliminaryForTemplateMethodSelected/*.root
+#  rm WGammaOutput/$1$2/FsrSelected/*.root
 #  rm WGammaOutput/$1$2/FullySelected/*.root
   rm WGammaOutput/$1$2/YieldsAndBackground/*.root
   rm WGammaOutput/$1$2/Constants/*.root
+
+  for d in WGammaOutput/$1$2/Plots/*
+    do
+      rm $d/*.png
+      rm $d/*.pdf
+      rm $d/*.root
+    done 
 }
+#end of RemoveOneChannelOneVgamma()
 
 RemoveOneChannelOneVgamma MUON _WGamma
 RemoveOneChannelOneVgamma MUON _ZGamma

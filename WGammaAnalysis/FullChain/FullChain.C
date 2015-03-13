@@ -282,7 +282,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         anPars.templFits=itp;
-        AuxTemplates(anPars);
+        AuxTemplates(anPars,0);// 0 - no isMCclosure
         std::cout<<"%_%  DONE "<<strAffix<<std::endl;
         std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
       }//end of loop over itp
@@ -299,7 +299,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         anPars.templFits=itp;
-        AuxTemplatesSystSidebandVariation(anPars); 
+        AuxTemplatesSystSidebandVariation(anPars,0);// 0 - no isMCclosure
        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
       }//end of loop over itp

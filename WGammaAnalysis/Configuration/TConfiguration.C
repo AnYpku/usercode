@@ -47,7 +47,7 @@ TString TConfiguration::StrSample(int sample){
 TString TConfiguration::StrBlindType(int blind){
   if (blind==UNBLIND) return "UNblind";
   if (blind==BLIND_PRESCALE) return "blindPRESCALE";
-  if (blind==BLIND_DECRACC) return "blindDECRACC";
+  if (blind==BLIND_COMBINED) return "blindCOMBINED";
   return "";
 }
 
@@ -194,6 +194,22 @@ TString TConfiguration::GetCrossSectionFileName(int channel, int vgamma){
 
 TString TConfiguration::GetCSname(int channel, int csMode){
   return TString("csMeasured_")+StrChannel(channel)+TString("_")+StrCsMode(csMode);}
+
+TString TConfiguration::GetSidebandsFileName(int channel, int vgamma, int templ, TString strKin){
+  return GetOutputDirName(channel, vgamma)+TString("Constants/sidebands_")+StrTempl(templ)+TString("_")+strKin+TString(".root");
+}// end of GetSidebandsFileName
+
+TString TConfiguration::GetSidebandsLowerHistName(int ieta){
+  return TString("sidebandsLower_")+StrEtaBin(ieta);}
+
+TString TConfiguration::GetSidebandsUpperHistName(int ieta){
+  return TString("sidebandsUpper_")+StrEtaBin(ieta);}
+
+TString TConfiguration::GetMCtruthTrueHistName(int ieta){
+  return TString("hTrueMCtruth_")+StrEtaBin(ieta);}
+
+TString TConfiguration::GetFromMCfitTrueHistName(int ieta){
+  return TString("hTrueFromMCfit_")+StrEtaBin(ieta);}
 
 //TString TConfiguration::GetUnfoldingFileName(int channel)
 //{

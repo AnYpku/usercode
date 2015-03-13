@@ -28,7 +28,7 @@ void SetLimsSihihTempl_phoEt_Zg_ELECTRON(TTemplates::TemplatesPars &pars);
 
 void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars);
 
-void AuxTemplates(TConfiguration::AnalysisParameters &anPars)
+void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   //this function is called in FullChain
 
@@ -41,12 +41,30 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars)
   if (anPars.templFits==TConfiguration::TEMPL_CHISO) 
     SetParsChIsoTempl(pars, anPars);
 
+  TConfiguration conf;
+  TFile* fSbs = new TFile(conf.GetSidebandsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin));
+  TH1F* hSbL[2];
+  TH1F* hSbU[2];
 
+  for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
+    
+    hSbL[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsLowerHistName(ieta));
+    hSbU[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsUpperHistName(ieta));
+    for (int ikin=1; ikin<=anPars.nKinBins; ikin++){
+ //       pars.sideband[ikin][ieta]=hSbL[ieta]->GetBinContent(ikin);
+ //       pars.sidebandUp[ikin][ieta]=hSbU[ieta]->GetBinContent(ikin);
+    }//end of loop over ikin
+    
+  }// end of loop over ieta
+
+  pars.isMCclosureMode=isMCclosure;
+  
   TTemplates temp(pars);
   temp.ComputeBackground();
-}
+  
+}// end of AuxTemplates()
 
-void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPars)
+void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   //this function is called in FullChain
   TConfiguration conf;
@@ -71,17 +89,17 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
 
     SetParsChIsoTempl(pars, anPars);
 
-    variationPars.nPointsLower[conf.BARREL]=10+1;//10;//10;//16;
+    variationPars.nPointsLower[conf.BARREL]=5+1;//10+1;
     variationPars.lowerSidebandCutFrom[conf.BARREL]=0.005;
     variationPars.lowerSidebandCutTo[conf.BARREL]=0.015;
-    variationPars.nPointsUpper[conf.BARREL]=9+1;//10;//10;//16;
+    variationPars.nPointsUpper[conf.BARREL]=2+1;//9+1;
     variationPars.upperSidebandCutFrom[conf.BARREL]=0.012;
     variationPars.upperSidebandCutTo[conf.BARREL]=0.021;
 
-    variationPars.nPointsLower[conf.ENDCAP]=15+1;//12;//12;//16;
+    variationPars.nPointsLower[conf.ENDCAP]=2+1;//15+1;
     variationPars.lowerSidebandCutFrom[conf.ENDCAP]=0.019;
     variationPars.lowerSidebandCutTo[conf.ENDCAP]=0.049;
-    variationPars.nPointsUpper[conf.ENDCAP]=15+1;//15;//15;//16;
+    variationPars.nPointsUpper[conf.ENDCAP]=2+1;//20+1;
     variationPars.upperSidebandCutFrom[conf.ENDCAP]=0.027;
     variationPars.upperSidebandCutTo[conf.ENDCAP]=0.067;
   }
@@ -89,6 +107,8 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
   pars.strPlotsDir=conf.GetPlotsDirName(anPars.channel, anPars.vgamma, conf.PLOTS_TEMPL_FITS_SYST);
   //pars.strPlotsBaseName=TString("c_")+config.StrTempl(config.TEMPL_CHISO)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
   pars.strPlotsBaseName.Replace(0,1,"cSyst_");
+
+  pars.isMCclosureMode=isMCclosure;
 
   TTemplatesSyst temp(pars,variationPars);
   temp.SidebandVariation();
@@ -127,25 +147,25 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
     }
     pars.sideband[ikb][config.BARREL]=0.011;
     pars.sideband[ikb][config.ENDCAP]=0.033;
-    pars.sidebandUp[ikb][config.BARREL]=0.018;
-    pars.sidebandUp[ikb][config.ENDCAP]=0.053;
+    pars.sidebandUp[ikb][config.BARREL]=0.014;//0.018;
+    pars.sidebandUp[ikb][config.ENDCAP]=0.044;//0.053;
       //for these arrays, nFitBins[ikin][ieta], 
       //maxVarFit[ikin][ieta], sideband[ikin][ieta]
       // ikin=0 stands for total fit (e.g. 15-500)
       // ikin=[1,nKinBins] are for individual bin fits 
       // ieta=0 - BARREL, ieta=1 - ENDCAP
   }
-  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
-    SetLimsChIsoTempl_phoEt_Wg_MUON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
+  //    SetLimsChIsoTempl_phoEt_Wg_MUON(pars);
 
-  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
-    SetLimsChIsoTempl_phoEt_Zg_MUON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
+  //   SetLimsChIsoTempl_phoEt_Zg_MUON(pars);
 
-  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA)
-    SetLimsChIsoTempl_phoEt_Wg_ELECTRON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA)
+  //    SetLimsChIsoTempl_phoEt_Wg_ELECTRON(pars);
 
-  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.Z_GAMMA)
-    SetLimsChIsoTempl_phoEt_Zg_ELECTRON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.Z_GAMMA)
+  //    SetLimsChIsoTempl_phoEt_Zg_ELECTRON(pars);
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
     //the histograms with extracted yields will be saved here
@@ -192,13 +212,12 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
-  pars.showTreeRef=1;
   pars.sumOverHist=0;
 
   pars.varSideband="phoSigmaIEtaIEta";//TString
-  pars.varTrueTempl="phoRandConeChIso04Corr";//"phoRandConeChIso04Corr";//TString
-  pars.varFakeTempl="phoSCRChIso04Corr";//"phoSCRChIso04Corr";//TString
-  pars.varFit="phoSCRChIso04Corr";//"phoSCRChIso04Corr"; //TString
+  pars.varTrueTempl="phoRandConeChIsoCorr";//"phoRandConeChIso04Corr";//TString
+  pars.varFakeTempl="phoSCRChIsoCorr";//"phoSCRChIso04Corr";//TString
+  pars.varFit="phoSCRChIsoCorr";//"phoSCRChIso04Corr"; //TString
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
 
@@ -254,14 +273,14 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
     pars.combineFakeTempl[ikb][config.BARREL]=0;
     pars.combineFakeTempl[ikb][config.ENDCAP]=0;
   }
-  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
-    SetLimsSihihTempl_phoEt_Wg_MUON(pars);
-  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
-    SetLimsSihihTempl_phoEt_Zg_MUON(pars);
-  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA)
-    SetLimsSihihTempl_phoEt_Wg_ELECTRON(pars);
-  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.Z_GAMMA)
-    SetLimsSihihTempl_phoEt_Zg_ELECTRON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
+  //    SetLimsSihihTempl_phoEt_Wg_MUON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
+  //    SetLimsSihihTempl_phoEt_Zg_MUON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA)
+  //    SetLimsSihihTempl_phoEt_Wg_ELECTRON(pars);
+  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.Z_GAMMA)
+  //    SetLimsSihihTempl_phoEt_Zg_ELECTRON(pars);
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
     //the histograms with extracted yields will be saved here
@@ -308,7 +327,6 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
-  pars.showTreeRef=1;
   pars.sumOverHist=0;
 
   pars.varSideband="phoSCRChIsoCorr";//TString

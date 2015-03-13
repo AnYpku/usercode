@@ -35,12 +35,12 @@ TTemplatesSyst::~TTemplatesSyst()
 void TTemplatesSyst::SidebandVariation()
 {
 
-  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-  // for (int ikin=1; ikin<=1; ikin++){
+  //for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
+   for (int ikin=1; ikin<=1; ikin++){
     SidebandVariationOneKinBin(ikin);
   }
-  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-  // for (int ikin=1; ikin<=1; ikin++){
+  //for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
+   for (int ikin=1; ikin<=1; ikin++){
     PlotOneKinBin(ikin);
   }
 
@@ -65,7 +65,6 @@ void TTemplatesSyst::SidebandVariationOneKinBin(int ikin)
    //for _BARREL or _ENDCAP
    VarySidebandKinEtaBin(ikin,ieta);
 
-
    //prepare graphs for plotting
    PrepareGraphsKinEtaBin(ikin,ieta);
 
@@ -88,13 +87,15 @@ void TTemplatesSyst::PlotOneKinBin(int ikin)
     TCanvas* c = new TCanvas(canvName,canvName,900,600);
  //   c->Divide(1,2);
  //   c->cd(1);
+    _pars.fOutForSave->cd();
     _grTrueVal[ikin][ieta]->Draw("COLZ");
  //   TPaletteAxis *palette = (TPaletteAxis*)_grTrueVal[ikin][ieta]->GetListOfFunctions()->FindObject("palette");
  //   c->cd(2);
  //   palette->Draw();
 
     TString saveName=_pars.strPlotsDir+canvName;
-    saveName+=".png";
+    if (_pars.isMCclosureMode) saveName+="_MCclosure.png";
+    else saveName+=".png";
     c->SaveAs(saveName);
     saveName.ReplaceAll(".png",".pdf");
     c->SaveAs(saveName);
@@ -110,21 +111,20 @@ void TTemplatesSyst::VarySidebandKinEtaBin(int ikin, int ieta)
     float unitUpper=(_variationPars.upperSidebandCutTo[ieta]-_variationPars.upperSidebandCutFrom[ieta])/(_variationPars.nPointsUpper[ieta]-1);
     float unitLower=(_variationPars.lowerSidebandCutTo[ieta]-_variationPars.lowerSidebandCutFrom[ieta])/(_variationPars.nPointsLower[ieta]-1);
 
-
     for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
       _sidebandLowerVal[isL]=_variationPars.lowerSidebandCutFrom[ieta]+unitLower*isL;
       _sidebandLowerErr[isL]=0.01*_sidebandLowerVal[isL];
-
     }//end of loop over isL, lower sideband cut
+
     for (int isU=0; isU<_variationPars.nPointsUpper[ieta]; isU++){
       _sidebandUpperVal[isU]=_variationPars.upperSidebandCutFrom[ieta]+unitUpper*isU;
       _sidebandUpperErr[isU]=0.01*_sidebandUpperVal[isU];
-
     }//end of loop over isU, upper sideband cut
 
     for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
 
       for (int isU=0; isU<_variationPars.nPointsUpper[ieta]; isU++){
+        _MCtruthKolmogorov[isL][isU]=-1;
         if (_sidebandLowerVal[isL]>=_sidebandUpperVal[isU] || 
             (_sidebandUpperVal[isU]-_sidebandLowerVal[isL])<0.005*(_sidebandUpperVal[isU]+_sidebandLowerVal[isL])){
           _yieldsTrueVal[isL][isU]=-1;
@@ -142,11 +142,22 @@ void TTemplatesSyst::VarySidebandKinEtaBin(int ikin, int ieta)
         std::cout<<"isL="<<isL<<", isU="<<isU;
         std::cout<<", sideband: ";
         std::cout<<std::setprecision(4)<<_sidebandLowerVal[isL]<<"-"<<_sidebandUpperVal[isU]<<"; "<<std::endl;
-        ComputeBackgroundOne(ikin,ieta,0);
-        _yieldsTrueVal[isL][isU]=_nTrueYieldsVal[ikin][ieta];
-        _yieldsTrueErr[isL][isU]=_nTrueYieldsErr[ikin][ieta];
-        _yieldsFakeVal[isL][isU]=_nFakeYieldsVal[ikin][ieta];
-        _yieldsFakeErr[isL][isU]=_nFakeYieldsErr[ikin][ieta];
+        bool isOk = ComputeBackgroundOne(ikin,ieta,0);
+        if (_nTrueYieldsErr[ikin][ieta]>0.5*_nTrueYieldsVal[ikin][ieta] && 
+            _nFakeYieldsErr[ikin][ieta]>0.5*_nFakeYieldsVal[ikin][ieta]) isOk=0;
+        if (isOk){
+          _yieldsTrueVal[isL][isU]=_nTrueYieldsVal[ikin][ieta];
+          _yieldsTrueErr[isL][isU]=_nTrueYieldsErr[ikin][ieta];
+          _yieldsFakeVal[isL][isU]=_nFakeYieldsVal[ikin][ieta];
+          _yieldsFakeErr[isL][isU]=_nFakeYieldsErr[ikin][ieta];
+          _MCtruthKolmogorov[isL][isU]=_testMCtruthKolmogorov[ikin][ieta];
+        }//end of if (isOk)
+        else{
+          _yieldsTrueVal[isL][isU]=-1;
+          _yieldsTrueErr[isL][isU]=0.001;
+          _yieldsFakeVal[isL][isU]=-1;
+          _yieldsFakeErr[isL][isU]=0.001;       
+        }
       }//end of loop over isU, upper sideband cut
 
     }//end of loop over isL, lower sideband cut
@@ -162,6 +173,7 @@ void TTemplatesSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
   double sbL[nPL*nPU];
   double sbU[nPL*nPU];
   double yTrueVal[nPL*nPU];
+  double kolmogorov[nPL*nPU];
   std::cout<<std::endl;
   std::cout<<"Prepare Graphs for "<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
   for (int isL=0; isL<nPL; isL++){ 
@@ -172,13 +184,19 @@ void TTemplatesSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
       sbL[nP]=_sidebandLowerVal[isL];
       sbU[nP]=_sidebandUpperVal[isU];
       yTrueVal[nP]=_yieldsTrueVal[isL][isU];
+      kolmogorov[nP]=_MCtruthKolmogorov[isL][isU];
       std::cout<<"isL="<<isL<<", isU="<<isU<<", nP="<<nP;
       std::cout<<std::setprecision(4)<<", sbL="<<sbL[nP]<<", sbU="<<sbU[nP];
-      std::cout<<std::setprecision(0)<<", yTrueVal="<<yTrueVal[nP]<<std::endl;
+      std::cout<<std::setprecision(0)<<", yTrueVal="<<yTrueVal[nP];
+      std::cout<<std::setprecision(3)<<", kolmogorov="<<kolmogorov[nP]<<std::endl;
       nP++;
     }//end of loop over isU
   }//end of loop over isL
-
+  for (int ip=0; ip<nP; ip++){
+    std::cout<<std::setprecision(0)<<"nP="<<nP;
+    std::cout<<std::setprecision(4)<<", sbL="<<sbL[ip]<<", sbU="<<sbU[ip];
+    std::cout<<std::setprecision(0)<<", yTrueVal="<<yTrueVal[ip]<<std::endl;
+  }// end of loop over ip
   _grTrueVal[ikin][ieta]=new TGraph2D(nP,sbL,sbU,yTrueVal);
   _grTrueVal[ikin][ieta]->GetXaxis()->SetTitle("lower sb cut");
   _grTrueVal[ikin][ieta]->GetYaxis()->SetTitle("upper sb cut");
@@ -186,11 +204,15 @@ void TTemplatesSyst::PrepareGraphsKinEtaBin(int ikin, int ieta)
   _vecSidebandLower[ikin][ieta]=new TVectorD(nP,sbL);
   _vecSidebandUpper[ikin][ieta]=new TVectorD(nP,sbU);
   _vecTrueVal[ikin][ieta]=new TVectorD(nP,yTrueVal);
+  _vecMCtruthKolmogorov[ikin][ieta]=new TVectorD(nP,kolmogorov);
+
+
   _pars.fOutForSave->cd();
   _vecSidebandLower[ikin][ieta]->Write(TString("vec_sbL")+StrLabelKin(ikin)+StrLabelEta(ieta));
   _vecSidebandUpper[ikin][ieta]->Write(TString("vec_sbU")+StrLabelKin(ikin)+StrLabelEta(ieta));
-  _vecTrueVal[ikin][ieta]->Write(TString("vec_trueVal")+StrLabelKin(ikin)+StrLabelEta(ieta));  
-
+  _vecTrueVal[ikin][ieta]->Write(TString("vec_trueVal")+StrLabelKin(ikin)+StrLabelEta(ieta)); 
+  _vecMCtruthKolmogorov[ikin][ieta]->Write(TString("vec_MCtruthKolmogorov")+StrLabelKin(ikin)+StrLabelEta(ieta));
+  _grTrueVal[ikin][ieta]->Write(TString("grTrue")+StrLabelKin(ikin)+StrLabelEta(ieta));
 
 }// end of PrepareGraphsKinEtaBin(int ikin, int ieta)
 
@@ -208,7 +230,7 @@ void TTemplatesSyst::PrintOutKinEtaBin(int ikin, int ieta)
     std::cout<<"ikin="<<StrLabelKin(ikin);
     std::cout<<", ieta="<<StrLabelEta(ieta)<<std::endl;
     for (int isL=0; isL<_variationPars.nPointsLower[ieta]; isL++){
-      for (int isU=isL+1; isU<_variationPars.nPointsUpper[ieta]+1; isU++){
+      for (int isU=0; isU<_variationPars.nPointsUpper[ieta]; isU++){
       std::cout<<std::setprecision(3)<<std::endl;
       std::cout<<"isL="<<isL<<", isU="<<isU<<", sideband="<<_sidebandLowerVal[isL]<<"-"<<_sidebandUpperVal[isU]<<std::endl;
       std::cout<<"true yield : ";

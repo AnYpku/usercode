@@ -41,6 +41,13 @@ in runSkimLepPho.C fileToSkim is file to be skimmed, the last TString variable i
 to skim many files, doSkimManyFiles.sh can be used 
 but it may not be up to date
 
+How to add another variable from ggNtuple to the analysis ?
+- Find and uncomment the variable in Include/TEventTree.h (TEventTree::InputTreeLeaves)
+- Uncomment in Include/TEventTree.C (Init), SetBranchAddress and Set object pointer if applicable
+- Add in Include/TEventTree.C appropriate GetEntry
+- Uncomment in TInputOutputTree::InintOutputTree
+- Run Splits, Skims, Selections again  
+
 ##############################
 2) FullChain
 

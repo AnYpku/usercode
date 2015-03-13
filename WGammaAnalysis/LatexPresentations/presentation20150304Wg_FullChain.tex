@@ -1,0 +1,108 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{Full Chain, Preliminary}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{March 4th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Analysis Outline}
+{
+  \begin{itemize}
+  \item cut-based  event selection
+  \item $jets \rightarrow \gamma$ data driven background subtraction
+  \item $e \rightarrow \gamma $ and true $\gamma$ MC-based background subtraction
+  \item detector resolution unfolding correction (for differential cross section only)
+  \item acceptance x efficiency correction (bin-by-bin)
+  \item divide over luminocity (19.5 $fb^{-1}$)
+  \item divide over bin width (for differential cross section only)
+  \item compare measured CS vs theory CS, MUON vs ELECTRON
+  \item For Zg, also compare with Otto's result
+  \end{itemize}
+}
+\end{frame}
+
+\begin{frame}{Phase Space Definition and Tentative Binning}
+{
+  \begin{itemize}
+%  \item Tentative pho pt binning: 15-20-25-30-35-45-55-65-500 GeV 
+%  \iten Plan: 15-20-25-30-35-45-55-65-75-85-95-120-500 GeV
+  \item pho pt $>$ 15 GeV (for total CS)
+  \item dR(pho,lep)$ >$ 0.7
+  \item pho $|\eta|<2.5$, lep $|\eta|<2.5$
+  \item lep Pt $>$ 20 GeV
+  \item pho I $>$ 5 GeV (sum of all pt within dR$<$0.3 based on MC particles)
+  \item for Zg: M(lep,lep)$>$50 GeV
+  \end{itemize}
+}
+\end{frame}
+
+
+%---------------------------------------------
+
+\begin{frame}{$jets \rightarrow \gamma$ data driven background subtraction}\\*
+  Wg, MUON channel, Ich fits, Endcap\\*
+  \begin{tabular}{|c|c|c|c|}
+  bin lims & nFitBins & fit range & sideband \\ \hline
+  phoEtTotal & 21 & -0.900-20.100 & 0.033-0.053 \\ \hline
+  phoEt15to20 & 21 & -0.900-20.100 & 0.027-0.035 \\ \hline
+  phoEt20to25 & 21 & -0.900-20.100 & 0.021-0.043 \\ \hline
+  phoEt25to30 & 21 & -0.900-20.100 & 0.019-0.046 \\ \hline
+  phoEt30to35 & 21 & -0.900-20.100 & 0.021-0.051 \\ \hline
+  phoEt35to45 & 21 & -0.900-20.100 & 0.021-0.059 \\ \hline
+  phoEt45to55 & 21 & -0.900-20.100 & 0.023-0.046 \\ \hline
+  phoEt55to65 & 21 & -0.900-20.100 & 0.023-0.046 \\ \hline
+  phoEt65to500 & 8 & -0.900-15.100 & 0.045-0.046 \\ \hline
+  \end{tabular}\\*
+  \scriptsize Sideband ranges were determined by MC-mixture fits (when the yields determined from fit match MC truth), the applied on data\\* 
+  \scriptsize These tables will be added to the note\\*
+  \scriptsize But before need some more work to make fits better and cosmetic adjustments\\*
+\end{frame}
+
+\begin{frame}{Unfolding (migration matrices)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/Constants/cMigrMatrix_MUON_WGamma_.pdf}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/Constants/cMigrMatrix_MUON_ZGamma_.pdf}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/Constants/cMigrMatrix_ELECTRON_WGamma_.pdf}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_ZGamma/Plots/Constants/cMigrMatrix_ELECTRON_ZGamma_.pdf}
+    %\\Comments here
+  \end{figure}
+  \scriptsize top: MUON, bottom: ELECTRON; left: Wg, right: Zg\\*
+  \scriptsize Concern: Otto's matrices look very different (high migration between underflow and first bins)\\*
+\end{frame}
+
+\begin{frame}{Cross Section}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth, keepaspectratio=true]{../CrossSection/compareCSWGamma.pdf}\includegraphics[width=0.5\textwidth, keepaspectratio=true]{../CrossSection/compareCSZGamma.pdf}
+    %\\Comments here
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Plans}
+{
+  \begin{itemize}
+  \item document everything in the note (started)
+  \item some technical updates (table printing; full chain; plots etc)
+  \item figure out difference in unfolding with Otto
+  \item continue template fits cross checks
+  \item estimate syst error due to $jets \rightarrow \gamma$ following Otto's recipe butwith Ich fits only
+  \item add high pt binning
+  \item check if templates for muon and electron channel are the same - if yes, combine statistics
+  \end{itemize}
+}
+\end{frame}
+
+
+\end{document}
+

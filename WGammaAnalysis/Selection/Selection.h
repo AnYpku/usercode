@@ -85,7 +85,7 @@ class Selection
        TPuReweight* _puWeight;
        TString _selectedTreeFileName;
 
-       void PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced);
+       void PickHardestPhotonInEvent(TTree* trToBeWritten, TTree* trReduced, int blind);
   };
 
 #endif //#ifndef Selection_h

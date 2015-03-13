@@ -65,8 +65,9 @@ void TTemplates::ComputeBackground(bool noPrint, bool noPlot)
   }
   if (!noPlot) PlotTemplates();
   PrintYieldsAndChi2();
+  PrintLatex();
   SaveYields();
-}
+}// end of ComputeBackground()
 
 void TTemplates::PrintPars()
 {
@@ -113,6 +114,42 @@ void TTemplates::PrintPars()
   std::cout<<"==============================="<<std::endl;
 }// end of TTemplates::PrintPars()
 
+void TTemplates::PrintLatex()
+{
+  std::cout<<"==============================="<<std::endl;
+  std::cout<<"||||========== Print Latex"<<std::endl;
+  for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
+    TString strEta = StrLabelEta(ieta);
+    strEta.ReplaceAll("_","");
+
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{"<<strEta<<"}"<<std::endl;
+    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|}"<<std::endl;
+    std::cout<<"    bin & N of & fit & sideband & leak\\\\ "<<std::endl;
+    std::cout<<"    lims & fit bins & range & & fraction, \\% \\\\ \\hline"<<std::endl;
+    for (int ik=1; ik<=_pars.nKinBins; ik++){
+      std::cout<<"    ";
+      std::cout<<std::setprecision(0)<<_pars.kinBinLims[ik-1]<<"-"<<_pars.kinBinLims[ik]<<" & ";
+      std::cout<<std::setprecision(0)<<_pars.nFitBins[ik][ieta]<<" & ";
+      int presFit, presSb;
+      if (_pars.maxVarFit[ik][ieta]-_pars.minVarFit[ik][ieta]<1) {presFit=3; presSb=1;}
+      else {presFit=1; presSb=3;}
+      std::cout<<std::setprecision(presFit)<<_pars.minVarFit[ik][ieta]<<"-"<<_pars.maxVarFit[ik][ieta]<<" & ";
+      std::cout<<std::setprecision(presSb)<<_pars.sideband[ik][ieta]<<"-"<<_pars.sidebandUp[ik][ieta]<<" & ";
+      std::cout<<std::setprecision(1)<<_leakFraction[ik][ieta];
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    }//end of loop over ik
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:fit_pars_"<<strEta<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
+  }//end of loop over ieta
+  std::cout<<"|||| end of Print Latex"<<std::endl;
+  std::cout<<"==============================="<<std::endl;
+}// end of TTemplates::PrintLatex()
+
 bool TTemplates::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
 {
   // if ieta == _COMMON - compute BARREL, ENDCAP and SUM
@@ -152,7 +189,8 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
 
   _pars.unitOrigFit[ikin][ieta] = (_pars.maxVarFit[ikin][ieta]-_pars.minVarFit[ikin][ieta])/_pars.nFitBins[ikin][ieta];
   NewHistograms(ikin, ieta, noPrint);
-  SetFakeTemplate(ikin, ieta, noPrint);
+  bool isOk = SetFakeTemplate(ikin, ieta, noPrint);
+  if (!isOk) return 0;
   SetTrueTemplate(ikin, ieta, noPrint);
   SetDataAndSignHists(ikin, ieta, noPrint);
   bool badBins[150];
@@ -164,7 +202,8 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
     DeleteHistograms(ikin, ieta);
     RebinTemplates(ikin, ieta, badBins, noPrint);
     NewHistograms(ikin, ieta, noPrint);
-    SetFakeTemplate(ikin, ieta, noPrint);
+    bool isOk = SetFakeTemplate(ikin, ieta, noPrint);
+    if (!isOk) return 0;
     SetTrueTemplate(ikin, ieta, noPrint);
     SetDataAndSignHists(ikin, ieta, noPrint);  
     hasBadBins=CheckTemplates(ikin, ieta, badBins, noPrint); 
@@ -232,7 +271,7 @@ void TTemplates::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool n
   }
 }
 
-void TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
+bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
 {
   if (!noPrint){ 
     std::cout<<std::endl;
@@ -254,6 +293,24 @@ void TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
   if (!noPrint) std::cout<<"Fake template cut="<<cut.GetTitle()<<std::endl;
   SetTemplate(0,_hFake[ikin][ieta], cut, noPrint, _hLeak[ikin][ieta]);
   // "0" for fake gamma template
+  if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
+    float num = 100.0*_hLeak[ikin][ieta]->GetSumOfWeights();
+    float den = _hLeak[ikin][ieta]->GetSumOfWeights()+_hFake[ikin][ieta]->GetSumOfWeights();
+    _leakFraction[ikin][ieta]=num/den;
+  }
+  if (_hFake[ikin][ieta]->GetSumOfWeights()==0){
+    std::cout<<"_hFake[ikin][ieta]->GetSumOfWeights()==0; return 0;"<<std::endl;
+    return 0;
+  }
+  if (_pars.isMCclosureMode && _leakFraction[ikin][ieta]>_acceptableLeakFraction[ikin][ieta]){
+    std::cout<<"_hFake[ikin][ieta]->GetSumOfWeights()="<<_hFake[ikin][ieta]->GetSumOfWeights()<<"; ";
+    std::cout<<"_hLeak[ikin][ieta]->GetSumOfWeights()="<<_hLeak[ikin][ieta]->GetSumOfWeights()<<"; ";
+    std::cout<<"_leakFraction[ikin][ieta]="<<_leakFraction[ikin][ieta]<<"; ";
+    std::cout<<"_acceptableFraction[ikin][ieta]="<<_acceptableLeakFraction[ikin][ieta]<<"; ";
+    std::cout<<"return 0;"<<std::endl;
+    return 0;
+  }
+  return 1;
 }// end of SetFakeTemplate
 
 void TTemplates::SetTrueTemplate(int ikin, int ieta, bool noPrint)
@@ -332,6 +389,12 @@ void TTemplates::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
   
   varDraw=_pars.varFit+TString(">>")+_hFakeMCtruth[ikin][ieta]->GetName();
   _pars.treeFakeRef->Draw(varDraw,cut*_pars.cutWeight,"goff");
+
+  _testMCtruthKolmogorov[ikin][ieta]=_hFakeMCtruth[ikin][ieta]->KolmogorovTest(_hFake[ikin][ieta]);
+  _testMCtruthChi2[ikin][ieta]=_hFakeMCtruth[ikin][ieta]->Chi2Test(_hFake[ikin][ieta],"WW");
+  std::cout<<"Compare fake to MCtruth hist (relevant for MC-closure only)"<<std::endl;
+  std::cout<<"KolmogorovTest="<<_testMCtruthKolmogorov[ikin][ieta]<<std::endl;
+  std::cout<<"Chi2Test="<<_testMCtruthChi2[ikin][ieta]<<std::endl;
 
   TH1F* histTemp = new TH1F("histTemp","histTemp",1,_pars.treeData->GetMinimum(_pars.varWeight)-1,_pars.treeData->GetMaximum(_pars.varWeight)+1);
   histTemp->Sumw2();
@@ -638,6 +701,7 @@ void TTemplates::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
     PrintOneHistogramBinByBin(_hFakeReference, ikin, ieta);
     PrintOneHistogramBinByBin(_hLeak, ikin, ieta);
     PrintOneHistogramBinByBin(_hData, ikin, ieta);
+    std::cout<<"_leakFraction[ikin][ieta]="<<_leakFraction[ikin][ieta]<<std::endl;
   }
   RooDataHist dataHist("hist", "data set converted to hist", argList, _hData[ikin][ieta]);
   //create Fake and True PDFs
@@ -857,8 +921,8 @@ void TTemplates::PrintYieldsAndChi2()
       std::cout<<_nTrueFromFitVal[ikin][ieta]<<"+-";
       std::cout<<_nTrueFromFitErr[ikin][ieta]<<"; ";
       if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
-        leakFraction[ikin][ieta]=100.0*_hLeak[ikin][ieta]->GetSumOfWeights()/(_hLeak[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights());
-        std::cout<<leakFraction[ikin][ieta]<<"%; ";
+        _leakFraction[ikin][ieta]=100.0*_hLeak[ikin][ieta]->GetSumOfWeights()/(_hLeak[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights());
+        std::cout<<_leakFraction[ikin][ieta]<<"%; ";
       }
     }
     std::cout<<std::endl;
@@ -1053,7 +1117,7 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
     _hData[ikin][ieta]->SetLineWidth(2);
     _hData[ikin][ieta]->Draw("EP same");
 
-    if (_pars.showTreeRef){
+    if (_pars.isMCclosureMode){
       float sum=0; 
       _hFakeMCtruth[ikin][ieta]->SetLineWidth(2);
       _hFakeMCtruth[ikin][ieta]->SetLineColor(7);
@@ -1082,7 +1146,8 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
     line->Draw("same");
    
     cName.ReplaceAll("-1","total");
-    cName+=".png";
+    if (_pars.isMCclosureMode) cName+="_MCclosure.png";
+    else cName+=".png";
     c1->SaveAs(cName);
     cName.ReplaceAll(".png",".pdf");
     c1->SaveAs(cName);
