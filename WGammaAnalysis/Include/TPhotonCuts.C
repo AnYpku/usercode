@@ -213,7 +213,7 @@ TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp, int ieta)
 
   TString cutBStr="phoSigmaIEtaIEta<=";
   cutBStr+=sigmaCutB;
-  //  cutBStr+="&& phoSigmaIEtaIEta>=";
+  // cutBStr+="&& phoSigmaIEtaIEta>=";
   // cutBStr+=_phoSigmaIEtaIEtaBarrelCutLeft;
   TCut cutB(cutBStr);
   TString cutEStr="phoSigmaIEtaIEta<=";
@@ -231,7 +231,7 @@ TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp, int ieta)
 
 TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType, int ieta)
 {
-//  if (isoType==ISO_CHorTRK) return "1";
+  if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
   if (year==2011 && isoType==ISO_CHorTRK) strIso="phoTrkIsoHollowDR04Corr";
   if (year==2012 && isoType==ISO_CHorTRK) strIso="phoPFChIsoCorr";

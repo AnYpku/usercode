@@ -84,8 +84,9 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
   TString strWeightBlind=strWeight;
   if (source.sourceType!=DATA){
     strWeightBlind+="*";
-    strWeightBlind+=_pyPars.blindFraction;//0.05 if blinded, 1 if unblinded
+    strWeightBlind+=_pyPars.blindFraction;//0.05 if BLIND_PRESCALE, 1 if UNBLIND or BLIND_COMBINE
   }
+  std::cout<<"strWeightBlind="<<strWeightBlind<<", blind frac = "<<_pyPars.blindFraction<<std::endl;
   TCut cutWblind(strWeightBlind);
 
   _pyPars.fOut->cd();

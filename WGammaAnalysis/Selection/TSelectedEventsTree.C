@@ -480,14 +480,9 @@ void TSelectedEventsTree::SetPhotonIsoValues(TEventTree::InputTreeLeaves& leaf, 
 
     SetThreeIsolations(leaf, cand, _phoSCRChIso04Corr, _phoSCRNeuIso04Corr, _phoSCRPhoIso04Corr, leaf.phoSCRChIso04->at(cand.ipho), leaf.phoSCRNeuIso04->at(cand.ipho), leaf.phoSCRPhoIso04->at(cand.ipho));
 
-
-  if (sample==_config.DATA || channel==_config.MUON) {
-
     SetThreeIsolations(leaf, cand, _phoRandConeChIsoCorr, _phoRandConeNeuIsoCorr, _phoRandConePhoIsoCorr, leaf.phoRandConeChIso->at(cand.ipho), leaf.phoRandConeNeuIso->at(cand.ipho), leaf.phoRandConePhoIso->at(cand.ipho));
 
     SetThreeIsolations(leaf, cand, _phoRandConeChIso04Corr, _phoRandConeNeuIso04Corr, _phoRandConePhoIso04Corr, leaf.phoRandConeChIso04->at(cand.ipho), leaf.phoRandConeNeuIso04->at(cand.ipho), leaf.phoRandConePhoIso04->at(cand.ipho));
-
-  } //phoRandcone isolations for data only
 
   //photon isolation corrections 2011
   _phoEcalIsoDR04Corr=_photon.GetPhoEcalIsoDR04Corr(leaf.phoEcalIsoDR04->at(cand.ipho),leaf.rho2011,leaf.phoSCEta->at(cand.ipho));

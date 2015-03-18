@@ -54,6 +54,9 @@ class Unfolding
 
        TH2D* _histEventCountMigrMatrix;
        TH2D* _histMigrMatrixNotNormalized;
+       TH2D* _histUnfoldingMatrix;
+       TH2D* _histResponseMatrix;
+       TH2D* _histCovarianceMatrix;
 
        TH1D* _histYieldsRec;
        TH1D* _histYieldsRecSmeared;

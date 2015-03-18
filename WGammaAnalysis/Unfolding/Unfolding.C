@@ -192,18 +192,24 @@ bool Unfolding::PrepareMigrationMatrix()
 
 
   _fOut->cd();
-  
-  _histMigrMatrixNotNormalized = new TH2D("migrNotNorm","_histMigrMatrixNotNormalized",_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
-  _histMigrMatrixNotNormalized->Sumw2();
-  _histEventCountMigrMatrix = new TH2D("migrMatrix","Migration Matrix: Counts (no weights)",_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
 
-  _histYieldsRec = new TH1D("yieldsRec","yields rec",_nBinsRec,_phoPtLimitsRec);
+  TConfiguration config;
+  TString strAffix = "_";
+  strAffix+=config.StrChannel(_channel);
+  strAffix+="_";
+  strAffix+=config.StrVgType(_vgamma);
+  
+  _histMigrMatrixNotNormalized = new TH2D(TString("migrNotNorm")+strAffix,TString("_histMigrMatrixNotNormalized")+strAffix,_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
+  _histMigrMatrixNotNormalized->Sumw2();
+  _histEventCountMigrMatrix = new TH2D(TString("migrMatrix")+strAffix,TString("Migration Matrix: Counts (no weights)")+strAffix,_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);
+
+  _histYieldsRec = new TH1D(TString("yieldsRec")+strAffix,TString("yields rec")+strAffix,_nBinsRec,_phoPtLimitsRec);
   _histYieldsRec->Sumw2();
-  _histYieldsRecSmeared = new TH1D("yieldsRecSmeared","yields rec smeared",_nBinsRec,_phoPtLimitsRec);
+  _histYieldsRecSmeared = new TH1D(TString("yieldsRecSmeared")+strAffix,TString("yields rec smeared")+strAffix,_nBinsRec,_phoPtLimitsRec);
     //the smeared histogram is prepared in order to test the procedure on the 
     //signal MC like if it were data;
     //that is why the errors on rec smeared are sqrt(N)
-  _histYieldsGen = new TH1D("yieldsGen","yields gen",_nBinsGen,_phoPtLimitsGen);
+  _histYieldsGen = new TH1D(TString("yieldsGen")+strAffix,TString("yields gen")+strAffix,_nBinsGen,_phoPtLimitsGen);
   _histYieldsGen->Sumw2();
   
   
@@ -333,6 +339,9 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
     errStatV[i-1]=histUnfoldedYields->GetBinError(i);
     errSystV[i-1]=errSyst[i];
   }
+
+  TCanvas* c = new TCanvas("errCovStat","errCovStat");
+  errCovStat.Draw("COLZ");
 
   std::cout<<"Input yields:"<<std::endl;
   for (int i=1; i<=_nBinsGen; i++){
@@ -495,8 +504,14 @@ bool Unfolding::PlotAndStore()
   for (int ig=1; ig<=_nBinsRec; ig++)
     limsGenDraw[ig]= _phoPtLimitsGen[ig];
 
-  TH2D* histEventCountDraw = new TH2D("histEventCount","Migration Matrix: Counts (no weights)",_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
-  TH2D* histMigrMatrixDraw = new TH2D("histMigrMatrix","Migration Matrix: no normalization",_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
+  TString strAffixTitle=TString("_")+_config.StrChannel(_channel)+TString("_")+_config.StrVgType(_vgamma)+TString("_");
+
+  TH2D* histEventCountDraw = new TH2D(TString("histEventCount")+strAffixTitle,TString("Migration Matrix: Counts (no weights)")+strAffixTitle,_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
+  TH2D* histMigrMatrixDraw = new TH2D(TString("histMigrMatrix")+strAffixTitle,TString("Migration Matrix: no normalization")+strAffixTitle,_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
+  histEventCountDraw->GetXaxis()->SetTitle("phoEt reco, GeV");
+  histEventCountDraw->GetYaxis()->SetTitle("phoEt gen, GeV");
+  histMigrMatrixDraw->GetXaxis()->SetTitle("phoEt reco, GeV");
+  histMigrMatrixDraw->GetYaxis()->SetTitle("phoEt gen, GeV");
 
 
   for (int ir=1; ir<_nBinsRec+1; ir++)
@@ -513,8 +528,7 @@ bool Unfolding::PlotAndStore()
 
   style->SetPaintTextFormat("g");
  
-  TString strAffixTitle=TString("_")+_config.StrChannel(_channel)+TString("_")+_config.StrVgType(_vgamma)+TString("_");
-  
+ 
   TCanvas* cEventCount = new TCanvas(TString("cEventCount")+strAffixTitle,TString("cEventCount")+strAffixTitle);
   cEventCount->SetLogx();
   cEventCount->SetLogy();

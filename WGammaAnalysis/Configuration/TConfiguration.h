@@ -147,8 +147,8 @@ class TConfiguration
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,40.};
 //static const int _nPhoPtBins = 2;
 //static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.};
-static const int _nPhoPtBins = 8;
-static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,500.};
+static const int _nPhoPtBins = 12;
+static const float _phoPtBinsLimits[_nPhoPtBins+1]={15.,20.,25.,30.,35.,45.,55.,65.,75.,85.,95.,120.,500.};
 static const float _phoPtMin=15.;
 static const float _phoPtMax=2000.;
   //minimum value for total CS

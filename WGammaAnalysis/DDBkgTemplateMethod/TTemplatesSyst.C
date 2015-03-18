@@ -22,7 +22,8 @@ TTemplatesSyst::TTemplatesSyst(TemplatesPars pars, TemplatesSidebandVariationPar
 {
   SetPars(pars);
   _pars.fOutForSave->Close();
-  _pars.strFileOutName.ReplaceAll(".root","_Syst.root");
+  if (_pars.isMCclosureMode) _pars.strFileOutName.ReplaceAll(".root","_Syst_MCclosure.root");
+  else _pars.strFileOutName.ReplaceAll(".root","_Syst.root");
   _pars.fOutForSave = new TFile(_pars.strFileOutName,"recreate");
   _variationPars=variationPars;
 }
@@ -35,12 +36,12 @@ TTemplatesSyst::~TTemplatesSyst()
 void TTemplatesSyst::SidebandVariation()
 {
 
-  //for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-   for (int ikin=1; ikin<=1; ikin++){
+  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
+  // for (int ikin=1; ikin<=1; ikin++){
     SidebandVariationOneKinBin(ikin);
   }
-  //for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-   for (int ikin=1; ikin<=1; ikin++){
+  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
+  // for (int ikin=1; ikin<=1; ikin++){
     PlotOneKinBin(ikin);
   }
 

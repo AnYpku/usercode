@@ -39,7 +39,7 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
   }
 
   TString strF = conf.GetDDTemplateFileName(anPars.channel,anPars.vgamma,anPars.templFits,anPars.varKin);
-  strF.ReplaceAll(".root","_Syst.root");
+  strF.ReplaceAll(".root","_Syst_MCclosure.root");
   TFile fInpMCclosure(strF);     
   TVectorD* vecSbL[50][2];
   TVectorD* vecSbU[50][2];

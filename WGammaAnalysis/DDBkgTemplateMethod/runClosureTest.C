@@ -9,11 +9,11 @@
   noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   noClosure[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=0;
   noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
-  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  noClosure[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=0;
   noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
-  noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
+  noClosure[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=0;
   noClosure[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
-  noClosure[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  noClosure[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=0;
 
   TConfiguration::AnalysisParameters anPars;
   FullChain fch; 

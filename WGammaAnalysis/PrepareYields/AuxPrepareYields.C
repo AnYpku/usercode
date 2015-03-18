@@ -79,6 +79,7 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   for (int il=0; il<anPars.nKinBins+1; il++)
     pars.kinBinLims[il]=anPars.kinBinLims[il];
   if (anPars.blind[anPars.channel][anPars.vgamma]==config.UNBLIND) pars.blindFraction=1;
+  if (anPars.blind[anPars.channel][anPars.vgamma]==config.BLIND_COMBINED) pars.blindFraction=1;
   if (anPars.blind[anPars.channel][anPars.vgamma]==config.BLIND_PRESCALE) pars.blindFraction=1./config.GetBlindPrescale();
   pars.varWeight="weight";
   pars.cutBarrel=photon.RangeBarrel();

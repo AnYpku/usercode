@@ -17,15 +17,6 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
 
 void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars);
 
-void SetLimsChIsoTempl_phoEt_Wg_MUON(TTemplates::TemplatesPars &pars);
-void SetLimsChIsoTempl_phoEt_Zg_MUON(TTemplates::TemplatesPars &pars);
-void SetLimsSihihTempl_phoEt_Wg_MUON(TTemplates::TemplatesPars &pars);
-void SetLimsSihihTempl_phoEt_Zg_MUON(TTemplates::TemplatesPars &pars);
-void SetLimsChIsoTempl_phoEt_Wg_ELECTRON(TTemplates::TemplatesPars &pars);
-void SetLimsChIsoTempl_phoEt_Zg_ELECTRON(TTemplates::TemplatesPars &pars);
-void SetLimsSihihTempl_phoEt_Wg_ELECTRON(TTemplates::TemplatesPars &pars);
-void SetLimsSihihTempl_phoEt_Zg_ELECTRON(TTemplates::TemplatesPars &pars);
-
 void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars);
 
 void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
@@ -51,8 +42,8 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
     hSbL[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsLowerHistName(ieta));
     hSbU[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsUpperHistName(ieta));
     for (int ikin=1; ikin<=anPars.nKinBins; ikin++){
- //       pars.sideband[ikin][ieta]=hSbL[ieta]->GetBinContent(ikin);
- //       pars.sidebandUp[ikin][ieta]=hSbU[ieta]->GetBinContent(ikin);
+        pars.sideband[ikin][ieta]=hSbL[ieta]->GetBinContent(ikin);
+        pars.sidebandUp[ikin][ieta]=hSbU[ieta]->GetBinContent(ikin);
     }//end of loop over ikin
     
   }// end of loop over ieta
@@ -89,17 +80,17 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
 
     SetParsChIsoTempl(pars, anPars);
 
-    variationPars.nPointsLower[conf.BARREL]=5+1;//10+1;
+    variationPars.nPointsLower[conf.BARREL]=10+1;//10+1;
     variationPars.lowerSidebandCutFrom[conf.BARREL]=0.005;
     variationPars.lowerSidebandCutTo[conf.BARREL]=0.015;
-    variationPars.nPointsUpper[conf.BARREL]=2+1;//9+1;
+    variationPars.nPointsUpper[conf.BARREL]=9+1;//9+1;
     variationPars.upperSidebandCutFrom[conf.BARREL]=0.012;
     variationPars.upperSidebandCutTo[conf.BARREL]=0.021;
 
-    variationPars.nPointsLower[conf.ENDCAP]=2+1;//15+1;
+    variationPars.nPointsLower[conf.ENDCAP]=30+1;//15+1;
     variationPars.lowerSidebandCutFrom[conf.ENDCAP]=0.019;
     variationPars.lowerSidebandCutTo[conf.ENDCAP]=0.049;
-    variationPars.nPointsUpper[conf.ENDCAP]=2+1;//20+1;
+    variationPars.nPointsUpper[conf.ENDCAP]=40+1;//20+1;
     variationPars.upperSidebandCutFrom[conf.ENDCAP]=0.027;
     variationPars.upperSidebandCutTo[conf.ENDCAP]=0.067;
   }
@@ -137,14 +128,16 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
     return;
   }
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
-    pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-40-55-75-95-500
+    pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
     for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
       pars.nFitBins[ikb][ieta]=21;
       pars.minVarFit[ikb][ieta]=-1.0+0.1;
       pars.maxVarFit[ikb][ieta]=20.0+0.1;
       pars.combineTrueTempl[ikb][ieta]=0;
       pars.combineFakeTempl[ikb][ieta]=0;
-    }
+      if (pars.kinBinLims[ikb]>29) pars.combineTrueTempl[ikb][ieta]=1;
+      if (pars.kinBinLims[ikb]>44) pars.combineFakeTempl[ikb][ieta]=1;
+    } 
     pars.sideband[ikb][config.BARREL]=0.011;
     pars.sideband[ikb][config.ENDCAP]=0.033;
     pars.sidebandUp[ikb][config.BARREL]=0.014;//0.018;
@@ -155,17 +148,6 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
       // ikin=[1,nKinBins] are for individual bin fits 
       // ieta=0 - BARREL, ieta=1 - ENDCAP
   }
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
-  //    SetLimsChIsoTempl_phoEt_Wg_MUON(pars);
-
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
-  //   SetLimsChIsoTempl_phoEt_Zg_MUON(pars);
-
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA)
-  //    SetLimsChIsoTempl_phoEt_Wg_ELECTRON(pars);
-
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.Z_GAMMA)
-  //    SetLimsChIsoTempl_phoEt_Zg_ELECTRON(pars);
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
     //the histograms with extracted yields will be saved here
@@ -272,15 +254,11 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
     pars.combineTrueTempl[ikb][config.ENDCAP]=0;
     pars.combineFakeTempl[ikb][config.BARREL]=0;
     pars.combineFakeTempl[ikb][config.ENDCAP]=0;
-  }
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.W_GAMMA)
-  //    SetLimsSihihTempl_phoEt_Wg_MUON(pars);
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.MUON && anPars.vgamma==config.Z_GAMMA)
-  //    SetLimsSihihTempl_phoEt_Zg_MUON(pars);
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA)
-  //    SetLimsSihihTempl_phoEt_Wg_ELECTRON(pars);
-  //  if (anPars.varKin=="phoEt" && anPars.channel==config.ELECTRON && anPars.vgamma==config.Z_GAMMA)
-  //    SetLimsSihihTempl_phoEt_Zg_ELECTRON(pars);
+    if (pars.kinBinLims[ikb]>54) pars.combineTrueTempl[ikb][config.BARREL]=1;
+    if (pars.kinBinLims[ikb]>54) pars.combineTrueTempl[ikb][config.ENDCAP]=1;
+    if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][config.BARREL]=1;
+    if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][config.ENDCAP]=1;
+  }//end
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
     //the histograms with extracted yields will be saved here
@@ -355,7 +333,7 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.cutAdd=anPars.cutAdd;
   pars.noLeakSubtr=0;
 
-}
+}// end of SetParsSigmaIEtaIEtaTempl()
 
 void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars)
 {
@@ -371,308 +349,3 @@ void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars
     std::cout<<"ik="<<ik<<", ieta="<<ieta<<", nFitBins="<<pars.nFitBins[ik][ieta]<<", varFit: "<<pars.minVarFit[ik][ieta]<<"-"<<pars.maxVarFit[ik][ieta]<<", sideband: "<<pars.sideband[ik][ieta]<<"-"<<pars.sidebandUp[ik][ieta]<<"; combTrue="<<pars.combineTrueTempl[ik][ieta]<<"; combineFake="<<pars.combineFakeTempl[ik][ieta]<<std::endl;
   }
 }// end of SetValuesToKinEtaArray
-
-void SetLimsSihihTempl_phoEt_Wg_MUON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp, combTrue, combFake
-
-    float valsB[250]={32, 0.005, 0.021, 0.1, 1.1, 0, 0,//Total
-                      32, 0.005, 0.021, 0.1, 1.1, 0, 0,//15-20 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 0, 0,//20-25 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 0, 0,//25-30 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 0, 0,//30-35 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 0, 0,//35-45 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 0, 0,//45-55 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1,//55-65 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1,//65-75 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1,//75-85 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1,//85-95 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1,//95-120 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1};//120-500 GeV
-
-    float valsE[250]={48, 0.019, 0.067, 0.1, 1.1, 0, 0,//Total
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//15-20 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//20-25 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//25-30 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 0, 0,//30-35 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//35-45 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//45-55 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 1, 1,//55-65 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 1, 1,//65-75 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 1, 1,//75-85 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 1, 1,//85-95 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 1, 1,//95-120 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 1, 1};//120-500 GeV 
-
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-}//end  of SetLimsSihihTempl_phoEt_Wg_MUON
-
-void SetLimsSihihTempl_phoEt_Zg_MUON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
-
-    float valsB[250]={32, 0.005, 0.021, 2.6, 3.1, 0, 0,//Total
-                      32, 0.005, 0.021, 2.6, 3.1, 0, 0,//15-20 GeV
-                      32, 0.005, 0.021, 1.1, 7.1, 0, 0,//20-25 GeV
-                      32, 0.005, 0.021, 2.1, 5.1, 0, 0,//25-30 GeV
-                      32, 0.005, 0.021, 1.1, 2.1, 0, 0,//30-35 GeV
-                      32, 0.005, 0.021, 1.1, 2.1, 0, 0,//35-45 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 0, 0,//45-55 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 1, 1,//55-65 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 1, 1,//65-75 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 1, 1,//75-85 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 1, 1,//85-95 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 1, 1,//95-120 GeV
-                      32, 0.005, 0.021, 0.6, 1.1, 1, 1};//120-500 GeV
-
-    float valsE[250]={48, 0.019, 0.067, 0.1, 1.1, 0, 0,//Total
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//15-20 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//20-25 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//25-30 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//30-35 GeV
-                      48, 0.019, 0.067, 2.1, 3.1, 0, 0,//35-45 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 0, 0,//45-55 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1,//55-65 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 1, 1,//65-75 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 1, 1,//75-85 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 1, 1,//85-95 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 1, 1,//95-120 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 1, 1};//120-500 GeV 
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-}//end  of SetLimsSihihTempl_phoEt_Zg_MUON
-
-
-void SetLimsChIsoTempl_phoEt_Wg_MUON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
-
-    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.009, 0.014, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.009, 0.014, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.009, 0.019, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.009, 0.019, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.020, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.009, 0.020, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.019, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.009, 0.012, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.013, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.013, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.013, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.013, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.013, 1, 1};//120-500 GeV
-
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.027, 0.035, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.027, 0.035, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.021, 0.043, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.019, 0.046, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.021, 0.051, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.021, 0.059, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.023, 0.046, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.023, 0.046, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.046, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.046, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.046, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.046, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.046, 1, 1};//120-500 GeV  
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-                 
-}//end  of SetLimsChIsoTempl_phoEt_Wg_MUON
-
-void SetLimsChIsoTempl_phoEt_Zg_MUON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
-
-    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.009, 0.014, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.009, 0.014, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.014, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.012, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.014, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.019, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.013, 0.017, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.021, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.012, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.012, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.012, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.012, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.010, 0.012, 1, 1};//120-500 GeV
-
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.019, 0.040, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.019, 0.040, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.048, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.023, 0.067, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.031, 0.064, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.030, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.019, 0.027, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.019, 0.027, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.049, 0.056, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.049, 0.056, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.049, 0.056, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.049, 0.056, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.049, 0.056, 1, 1};//120-500 GeV  
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-     
-}//end  of SetLimsChIsoTempl_phoEt_Zg_MUON
-
-void SetLimsSihihTempl_phoEt_Wg_ELECTRON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp, combTrue, combFake
-
-    float valsB[250]={32, 0.005, 0.021, 0.1, 2.1, 0, 0,//Total
-                      32, 0.005, 0.021, 0.1, 2.1, 0, 0,//15-20 GeV
-                      32, 0.005, 0.021, 0.1, 1.1, 0, 0,//20-25 GeV
-                      32, 0.005, 0.021, 1.1, 2.1, 0, 0,//25-30 GeV
-                      32, 0.005, 0.021, 1.1, 3.1, 0, 0,//30-35 GeV
-                      32, 0.005, 0.021, 0.1, 5.1, 0, 0,//35-45 GeV
-                      32, 0.005, 0.021, 0.1, 7.1, 0, 0,//45-55 GeV
-                      32, 0.005, 0.021, 0.1, 8.1, 1, 1,//55-65 GeV
-                      32, 0.005, 0.021, 1.6, 4.1, 1, 1,//65-75 GeV
-                      32, 0.005, 0.021, 1.6, 4.1, 1, 1,//75-85 GeV
-                      32, 0.005, 0.021, 1.6, 4.1, 1, 1,//85-95 GeV
-                      32, 0.005, 0.021, 1.6, 4.1, 1, 1,//95-120 GeV
-                      32, 0.005, 0.021, 1.6, 4.1, 1, 1};//120-500 GeV
-
-    float valsE[250]={48, 0.019, 0.067, 0.1, 8.1, 0, 0,//Total
-                      48, 0.019, 0.067, 0.1, 8.1, 0, 0,//15-20 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 0, 0,//20-25 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//25-30 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//30-35 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//35-45 GeV
-                      48, 0.019, 0.067, 2.1, 4.1, 0, 0,//45-55 GeV
-                      48, 0.019, 0.067, 1.6, 2.1, 1, 1,//55-65 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1,//65-75 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1,//75-85 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1,//85-95 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1,//95-120 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1};//120-500 GeV 
-
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-}//end  of SetLimsSihihTempl_phoEt_Wg_ELECTRON
-
-void SetLimsSihihTempl_phoEt_Zg_ELECTRON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
-
-    float valsB[250]={32, 0.005, 0.021, 0.6, 2.1, 0, 0,//Total
-                      32, 0.005, 0.021, 0.6, 2.1, 0, 0,//15-20 GeV
-                      32, 0.005, 0.021, 0.1, 9.1, 0, 0,//20-25 GeV
-                      32, 0.005, 0.021, 0.1, 3.1, 0, 0,//25-30 GeV
-                      32, 0.005, 0.021, 1.1, 8.1, 0, 0,//30-35 GeV
-                      32, 0.005, 0.021, 3.1, 15.1, 0, 0,//35-45 GeV
-                      32, 0.005, 0.021, 2.1, 6.1, 0, 0,//45-55 GeV
-                      32, 0.005, 0.021, 1.6, 3.1, 1, 1,//55-65 GeV
-                      32, 0.005, 0.021, 0.1, 2.1, 1, 1,//65-75 GeV
-                      32, 0.005, 0.021, 0.1, 2.1, 1, 1,//75-85 GeV
-                      32, 0.005, 0.021, 0.1, 2.1, 1, 1,//85-95 GeV
-                      32, 0.005, 0.021, 0.1, 2.1, 1, 1,//95-120 GeV
-                      32, 0.005, 0.021, 0.1, 2.1, 1, 1};//120-500 GeV
-
-    float valsE[250]={48, 0.019, 0.067, 1.6, 3.1, 0, 0,//Total
-                      48, 0.019, 0.067, 1.6, 3.1, 0, 0,//15-20 GeV
-                      48, 0.019, 0.067, 0.1, 1.1, 0, 0,//20-25 GeV
-                      48, 0.019, 0.067, 0.1, 2.1, 0, 0,//25-30 GeV
-                      48, 0.019, 0.067, 0.1, 3.1, 0, 0,//30-35 GeV
-                      48, 0.019, 0.067, 0.6, 7.1, 0, 0,//35-45 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 0, 0,//45-55 GeV
-                      48, 0.019, 0.067, 0.6, 1.1, 1, 1,//55-65 GeV
-                      48, 0.019, 0.067, 1.1, 2.1, 1, 1,//65-75 GeV
-                      48, 0.019, 0.067, 1.1, 2.1, 1, 1,//75-85 GeV
-                      48, 0.019, 0.067, 1.1, 2.1, 1, 1,//85-95 GeV
-                      48, 0.019, 0.067, 1.1, 2.1, 1, 1,//95-120 GeV
-                      48, 0.019, 0.067, 1.1, 2.1, 1, 1};//120-500 GeV 
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-}//end  of SetLimsSihihTempl_phoEt_Zg_ELECTRON
-
-
-void SetLimsChIsoTempl_phoEt_Wg_ELECTRON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
-
-    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.013, 0.014, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.013, 0.014, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.015, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.013, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.014, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.012, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.017, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.012, 0.014, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.018, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.018, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.018, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.018, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.018, 1, 1};//120-500 GeV
-
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.023, 0.027, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.025, 0.030, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.025, 0.062, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.038, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.021, 0.051, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.021, 0.040, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.031, 0.035, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.021, 0.059, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.051, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.051, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.051, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.051, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.029, 0.051, 1, 1};//120-500 GeV  
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-                 
-}//end  of SetLimsChIsoTempl_phoEt_Wg_ELECTRON
-
-void SetLimsChIsoTempl_phoEt_Zg_ELECTRON( TTemplates::TemplatesPars &pars)
-{
-    TConfiguration config;
-    // nFitBins, minVarFit, maxVarFit, sideband, sidebandUp,  combTrue, combFake
-
-    float valsB[250]={21, -1.0+0.1, 20.0+0.1, 0.014, 0.015, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.015, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.014, 0.016, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.018, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.012, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.011, 0.012, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.015, 0.016, 1, 1};//120-500 GeV
-
-    float valsE[250]={21, -1.0+0.1, 20.0+0.1, 0.043, 0.051, 0, 0,//Total
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.051, 0, 0,//15-20 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 0, 0,//20-25 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 0, 0,//25-30 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.031, 0.048, 0, 0,//30-35 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.048, 1, 0,//35-45 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.045, 0.048, 1, 0,//45-55 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.037, 0.038, 1, 0,//55-65 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 1, 1,//65-75 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 1, 1,//75-85 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 1, 1,//85-95 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 1, 1,//95-120 GeV
-                      21, -1.0+0.1, 20.0+0.1, 0.043, 0.046, 1, 1};//120-500 GeV  
-                 
-    SetValuesToKinEtaArray(config.BARREL, valsB, pars);
-    SetValuesToKinEtaArray(config.ENDCAP, valsE, pars);
-     
-}//end  of SetLimsChIsoTempl_phoEt_Zg_ELECTRON
-

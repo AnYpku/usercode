@@ -29,10 +29,11 @@ FullChain::~FullChain()
 
 void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin)
 {
+  TConfiguration conf;
   anPars.year=2012;//2012, 2011
-  anPars.channel=TConfiguration::MUON;//MUON, ELECTRON
-  anPars.vgamma=TConfiguration::W_GAMMA;//W_GAMMA, Z_GAMMA
-  anPars.templFits=TConfiguration::TEMPL_CHISO;
+  anPars.channel=conf.MUON;//MUON, ELECTRON
+  anPars.vgamma=conf.W_GAMMA;//W_GAMMA, Z_GAMMA
+  anPars.templFits=conf.TEMPL_CHISO;
 
   anPars.sampleMode=Selection::ALL;
   anPars.analyzedSamples="";
@@ -42,12 +43,36 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
   anPars.cutAdd="1";
 
+  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.BLIND_COMBINED;
+  anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
+  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_COMBINED;
+  anPars.blind[conf.ELECTRON][conf.Z_GAMMA]=conf.UNBLIND;
+
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      anPars.noPreSelection[ich][ivg]=1;
+      anPars.noExtraSelection[ich][ivg]=1;
+      anPars.noDDBkgComputation[ich][ivg][conf.TEMPL_CHISO]=1;
+      anPars.noDDBkgComputation[ich][ivg][conf.TEMPL_SIHIH]=1;
+      anPars.noPrepareYields[ich][ivg]=1;
+      anPars.noSubtractBackground[ich][ivg][conf.TEMPL_CHISO]=1;
+      anPars.noSubtractBackground[ich][ivg][conf.TEMPL_SIHIH]=1;
+      anPars.noSubtractBackground[ich][ivg][conf.TEMPL_OVERLAY]=1;
+      anPars.noCalcAccAndEff[ich][ivg]=1;
+      anPars.noCalcCrossSection[ich][ivg]=1;
+      anPars.noSystDDBkgSidebandVariation[ich][ivg][conf.TEMPL_CHISO]=1;
+      anPars.noSystDDBkgSidebandVariation[ich][ivg][conf.TEMPL_SIHIH]=1;
+      anPars.noCalcAccAndEff[ich][ivg]=1;
+      anPars.noCalcCrossSection[ich][ivg]=1;
+    }//end of ivg
+  }//end of ich
+
   if (varKin=="phoEt")
     SetAnalysisKinParameters(anPars);
   else
     SetDiffKinFullChainParameters(anPars,varKin);
 
-}
+}// end of FullChain::SetDefaultFullChainParameters
 
 void FullChain::SetAnalysisKinParameters(TConfiguration::AnalysisParameters& anPars)
 {

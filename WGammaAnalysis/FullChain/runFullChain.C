@@ -56,11 +56,11 @@
 
   // [conf.MUON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.MUON][conf.Z_GAMMA]=1;
-  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=1;
-  anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=0;
+  anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=0;
   anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.MUON][conf.Z_GAMMA]=1;
-  anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
+  anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=0;
   anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_OVERLAY]=1;
   anPars.noCalcAccAndEff[conf.MUON][conf.Z_GAMMA]=1;
