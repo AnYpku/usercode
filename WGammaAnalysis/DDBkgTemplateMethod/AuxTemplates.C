@@ -15,7 +15,7 @@
 
 void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars);
 
-void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars);
+void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
 
 void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars);
 
@@ -30,7 +30,7 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
     SetParsSigmaIEtaIEtaTempl(pars, anPars);
 
   if (anPars.templFits==TConfiguration::TEMPL_CHISO) 
-    SetParsChIsoTempl(pars, anPars);
+    SetParsChIsoTempl(pars, anPars, isMCclosure);
 
   TConfiguration conf;
   TFile* fSbs = new TFile(conf.GetSidebandsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin));
@@ -65,34 +65,40 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
   if (anPars.templFits==TConfiguration::TEMPL_SIHIH) {
 
     SetParsSigmaIEtaIEtaTempl(pars, anPars);
+
+    // sideband range can not overlap with nominal range
+    // nominal for Barrel is <1.5; for Endcap <1.2
     
     for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
       variationPars.nPointsLower[ieta]=6+1;//6;//30;
-      variationPars.lowerSidebandCutFrom[ieta]=0.1;
-      variationPars.lowerSidebandCutTo[ieta]=3.1;
-      variationPars.nPointsUpper[ieta]=14+1;//14;//30; 
-      variationPars.upperSidebandCutFrom[ieta]=1.1;
-      variationPars.upperSidebandCutTo[ieta]=15.1;
+      variationPars.lowerSidebandCutFrom[ieta]=1.5;
+      variationPars.lowerSidebandCutTo[ieta]=3.5;
+      variationPars.nPointsUpper[ieta]=13+1;//14;//30; 
+      variationPars.upperSidebandCutFrom[ieta]=2.0;
+      variationPars.upperSidebandCutTo[ieta]=15.0;
     }            
   }
 
   if (anPars.templFits==TConfiguration::TEMPL_CHISO) {
 
-    SetParsChIsoTempl(pars, anPars);
+    SetParsChIsoTempl(pars, anPars, isMCclosure);
 
-    variationPars.nPointsLower[conf.BARREL]=10+1;//10+1;
-    variationPars.lowerSidebandCutFrom[conf.BARREL]=0.005;
+    // sideband range can not overlap with nominal range
+    // nominal for Barrel is <0.011; for Endcap <0.033
+
+    variationPars.nPointsLower[conf.BARREL]=4+1;//10+1;
+    variationPars.lowerSidebandCutFrom[conf.BARREL]=0.011;
     variationPars.lowerSidebandCutTo[conf.BARREL]=0.015;
     variationPars.nPointsUpper[conf.BARREL]=9+1;//9+1;
     variationPars.upperSidebandCutFrom[conf.BARREL]=0.012;
     variationPars.upperSidebandCutTo[conf.BARREL]=0.021;
 
-    variationPars.nPointsLower[conf.ENDCAP]=30+1;//15+1;
-    variationPars.lowerSidebandCutFrom[conf.ENDCAP]=0.019;
+    variationPars.nPointsLower[conf.ENDCAP]=8+1;//15+1;
+    variationPars.lowerSidebandCutFrom[conf.ENDCAP]=0.033;
     variationPars.lowerSidebandCutTo[conf.ENDCAP]=0.049;
-    variationPars.nPointsUpper[conf.ENDCAP]=40+1;//20+1;
-    variationPars.upperSidebandCutFrom[conf.ENDCAP]=0.027;
-    variationPars.upperSidebandCutTo[conf.ENDCAP]=0.067;
+    variationPars.nPointsUpper[conf.ENDCAP]=15+1;//20+1;
+    variationPars.upperSidebandCutFrom[conf.ENDCAP]=0.035;
+    variationPars.upperSidebandCutTo[conf.ENDCAP]=0.065;
   }
 
   pars.strPlotsDir=conf.GetPlotsDirName(anPars.channel, anPars.vgamma, conf.PLOTS_TEMPL_FITS_SYST);
@@ -116,7 +122,7 @@ TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)
   return (TTree*)f->Get("selectedEvents");
 }
 
-void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars)
+void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
 
   TConfiguration config;
@@ -136,7 +142,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
       pars.combineTrueTempl[ikb][ieta]=0;
       pars.combineFakeTempl[ikb][ieta]=0;
       if (pars.kinBinLims[ikb]>29) pars.combineTrueTempl[ikb][ieta]=1;
-      if (pars.kinBinLims[ikb]>44) pars.combineFakeTempl[ikb][ieta]=1;
+      if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][ieta]=1;
     } 
     pars.sideband[ikb][config.BARREL]=0.011;
     pars.sideband[ikb][config.ENDCAP]=0.033;
@@ -169,6 +175,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   std::cout<<std::endl;
 
   TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA);
+  if (isMCclosure) strData.ReplaceAll(".root","_MCclosure.root");
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
@@ -176,13 +183,13 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
 
-  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
-//  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+  TString strTrue="../WGammaOutput/MERGED/selected_WGamma_ForTemplates.root";
+  if (isMCclosure) strTrue="../WGammaOutput/MERGED/selected_WGamma_ForTemplates_MCclosure.root";
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-//  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
+  TString strFake="../WGammaOutput/MERGED/selected_WGamma_ForTemplates.root";
+  if (isMCclosure) strFake="../WGammaOutput/MERGED/selected_WGamma_ForTemplates_MCclosure.root";
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 

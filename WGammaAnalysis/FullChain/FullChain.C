@@ -339,7 +339,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
         anPars.channel=ich;
         anPars.vgamma=ivg;
-        AuxPrepareYields(anPars); 
+        AuxPrepareYields(anPars,0); 
        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
     }//end of loop over ivg
@@ -355,7 +355,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         anPars.templFits=itp;
-        AuxSubtractBackground(anPars); 
+        AuxSubtractBackground(anPars,0); 
        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
       }//end of loop over itp

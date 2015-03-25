@@ -124,7 +124,7 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
       hSbUpper->SetBinContent(ikin,selSbU[ikin][ieta]);
       hSbUpper->SetBinError(ikin,0.01*selSbU[ikin][ieta]);
       hFromMCfitTrue->SetBinContent(ikin,selTrueVal[ikin][ieta]);
-      //      hFromMCfitTrue->SetBinError(ikin,selTrueErr[ikin][ieta]);
+      // hFromMCfitTrue->SetBinError(ikin,selTrueErr[ikin][ieta]);
       hFromMCfitTrue->SetBinError(ikin,sqrt(selTrueVal[ikin][ieta]));
     }//end of loop over ikin
     hSbLower->Write();
@@ -132,3 +132,9 @@ void AuxTemplatesPickSideband(TConfiguration::AnalysisParameters &anPars)
     hFromMCfitTrue->Write();
   }//end of loop over ieta
 }//end  of AuxTemplatesPickSideband
+
+// for one eta bin
+void Redo2DPlotsMCclosure(TH1F* hSbLower, TH1F* hSbUpper, TH1F* hFromMCfitTrue, TH1F* hTrueMCtruth)
+{
+
+}// end of Redo2DPlotsMCclosure

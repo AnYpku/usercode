@@ -4,9 +4,9 @@
 #include "TPrepareYields.h"
 #include "TSubtractBackground.h"
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars);
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
 
-void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars)
+void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   TConfiguration conf;
   TPrepareYields prep;
@@ -14,11 +14,11 @@ void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars)
 
   pars.strFileOut=conf.GetYieldsMCtruthFileName(anPars.channel, anPars.vgamma, anPars.varKin);
 
-  AuxPrepareYieldsCommon(prep, pars, anPars);
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure);
 
   prep.PlotPrintSave();
   
-}
+}// end of AuxPrepareYields
 
 void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::AnalysisParameters &anPars, int templFits)
 {
@@ -44,7 +44,7 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
   prep.Increase_nDDsources();
 }// end of AuxSubtractBackgroundOneTempl
 
-void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars)
+void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   TConfiguration conf;
   TSubtractBackground prep;
@@ -52,7 +52,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars)
 
   pars.strFileOut=conf.GetYieldsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin);
 
-  AuxPrepareYieldsCommon(prep, pars, anPars);
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure);
 
   TConfiguration config;
 
@@ -67,7 +67,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars)
   prep.PlotPrintSave();
 }// end of AuxSubtractBackground
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars)
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   TConfiguration config;
   TPhotonCuts photon;
@@ -102,6 +102,8 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
     pars.strYieldsNameTot_SignalMCGenBins[ieta]=config.GetYieldsSignalMCGenBinsName(config.TOTAL, ieta);
   }
 
+  pars.isMCclosure=isMCclosure;
+
   prep.SetPars(pars);
 
   //bool SetOneYieldSource(int sourceType, TString name, TString label, int color, TString fileName, TString treeName);
@@ -117,7 +119,12 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
     strYieldsName1D[ieta]=config.GetYieldsSelectedName(config.ONEDI, ieta, config.DATA);
     strYieldsNameTot[ieta]=config.GetYieldsSelectedName(config.TOTAL, ieta, config.DATA);
   }
-  prep.SetOneYieldSource(prep.DATA, "data", "data", 1, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA), "selectedEvents", strYieldsName1D, strYieldsNameTot);
+  TString strDataFile=config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA);
+  if (isMCclosure){
+    strDataFile=config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
+    strDataFile.ReplaceAll(".root","_MCclosure.root");
+  } 
+  prep.SetOneYieldSource(prep.DATA, "data", "data", 1, strDataFile, "selectedEvents", strYieldsName1D, strYieldsNameTot);
 
   // signal MC
   for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){

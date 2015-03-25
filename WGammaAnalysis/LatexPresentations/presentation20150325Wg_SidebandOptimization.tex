@@ -1,0 +1,222 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{Sideband Optimization}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{March 25th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Analysis Outline}
+{
+  \begin{itemize}
+  \item Electron vs Muon, Zg vs Wg templates on data \\
+   (check only one sideband)
+  \item Should we change selection for templates?
+  \item Run sideband optimization on MC mixture \\
+   (plots and tables with selected sidebands)
+  \item Concerns about high pt bins and endcap
+  \item Individual MC-mixture fit plots
+  \item MC closure test
+  \item Apply recommended sidebands on data
+  \item True-gamma DataDriven vs MC agreement
+  \end{itemize}
+}
+\end{frame}
+
+%---------------------------------------------
+
+\begin{frame}{Electron vs Muon, Zg vs Wg true templates on data}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cTrue_pt15to20_Barrel_.png}\includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cTrue_pt15to20_Endcap_.png}
+    \includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cTrue_pt45to55_Barrel_.png}\includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cTrue_pt45to55_Endcap_.png}
+    \end{figure}
+  \scriptsize 15-20 GeV, 45-55 GeV, Barrel and Endcap\\*
+\end{frame}
+
+\begin{frame}{Electron vs Muon, Zg vs Wg fake templates on data}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cFake_pt15to20_Barrel_.png}\includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cFake_pt15to20_Endcap_.png}
+    \includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cFake_pt45to55_Barrel_.png}\includegraphics[width=0.35\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/QuickChecks/cFake_pt45to55_Endcap_.png}
+    \end{figure}
+  \scriptsize 15-20 GeV, 45-55 GeV, Barrel and Endcap\\*
+\end{frame}
+
+\begin{frame}{Possible change of selection for templates}\\*
+  \scriptsize 
+  ---------------\\*
+  For further studies, Electron and Muon templates are merged with hadd\\*
+  Since Wg and Zg looks consistent, it may worse to come up with special selection criteria for templates which would be less strict than full Wg criteria; Wg and Zg templates were not merged because \# of events selected in Zg is 15\% of those in Wg and they also may overlap which would meka merging non-trivial and gain wouldn't be very high
+\end{frame}
+
+
+\begin{frame}{Sideband Optimization on MC-mixture}\\*
+  \scriptsize 
+  ---------------\\*
+  Prepare MC-mixture = MC (Wg + Wjets + Zg + DYjets) - all Wg-selected\\*
+  Do fits on MC-mixture like if it were data for differenet sidebands and extract true yields\\*
+  When true yield equals to (or is the closest to) MC-truth prediction - store this sideband range and apply on data\\*
+  Necessary values to estimate systematic uncerntainties are:\\*
+  -- $b_i = N_i / Ntruth$, where i goes over all sideband ranges when fit is possible\\*
+  -- result of Kolmogorov test between fake template and fake distribution predicted by MC-truth\\*
+  $N_i$, Ntruth and Kolmogorov probability are stored but the systematic uncerntainty estimation is not done 
+\end{frame}
+
+\begin{frame}{Sideband Optimization on MC-mixture. Tables}\\*
+\scriptsize
+------------\\*
+Barrel (MUON)\\*
+------------\\*
+phoEt15to20: sb=0.011-0.015, true yield = 13463.7 ( MC truth = 13400.3 ) \\*
+phoEt20to25: sb=0.011-0.014, true yield = 7748.51 ( MC truth = 7690.93 ) \\*
+phoEt25to30: sb=0.011-0.02, true yield = 5041.05 ( MC truth = 5055.54 ) \\*
+phoEt30to35: sb=0.011-0.021, true yield = 3619.81 ( MC truth = 3569.94 ) \\*
+phoEt35to45: sb=0.012-0.014, true yield = 4464.45 ( MC truth = 4383.91 ) \\*
+phoEt45to55: sb=0.012-0.02, true yield = 0.00046421 ( MC truth = 2287.89 ) \\*
+phoEt55to65: sb=0.013-0.02, true yield = 0.000336107 ( MC truth = 1359.68 ) \\*
+phoEt65to75: sb=0.011-0.012, true yield = 356.676 ( MC truth = 812.548 ) \\*
+...\\*
+------------\\*
+Barrel (ELECTRON)\\*
+------------\\*
+phoEt15to20: sb=0.014-0.018, true yield = 5537.65 ( MC truth = 5532.15 ) \\*
+phoEt20to25: sb=0.014-0.02, true yield = 2718.46 ( MC truth = 2714.27 ) \\*
+phoEt25to30: sb=0.014-0.019, true yield = 1400.67 ( MC truth = 1421.84 ) \\*
+phoEt30to35: sb=0.013-0.015, true yield = 882.83 ( MC truth = 888.128 ) \\*
+phoEt35to45: sb=0.013-0.015, true yield = 1129.74 ( MC truth = 1177.18 ) \\*
+phoEt45to55: sb=0.011-0.014, true yield = 0.000241037 ( MC truth = 848.114 ) \\*
+phoEt55to65: sb=0.011-0.012, true yield = 190.763 ( MC truth = 600.519 ) \\*
+phoEt65to75: sb=0.011-0.012, true yield = 32.5131 ( MC truth = 447.497 )\\*
+...\\*
+\end{frame}
+
+\begin{frame}{Sideband Optimization on MC-mixture. Tables}\\*
+\scriptsize
+------------\\*
+Endcap (MUON)\\*
+------------\\*
+phoEt15to20: sb=0.033-0.035, true yield = 9340.11 ( MC truth = 7603.02 ) \\*
+phoEt20to25: sb=0.037-0.039, true yield = 4524.09 ( MC truth = 4374.37 ) \\*
+phoEt25to30: sb=0.041-0.045, true yield = 2768.15 ( MC truth = 2787.63 ) \\*
+phoEt30to35: sb=0.035-0.037, true yield = 2844.64 ( MC truth = 1899.47 ) \\*
+phoEt35to45: sb=0.037-0.039, true yield = 2517.4 ( MC truth = 2167.25 ) \\*
+phoEt45to55: sb=0.035-0.063, true yield = 0.000452199 ( MC truth = 1100.12 ) \\*
+phoEt55to65: sb=0.047-0.053, true yield = 0.00103148 ( MC truth = 668.912 ) \\*
+phoEt65to75: sb=0.045-0.057, true yield = 0.000589578 ( MC truth = 367.131 ) \\*
+...\\*
+------------\\*
+Endcap (ELECTRON)\\*
+------------\\*
+phoEt15to20: sb=0.033-0.035, true yield = 3244.55 ( MC truth = 2657.8 ) \\*
+phoEt20to25: sb=0.033-0.035, true yield = 1380.02 ( MC truth = 1361.34 ) \\*
+phoEt25to30: sb=0.039-0.045, true yield = 968.304 ( MC truth = 753.574 ) \\*
+phoEt30to35: sb=0.045-0.061, true yield = 523.583 ( MC truth = 467.962 ) \\*
+phoEt35to45: sb=0.037-0.041, true yield = 790.783 ( MC truth = 704.178 ) \\*
+phoEt45to55: sb=0.049-0.051, true yield = 23.3641 ( MC truth = 368.668 ) \\*
+phoEt55to65: sb=0.033-0.037, true yield = 0.000397886 ( MC truth = 270.011 ) \\*
+phoEt65to75: sb=0.049-0.051, true yield = 42.1332 ( MC truth = 196.35 ) \\*
+...\\*
+\end{frame}
+
+\begin{frame}{Sideband Optimization on MC-mixture. 2D Plots}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt15to20__Barrel__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt15to20__Barrel__MCclosure.png}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt15to20__Endcap__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt15to20__Endcap__MCclosure.png}
+    \end{figure}
+  \scriptsize Left - MUON, right - ELECTRON; \\*
+  \scriptsize MC truth: MUON Barrel 13400, ELECTRON Barrel 5532 \\*
+  \scriptsize MC truth: MUON Endcap  7603, ELECTRON Endcap 2659 
+\end{frame}
+
+\begin{frame}{Sideband Optimization on MC-mixture. 2D Plots}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt45to55__Barrel__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt45to55__Barrel__MCclosure.png}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt45to55__Endcap__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt45to55__Endcap__MCclosure.png}
+    \end{figure}
+  \scriptsize Left - MUON, right - ELECTRON; \\*
+  \scriptsize MC truth: MUON Barrel 2288, ELECTRON Barrel 848 \\*
+  \scriptsize MC truth: MUON Endcap 1100, ELECTRON Endcap 369 
+\end{frame}
+
+\begin{frame}{Individual MC-mixture fit plots}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Barrel__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Barrel__MCclosure.png}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Endcap__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt15to20__Endcap__MCclosure.png}
+  \end{figure}
+  \scriptsize 
+  Left - MUON, right - ELECTRON; \\*
+  Blue - fake template from sideband; Cyan - MC-truth fake histogram for reference; \\* 
+  Difference between blue and cyan for endcap may be the reasons for disagreement between MC-truth and fitted result for endcap;\\*
+  Difference between nTrue quoted here and in the tables are subjects for investigation
+\end{frame}
+
+\begin{frame}{Individual MC-mixture fit plots}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt45to55__Barrel__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt45to55__Barrel__MCclosure.png}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt45to55__Endcap__MCclosure.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_UNblind__phoEt45to55__Endcap__MCclosure.png}
+  \end{figure}
+  \scriptsize Left - MUON, right - ELECTRON; \\*
+\end{frame}
+
+\begin{frame}{MC-closure test (no Ich cut)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_MUON_WGamma_TEMPL_CHISO_UNblind__Barrel__phoEt_MCclosure.png}\includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_ELECTRON_WGamma_TEMPL_CHISO_UNblind__Barrel__phoEt_MCclosure.png}
+    \includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_MUON_WGamma_TEMPL_CHISO_UNblind__Endcap__phoEt_MCclosure.png}\includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_ELECTRON_WGamma_TEMPL_CHISO_UNblind__Endcap__phoEt_MCclosure.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Apply quoted sidebands on data}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt15to20__Barrel_.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt15to20__Barrel_.png}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt15to20__Endcap_.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt15to20__Endcap_.png}
+  \end{figure}
+  \scriptsize 
+  Left - MUON, right - ELECTRON; 
+\end{frame}
+
+\begin{frame}{Apply quoted sidebands on data}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt45to55__Barrel_.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt45to55__Barrel_.png}
+    \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt45to55__Endcap_.png}\includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt45to55__Endcap_.png}
+  \end{figure}
+  \scriptsize 
+  Left - MUON, right - ELECTRON; 
+\end{frame}
+
+\begin{frame}{DD vs MC, data (no Ich cut)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_MUON_WGamma_TEMPL_CHISO_blindCOMBINED__Barrel__phoEt.png}\includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_ELECTRON_WGamma_TEMPL_CHISO_blindCOMBINED__Barrel__phoEt.png}
+    \includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_MUON_WGamma_TEMPL_CHISO_blindCOMBINED__Endcap__phoEt.png}\includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_WGamma/Plots/PrepareYields/c_TrueDDvsMC_c_ELECTRON_WGamma_TEMPL_CHISO_blindCOMBINED__Endcap__phoEt.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{DD vs MC, data, Zgamma (no Ich cut)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TrueDDvsMC_c_MUON_ZGamma_TEMPL_CHISO_UNblind__Barrel__phoEt.png}\includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/c_TrueDDvsMC_c_ELECTRON_ZGamma_TEMPL_CHISO_UNblind__Barrel__phoEt.png}
+    \includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_ZGamma/Plots/PrepareYields/c_TrueDDvsMC_c_MUON_ZGamma_TEMPL_CHISO_UNblind__Endcap__phoEt.png}\includegraphics[width=0.40\textwidth, keepaspectratio=true]{../WGammaOutput/ELECTRON_ZGamma/Plots/PrepareYields/c_TrueDDvsMC_c_ELECTRON_ZGamma_TEMPL_CHISO_UNblind__Endcap__phoEt.png}
+  \end{figure}
+\end{frame}
+
+\end{document}
+

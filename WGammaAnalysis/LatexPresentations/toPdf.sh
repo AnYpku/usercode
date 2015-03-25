@@ -1,3 +1,3 @@
-pdflatex presentation20150304Wg_FullChain.tex
-acroread presentation20150304Wg_FullChain.pdf
+pdflatex presentation20150325Wg_SidebandOptimization.tex
+acroread presentation20150325Wg_SidebandOptimization.pdf
 

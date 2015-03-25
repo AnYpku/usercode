@@ -45,6 +45,7 @@ class TPrepareYields
       TString strYieldsNameTot_BkgSubtrData[3];
       TString strYieldsName1D_SignalMCGenBins[3];
       TString strYieldsNameTot_SignalMCGenBins[3];
+      bool isMCclosure;
     };
 
     struct YieldsSource{
