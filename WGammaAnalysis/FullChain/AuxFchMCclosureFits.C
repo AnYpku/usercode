@@ -6,7 +6,7 @@
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
-void AuxFchMCclosure(TString strChannel, TString strVGamma)
+void AuxFchMCclosureFits(TString strChannel, TString strVGamma)
 {
 
   TBenchmark time;
@@ -37,7 +37,6 @@ void AuxFchMCclosure(TString strChannel, TString strVGamma)
       anPars.vgamma=vgamma;//W_GAMMA, Z_GAMMA
       anPars.templFits=tm;
       AuxTemplates(anPars,1);// 1 - isMCclosure
-      AuxSubtractBackground(anPars,1);
     }//end of if (!noClosure[ch][vg][tm])
   }// end of loop over tm
 

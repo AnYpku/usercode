@@ -413,21 +413,42 @@ void TTemplates::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
 bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPrint){
   if (!noPrint){ 
     std::cout<<std::endl;
-    std::cout<<"Will CheckTemplates:"<<std::endl;
+    std::cout<<"Will CheckTemplates:";
     std::cout<<std::endl;
   }
   int nBins = _hData[ikin][ieta]->GetNbinsX();
   //bool badBins[nBins];
   bool hasBadBin=0;
+
+  int NeffEv=10;
+  if (nBins<=11) NeffEv=5;
+  if (nBins<=8) NeffEv=3;
+  if (nBins<=6) NeffEv=1;
+  if (nBins<=3) NeffEv=0.01;
+  
+  float errRateAllowed=sqrt(NeffEv)/NeffEv;
+
   for (int i=1; i<=nBins; i++){
     float contD=_hData[ikin][ieta]->GetBinContent(i);
     float contT=_hTrue[ikin][ieta]->GetBinContent(i);
     float contF=_hFake[ikin][ieta]->GetBinContent(i);
+    
+    float errD=_hData[ikin][ieta]->GetBinError(i);
+
     badBins[i]=0;
-    if (contD<0 || contT<0 || contF<0) {badBins[i]=1; hasBadBin=1;}
-//    if (contD==0 && (contT+contF)>0) {badBins[i]=1; hasBadBin=1;}
-    if (contD>0 && (contT+contF)==0) {badBins[i]=1; hasBadBin=1;}
+    if (contD<0) {std::cout<<i<<": contD<0; "; badBins[i]=1; hasBadBin=1;}
+    if (contT<0) {std::cout<<i<<": contT<0; "; badBins[i]=1; hasBadBin=1;}
+    if (contF<0) {std::cout<<i<<": contF<0; "; badBins[i]=1; hasBadBin=1;}
+    if (contD==0 && (contT+contF)>0) {std::cout<<i<<": contD==0;"; badBins[i]=1; hasBadBin=1;}
+    if (contD>0 && (contT+contF)==0) {std::cout<<i<<": contT+contF==0;"; badBins[i]=1; hasBadBin=1;}
+    if (errD>errRateAllowed*contD) {
+      // corresponds to 10 events for unweighted hist
+      std::cout<<i<<": errD>"<<errRateAllowed<<"*contD="<<errD<<">"<<errRateAllowed<<"*"<<contD;
+      std::cout<<"="<<errRateAllowed*contD<<"; ";
+      badBins[i]=1; hasBadBin=1;
+    }//end of errD>0.32*contD
   }//end of loop over i
+  std::cout<<std::endl;
   if (!hasBadBin) {
     if (!noPrint) std::cout<<"CheckTemplates: all bins are OK"<<std::endl;
     return hasBadBin;
@@ -774,19 +795,12 @@ void TTemplates::ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint)
 void TTemplates::ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma,TH1D* hist[2],
 	double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr)
 {
-  float eff[2];
+
   for (int ieta1=_BARREL; ieta1<=_ENDCAP; ieta1++){
     if (ieta!=_COMMON && ieta!=ieta1) continue;
 
-      if (!_pars.sumOverHist){
-        eff[ieta1]=EffFromTree(ikin, ieta1, noPrint, isTrueGamma);
-      }// end of if (!_pars.sumOverHist)
-      if (_pars.sumOverHist){
-        eff[ieta1]=EffFromSum(ikin, ieta1, noPrint, hist[ieta1]);
-      }// end of if (_pars.sumOverHist)
-
-    nYieldsVal[ieta1]=nFromFitVal[ieta1]*eff[ieta1];
-    nYieldsErr[ieta1]=nFromFitErr[ieta1]*eff[ieta1];
+    nYieldsVal[ieta1]=nFromFitVal[ieta1];
+    nYieldsErr[ieta1]=nFromFitErr[ieta1];
   }//end of loop over ieta1
 
   if (ieta==_COMMON){
@@ -795,106 +809,7 @@ void TTemplates::ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGa
     if (valsqr>=0) nYieldsErr[_COMMON]=sqrt(valsqr);
     else nYieldsErr[_COMMON]=0;
   }//end of if (ieta==_COMMON)
-
-  if (!noPrint){
-    for (int ieta1=_BARREL; ieta1<=_ENDCAP; ieta1++){
-      if (ieta!=_COMMON && ieta!=ieta1) continue;
-      TString strTrueOrFake;
-      if (isTrueGamma) strTrueOrFake="nTrue";
-      else strTrueOrFake="nFake";
-      std::cout<<"fromFit*eff="<<strTrueOrFake<<"=("<<nFromFitVal[ieta1]<<"+-"<<nFromFitErr[ieta1]<<")*"<<eff[ieta1]<<"="<<nYieldsVal[ieta1]<<"+-"<<nYieldsErr[ieta1]<<";"<<std::endl;
-    }//loop over ieta
-  }//end of if (!noPrint)
 }
-
-
-float TTemplates::EffFromTree(int ikin, int ieta, bool noPrint, bool isTrueGamma)
-{
-//  int nPassed;
-//  int nPassedFitVar;
-//  int nTot;
-  float eff;
-  TCut cutSidebandVar;
-
-  if (isTrueGamma) cutSidebandVar=_pars.cutSidebandVarNominalRange[ieta];
-  else cutSidebandVar=SidebandCut(ikin,ieta);
-
-  TCut cutTot = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta);
-  TCut cutPassed = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta) && CutKinBin(ikin) && _pars.cutNominalExceptSidebandVar[ieta];
-
-  std::cout<<setprecision(2)<<std::endl;
-  std::cout<<StrLabelEta(ieta)<<": "<<std::endl;
-  std::cout<<"cutAdd="<<_pars.cutAdd.GetTitle()<<std::endl;
-  std::cout<<"cutEta="<<CutEtaBin(ieta).GetTitle()<<std::endl;
-  std::cout<<"cutKin="<<CutKinBin(ikin).GetTitle()<<std::endl;
-  std::cout<<"_pars.cutSidebandVarNominalRange[ieta1]="<<_pars.cutSidebandVarNominalRange[ieta].GetTitle()<<std::endl;
-  std::cout<<"SidebandCut(ikin,ieta1)="<<SidebandCut(ikin,ieta).GetTitle()<<std::endl;
-  std::cout<<"cutSidebandVar="<<cutSidebandVar.GetTitle()<<std::endl;
-  std::cout<<"cutNominalExceptSidebandVar="<<_pars.cutNominalExceptSidebandVar[ieta].GetTitle()<<std::endl;
-  std::cout<<"FitVarFitRangeCut(ikin,ieta)="<<FitVarFitRangeCut(ikin,ieta).GetTitle()<<std::endl;
-  std::cout<<"cutPassed="<<cutPassed.GetTitle()<<std::endl;
-  std::cout<<"cutTot="<<cutTot.GetTitle()<<std::endl;
-
-  if (isTrueGamma){
-    TString nameHistT=TString("histPassedT")+StrLabelKin(ikin)+StrLabelEta(ieta);
-    TH1F* hSignPassed = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
-    _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutPassed*_pars.cutWeight,"goff");
-    nameHistT=TString("histTotT")+StrLabelKin(ikin)+StrLabelEta(ieta);
-    TH1F* hSignTot = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
-    _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutTot*_pars.cutWeight,"goff");
-    TH1F* hEff = (TH1F*)hSignPassed->Clone();
-    hEff->Divide(hSignTot);
-    eff=hEff->GetBinContent(1);
-    delete hSignPassed;
-    delete hSignTot;
-  }// end of isTrueGamma
-  else{
-    TString nameHistF=TString("histPassedF")+StrLabelKin(ikin)+StrLabelEta(ieta);
-    TH1F* hFakePassed = new TH1F(nameHistF,nameHistF,1,-3.0,3.0);
-    _pars.treeFake->Draw(_pars.varPhoEta+TString(">>")+nameHistF,cutPassed*_pars.cutWeight,"goff");
-    nameHistF=TString("histTotF")+StrLabelKin(ikin)+StrLabelEta(ieta);
-    TH1F* hFakeTot = new TH1F(nameHistF,nameHistF,1,-3.0,3.0);
-    _pars.treeFake->Draw(_pars.varPhoEta+TString(">>")+nameHistF,cutTot*_pars.cutWeight,"goff");
-    if (!_pars.noLeakSubtr){
-      TString nameHistL=TString("histPassedL")+StrLabelKin(ikin)+StrLabelEta(ieta);
-      TH1F* hSignPassed = new TH1F(nameHistL,nameHistL,1,-3.0,3.0);
-      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistL,cutPassed*_pars.cutWeight,"goff");
-      nameHistL=TString("histTotL")+StrLabelKin(ikin)+StrLabelEta(ieta);
-      TH1F* hSignTot = new TH1F(nameHistL,nameHistL,1,-3.0,3.0);
-      _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistL,cutTot*_pars.cutWeight,"goff");
-      hFakePassed->Add(hSignPassed,-1);
-      hFakeTot->Add(hSignTot,-1);
-      delete hSignPassed;
-      delete hSignTot;        
-    }// end of if (!_pars.noLeakSubtr)
-    TH1F* hEff = (TH1F*)hFakePassed->Clone();
-    hEff->Divide(hFakeTot);
-    eff=hEff->GetBinContent(1);
-    delete hFakePassed;
-    delete hFakeTot;
-  }// end of else of if(isTrueGamma)
-  return eff;
-}// end of EffFromTree
-
-float TTemplates::EffFromSum(int ikin, int ieta, bool noPrint, TH1D* hist)
-{
-  float lim=0;
-  if (ieta==_BARREL) lim=0.011;
-  if (ieta==_ENDCAP) lim=0.033;
-  float histInt=0;
-  float histCut=0;
-  std::cout<<"sum of hist cut: ";
-  for (int ib=1; ib<=hist->GetNbinsX(); ib++){
-    histInt+=hist->GetBinContent(ib);
-    if (hist->GetBinLowEdge(ib)+hist->GetBinWidth(ib)<lim+0.0001){
-      histCut+=hist->GetBinContent(ib);
-      std::cout<<std::setprecision(4)<<hist->GetBinLowEdge(ib)<<"-"<<hist->GetBinLowEdge(ib)+hist->GetBinWidth(ib)<<", ";
-    }
-  }// end of loop over ib
-  std::cout<<std::endl;
-  
-  return 1.0*histCut/histInt;
-}// end of ComputeOneYieldWithSum
 
 void TTemplates::PrintYieldsAndChi2()
 {

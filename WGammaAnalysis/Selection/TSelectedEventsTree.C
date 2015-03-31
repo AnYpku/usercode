@@ -388,7 +388,7 @@ void TSelectedEventsTree::SetElectronValues(TEventTree::InputTreeLeaves& leaf, T
 
 
 
-    _hasMoreLeptons=_electron.HasMoreElectrons(leaf,cand.ilep1);//only important for WGamma
+    _hasMoreLeptons=_electron.HasMoreElectrons(leaf,cand.ilep1,0);//only important for WGamma
 //    _HLT_Ele27_WP80_v=leaf.HLT[leaf.HLTIndex[17]];
 //    _HLT_Ele17_Ele8_v=leaf.HLT[leaf.HLTIndex[22]];
 }//end of SetElectronValues

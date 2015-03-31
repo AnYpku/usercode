@@ -40,7 +40,7 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   // returns 0 otherwise (has no candidates)
 
    _isEvForCheck=0;
-   if (leaf.event==99010980 || leaf.event==1576073420 || leaf.event==1251424180) _isEvForCheck=1;
+   if (leaf.event==6136849 || leaf.event==2559882 || leaf.event==479598 || leaf.event==3574696 || leaf.event==5208885) _isEvForCheck=1;
 // 16135540 passed but rejected later
    if (_isEvForCheck) {std::cout<<std::endl; std::cout<<"event="<<leaf.event<<std::endl;}
 
@@ -118,7 +118,9 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
       if (channel==_config.MUON)
         if (_muon.HasMoreMuons(_leaf,_ilepLead)) {passed=_passed; return 0;}
       if (channel==_config.ELECTRON)
-        if (_electron.HasMoreElectrons(_leaf,_ilepLead)) {passed=_passed; return 0;}
+        if (_electron.HasMoreElectrons(_leaf,_ilepLead, _isEvForCheck)) {
+          passed=_passed; return 0;
+        }
   }//end of if (vgamma==W_GAMMA)
   _passed.secondLeptonVeto++;
    if (_isEvForCheck) std::cout<<"passed second lepton veto"<<std::endl;
@@ -229,6 +231,12 @@ bool TFullCuts::ZMassWindowCut(int ipho, int iele)
   vele.SetPtEtaPhiM(_leaf.elePt->at(iele),_leaf.eleEta->at(iele),_leaf.elePhi->at(iele),0);
   vpho.SetPtEtaPhiM(_leaf.phoEt->at(ipho),_leaf.phoEta->at(ipho),_leaf.phoPhi->at(ipho),0);
   float M=(vele + vpho).M(); 
+  if (_isEvForCheck){
+    std::cout<<"M(ele,pho)="<<M;
+    std::cout<<", iele="<<iele<<", elePt="<<_leaf.elePt->at(iele)<<", eleEta="<<_leaf.eleEta->at(iele)<<", elePhi="<<_leaf.elePhi->at(iele);
+    std::cout<<", ipho="<<ipho<<", phoPt="<<_leaf.phoEt->at(ipho)<<", phoEta="<<_leaf.phoEta->at(ipho)<<", phoPhi="<<_leaf.phoPhi->at(ipho);
+    std::cout<<std::endl;
+  }
   if (M>_ZmassLeft && M<_ZmassRight) return 0;
   return 1;
 }// end of ZMassWindowCut
@@ -402,7 +410,9 @@ TCut TFullCuts::RangeMoreLeptonsVeto(){
 
 TCut TFullCuts::RangeMetRelatedCut(int year, int channel)
 {
-  TString cutStr="WMt>";
+//  TString cutStr="WMt>";
+  TString cutStr="sqrt(2*lepton1Pt*pfMET_notSmeared*(1-cos(lepton1Phi-pfMETPhi_notSmeared)))>";
+//_WMt = sqrt(2*_lepPt[0]*_pfMET*(1-cos(_lepPhi[0]-_pfMETPhi)));
   if (year==2012) cutStr+=_WMtCut2012[channel];
   else if (year==2011) cutStr+=_WMtCut2011;
   TCut cut(cutStr);

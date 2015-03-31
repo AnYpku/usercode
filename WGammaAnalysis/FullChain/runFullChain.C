@@ -30,7 +30,8 @@
   TConfiguration conf;
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.isDebugMode=0;
-  anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+//  anPars.sampleMode=Selection::SIGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+  anPars.sampleMode=Selection::NOTSPECIFIED; anPars.analyzedSamples="ttbarjets ttbarg";
   anPars.cutAdd="1";//"phoEt<40";
 
   anPars.blind[conf.MUON][conf.W_GAMMA]=conf.BLIND_COMBINED;
@@ -56,7 +57,7 @@
 
   // [conf.MUON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.MUON][conf.Z_GAMMA]=1;
-  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=0;
+  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=1;
   anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.MUON][conf.Z_GAMMA]=1;
@@ -88,7 +89,7 @@
 
   // [conf.ELECTRON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
-  anPars.noExtraSelection[conf.ELECTRON][conf.Z_GAMMA]=0;
+  anPars.noExtraSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.ELECTRON][conf.Z_GAMMA]=1;

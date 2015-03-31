@@ -99,7 +99,8 @@ void Selection::LoopOverInputFiles()
        //sources are data, sigmc, DYjets, multibosons etc.
        //each source may consist of several input files
        if (_INPUT->allInputs_[iSource].sourceName_=="DYjets_to_ll" ||
-              _INPUT->allInputs_[iSource].sourceName_=="Wjets_to_lnu")
+              _INPUT->allInputs_[iSource].sourceName_=="Wjets_to_lnu" || 
+              _INPUT->allInputs_[iSource].sourceName_=="ttbarjets")
          _isVJets=1;
        else _isVJets=0;
        if (!_doAnalizeSample[iSource])

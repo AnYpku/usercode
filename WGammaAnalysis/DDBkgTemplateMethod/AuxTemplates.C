@@ -201,8 +201,6 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
-  pars.sumOverHist=0;
-
   pars.varSideband="phoSigmaIEtaIEta";//TString
   pars.varTrueTempl="phoRandConeChIsoCorr";//"phoRandConeChIso04Corr";//TString
   pars.varFakeTempl="phoSCRChIsoCorr";//"phoSCRChIso04Corr";//TString
@@ -312,7 +310,6 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
-  pars.sumOverHist=0;
 
   pars.varSideband="phoSCRChIsoCorr";//TString
   pars.varTrueTempl="phoSigmaIEtaIEta";//TString

@@ -152,8 +152,8 @@ void TPrepareYields::PlotPrintSave()
   //Print Yields
   for (int is=0; is<_sources.size(); is++){
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
-      PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].hist[ieta]);
-      PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].histBlind[ieta]);
+      PrintYieldsOne(_sources[is].name+TString(", ")+StrLabelEta(ieta), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].hist[ieta]);
+//      PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].histBlind[ieta]);
     }
   }//end of loop over is
 
@@ -369,11 +369,11 @@ void TPrepareYields::PrintYieldsOne(TString strYieldType, float totVal, float to
   std::cout<<std::setprecision(0);
   std::cout<<std::setw(5);
   std::cout<<std::fixed;
-  std::cout<<strYieldType<<": "<<totVal<<"+-"<<totErr<<"; ";
+  std::cout<<strYieldType<<": Tot: "<<totVal<<"+-"<<totErr<<"; (";
   for (int ib=1; ib<=hist->GetNbinsX(); ib++){
     std::cout<<hist->GetBinContent(ib)<<"+-"<<hist->GetBinError(ib)<<", ";
   }
-  std::cout<<hist->GetSumOfWeights()<<std::endl;
+  std::cout<<" sum="<<hist->GetSumOfWeights()<<" ) "<<std::endl;
 }
 
 void TPrepareYields::PrepareMCtruth(int ieta, int bkgType)

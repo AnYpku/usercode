@@ -56,7 +56,7 @@ bool TSelectionPlots::GetTrees(int channel, int vgamma, int blind, string confFi
 //      TString fileName = (TString)(config.GetSelectedName(config.FULLY, channel, blind, INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_)) ;
     bool doThisSource=0;
 
-    if (INPUT.allInputs_[iSource].sample_!=TConfiguration::DATA) continue;
+    if (INPUT.allInputs_[iSource].sample_!=TConfiguration::SIGMC) continue;
 
     for (int j=0; j<nNames; j++){
       if (names[j]==INPUT.allInputs_[iSource].sourceName_)
@@ -117,12 +117,20 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
   TCut cutExtra[nCuts];
   TString strDescr[nCuts];
 
-  TCut cut="event==16135540";
+
+  TCut cut="event==6865278";
+//  TCut cut="event==6870283";
+//  TCut cut="event==6883214";
+//  TCut cut="event==7537047";
+//  TCut cut="event==6958805";
+
+
+  cut = cut && photon.RangeBarrel();
 
   cutExtra[0]=photon.RangeSigmaIEtaIEta(year, wp);
   cutExtra[1]=photon.RangeHoverE(year);
   cutExtra[2]=photon.RangePhoEleVeto();
-  cutExtra[3]=photon.RangeOneIsolation(year,wp,photon.ISO_CHorTRK);
+  cutExtra[3]="1";//photon.RangeOneIsolation(year,wp,photon.ISO_CHorTRK);
   cutExtra[4]=photon.RangeOneIsolation(year,wp,photon.ISO_NEUorHCAL);
   cutExtra[5]=photon.RangeOneIsolation(year,wp,photon.ISO_PHOorECAL);
   cutExtra[6]=fullCuts.RangeMetRelatedCut(year,config.ELECTRON);

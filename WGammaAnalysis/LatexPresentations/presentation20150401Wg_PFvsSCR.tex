@@ -1,0 +1,102 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{PF vs SCR Ich; RooFit vs Standard ROOT fits}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+%\date{April 3rd, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{eff of $I_{ch}$ PF vs SCR (based on ZGamma FSR weighted events counting, Muon+Electron)}
+{
+
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{ eff of $I_{ch}$ PF vs SCR, Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+ & PF & PF & PF & SCR & SCR & SCR \\
+ bin & $eff_{data}$ & $eff_{sign}$ & $eff_{data}/eff_{sign}$ & $eff_{data}$ & $eff_{sign}$ & $eff_{data}/eff_{sign}$ \\ \hline
+15-20 &  $0.94\pm0.01$  &  $0.95\pm0.008$  &  $0.98\pm0.02$  &  $0.94\pm0.01$  &  $0.95\pm0.008$  &  $0.99\pm0.02$  \\ \hline 
+20-25 &  $0.94\pm0.02$  &  $0.95\pm0.01$  &  $0.99\pm0.02$  &  $0.94\pm0.02$  &  $0.95\pm0.01$  &  $0.99\pm0.02$  \\ \hline 
+25-30 &  $0.95\pm0.03$  &  $0.95\pm0.02$  &  $1\pm0.04$  &  $0.94\pm0.03$  &  $0.95\pm0.02$  &  $1\pm0.03$  \\ \hline 
+30-35 &  $0.94\pm0.04$  &  $0.96\pm0.03$  &  $0.98\pm0.06$  &  $0.95\pm0.05$  &  $0.95\pm0.03$  &  $1\pm0.06$  \\ \hline 
+35-45 &  $0.94\pm0.06$  &  $0.95\pm0.04$  &  $0.98\pm0.07$  &  $0.93\pm0.06$  &  $0.96\pm0.04$  &  $0.97\pm0.07$  \\ \hline 
+45-55 &  $0.95\pm0.11$  &  $0.94\pm0.08$  &  $1\pm0.15$  &  $0.96\pm0.11$  &  $0.94\pm0.08$  &  $1\pm0.15$  \\ \hline 
+55-500 &  $0.91\pm0.14$  &  $0.94\pm0.1$  &  $0.97\pm0.18$  &  $0.91\pm0.14$  &  $0.92\pm0.1$  &  $0.99\pm0.19$  \\ \hline 
+  \end{tabular}
+  \label{tab:sf_PFvsSCR_Barrel}
+  \end{center}
+\end{table}
+
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{ eff of $I_{ch}$ PF vs SCR, Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+ & PF & PF & PF & SCR & SCR & SCR \\
+ bin & $eff_{data}$ & $eff_{sign}$ & $eff_{data}/eff_{sign}$ & $eff_{data}$ & $eff_{sign}$ & $eff_{data}/eff_{sign}$ \\ \hline
+15-20 &  $0.92\pm0.02$  &  $0.94\pm0.02$  &  $0.97\pm0.03$  &  $0.93\pm0.02$  &  $0.94\pm0.02$  &  $0.99\pm0.03$  \\ \hline 
+20-25 &  $0.93\pm0.03$  &  $0.95\pm0.02$  &  $0.97\pm0.04$  &  $0.94\pm0.03$  &  $0.95\pm0.02$  &  $0.99\pm0.04$  \\ \hline 
+25-30 &  $0.92\pm0.05$  &  $0.94\pm0.03$  &  $0.97\pm0.06$  &  $0.94\pm0.05$  &  $0.95\pm0.03$  &  $0.99\pm0.06$  \\ \hline 
+30-35 &  $0.91\pm0.08$  &  $0.92\pm0.06$  &  $0.99\pm0.1$  &  $0.94\pm0.08$  &  $0.95\pm0.06$  &  $0.99\pm0.1$  \\ \hline 
+35-45 &  $0.9\pm0.1$  &  $0.95\pm0.08$  &  $0.95\pm0.13$  &  $0.94\pm0.11$  &  $0.92\pm0.07$  &  $1\pm0.14$  \\ \hline 
+45-55 &  $0.97\pm0.26$  &  $0.99\pm0.16$  &  $0.98\pm0.31$  &  $0.97\pm0.26$  &  $0.96\pm0.16$  &  $1\pm0.31$  \\ \hline 
+55-500 &  $0.95\pm0.3$  &  $0.9\pm0.21$  &  $1.1\pm0.42$  &  $0.9\pm0.29$  &  $0.87\pm0.21$  &  $1\pm0.42$  \\ \hline 
+  \end{tabular}
+  \label{tab:sf_PFvsSCR_Endcap}
+  \end{center}
+\end{table}
+
+}
+\end{frame}
+
+\begin{frame}{RooFit vs Standard ROOT Fits}
+{
+
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{Fits of data}
+  \begin{tabular}{|c|c|c|c|c|}
+     & RooFit & RooFit & St ROOT & St ROOT \\ \hline
+ bin  & true & fake & true & fake \\ \hline
+15-20 &  $6878\pm235$  &  $24911\pm211$  &  $6850\pm234$  &  $24939\pm269$ \\ \hline 
+20-25 &  $2599\pm155$  &  $11721\pm182$  &  $2578\pm155$  &  $11742\pm182$ \\ \hline 
+40-45 &  $0\pm6$  &  $3620\pm16$  &  $1221\pm59$  &  $2399\pm68$ \\ \hline 
+95-120 &  $379\pm46$  &  $621\pm49$  &  $666\pm33$  &  $337\pm27$ \\ \hline 
+  \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{Fits of MC mixture}
+  \begin{tabular}{|c|c|c|c|c|}
+     & RooFit & RooFit & St ROOT & St ROOT \\ \hline
+ bin  & true & fake & true & fake \\ \hline
+15-20 &  $4824\pm230$  &  $25252\pm271$  &  $4798\pm229$  &  $25280\pm270$ \\ \hline 
+20-25 &  $2290\pm137$  &  $8952\pm160$  &  $2273\pm137$  &  $8971\pm159$ \\ \hline 
+40-45 &  $0\pm7$  &  $2519\pm1883$  &  $895\pm48$  &  $1624\pm55$ \\ \hline 
+120-500 &  $242\pm37$  &  $388\pm39$  &  $422\pm26$  &  $209\pm21$ \\ \hline 
+  \end{tabular}
+  \end{center}
+\end{table}
+
+Will try to do all fits with the Standard ROOT fits and see if it improves the fits
+
+}
+\end{frame}
+
+\end{document}

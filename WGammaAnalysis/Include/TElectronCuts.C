@@ -10,12 +10,20 @@ TElectronCuts::~TElectronCuts()
 {
 }
 
-bool TElectronCuts::HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele)
+bool TElectronCuts::HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele, bool isEvForCheck)
 {
   for (int iele1=0; iele1<leaf.nEle; iele1++){
     if (iele1==iele) continue;
     if ( PassedKinematics(_config.W_GAMMA,1,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1)) &&
-         EleID2012(leaf,iele1,ELE_VETO)) return 1;
+         EleID2012(leaf,iele1,ELE_VETO)){
+      if (isEvForCheck){
+        std::cout<<"HasMoreLeptons, check "<<iele1<<": "<<"pt="<<leaf.elePt->at(iele1)<<", eleSCEta="<<leaf.eleSCEta->at(iele1);
+        std::cout<<", PassedKin="<<PassedKinematics(_config.W_GAMMA,1,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1));
+        std::cout<<", EleID2012(WP VETO)="<<EleID2012(leaf,iele1,ELE_VETO);
+        std::cout<<std::endl;
+      }
+      return 1;
+    }
   }
   return 0;
 }

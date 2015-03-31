@@ -56,10 +56,7 @@ class TTemplates
       TCut cutSidebandVarNominalRange[2];
       TCut cutWeight;
       bool noLeakSubtr;
-      bool sumOverHist;
-        // the method how to extract yields from fit:
-        // sum over histogram or apply efficiency
- //     bool showTreeRef;
+
       bool isMCclosureMode;
       TFile* fOutForSave;
       TString strFileOutName;
@@ -114,10 +111,7 @@ class TTemplates
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
     void ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint=0);
     void ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
-    float EffFromTree(int ikin, int ieta, bool noPrint, bool isTrueGamma);
-    float EffFromSum(int ikin, int ieta, bool noPrint, TH1D* hist);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
-//    float EffPhoChIsoCorr(int ikin, int ieta, bool isTrue);
 
     void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
 
