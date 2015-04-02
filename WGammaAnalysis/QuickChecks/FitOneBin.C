@@ -32,15 +32,16 @@ double FuncTempl(Double_t* x, Double_t* par)
 void FitOneBin()
 {
   //data
-//  TFile fData("../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGamma_blindCOMBINED_DATA.root");
-//  TFile fSign("../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
-//  TFile fTemp("../WGammaOutput/MERGED/selected_WGamma_ForTemplates.root");
+  TFile fData("../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGamma_UNblind_DATA.root");
+  TFile fSign("../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
+  TFile fTemp("../WGammaOutput/MERGED/selected_WGamma_ForTemplates.root");
 
   //MC mixture
+/*
   TFile fData("../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGamma_UNblind_DATA_MCclosure.root");
   TFile fSign("../WGammaOutput/ELECTRON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
   TFile fTemp("../WGammaOutput/MERGED/selected_WGamma_ForTemplates_MCclosure.root");
-
+*/
   TTree* trData=(TTree*)fData.Get("selectedEvents");
   TTree* trSign=(TTree*)fSign.Get("selectedEvents");
   TTree* trTemp=(TTree*)fTemp.Get("selectedEvents");
@@ -66,16 +67,16 @@ void FitOneBin()
   TCut cutSihihSideband="phoSigmaIEtaIEta>0.014 && phoSigmaIEtaIEta<0.020";
   // end 20-25
 */
-/*
+
   // begin 45-55
-  TCut cutPtTrue="phoEt>30";
+  TCut cutPtTrue="phoEt>25";
   TCut cutPtFake="phoEt>55";
   TCut cutPtData="phoEt>45 && phoEt<55";
-//  int nbins=6; float low=-0.9; float up=17.1; // data
-  int nbins=5; float low=-0.9; float up=14.1;
+  int nbins=6; float low=-0.9; float up=17.1; // data
+//  int nbins=8; float low=-0.9; float up=15.1;
   TCut cutSihihSideband="phoSigmaIEtaIEta>0.011 && phoSigmaIEtaIEta<0.014";
   // end 45-55
-*/
+
 /*
   // begin 95-120
   TCut cutPtTrue="phoEt>30";
@@ -85,7 +86,7 @@ void FitOneBin()
   TCut cutSihihSideband="phoSigmaIEtaIEta>0.011 && phoSigmaIEtaIEta<0.012";
   // end 95-120
 */
-
+/*
   // begin 120-500
   TCut cutPtTrue="phoEt>30";
   TCut cutPtFake="phoEt>55";
@@ -93,7 +94,7 @@ void FitOneBin()
   int nbins=4; float low=-0.9; float up=15.1; // data
   TCut cutSihihSideband="phoSigmaIEtaIEta>0.011 && phoSigmaIEtaIEta<0.012";
   // end 120-500
-
+*/
   TCut cutB="phoSCEta>-1.4442 && phoSCEta<1.4442";
 
   TCut cutSihihNominal="phoSigmaIEtaIEta<0.011";

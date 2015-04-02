@@ -17,7 +17,7 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
 
 void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
 
-void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars);
+//void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars);
 
 void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
@@ -49,6 +49,7 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
   }// end of loop over ieta
 
   pars.isMCclosureMode=isMCclosure;
+  pars.isRooFit=1;//0;
   
   TTemplates temp(pars);
   temp.ComputeBackground();
@@ -106,6 +107,7 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
   pars.strPlotsBaseName.Replace(0,1,"cSyst_");
 
   pars.isMCclosureMode=isMCclosure;
+  pars.isRooFit=0;
 
   TTemplatesSyst temp(pars,variationPars);
   temp.SidebandVariation();
@@ -133,16 +135,18 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
     std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplates::nKinBinsMax<<std::endl;
     return;
   }
+  pars.thresholdCombineTrueTemplates=29.9;
+  pars.thresholdCombineFakeTemplates=54.9;
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
     pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
     for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
       pars.nFitBins[ikb][ieta]=21;
       pars.minVarFit[ikb][ieta]=-1.0+0.1;
       pars.maxVarFit[ikb][ieta]=20.0+0.1;
-      pars.combineTrueTempl[ikb][ieta]=0;
-      pars.combineFakeTempl[ikb][ieta]=0;
-      if (pars.kinBinLims[ikb]>29) pars.combineTrueTempl[ikb][ieta]=1;
-      if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][ieta]=1;
+ //     pars.combineTrueTempl[ikb][ieta]=0;
+ //     pars.combineFakeTempl[ikb][ieta]=0;
+//      if (pars.kinBinLims[ikb]>29) pars.combineTrueTempl[ikb][ieta]=1;
+//      if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][ieta]=1;
     } 
     pars.sideband[ikb][config.BARREL]=0.011;
     pars.sideband[ikb][config.ENDCAP]=0.033;
@@ -255,14 +259,6 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
     pars.sideband[ikb][config.ENDCAP]=1.2;//2.3;
     pars.sidebandUp[ikb][config.BARREL]=5.0;//15.0;
     pars.sidebandUp[ikb][config.ENDCAP]=5.0;//15.0;
-    pars.combineTrueTempl[ikb][config.BARREL]=0;
-    pars.combineTrueTempl[ikb][config.ENDCAP]=0;
-    pars.combineFakeTempl[ikb][config.BARREL]=0;
-    pars.combineFakeTempl[ikb][config.ENDCAP]=0;
-    if (pars.kinBinLims[ikb]>54) pars.combineTrueTempl[ikb][config.BARREL]=1;
-    if (pars.kinBinLims[ikb]>54) pars.combineTrueTempl[ikb][config.ENDCAP]=1;
-    if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][config.BARREL]=1;
-    if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][config.ENDCAP]=1;
   }//end
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
@@ -338,7 +334,7 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.noLeakSubtr=0;
 
 }// end of SetParsSigmaIEtaIEtaTempl()
-
+/*
 void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars &pars)
 {
   TConfiguration config;
@@ -353,3 +349,4 @@ void SetValuesToKinEtaArray(int ieta, float vals[250], TTemplates::TemplatesPars
     std::cout<<"ik="<<ik<<", ieta="<<ieta<<", nFitBins="<<pars.nFitBins[ik][ieta]<<", varFit: "<<pars.minVarFit[ik][ieta]<<"-"<<pars.maxVarFit[ik][ieta]<<", sideband: "<<pars.sideband[ik][ieta]<<"-"<<pars.sidebandUp[ik][ieta]<<"; combTrue="<<pars.combineTrueTempl[ik][ieta]<<"; combineFake="<<pars.combineFakeTempl[ik][ieta]<<std::endl;
   }
 }// end of SetValuesToKinEtaArray
+*/

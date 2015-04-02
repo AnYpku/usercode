@@ -24,6 +24,7 @@
 #include "TCanvas.h"
 #include "TString.h"
 #include "TText.h"
+#include "TF1.h"
 #include "TLatex.h"
 #include "TLine.h"
 #include "TGraph.h"
@@ -102,6 +103,7 @@ void TTemplates::PrintPars()
   std::cout<<"cutEndcap="<<_pars.cutEndcap.GetTitle()<<std::endl;
   std::cout<<"cutWeight="<<_pars.cutWeight.GetTitle()<<std::endl;
   std::cout<<"noLeakSubtr="<<_pars.noLeakSubtr<<std::endl;
+  std::cout<<"isRooFit="<<_pars.isRooFit<<std::endl;
   std::cout<<"strFileOutName="<<_pars.strFileOutName<<std::endl;
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     std::cout<<StrLabelEta(ieta)<<":"<<std::endl;
@@ -166,7 +168,8 @@ bool TTemplates::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
     if (!noPrint) std::cout<<"SetHists is done; ok="<<ok<<std::endl;
     if (!ok) return 0;
     if (!noPrint) std::cout<<"Will do FitOne; ieta="<<StrLabelEta(ieta)<<", ieta1="<<StrLabelEta(ieta1)<<std::endl;
-    FitOne(ikin, ieta1, noPrint);
+    if (_pars.isRooFit) FitOneRooFit(ikin, ieta1, noPrint);
+    else FitOneROOT(ikin, ieta1, noPrint);
   }//end of loop over ieta
 
   ComputeYieldOneKinBin(ikin,ieta,noPrint);
@@ -279,11 +282,11 @@ bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<std::endl;
   }
   TCut cutKin=CutKinBin(ikin); 
-  if (_pars.combineFakeTempl[ikin][ieta] && ikin>0){
-     cutKin="1";
-     for (int i=1; i<=_pars.nKinBins; i++){
-       if (_pars.combineFakeTempl[i][ieta]) cutKin = cutKin || CutKinBin(i);
-     }
+  if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineFakeTemplates && ikin>0){
+     TString strCutKin=_pars.varKin;
+     strCutKin+=">";
+     strCutKin+=_pars.thresholdCombineFakeTemplates;
+     cutKin=TCut(strCutKin);
   }
   TCut cut = _pars.cutAdd && CutEtaBin(ieta) && cutKin && SidebandCut(ikin,ieta);
   if (!noPrint) {
@@ -321,11 +324,11 @@ void TTemplates::SetTrueTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<std::endl;
   }
   TCut cutKin=CutKinBin(ikin); 
-  if (_pars.combineTrueTempl[ikin][ieta] && ikin>0){
-     cutKin="1";
-     for (int i=1; i<=_pars.nKinBins; i++){
-       if (_pars.combineTrueTempl[i][ieta]) cutKin = cutKin || CutKinBin(i);
-     }
+  if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineTrueTemplates && ikin>0){
+     TString strCutKin=_pars.varKin;
+     strCutKin+=">";
+     strCutKin+=_pars.thresholdCombineTrueTemplates;
+     cutKin=TCut(strCutKin);
   }
   TCut cut = _pars.cutAdd && CutEtaBin(ieta) && cutKin && SidebandVarNominalCut(ieta);// && cutSignal;;
   if (!noPrint) {
@@ -629,11 +632,36 @@ TString TTemplates::StrLabelKin(int ikin, int nKinBins, float* kinBinLims, TStri
   return str;
 }
 
-void TTemplates::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
+void TTemplates::FitOneROOT(int ikin, int ieta, bool noPrint, bool noPlot)
+{
+  float low = _hData[ikin][ieta]->GetBinLowEdge(1);
+  int nBins = _hData[ikin][ieta]->GetNbinsX();
+  float up = _hData[ikin][ieta]->GetBinLowEdge(nBins)+_hData[ikin][ieta]->GetBinWidth(nBins);
+
+  _hTrueTemp=_hTrue[ikin][ieta];
+  _hFakeTemp=_hFake[ikin][ieta];
+
+  TF1* funcTempl = new TF1("FuncTempl",FuncTempl,low,up,2);
+
+  float nMax = _hData[ikin][ieta]->GetSumOfWeights();
+  float nSign = _hSign[ikin][ieta]->GetSumOfWeights();
+  float nTrueStart = 0.5*nMax;//nSign;
+  float nFakeStart = 0.5*nMax;//nMax - nSign;
+  if (nTrueStart<=0 || nFakeStart<=0){nTrueStart=0.5*nMax; nFakeStart=0.5*nMax;}
+  std::cout<<"some true and fake parameters: nTrueStart="<<nTrueStart<<", nFakeStart="<<nFakeStart<<", nSign="<<nSign<<", nMax="<<nMax<<std::endl;
+  funcTempl->SetParameters(nTrueStart,nFakeStart);
+  funcTempl->SetParLimits(0,0,nMax);
+  funcTempl->SetParLimits(1,0,nMax);
+  funcTempl->SetParNames("nTrue","nFake");
+  
+  _hData[ikin][ieta]->Fit("FuncTempl","L");
+}// end of FitOneROOT
+
+void TTemplates::FitOneRooFit(int ikin, int ieta, bool noPrint, bool noPlot)
 {
   if (!noPrint){
     std::cout<<std::endl;
-    std::cout<<"FitOne: "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<std::endl;
+    std::cout<<"FitOneRooFit: "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<std::endl;
     std::cout<<std::endl;
   }
 
@@ -770,7 +798,7 @@ void TTemplates::FitOne(int ikin, int ieta, bool noPrint, bool noPlot)
   fullPdf.plotOn(_plotter[ikin][ieta], Components("fakePdf"),Name("fake"),LineColor(kBlue),LineStyle(9));
   fullPdf.paramOn(_plotter[ikin][ieta]);
 
-}// end of FitOne
+}// end of FitOneRooFit
 
 void TTemplates::ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint)
 {
@@ -1015,8 +1043,10 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
     pad2->SetBottomMargin(0.45);
     pad1->cd();
 
-    _plotter[ikin][ieta]->SetTitle("");
-    _plotter[ikin][ieta]->Draw();
+    if (_pars.isRooFit){
+      _plotter[ikin][ieta]->SetTitle("");
+      _plotter[ikin][ieta]->Draw();
+    }// end of if (_pars.isRooFit)
 
     _hSumm[ikin][ieta]->SetLineColor(7);
     _hSumm[ikin][ieta]->SetLineWidth(2);
@@ -1061,6 +1091,8 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
     line->Draw("same");
    
     cName.ReplaceAll("-1","total");
+    if (_pars.isRooFit) cName+="_RooFit";
+    else cName+="_ROOTfit";
     if (_pars.isMCclosureMode) cName+="_MCclosure.png";
     else cName+=".png";
     c1->SaveAs(cName);

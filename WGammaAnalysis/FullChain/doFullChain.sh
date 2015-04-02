@@ -24,8 +24,8 @@ DoFullChain(){
 #  root -l -b -q AuxFchTemplatesPickSideband.C+\(\"$1\",\"$2\"\) #> $3PickSideband.log 2>&1&
 #  root -l  AuxFchMCclosureFits.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l  AuxFchMCclosureCompareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-  root -l AuxFchTemplateFitsData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l AuxFchTemplateFitsData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l  AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 }
 #end of DoFullChain

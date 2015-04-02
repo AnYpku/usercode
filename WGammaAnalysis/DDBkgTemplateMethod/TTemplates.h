@@ -46,8 +46,10 @@ class TTemplates
       float unitOrigFit[nKinBinsMax][2];
       float sideband[nKinBinsMax][2];
       float sidebandUp[nKinBinsMax][2];
-      bool combineTrueTempl[nKinBinsMax][2];
-      bool combineFakeTempl[nKinBinsMax][2];
+//      bool combineTrueTempl[nKinBinsMax][2];
+//      bool combineFakeTempl[nKinBinsMax][2];
+      float thresholdCombineFakeTemplates;
+      float thresholdCombineTrueTemplates;     
       TCut cutAdd;
       TCut cutBarrel;
       TCut cutEndcap;
@@ -56,8 +58,8 @@ class TTemplates
       TCut cutSidebandVarNominalRange[2];
       TCut cutWeight;
       bool noLeakSubtr;
-
       bool isMCclosureMode;
+      bool isRooFit;// RooFit or standard ROOT fits
       TFile* fOutForSave;
       TString strFileOutName;
       TString strTrueYieldsTot[3];
@@ -105,7 +107,13 @@ class TTemplates
     bool SetHists(int kinBin, int etaBin, bool noPrint=0);
     void RandomizeTemplates(int ikin, int ieta);
 
-    void FitOne(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
+    void FitOneRooFit(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
+//    TH1D* _hFakeTemp;
+//    TH1D* _hTrueTemp;
+//    Double_t FuncTempl(Double_t* x, Double_t* par);
+    void FitOneROOT(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
+
+
     void PrintYieldsAndChi2();
     void PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]);
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
@@ -159,22 +167,6 @@ class TTemplates
 
     const static int _nToys=100;
 };
-/*
-    float _acceptableLeakFraction[TTemplates::nKinBinsMax][2] = 
-                                                    { { 15.0,  17.5},  //Total
-                                                      { 15.0,  17.5},  //15-20
-                                                      { 15.0,  17.5},  //20-25
-                                                      { 15.0,  17.5},  //25-30
-                                                      { 15.0,  17.5},  //30-35
-                                                      { 15.0,  17.5},  //35-45
-                                                      {100.0, 105.0},  //45-55
-                                                      {100.0, 105.0},  //55-65
-                                                      {100.0, 105.0},  //65-75
-                                                      {100.0, 105.0},  //75-85
-                                                      {100.0, 105.0},  //85-95
-                                                      {100.0, 105.0},  //95-120
-                                                      {100.0, 105.0}}; //120-500*/
-
     float _acceptableLeakFraction[TTemplates::nKinBinsMax][2] = 
                                                     { { 5.0,  7.5},  //Total
                                                       { 5.0,  7.5},  //15-20
@@ -190,5 +182,31 @@ class TTemplates
                                                       {10.0, 15.0},  //95-120
                                                       {10.0, 15.0}}; //120-500
 
+TH1D* _hFakeTemp;
+TH1D* _hTrueTemp;
+// for some reason, TF1 constructor doesn't work if I define FuncTempl as usual: head inside the TTemplates and the body in the TTemplates.C
+// Thus, I define it this way and introduce two global variables: 
+// _hTrueTemp and _hFakeTemp
+Double_t FuncTempl(Double_t* x, Double_t* par)
+{
+  //x[0] - I_ch
+  //par[0] - nTrue, par[1] - nFake
+  int nBins=_hTrueTemp->GetNbinsX();
+  float sumTrue=0;
+  float sumFake=0;
+  int ibThisEvent=-1;
+  for (int ib=1; ib<=nBins; ib++){
+    sumTrue+=_hTrueTemp->GetBinContent(ib);
+    sumFake+=_hFakeTemp->GetBinContent(ib);
+    if (x[0]>=_hTrueTemp->GetBinLowEdge(ib) && x[0]<_hTrueTemp->GetBinLowEdge(ib)+_hTrueTemp->GetBinWidth(ib))
+      ibThisEvent=ib;
+  }// end of loop over ib
+  if (ibThisEvent==-1){
+    if (x[0]<_hTrueTemp->GetBinLowEdge(1)) ibThisEvent=1;
+    else ibThisEvent=nBins;
+  }
+  float val = par[0]*_hTrueTemp->GetBinContent(ibThisEvent)/sumTrue+par[1]*_hFakeTemp->GetBinContent(ibThisEvent)/sumFake;
+  return val;
+}// end of FuncTempl
 
 #endif //TTemplates_h
