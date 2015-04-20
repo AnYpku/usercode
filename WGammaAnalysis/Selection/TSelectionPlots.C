@@ -125,6 +125,7 @@ void TSelectionPlots::SelectionEfficiencyInStages(int year, int vgamma, int wp, 
 //  TCut cut="event==6958805";
 
 
+
   cut = cut && photon.RangeBarrel();
 
   cutExtra[0]=photon.RangeSigmaIEtaIEta(year, wp);

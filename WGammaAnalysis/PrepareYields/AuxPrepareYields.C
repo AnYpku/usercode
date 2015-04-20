@@ -110,6 +110,7 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   
   //int selStage=config.FSR;//config.FULLY;
   int selStage=config.FULLY;
+  //int selStage=config.PRELIMINARY_FOR_TEMPLATE_METHOD;
 
   TString strYieldsName1D[3];
   TString strYieldsNameTot[3];

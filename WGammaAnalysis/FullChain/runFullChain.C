@@ -28,11 +28,13 @@
   std::cout<<"configfile="<<anPars.configfile<<std::endl;
 
   TConfiguration conf;
-  anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
+  TPhotonCuts photon; 
+  anPars.phoWP=photon.WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.isDebugMode=0;
-//  anPars.sampleMode=Selection::SIGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
-  anPars.sampleMode=Selection::NOTSPECIFIED; anPars.analyzedSamples="ttbarjets ttbarg";
+  anPars.sampleMode=Selection::DATA;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+//  anPars.sampleMode=Selection::NOTSPECIFIED; anPars.analyzedSamples="ttbarjets ttbarg";
   anPars.cutAdd="1";//"phoEt<40";
+//  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
 
   anPars.blind[conf.MUON][conf.W_GAMMA]=conf.BLIND_COMBINED;
   anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
@@ -76,7 +78,7 @@
   anPars.noExtraSelection[conf.ELECTRON][conf.W_GAMMA]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
-  anPars.noPrepareYields[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noPrepareYields[conf.ELECTRON][conf.W_GAMMA]=0;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;

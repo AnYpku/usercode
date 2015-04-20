@@ -107,7 +107,7 @@ void AuxTemplatesSystSidebandVariation(TConfiguration::AnalysisParameters &anPar
   pars.strPlotsBaseName.Replace(0,1,"cSyst_");
 
   pars.isMCclosureMode=isMCclosure;
-  pars.isRooFit=0;
+  pars.isRooFit=1;//0;
 
   TTemplatesSyst temp(pars,variationPars);
   temp.SidebandVariation();

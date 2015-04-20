@@ -1,9 +1,10 @@
 #include "../Configuration/TConfiguration.h"
+#include "../DDBkgTemplateMethod/TComputeSystDueToSbVariation.h"
 #include "../FullChain/FullChain.h"
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
-void AuxFchPreliminarySelection(TString strChannel, TString strVGamma)
+void AuxFchComputeSystDueToSbVar(TString strChannel, TString strVGamma)
 {
   TBenchmark time;
   time.Start("time");
@@ -16,15 +17,14 @@ void AuxFchPreliminarySelection(TString strChannel, TString strVGamma)
   TConfiguration conf;
   int channel;
   int vgamma;
-  if (strChannel=="MUON") channel=conf.MUON;
-  if (strChannel=="ELECTRON") channel=conf.ELECTRON;
-  if (strVGamma=="WGamma") vgamma=conf.W_GAMMA;
-  if (strVGamma=="ZGamma") vgamma=conf.Z_GAMMA;
+  if (strChannel=="MUON") anPars.channel=conf.MUON;
+  if (strChannel=="ELECTRON") anPars.channel=conf.ELECTRON;
+  if (strVGamma=="WGamma") anPars.vgamma=conf.W_GAMMA;
+  if (strVGamma=="ZGamma") anPars.vgamma=conf.Z_GAMMA;
 
-  anPars.noPreSelection[channel][vgamma]=0;
-
-  fch.RunAnalysis(anPars);
-
+  TComputeSystDueToSbVariation syst(anPars);
+  bool isOk = syst.ComputeSyst();  
+  
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 }

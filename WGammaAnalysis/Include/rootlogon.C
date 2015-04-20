@@ -29,6 +29,7 @@
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesSyst.C+");
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplates.C+");
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesPickSideband.C+");
+  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TComputeSystDueToSbVariation.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
   gROOT->ProcessLine(".L ../PrepareYields/TSubtractBackground.C+");
@@ -41,6 +42,15 @@
   gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
 
   gROOT->ProcessLine(".L ../FullChain/FullChain.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchPreliminarySelection.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchExtraSelection.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchPrepareYields.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchMCclosureSidebandVariation.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchTemplatesPickSideband.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchMCclosureFits.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchMCclosureCompareYields.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchTemplateFitsData.C+");
+//  gROOT->ProcessLine(".L ../FullChain/AuxFchSubtractBackgroundData.C+");
 
 
   gROOT->ProcessLine(".L ../SkimSplitMerge/TInputOutputTree.C+");

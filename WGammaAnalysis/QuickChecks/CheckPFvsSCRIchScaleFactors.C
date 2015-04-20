@@ -103,7 +103,7 @@ void CheckPFvsSCRIchScaleFactors()
     if (ieta==1) strEta="Endcap";
 
     std::cout<<"\\begin{table}[h]"<<std::endl;
-    std::cout<<"  \\tiny"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
     std::cout<<"  \\begin{center}"<<std::endl;
     std::cout<<"  \\caption{ eff of $I_{ch}$ PF vs SCR, "<<strEta<<"}"<<std::endl;
     std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;

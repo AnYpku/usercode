@@ -10,10 +10,10 @@ class TElectronCuts
        TElectronCuts ();
        virtual ~TElectronCuts();
        enum {ELE_VETO=0, ELE_LOOSE=1, ELE_MEDIUM=2, ELE_TIGHT=3};
-       bool HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele, bool isEvForCheck);
+       bool HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele, bool isEvForCheck=0);
        bool PassedKinematics(int vgamma, bool isLead, float pt, float eta);
-       bool EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int wp, bool doEventCheck=0);
-       float GetCorrectedIsolation(TEventTree::InputTreeLeaves& leaf, int iele);
+       bool EleID2012(TEventTree::InputTreeLeaves& leaf, int iele, int wp, bool isEvForCheck=0);
+       float GetCorrectedIsolation(TEventTree::InputTreeLeaves& leaf, int iele, bool isEvForCheck=0);
        float GetEffectiveArea(float eta);
        bool IsBarrel(float eta);
        bool IsEndcap(float eta);

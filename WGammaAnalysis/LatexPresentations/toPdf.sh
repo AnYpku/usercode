@@ -1,3 +1,3 @@
-pdflatex presentation20150401Wg_PFvsSCR.tex
-acroread presentation20150401Wg_PFvsSCR.pdf
+pdflatex presentation20150422Wg_SystDueToSbVar.tex
+acroread presentation20150422Wg_SystDueToSbVar.pdf
 

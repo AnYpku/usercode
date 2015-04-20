@@ -112,9 +112,9 @@ $ BKGMC   ZGAMMA  MUON   DYjets_to_ll    DY+jets#rightarrowl#bar{l}   418
 ###################################################################
 $   DATA   WGAMMA    ELECTRON    1    lumiTotal 19593.0        
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012a_Jan22rereco_ElePhoSkim.root
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012b_Jan22rereco_ElePhoSkim.root
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012c_Jan2012rereco_ElePhoSkim.root
-- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012d_Jan22rereco_ElePhoSkim.root
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012b_Jan22rereco_ElePhoSkim.root
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012c_Jan2012rereco_ElePhoSkim.root
+#- /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaData2012Jan22ReReco/job_electron_2012d_Jan22rereco_ElePhoSkim.root
 
 $   SIGMC  WGAMMA    ELECTRON   Wg_to_enu  W#gamma#rightarrowe#nu#gamma    634         
 - /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/eavdeeva2/WGammaMCsummer12New/Skim/job_summer12_Wg_enu_ElePhoSkim.root   553.92  

@@ -40,7 +40,7 @@ bool TFullCuts::VeryPreliminaryCut(TEventTree::InputTreeLeaves& leaf,
   // returns 0 otherwise (has no candidates)
 
    _isEvForCheck=0;
-   if (leaf.event==6136849 || leaf.event==2559882 || leaf.event==479598 || leaf.event==3574696 || leaf.event==5208885) _isEvForCheck=1;
+   if (leaf.event==468631305 || leaf.event==51821135 || leaf.event==506834593 || leaf.event==132819027 || leaf.event==1075101220 || leaf.event==1933877108 || leaf.event==956789312 || leaf.event==1011240814 || leaf.event==707875590 || leaf.event==447864431) _isEvForCheck=1;
 // 16135540 passed but rejected later
    if (_isEvForCheck) {std::cout<<std::endl; std::cout<<"event="<<leaf.event<<std::endl;}
 

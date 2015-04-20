@@ -23,7 +23,7 @@ public :
 //   const static Int_t kMaxnVtxBS = 70;
 //   const static Int_t kMaxnPFPho = 48;
 //   const static Int_t kMaxnPFEle = 6;
-   const static Int_t kMaxnEle = 11;
+   const static Int_t kMaxnEle = 12;
    const static Int_t kMaxnPho = 16;
    const static Int_t kMaxnMu = 33;
 //   const static Int_t kMaxnJet = 97;
