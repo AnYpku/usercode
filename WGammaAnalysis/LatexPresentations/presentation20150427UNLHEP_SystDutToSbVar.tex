@@ -7,10 +7,10 @@
 %\usepackage{siunitx}
 %\usepackage{epstopdf}
 \usetheme{default}
-\title{Systematics due to sideband variation (Otto's method 1)}
-\author{Ekaterina Avdeeva}
-\institute{University of Nebraska - Lincoln}
-\date{April 22nd, 2015}
+\title{W$\gamma$: systematics due to sideband variation \\ (for the UNLHEP meeting)}
+\author{Ekaterina Avdeeva (1), Ilya Kravchenko (1), Lovedeep Saini (2), Yurii Maravin (2), Sachiko Toda (2)}
+\institute{(1)University of Nebraska - Lincoln, (2)Kansas State University}
+\date{April 27nd, 2015}
 
 
 
@@ -18,9 +18,45 @@
 
 \begin{frame}
 \titlepage
+\scriptsize
+And those authors left the analysis:
+Yutaro Iiyama, Manfred Paulini (Carnegie Melon University), Kuo Chia Ming (National Central University)
 \end{frame}
 
-\begin{frame}{Otto's method 1 (slightly modified)}\\*
+\begin{frame}{Major background $jets \rightarrow \gamma$}\\
+  \begin{figure}
+  \includegraphics[width=0.50\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/PrepareYields/c_TotalDATAvsMC_EtaCommon__phoEt.png}\\
+  \end{figure}
+  \scriptsize
+  Wg, MUON channel\\
+  After all the selection criteria applied, $\sim 80\%$ of W+jets background irreducable by cut-based selection remains\\
+  (photon $I_{ch}$ cut not applied on the plot)
+\end{frame}
+
+\begin{frame}{Template Method to subtract background. Fit of $I_{ch}$}\\
+  \scriptsize
+  \begin{itemize}
+  \item get true-$\gamma$ template from rand. cone isolation meth. [AN2013-034, ch. 6]
+  \item get fake-$\gamma$ template from sideband of $\sigma_{i\eta{i}\eta}$
+  \item fit data with $F=N_{true} \cdot T_{true} + N_{fake} \cdot T_{fake}$
+  \end{itemize}
+  \begin{figure}
+  \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt15to20__Barrel__RooFit.png}  \includegraphics[width=0.45\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFits/c_TEMPL_CHISO_blindCOMBINED__phoEt15to20__Endcap__RooFit.png}\\
+  \end{figure}
+  \scriptsize
+  Wg, MUON channel, pho pt 15-20 GeB; left: Barrel; right: Endcap\\ 
+\end{frame}
+
+\begin{frame}{$\sigma_{i\eta{i}\eta}$ Sideband Variation in fits of data. Wg, MUON channel, pho pt 15-20 GeB; Barrel}\\
+  \begin{figure}
+     \includegraphics[width=0.70\textwidth, keepaspectratio=true]{../WGammaOutput/MUON_WGamma/Plots/TemplateFitsSyst/cSyst__TEMPL_CHISO_UNblind__SbVar_True__phoEt15to20__Barrel_.png}\\
+  \end{figure}
+  \scriptsize
+  Each dot on the plot is result of fit with certain $\sigma_{i\eta{i}\eta}$ sideband (lower and upper bound)\\
+  The fit result depends significantly on the choice of sideband 
+\end{frame}
+
+\begin{frame}{Method of syst estimation from Zg-approved analysis [AN2013-280] (slightly modified)}\\*
     \scriptsize
     \begin{itemize}
       \item for each $\sigma_{i\eta{i}\eta}$ sideband fit MC mixture and determine $b_{i}=f_{i}^{MC}/f^{MC}_{truth}$, where $f^{MC}_{truth}$ is MC-truth signal yield and $f_{i}^{MC}$ - signal yield determined from fit for the i-th Ich range
@@ -32,7 +68,7 @@
       \item $err_{syst}=sqrt(RMS^{2}+U_{0}^2)$
     \end{itemize}
     Electron and muon templates are merged, but data-to-fit is different, sideband optimization was performed separately for muon and electron channel\\*
-    for ZGamma, templates of WGamma were used 
+    for Zg, templates of Wg were used 
 \end{frame}
 
 \begin{frame}{Very good: MUON ZGamma Barrel 15-20 GeV}
@@ -57,6 +93,26 @@
   \scriptsize top: left to right: sb variation in MC, sb variation in data, syst study\\*
   \scriptsize bottom: left to right: MCmixture fit with optimized sb, data fit with optimized sb, true gamma yields from data fit vs MC\\*
   \scriptsize optimized sideband: 0.033-0.035 (very left corner of the colored plot)
+\end{frame}
+
+\begin{frame}{Conclusions and Plans}
+  \scriptsize 
+  \begin{itemize}
+    \item the first version of the syst uncerntainty dut to sideband variation estimation is performed
+    \item syst errors in cerntain bins are unacceptably high
+    \item low MC statistics might be issue sometimes
+    \item while syst errors for Zg are low, they are larger then in approved Zg analysis
+  \end{itemize}
+  What we plan to do:
+  \begin{itemize}
+    \item try to increase MC statistics (do the MC-mixture study on Wg-selected Wjets with WMt cut removed + Zg-selected DYjets as fake-gamma samples, Wg + Zg as true gamma samples, muon and electron channel merged); the syst estimation procedure will be a little different because the approach described in today's slides assumes MC-mixture to mimic data but with WMt cut removed and adding Zg-selected DYjets, expected true yields will be different
+    \item whataever comes out of it - update and submit v1 of the AN-note and give presentation at the SMP-VV meeting (May 8th or May 15th, depending on how fast we proceed)
+    \item if the errors stay high - use Jet enriched dataset to get fake templates (Jet datasets in form of ggNtuples are available but one would need to figure out the selection criteria); Jet enriched dataset was used in approved Zg analysis
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{BACKUP}
+
 \end{frame}
 
 \begin{frame}
