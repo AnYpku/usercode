@@ -24,14 +24,14 @@ bool TComputeSystDueToSbVariation::ComputeSyst()
   GetHistsAndVectors();
   for (int ieta=0; ieta<=1; ieta++){
     for (int ikin=1; ikin<=_anPars.nKinBins; ikin++){
-      ComputeSystMeth1OneBin(ieta,ikin);
+      ComputeSystOneBin(METH1,ieta,ikin);
     }
   }
   PrintLatexTableMeth1();
   return 1;
 }// end of TComputeSystDueToSbVariation::ComputeSyst
 
-bool TComputeSystDueToSbVariation::ComputeSystMeth1OneBin(int ieta, int ikin)
+bool TComputeSystDueToSbVariation::ComputeSystOneBin(int meth, int ieta, int ikin)
 {
   // U_i = f_d_i - b_i x f_d, b_i = f_MC_i / f_MCtruth
   _f_MCtruth[ikin][ieta]=_hMCtruth[ieta]->GetBinContent(ikin);
@@ -64,34 +64,28 @@ bool TComputeSystDueToSbVariation::ComputeSystMeth1OneBin(int ieta, int ikin)
   std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
   std::cout<<"f_MCtruth="<<_f_MCtruth[ikin][ieta]<<", f_MC="<<_f_MC[ikin][ieta]<<", f_d="<<_f_d[ikin][ieta]<<", sb="<<sbL<<"-"<<sbU<<std::endl;
 
-  TString hUiName = "systMeth1_hUi";
+  TString hUiName = "syst_hUi";
   hUiName+=StrLabelKin(ikin);
   hUiName+=StrLabelEta(ieta);
 //  std::cout<<setprecision(1);
+  vector <float> vecUi;
   float Ui_min=100000;
   float Ui_max=-100000;
-  vector <float> vecUi;
-  for (int isb_data=0; isb_data<N_Sb_data; isb_data++){
-    for (int isb_MC=0; isb_MC<N_Sb_MC; isb_MC++){
-      if (!(fabs(_vecSbL_MC[ikin][ieta]->operator()(isb_MC)-_vecSbL_Data[ikin][ieta]->operator()(isb_data))<0.0001 &&
-            fabs(_vecSbU_MC[ikin][ieta]->operator()(isb_MC)-_vecSbU_Data[ikin][ieta]->operator()(isb_data))<0.0001 ))
-        continue;
-      float f_d_i = _vecFitRes_Data[ikin][ieta]->operator()(isb_data);
-      float f_MC_i = _vecFitRes_MC[ikin][ieta]->operator()(isb_MC);
-      if (f_MC_i/_f_MC[ikin][ieta]>2.0 || f_MC_i/_f_MC[ikin][ieta]<0.5) continue;
-      float Ui = f_d_i - _f_d[ikin][ieta]*f_MC_i/_f_MCtruth[ikin][ieta]; 
-      vecUi.push_back(Ui);
-//      int Ui_int = (int)Ui;
-//      std::cout<<Ui_int<<"; ";
-//      hUi->Fill(Ui);
-      if (Ui<Ui_min) Ui_min=Ui;
-      if (Ui>Ui_max) Ui_max=Ui;
-    }//end of loop over isb_MC
-  }//end of loop over isb_data
+
+  float KTthresh[6]={0.3,0.2,0.1,0.05,0.01,0.005};
+  int ikt;
+  for (ikt=0; ikt<6; ikt++){
+    Ui_min=100000;
+    Ui_max=-100000;
+    vecUi.clear();
+    FillVecUi(vecUi, Ui_min, Ui_max, meth, ikin, ieta, N_Sb_data, N_Sb_MC, KTthresh[ikt]);
+    if (vecUi.size()>5 || ikt==5) break;
+  }
+
 
   _fOut->cd();
 
-  std::cout<<"Ui_min = "<<Ui_min<<", Ui_max = "<<Ui_max<<", n of points = "<<vecUi.size()<<std::endl;
+  std::cout<<"Ui_min = "<<Ui_min<<", Ui_max = "<<Ui_max<<", n of points = "<<vecUi.size()<<", KTthresh["<<ikt<<"] = "<<KTthresh[ikt]<<std::endl;
   int nBins = vecUi.size()/4;
   if (nBins<5) nBins=5;
   TH1F* hUi = new TH1F(hUiName,hUiName,nBins,Ui_min,Ui_max);
@@ -135,10 +129,12 @@ bool TComputeSystDueToSbVariation::ComputeSystMeth1OneBin(int ieta, int ikin)
 //  hUi->GetXaxis()->SetRangeUser(Ui_min-0.5*fabs(Ui_min),Ui_max+0.5*fabs(Ui_max));
   hUi->Draw("EP");
   hUi->SetStats(0);
-  TLine* line = new TLine(_U0[ikin][ieta],0,_U0[ikin][ieta],1000);
-  line->SetLineWidth(2);
-  line->SetLineColor(2);
-  line->Draw("same");
+  if (meth==METH1){
+    TLine* line = new TLine(_U0[ikin][ieta],0,_U0[ikin][ieta],1000);
+    line->SetLineWidth(2);
+    line->SetLineColor(2);
+    line->Draw("same");
+  }
   textPars->Draw("same");
   textSyst->Draw("same");
 
@@ -152,8 +148,41 @@ bool TComputeSystDueToSbVariation::ComputeSystMeth1OneBin(int ieta, int ikin)
   strSaveName+=hUiName;
   strSaveName+=".png";
   c->SaveAs(strSaveName);
+  strSaveName.ReplaceAll(".png",".pdf");
+  c->SaveAs(strSaveName);
   return 1;
 }// end of TComputeSystDueToSbVariation::ComputeSystMeth1OneBin
+
+bool TComputeSystDueToSbVariation::FillVecUi(vector <float> &vecUi, float& Ui_min, float& Ui_max, int meth, int ikin, int ieta, int N_Sb_data, int N_Sb_MC, float KTthresh)
+{
+  Ui_min=100000;
+  Ui_max=-100000;
+
+  for (int isb_data=0; isb_data<N_Sb_data; isb_data++){
+    for (int isb_MC=0; isb_MC<N_Sb_MC; isb_MC++){
+      if (!(fabs(_vecSbL_MC[ikin][ieta]->operator()(isb_MC)-_vecSbL_Data[ikin][ieta]->operator()(isb_data))<0.0001 &&
+            fabs(_vecSbU_MC[ikin][ieta]->operator()(isb_MC)-_vecSbU_Data[ikin][ieta]->operator()(isb_data))<0.0001 ))
+        continue;
+      float f_d_i = _vecFitRes_Data[ikin][ieta]->operator()(isb_data);
+      float f_MC_i = _vecFitRes_MC[ikin][ieta]->operator()(isb_MC);
+      float Ui;
+      if (meth==METH1){
+        if (f_MC_i/_f_MC[ikin][ieta]>2.0 || f_MC_i/_f_MC[ikin][ieta]<0.5) continue;
+        Ui = f_d_i - _f_d[ikin][ieta]*f_MC_i/_f_MCtruth[ikin][ieta]; 
+      }
+      if (meth==METH2){
+        if (_vecKolmogorov_MC[ikin][ieta]->operator()(isb_MC)<KTthresh) continue;
+        Ui = f_d_i - _f_d[ikin][ieta];
+      }
+      vecUi.push_back(Ui);
+//      int Ui_int = (int)Ui;
+//      std::cout<<Ui_int<<"; ";
+//      hUi->Fill(Ui);
+      if (Ui<Ui_min) Ui_min=Ui;
+      if (Ui>Ui_max) Ui_max=Ui;
+    }//end of loop over isb_MC
+  }//end of loop over isb_data
+}//end of FillVecUiFillVecUi()
 
 bool TComputeSystDueToSbVariation::GetHistsAndVectors()
 {
@@ -255,7 +284,7 @@ bool TComputeSystDueToSbVariation::PrintLatexTableMeth1()
       std::cout<<" \\\\ \\hline"<<std::endl;
     }//end of loop over ik
     std::cout<<"  \\end{tabular}"<<std::endl;
-    std::cout<<"  \\label{tab:systSbVar_Meth1_"<<_config.StrChannel(_anPars.channel)<<"_";
+    std::cout<<"  \\label{tab:systSbVar_"<<_config.StrChannel(_anPars.channel)<<"_";
     std::cout<<_config.StrVgType(_anPars.vgamma)<<"_"<<strEta<<"}"<<std::endl;
     std::cout<<"  \\end{center}"<<std::endl;
     std::cout<<"\\end{table}"<<std::endl;

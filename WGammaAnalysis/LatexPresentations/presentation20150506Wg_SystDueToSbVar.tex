@@ -1,0 +1,286 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+\usepackage{multirow}
+%\usepackage[pdftex]{graphicx}
+%\usepackage{sidecap}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{Update on Systematics due to Sideband Variation}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{May 6th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}\frametitle{New Sideband Optimization Study}
+    \scriptsize
+    Study:
+    \begin{itemize}
+    \tiny
+      \item prepare MC-mixture 1 (for fake-$\gamma$ templates): Wjets(W$\gamma$-selected except WMt cut)+DYjets(Z$\gamma$-selected), muon+electron channels merged. The fake templates for MC-mixture sideband variation were taken from this mixture
+      \item prepare MC-mixture 2 (for true-$\gamma$ templates and data-to-fit):  Wjets+W$\gamma$(both W$\gamma$-selected except WMt cut), muon+electron channels merged (for Z$\gamma$, which is analyzed for reference, DYjets+Z$\gamma$, both Z$\gamma$-selected, muon+electron merged) 
+      \item for different $\sigma_{i\eta{i}\eta}$ sideband ranges (which wouldn't overlap with signal region), take fake template from mixture 1 phoSCRChIso, take true template from mixture 2 phoRandConeChIso and fit mixture 2 phoSCRChIso
+      \item pick sideband for which true yield from fit will be the closest to MC-truth
+      \item in data, take fake template from picked sidebands from fully W$\gamma$-selected data sample (except $I_{ch}$ and $\sigma_{i\eta{i}\eta}$), muon+electron merged
+      \item in data, take true template from phoRandConeChIso from fully W$\gamma$-selected data sample (except $I_{ch}$), muon+electron merged
+      \item fit data  
+    \end{itemize}
+    Reasoning for specific template selection for MC study:
+    \begin{itemize}
+    \tiny
+      \item low Wjets MC statistics is an issue
+      \item fake and true templates in MC for given sample don't depend on WMt cut 
+      \item fake and true templates are the same for muon and electron channel
+      \item $I_{ch}$ distributions of W$\gamma$-selected Wjets, DYjets and ttjets samples are different
+      \item $I_{ch}$ distributions of W$\gamma$-selected Wjets and Z$\gamma$-selected DYjets are the same and closer to data than W$\gamma$-selected DYjets and ttjets
+      \item RandCone distributions are different for W$\gamma$-selected Wjets/W$\gamma$ and Z$\gamma$-selected DYjets/Z$\gamma$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Syst Extimation. Otto's method 2 (slightly modified)}
+    \scriptsize
+    \begin{itemize}
+      \item select all possible $\sigma_{i\eta{i}\eta}$ ranges where $I_{ch}^{SCR}$ template is in good agreement with MC-truth fake distribution in nominal region("good" means Kolmogorov-Smirnov test probability $ > 30\%$; if there are fewer than 5 sideband ranges for which K.S.P.$>30\%$, go to K.S.P.$>20\%$, 10\%, 5\%, 1\% and 0.5\%)  
+      \item for each of selected $\sigma_{i\eta{i}\eta}$ sidebands, prepare fake template, fit data and get true-$\gamma$ yields   
+      \item take RMS of the distribution of true-$\gamma$ yields as syst ucerntainty 
+      \item compute $U_{0}=f^{d}-f^{d}{\cdot}f^{MC}/f^{MC}_{truth}$ as in Method 1
+      \item $err_{syst}=sqrt(RMS^{2}+U_{0}^2)$
+    \end{itemize}
+    Conclusions:
+    \begin{itemize}
+      \item improvement reached! (see the tables on next slides)
+      \item plots will be added to the note (AN-15-055)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Comment about data over MC Excess}
+\scriptsize
+I didn't see at some point and now see it back\\
+
+Here are the presentation where excess is almost absent\\
+
+https://indico.cern.ch/event/375292/contribution/1/material/slides/0.pdf\\
+(slide 2, yields)\\
+
+https://indico.cern.ch/event/378500/contribution/1/material/slides/0.pdf\\
+(slide 6, cross section)\\
+
+you see that plots are different than those which I sent you on Friday with cross section estimates\\
+
+the main difference in procedure - for plots which are showed on these 2 presentations I allowed the sihih sidebands to vary in signal region too and many of optimized sidebands overlapped with signal region.\\
+
+But later you told me I shouldn't use any events from signal region for fake templates because we want fake templates to be independent from data-to-fit and thus now sidebands are not allowed into the signal region during the optimization procedure\\
+
+\end{frame}
+
+\begin{frame}
+\centering
+\huge
+TABLES WITH SYSTs
+\end{frame}
+
+\begin{frame}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{MUON WGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.014-0.015 & 16642 & 25996 & 26046 & 31 & -1664 & 1531 & 1532 & 9  \\ \hline
+    20-25 & 0.012-0.017 & 8369 & 14243 & 14216 & -16 & -809 & 981 & 982 & 11  \\ \hline
+    25-30 & 0.011-0.017 & 6028 & 8478 & 8478 & 0 & -456 & 472 & 472 & 7  \\ \hline
+    30-35 & 0.011-0.017 & 4563 & 5469 & 5528 & 49 & -296 & 394 & 397 & 8  \\ \hline
+    35-45 & 0.013-0.016 & 5965 & 6545 & 6566 & 19 & -120 & 332 & 333 & 5  \\ \hline
+    45-55 & 0.011-0.012 & 2781 & 3530 & 4211 & 449 & -93 & 179 & 483 & 17  \\ \hline
+    55-65 & 0.014-0.021 & 1527 & 2779 & 2781 & 1 & 63 & 65 & 65 & 4  \\ \hline
+    65-75 & 0.013-0.014 & 1060 & 1948 & 1724 & -137 & -94 & 45 & 144 & 13  \\ \hline
+    75-85 & 0.011-0.012 & 712 & 1178 & 1178 & 0 & -27 & 22 & 22 & 3  \\ \hline
+    85-95 & 0.012-0.013 & 469 & 884 & 896 & 6 & -14 & 13 & 15 & 3  \\ \hline
+    95-120 & 0.013-0.014 & 726 & 1302 & 1349 & 24 & -43 & 24 & 34 & 4  \\ \hline
+    120-500 & 0.015-0.016 & 691 & 1653 & 1650 & -1 & 18 & 17 & 17 & 2  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_MUON_WGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{MUON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 12484 & 17338 & 12688 & -4574 & 2392 & 1859 & 4938 & 39  \\ \hline
+    20-25 & 0.039-0.043 & 7627 & 7666 & 7129 & -574 & -113 & 412 & 707 & 9  \\ \hline
+    25-30 & 0.041-0.045 & 5024 & 4894 & 4503 & -436 & -121 & 209 & 484 & 9  \\ \hline
+    30-35 & 0.045-0.047 & 3747 & 3429 & 2938 & -625 & -446 & 319 & 702 & 18  \\ \hline
+    35-45 & 0.037-0.039 & 3103 & 3823 & 3597 & -194 & 628 & 299 & 357 & 11  \\ \hline
+    45-55 & 0.037-0.059 & 1809 & 1997 & 1993 & -3 & -5 & 81 & 81 & 4  \\ \hline
+    55-65 & 0.037-0.039 & 958 & 1632 & 1431 & -134 & 81 & 132 & 188 & 19  \\ \hline
+    65-75 & 0.033-0.035 & 449 & 817 & 887 & 34 & 111 & 73 & 81 & 18  \\ \hline
+    75-85 & 0.033-0.035 & 283 & 511 & 580 & 33 & 77 & 38 & 51 & 18  \\ \hline
+    85-95 & 0.037-0.039 & 267 & 445 & 397 & -32 & 21 & 18 & 37 & 14  \\ \hline
+    95-120 & 0.033-0.047 & 379 & 620 & 623 & 1 & 18 & 15 & 15 & 4  \\ \hline
+    120-500 & 0.047-0.049 & 337 & 537 & 538 & 0 & -21 & 13 & 14 & 4  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_MUON_WGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{MUON ZGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.014-0.017 & 6290 & 11308 & 11277 & -17 & -80 & 154 & 155 & 2  \\ \hline
+    20-25 & 0.013-0.014 & 3430 & 6143 & 6140 & -1 & -255 & 104 & 104 & 3  \\ \hline
+    25-30 & 0.011-0.015 & 1734 & 3216 & 3215 & 0 & -58 & 46 & 46 & 2  \\ \hline
+    30-35 & 0.012-0.014 & 917 & 1565 & 1564 & 0 & -77 & 39 & 39 & 4  \\ \hline
+    35-45 & 0.014-0.017 & 880 & 1514 & 1527 & 7 & 8 & 33 & 33 & 3  \\ \hline
+    45-55 & 0.012-0.013 & 495 & 752 & 751 & 0 & -25 & 19 & 19 & 3  \\ \hline
+    55-65 & 0.013-0.014 & 276 & 471 & 459 & -7 & -18 & 8 & 11 & 4  \\ \hline
+    65-75 & 0.013-0.014 & 166 & 269 & 273 & 2 & -8 & 3 & 4 & 2  \\ \hline
+    75-85 & 0.014-0.017 & 110 & 201 & 200 & 0 & 1 & 2 & 2 & 2  \\ \hline
+    85-95 & 0.012-0.013 & 78 & 120 & 126 & 3 & -1 & 1 & 3 & 5  \\ \hline
+    95-120 & 0.012-0.013 & 151 & 161 & 179 & 14 & -2 & 2 & 15 & 9  \\ \hline
+    120-500 & 0.012-0.013 & 107 & 209 & 222 & 6 & -2 & 2 & 6 & 6  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_MUON_ZGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{MUON ZGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 2579 & 3956 & 3808 & -100 & 240 & 192 & 217 & 8  \\ \hline
+    20-25 & 0.039-0.041 & 1516 & 2391 & 2199 & -131 & -7 & 46 & 139 & 9  \\ \hline
+    25-30 & 0.039-0.043 & 714 & 1113 & 1110 & -1 & 15 & 22 & 22 & 3  \\ \hline
+    30-35 & 0.045-0.051 & 412 & 593 & 602 & 6 & -41 & 32 & 33 & 8  \\ \hline
+    35-45 & 0.033-0.055 & 419 & 647 & 647 & 0 & 22 & 32 & 32 & 7  \\ \hline
+    45-55 & 0.035-0.041 & 211 & 315 & 314 & 0 & 16 & 12 & 12 & 5  \\ \hline
+    55-65 & 0.033-0.035 & 91 & 230 & 202 & -12 & 29 & 16 & 20 & 22  \\ \hline
+    65-75 & 0.033-0.035 & 106 & 117 & 122 & 3 & 13 & 8 & 9 & 8  \\ \hline
+    75-85 & 0.033-0.037 & 73 & 83 & 83 & 0 & 5 & 4 & 4 & 5  \\ \hline
+    85-95 & 0.033-0.035 & 9 & 61 & 51 & -1 & 9 & 2 & 3 & 36  \\ \hline
+    95-120 & 0.037-0.043 & 27 & 79 & 79 & 0 & 0 & 2 & 2 & 10  \\ \hline
+    120-500 & 0.041-0.057 & 42 & 79 & 79 & 0 & -1 & 3 & 3 & 7  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_MUON_ZGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.014-0.015 & 7640 & 25996 & 26046 & 14 & -802 & 764 & 764 & 10  \\ \hline
+    20-25 & 0.012-0.017 & 3780 & 14243 & 14216 & -7 & -355 & 432 & 432 & 11  \\ \hline
+    25-30 & 0.011-0.017 & 2267 & 8478 & 8478 & 0 & -169 & 180 & 180 & 7  \\ \hline
+    30-35 & 0.011-0.017 & 1247 & 5469 & 5528 & 13 & -107 & 143 & 143 & 11  \\ \hline
+    35-45 & 0.013-0.016 & 1648 & 6545 & 6566 & 5 & -49 & 140 & 141 & 8  \\ \hline
+    45-55 & 0.011-0.012 & 1238 & 3530 & 4211 & 200 & -32 & 109 & 227 & 18  \\ \hline
+    55-65 & 0.014-0.021 & 908 & 2779 & 2781 & 0 & 42 & 42 & 42 & 4  \\ \hline
+    65-75 & 0.013-0.014 & 748 & 1948 & 1724 & -97 & -71 & 34 & 103 & 13  \\ \hline
+    75-85 & 0.011-0.012 & 452 & 1178 & 1178 & 0 & -17 & 19 & 19 & 4  \\ \hline
+    85-95 & 0.012-0.013 & 344 & 884 & 896 & 4 & -14 & 12 & 13 & 3  \\ \hline
+    95-120 & 0.013-0.014 & 534 & 1302 & 1349 & 18 & -34 & 20 & 27 & 5  \\ \hline
+    120-500 & 0.015-0.016 & 712 & 1653 & 1650 & -1 & 24 & 14 & 14 & 2  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 4157 & 17338 & 12688 & -1523 & 1299 & 1034 & 1841 & 44  \\ \hline
+    20-25 & 0.039-0.043 & 3214 & 7666 & 7129 & -242 & -58 & 228 & 332 & 10  \\ \hline
+    25-30 & 0.041-0.045 & 1779 & 4894 & 4503 & -154 & -70 & 126 & 199 & 11  \\ \hline
+    30-35 & 0.045-0.047 & 1266 & 3429 & 2938 & -211 & -237 & 145 & 256 & 20  \\ \hline
+    35-45 & 0.037-0.039 & 974 & 3823 & 3597 & -61 & 311 & 165 & 176 & 18  \\ \hline
+    45-55 & 0.037-0.059 & 851 & 1997 & 1993 & -1 & 2 & 64 & 64 & 7  \\ \hline
+    55-65 & 0.037-0.039 & 531 & 1632 & 1431 & -74 & 79 & 109 & 132 & 24  \\ \hline
+    65-75 & 0.033-0.035 & 345 & 817 & 887 & 26 & 88 & 55 & 61 & 17  \\ \hline
+    75-85 & 0.033-0.035 & 272 & 511 & 580 & 32 & 51 & 23 & 40 & 14  \\ \hline
+    85-95 & 0.037-0.039 & 219 & 445 & 397 & -26 & 20 & 13 & 30 & 13  \\ \hline
+    95-120 & 0.033-0.047 & 248 & 620 & 623 & 0 & 18 & 16 & 16 & 6  \\ \hline
+    120-500 & 0.047-0.049 & 384 & 537 & 538 & 0 & -18 & 12 & 12 & 3  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON ZGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.014-0.017 & 4948 & 11308 & 11277 & -13 & -71 & 139 & 140 & 2  \\ \hline
+    20-25 & 0.013-0.014 & 2949 & 6143 & 6140 & -1 & -207 & 85 & 85 & 2  \\ \hline
+    25-30 & 0.011-0.015 & 1466 & 3216 & 3215 & 0 & -47 & 39 & 39 & 2  \\ \hline
+    30-35 & 0.012-0.014 & 847 & 1565 & 1564 & 0 & -57 & 32 & 32 & 3  \\ \hline
+    35-45 & 0.014-0.017 & 659 & 1514 & 1527 & 5 & 3 & 31 & 31 & 4  \\ \hline
+    45-55 & 0.012-0.013 & 458 & 752 & 751 & 0 & -17 & 13 & 13 & 2  \\ \hline
+    55-65 & 0.013-0.014 & 213 & 471 & 459 & -5 & -17 & 8 & 9 & 4  \\ \hline
+    65-75 & 0.013-0.014 & 137 & 269 & 273 & 1 & -9 & 4 & 4 & 3  \\ \hline
+    75-85 & 0.014-0.017 & 74 & 201 & 200 & 0 & 1 & 2 & 2 & 3  \\ \hline
+    85-95 & 0.012-0.013 & 56 & 120 & 126 & 2 & -1 & 1 & 3 & 5  \\ \hline
+    95-120 & 0.012-0.013 & 99 & 161 & 179 & 9 & -2 & 2 & 10 & 10  \\ \hline
+    120-500 & 0.012-0.013 & 124 & 209 & 222 & 7 & -2 & 1 & 7 & 5  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_ZGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON ZGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 1859 & 3956 & 3808 & -72 & 217 & 170 & 184 & 9  \\ \hline
+    20-25 & 0.039-0.041 & 1008 & 2391 & 2199 & -87 & 0 & 42 & 97 & 9  \\ \hline
+    25-30 & 0.039-0.043 & 537 & 1113 & 1110 & -1 & 14 & 21 & 21 & 3  \\ \hline
+    30-35 & 0.045-0.051 & 403 & 593 & 602 & 6 & -32 & 25 & 26 & 6  \\ \hline
+    35-45 & 0.033-0.055 & 366 & 647 & 647 & 0 & 15 & 25 & 25 & 6  \\ \hline
+    45-55 & 0.035-0.041 & 213 & 315 & 314 & 0 & 12 & 10 & 10 & 4  \\ \hline
+    55-65 & 0.033-0.035 & 89 & 230 & 202 & -12 & 24 & 13 & 18 & 20  \\ \hline
+    65-75 & 0.033-0.035 & 25 & 117 & 122 & 0 & 18 & 11 & 11 & 45  \\ \hline
+    75-85 & 0.033-0.037 & 54 & 83 & 83 & 0 & 4 & 3 & 3 & 6  \\ \hline
+    85-95 & 0.033-0.035 & 29 & 61 & 51 & -5 & 7 & 2 & 6 & 21  \\ \hline
+    95-120 & 0.037-0.043 & 32 & 79 & 79 & 0 & 0 & 2 & 2 & 8  \\ \hline
+    120-500 & 0.041-0.057 & 63 & 79 & 79 & 0 & 0 & 1 & 1 & 1  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_ZGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+\end{document}

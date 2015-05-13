@@ -3,6 +3,7 @@
 #include "TString.h"
 #include "TLegend.h"
 #include "TCanvas.h"
+#include "TLine.h"
 
 #include "../Configuration/TConfiguration.h"
 
@@ -18,17 +19,26 @@ void CompareCS(int vgamma)
   TH1F* hTheory1D[2];
   TH1F* hOtto1D[2];//Z_GAMMA only
 
+  TH1F* hMeasuredTotal[2];
+  float thTotalCSval[2]={0.0,0.0};
+  
+
   TConfiguration config;
   TFile* fOut=new TFile("fOut.root","recreate");
   SetOttosHists(fOut,hOtto1D);
 
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++){
     fCS[ich]=new TFile(config.GetCrossSectionFileName(ich, vgamma));
+    std::cout<<"fCS="<<config.GetCrossSectionFileName(ich, vgamma)<<std::endl;
     hMeasured1D[ich]=(TH1F*)fCS[ich]->Get(config.GetCSname(ich, config.ONEDI));
+    hMeasuredTotal[ich]=(TH1F*)fCS[ich]->Get(config.GetCSname(ich, config.TOTAL));
     hTheory1D[ich]=(TH1F*)fCS[ich]->Get(config.GetTheoryCSname(config.ONEDI));
     hTheory1D[ich]->SetLineWidth(2);
     hMeasured1D[ich]->SetLineWidth(2);
     hOtto1D[ich]->SetLineWidth(2);
+    for (int ib=1; ib<=hTheory1D[ich]->GetNbinsX(); ib++){
+      thTotalCSval[ich]+=hTheory1D[ich]->GetBinContent(ib)*hTheory1D[ich]->GetBinWidth(ib);
+    }//end of ib
   }//end of loop over ich
 
   hMeasured1D[config.MUON]->SetLineColor(1);
@@ -66,6 +76,86 @@ void CompareCS(int vgamma)
 
   canv->SaveAs(TString("compareCS")+config.StrVgType(vgamma)+TString(".png"));
   canv->SaveAs(TString("compareCS")+config.StrVgType(vgamma)+TString(".pdf"));
+
+  TString canvTitle1 = "c_CS_Ratio_";
+  canvTitle1+=config.StrVgType(vgamma);
+  TCanvas* canv1 = new TCanvas(canvTitle1,canvTitle1,600,600);
+  canv1->SetLogx();
+  TH1F* hRatioMuEle = (TH1F*)hMeasured1D[config.MUON]->Clone("hRatioMuEle");
+  hRatioMuEle->Divide(hMeasured1D[config.ELECTRON]);
+  hRatioMuEle->SetLineWidth(2);
+  hRatioMuEle->SetLineColor(1);
+  hRatioMuEle->SetTitle(("PRELIMINARY: d#sigma/dP_{T}^{#gamma} muon/electron, ")+TString(config.StrVgType(vgamma)));
+//  TLegend* leg1 = new TLegend(0.55,0.80,0.90,0.90);
+//  leg1->AddEntry(hRatioMuEle,"mu/ele","l");
+  hRatioMuEle->Draw("EP");
+//  leg1->Draw("same");
+  hRatioMuEle->Draw("EP same");
+  TLine* line1 = new TLine(15,1,500,1);
+  line1->SetLineWidth(2);
+  line1->SetLineStyle(9);
+  line1->Draw("same");
+  canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".png"));
+  canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".pdf"));
+
+  if (vgamma==config.Z_GAMMA){
+    TString canvTitle2 = "c_CS_Ratio_Otto_";
+    canvTitle2+=config.StrVgType(vgamma);
+    TCanvas* canv2 = new TCanvas(canvTitle2,canvTitle2,600,600);
+    canv2->SetLogx();
+    TH1F* hRatioMuOtto = (TH1F*)hMeasured1D[config.MUON]->Clone("hRatioMuOtto");
+    hRatioMuOtto->SetTitle("PRELIMINARY: Z#gamma check: d#sigma/dP_{T}^{#gamma} meas./approved ");
+    hRatioMuOtto->GetYaxis()->SetRangeUser(0.60,1.40);
+    hRatioMuOtto->Divide(hOtto1D[config.MUON]);
+    hRatioMuOtto->SetLineWidth(2);
+    hRatioMuOtto->SetLineColor(4);   
+    TH1F* hRatioEleOtto = (TH1F*)hMeasured1D[config.ELECTRON]->Clone("hRatioEleOtto");
+    hRatioEleOtto->Divide(hOtto1D[config.ELECTRON]);
+    hRatioEleOtto->SetLineWidth(2);
+    hRatioEleOtto->SetLineColor(8); 
+    TLegend* leg2 = new TLegend(0.55,0.70,0.90,0.90);
+    leg2->AddEntry(hRatioMuOtto,"muon","l");
+    leg2->AddEntry(hRatioEleOtto,"electron","l");  
+    hRatioMuOtto->Draw("EP");
+    line1->Draw("same");
+    leg2->Draw("same");
+    hRatioMuOtto->Draw("EP same");
+    hRatioEleOtto->Draw("EP same");
+    canv2->SaveAs(TString("compareCSratioOtto")+config.StrVgType(vgamma)+TString(".png"));
+    canv2->SaveAs(TString("compareCSratioOtto")+config.StrVgType(vgamma)+TString(".pdf"));
+  } // end of (vgamma==config.Z_GAMMA)
+
+
+    TString canvTitle3 = "c_CS_Ratio_Theory_";
+    canvTitle3+=config.StrVgType(vgamma);
+    TCanvas* canv3 = new TCanvas(canvTitle3,canvTitle3,600,600);
+    canv3->SetLogx();
+    TH1F* hRatioMuTheory = (TH1F*)hMeasured1D[config.MUON]->Clone("hRatioMuTheory");
+    TH1F* hRatioEleTheory = (TH1F*)hMeasured1D[config.ELECTRON]->Clone("hRatioEleTheory");
+    hRatioEleTheory->SetTitle("PRELIMINARY: compare to theory: d#sigma/dP_{T}^{#gamma}, meas./theory ");
+//    hRatioMuTheory->GetYaxis()->SetRangeUser(0.60,1.40);
+    hRatioMuTheory->Divide(hTheory1D[config.MUON]);
+    hRatioMuTheory->SetLineWidth(2);
+    hRatioMuTheory->SetLineColor(4);   
+    hRatioEleTheory->Divide(hTheory1D[config.ELECTRON]);
+    hRatioEleTheory->SetLineWidth(2);
+    hRatioEleTheory->SetLineColor(8); 
+    TLegend* leg3 = new TLegend(0.55,0.70,0.90,0.90);
+    leg3->AddEntry(hRatioMuTheory,"muon","l");
+    leg3->AddEntry(hRatioEleTheory,"electron","l");  
+    hRatioEleTheory->Draw("EP");
+    line1->Draw("same");
+    leg3->Draw("same");
+    hRatioMuTheory->Draw("EP same");
+    hRatioEleTheory->Draw("EP same");
+    canv3->SaveAs(TString("compareCSratioTheory")+config.StrVgType(vgamma)+TString(".png"));
+    canv3->SaveAs(TString("compareCSratioTheory")+config.StrVgType(vgamma)+TString(".pdf"));
+
+  std::cout<<std::endl;
+  std::cout<<"Total Cross section: "<<std::endl;
+  std::cout<<"theory mu: "<<thTotalCSval[0]<<", theory ele: "<<thTotalCSval[1]<<", meas mu: "<<hMeasuredTotal[0]->GetBinContent(1)<<"+-"<<hMeasuredTotal[0]->GetBinError(1)<<", meas ele: "<<hMeasuredTotal[1]->GetBinContent(1)<<"+-"<<hMeasuredTotal[1]->GetBinError(1)<<std::endl;
+  if (vgamma==config.Z_GAMMA) std::cout<<"Otto mu: 2066+-"<<0.055*2066<<", Otto ele: 2087+-"<<0.058*2087<<std::endl;
+  std::cout<<std::endl;
 
   std::cout<<"MUO/ELE,   MEAS/THE(MUO), MEAS/THE(ELE) ";
   if (vgamma==config.Z_GAMMA) std::cout<<"MEAS/OTTO(MUO), MEAS/OTTO(ELE) ";

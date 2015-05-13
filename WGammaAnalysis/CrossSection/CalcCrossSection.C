@@ -106,8 +106,8 @@ void CalcCrossSection::DivideOverLumi()
 {
   float cont=_signalYieldTotal->GetBinContent(1);
   float err=_signalYieldTotal->GetBinError(1);
-  _signalYieldTotal->SetBinContent(1,cont/_lumi);
-  _signalYieldTotal->SetBinError(1,err/_lumi);
+  _signalYieldTotal->SetBinContent(1,1000*cont/_lumi);
+  _signalYieldTotal->SetBinError(1,1000*err/_lumi);
   for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
     cont=_signalYields1D->GetBinContent(ib);
     err=_signalYields1D->GetBinError(ib);
@@ -212,7 +212,7 @@ void CalcCrossSection::Plot()
   hRatio->GetXaxis()->SetTitleSize(0.12);
   hRatio->GetXaxis()->SetMoreLogLabels();
   hRatio->GetXaxis()->SetNoExponent();
-  hRatio->SetTitle(";phoEt, GeV;");
+  hRatio->SetTitle("; phoEt, GeV;");
   hRatio->Draw();
 
   int nBins = hRatio->GetNbinsX();

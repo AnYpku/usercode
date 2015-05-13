@@ -15,9 +15,11 @@ class TComputeSystDueToSbVariation
     virtual ~TComputeSystDueToSbVariation();
     //ComputeSystDueToSbVariationPars 
     bool ComputeSyst();
-    bool ComputeSystMeth1OneBin(int ieta, int ikin);
+    enum {METH1, METH2};
+    bool ComputeSystOneBin(int meth, int ieta, int ikin);
     bool GetHistsAndVectors();
     bool PrintLatexTableMeth1();
+    bool FillVecUi(vector <float> &vecUi, float& Ui_min, float& Ui_max, int meth, int ikin, int ieta, int N_Sb_Data, int N_Sb_MC, float KTthresh);
 
   private:
     TFile* _fOut;

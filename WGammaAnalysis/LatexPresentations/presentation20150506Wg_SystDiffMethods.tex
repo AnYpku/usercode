@@ -1,0 +1,223 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+\usepackage{multirow}
+%\usepackage[pdftex]{graphicx}
+%\usepackage{sidecap}
+%\usepackage{siunitx}
+%\usepackage{epstopdf}
+\usetheme{default}
+\title{Update on Systematics due to Sideband Variation}
+\author{Ekaterina Avdeeva}
+\institute{University of Nebraska - Lincoln}
+\date{May 6th, 2015}
+
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}\frametitle{ELECTRON Endcap, Summary}
+
+\scriptsize Old MC-mixture Approach. 1st method
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 4157 & 2799 & 2638 & -254 & -2119 & 627 & 677 & 16  \\ \hline
+    20-25 & 0.033-0.035 & 2655 & 2452 & 1338 & -2211 & -2621 & 342 & 2238 & 84  \\ \hline
+    25-30 & 0.039-0.047 & 1703 & 745 & 758 & 31 & -700 & 405 & 406 & 23  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+
+\scriptsize Old MC-mixture Approach. K.S.P. method
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    15-20 & 0.033-0.035 & 4157 & 2799 & 2638 & -254 & 1054 & 677 & 723 & 17  \\ \hline
+    20-25 & 0.033-0.035 & 2655 & 2452 & 1338 & -2211 & 630 & 291 & 2230 & 84  \\ \hline
+    25-30 & 0.039-0.047 & 1703 & 745 & 758 & 31 & 14 & 123 & 127 & 7  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Endcap}
+  \end{center}
+\end{table}
+
+\scriptsize New MC-mixture Approach. K.S.P. method
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    15-20 & 0.033-0.035 & 4157 & 17338 & 12688 & -1523 & 1299 & 1034 & 1841 & 44  \\ \hline
+    20-25 & 0.039-0.043 & 3214 & 7666 & 7129 & -242 & -58 & 228 & 332 & 10  \\ \hline
+    25-30 & 0.041-0.045 & 1779 & 4894 & 4503 & -154 & -70 & 126 & 199 & 11  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\huge
+COMPLETE TABLES
+\end{frame}
+
+\begin{frame}\frametitle{Old MC-mixture Approach. 1st method}
+\begin{table}[h]
+  \scriptsize
+  \begin{center}
+  \caption{ELECTRON WGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.013-0.016 & 7938 & 5436 & 5502 & 95 & -697 & 868 & 873 & 11  \\ \hline
+    20-25 & 0.014-0.018 & 2892 & 2654 & 2673 & 20 & 257 & 397 & 397 & 13  \\ \hline
+    25-30 & 0.013-0.021 & 1908 & 1399 & 1423 & 32 & -34 & 334 & 335 & 17  \\ \hline
+    30-35 & 0.013-0.015 & 1229 & 887 & 882 & -6 & -97 & 165 & 165 & 13  \\ \hline
+    35-45 & 0.013-0.017 & 1598 & 1173 & 1174 & 0 & 236 & 254 & 254 & 15  \\ \hline
+    45-55 & 0.011-0.014 & 1300 & 813 & 842 & 44 & 217 & 202 & 207 & 15  \\ \hline
+    55-65 & 0.015-0.016 & 937 & 723 & 575 & -241 & -313 & 59 & 248 & 26  \\ \hline
+    65-75 & 0.012-0.013 & 726 & 473 & 425 & -82 & -214 & 108 & 135 & 18  \\ \hline
+    75-85 & 0.012-0.013 & 458 & 268 & 270 & 2 & -51 & 24 & 24 & 5  \\ \hline
+    85-95 & 0.015-0.016 & 309 & 298 & 218 & -113 & -110 & 15 & 114 & 37  \\ \hline
+    95-120 & 0.012-0.013 & 521 & 340 & 340 & -1 & -43 & 19 & 19 & 3  \\ \hline
+    120-500 & 0.012-0.013 & 752 & 390 & 360 & -63 & -118 & 48 & 80 & 10  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \scriptsize
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 4157 & 2799 & 2638 & -254 & -2119 & 627 & 677 & 16  \\ \hline
+    20-25 & 0.033-0.035 & 2655 & 2452 & 1338 & -2211 & -2621 & 342 & 2238 & 84  \\ \hline
+    25-30 & 0.039-0.047 & 1703 & 745 & 758 & 31 & -700 & 405 & 406 & 23  \\ \hline
+    30-35 & 0.035-0.037 & 917 & 760 & 473 & -553 & -1142 & 225 & 597 & 65  \\ \hline
+    35-45 & 0.037-0.043 & 1230 & 608 & 693 & 151 & -559 & 215 & 263 & 21  \\ \hline
+    45-55 & 0.037-0.041 & 837 & 459 & 357 & -239 & -957 & 176 & 296 & 35  \\ \hline
+    55-65 & 0.033-0.035 & 427 & 283 & 264 & -30 & -255 & 92 & 97 & 22  \\ \hline
+    65-75 & 0.033-0.035 & 345 & 305 & 197 & -189 & -385 & 56 & 197 & 57  \\ \hline
+    75-85 & 0.033-0.035 & 272 & 173 & 129 & -93 & -279 & 46 & 104 & 38  \\ \hline
+    85-95 & 0.033-0.035 & 194 & 185 & 95 & -182 & -235 & 18 & 183 & 94  \\ \hline
+    95-120 & 0.037-0.039 & 233 & 174 & 149 & -38 & -106 & 35 & 52 & 22  \\ \hline
+    120-500 & 0.033-0.035 & 324 & 217 & 129 & -220 & -373 & 40 & 223 & 69  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+
+\begin{frame}\frametitle{Old MC-mixture Approach. K.S.P. method}
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.013-0.016 & 7938 & 5436 & 5502 & 95 & -886 & 786 & 791 & 9  \\ \hline
+    20-25 & 0.014-0.018 & 2892 & 2654 & 2673 & 20 & 542 & 538 & 538 & 18  \\ \hline
+    25-30 & 0.013-0.021 & 1908 & 1399 & 1423 & 32 & 187 & 222 & 224 & 11  \\ \hline
+    30-35 & 0.013-0.015 & 1229 & 887 & 882 & -6 & -83 & 145 & 145 & 11  \\ \hline
+    35-45 & 0.013-0.017 & 1598 & 1173 & 1174 & 0 & -3 & 123 & 123 & 7  \\ \hline
+    45-55 & 0.011-0.014 & 1300 & 813 & 842 & 44 & -100 & 99 & 108 & 8  \\ \hline
+    55-65 & 0.015-0.016 & 937 & 723 & 575 & -241 & 35 & 42 & 244 & 26  \\ \hline
+    65-75 & 0.012-0.013 & 726 & 473 & 425 & -82 & -31 & 27 & 86 & 11  \\ \hline
+    75-85 & 0.012-0.013 & 458 & 268 & 270 & 2 & -23 & 19 & 19 & 4  \\ \hline
+    85-95 & 0.015-0.016 & 309 & 298 & 218 & -113 & 21 & 13 & 114 & 37  \\ \hline
+    95-120 & 0.012-0.013 & 521 & 340 & 340 & -1 & -17 & 15 & 15 & 3  \\ \hline
+    120-500 & 0.012-0.013 & 752 & 390 & 360 & -63 & -16 & 14 & 65 & 8  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 4157 & 2799 & 2638 & -254 & 1054 & 677 & 723 & 17  \\ \hline
+    20-25 & 0.033-0.035 & 2655 & 2452 & 1338 & -2211 & 630 & 291 & 2230 & 84  \\ \hline
+    25-30 & 0.039-0.047 & 1703 & 745 & 758 & 31 & 14 & 123 & 127 & 7  \\ \hline
+    30-35 & 0.035-0.037 & 917 & 760 & 473 & -553 & 54 & 133 & 569 & 62  \\ \hline
+    35-45 & 0.037-0.043 & 1230 & 608 & 693 & 151 & 40 & 106 & 185 & 15  \\ \hline
+    45-55 & 0.037-0.041 & 837 & 459 & 357 & -239 & 14 & 72 & 249 & 29  \\ \hline
+    55-65 & 0.033-0.035 & 427 & 283 & 264 & -30 & 177 & 53 & 61 & 14  \\ \hline
+    65-75 & 0.033-0.035 & 345 & 305 & 197 & -189 & 98 & 43 & 194 & 56  \\ \hline
+    75-85 & 0.033-0.035 & 272 & 173 & 129 & -93 & 53 & 18 & 95 & 34  \\ \hline
+    85-95 & 0.033-0.035 & 194 & 185 & 95 & -182 & 39 & 14 & 183 & 94  \\ \hline
+    95-120 & 0.037-0.039 & 233 & 174 & 149 & -38 & 33 & 16 & 41 & 17  \\ \hline
+    120-500 & 0.033-0.035 & 324 & 217 & 129 & -220 & 38 & 13 & 220 & 68  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Endcap}
+  \end{center}
+\end{table}
+
+\end{frame}
+
+\begin{frame}\frametitle{New MC-mixture Approach. K.S.P. method}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Barrel}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.014-0.015 & 7640 & 25996 & 26046 & 14 & -802 & 764 & 764 & 10  \\ \hline
+    20-25 & 0.012-0.017 & 3780 & 14243 & 14216 & -7 & -355 & 432 & 432 & 11  \\ \hline
+    25-30 & 0.011-0.017 & 2267 & 8478 & 8478 & 0 & -169 & 180 & 180 & 7  \\ \hline
+    30-35 & 0.011-0.017 & 1247 & 5469 & 5528 & 13 & -107 & 143 & 143 & 11  \\ \hline
+    35-45 & 0.013-0.016 & 1648 & 6545 & 6566 & 5 & -49 & 140 & 141 & 8  \\ \hline
+    45-55 & 0.011-0.012 & 1238 & 3530 & 4211 & 200 & -32 & 109 & 227 & 18  \\ \hline
+    55-65 & 0.014-0.021 & 908 & 2779 & 2781 & 0 & 42 & 42 & 42 & 4  \\ \hline
+    65-75 & 0.013-0.014 & 748 & 1948 & 1724 & -97 & -71 & 34 & 103 & 13  \\ \hline
+    75-85 & 0.011-0.012 & 452 & 1178 & 1178 & 0 & -17 & 19 & 19 & 4  \\ \hline
+    85-95 & 0.012-0.013 & 344 & 884 & 896 & 4 & -14 & 12 & 13 & 3  \\ \hline
+    95-120 & 0.013-0.014 & 534 & 1302 & 1349 & 18 & -34 & 20 & 27 & 5  \\ \hline
+    120-500 & 0.015-0.016 & 712 & 1653 & 1650 & -1 & 24 & 14 & 14 & 2  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Barrel}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  	\tiny
+  \begin{center}
+  \caption{ELECTRON WGamma Endcap}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    bin & side- & data & MC & MC    & $U\_{0}$ & mean & RMS & Syst & Syst \\ 
+    lims & band & fit & fit & truth &       &      &     &      & rel, \% \\ \hline
+    15-20 & 0.033-0.035 & 4157 & 17338 & 12688 & -1523 & 1299 & 1034 & 1841 & 44  \\ \hline
+    20-25 & 0.039-0.043 & 3214 & 7666 & 7129 & -242 & -58 & 228 & 332 & 10  \\ \hline
+    25-30 & 0.041-0.045 & 1779 & 4894 & 4503 & -154 & -70 & 126 & 199 & 11  \\ \hline
+    30-35 & 0.045-0.047 & 1266 & 3429 & 2938 & -211 & -237 & 145 & 256 & 20  \\ \hline
+    35-45 & 0.037-0.039 & 974 & 3823 & 3597 & -61 & 311 & 165 & 176 & 18  \\ \hline
+    45-55 & 0.037-0.059 & 851 & 1997 & 1993 & -1 & 2 & 64 & 64 & 7  \\ \hline
+    55-65 & 0.037-0.039 & 531 & 1632 & 1431 & -74 & 79 & 109 & 132 & 24  \\ \hline
+    65-75 & 0.033-0.035 & 345 & 817 & 887 & 26 & 88 & 55 & 61 & 17  \\ \hline
+    75-85 & 0.033-0.035 & 272 & 511 & 580 & 32 & 51 & 23 & 40 & 14  \\ \hline
+    85-95 & 0.037-0.039 & 219 & 445 & 397 & -26 & 20 & 13 & 30 & 13  \\ \hline
+    95-120 & 0.033-0.047 & 248 & 620 & 623 & 0 & 18 & 16 & 16 & 6  \\ \hline
+    120-500 & 0.047-0.049 & 384 & 537 & 538 & 0 & -18 & 12 & 12 & 3  \\ \hline
+  \end{tabular}
+  \label{tab:systSbVar_Meth1_ELECTRON_WGamma_Endcap}
+  \end{center}
+\end{table}
+\end{frame}
+
+\end{document}
