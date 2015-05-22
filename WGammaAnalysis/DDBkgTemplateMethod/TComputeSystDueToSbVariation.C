@@ -24,7 +24,7 @@ bool TComputeSystDueToSbVariation::ComputeSyst()
   GetHistsAndVectors();
   for (int ieta=0; ieta<=1; ieta++){
     for (int ikin=1; ikin<=_anPars.nKinBins; ikin++){
-      ComputeSystOneBin(METH1,ieta,ikin);
+      ComputeSystOneBin(METH2,ieta,ikin);
     }
   }
   PrintLatexTableMeth1();

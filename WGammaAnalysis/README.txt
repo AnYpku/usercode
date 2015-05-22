@@ -7,6 +7,8 @@ based on ggNtuples
 is to compute total and differential cross sections of W_GAMMA
 (while it's not intended to analize Z_GAMMA, the package has Z_GAMMA built in, it's used for different cross-checks)
 
+! The sideband variation study on MC is now not part of the code here. Merged muon+electron MC files for this study are copied from ../WGammaAnalysisAux27_SbVariationMC_NoWMtCut_SomeMerging/ If we decide on this sideband optimization and computation of systematic error, the code will be restuctured to accomodate sideband variation study on MC !
+
 ##############################
 ## The sequence itself:
 
@@ -51,18 +53,14 @@ How to add another variable from ggNtuple to the analysis ?
 ##############################
 2) FullChain
 
-FullChain made to run full analysis
-has to have splitted and skimmed ggNtuples listed into the configuration file 
-it has struct with analysis parameters (FullChainParameters anPars) and ideally all the parameters to be changed for analysis, main checking and debugging purposes should be there
+FullChain made to run full analysis with
 
-FullChain has method 
-SetDefaultFullChainParameters(FullChainParameters& anPars, TString varKin)
-which sets the parameters to the default values and it can be used to run the whole analysis
-varKin = "phoEt", photon transverse momentum for the analysis purposes, 
-however other kinematic variables can be used to plot and look at the yields
-in practical purposes it's frequently needed to run only some parts of analysis or run Selection in debugMode or look at the WMt rather than phoPt yields etc.
+source doFullChain.sh
+
+has to have splitted and skimmed ggNtuples listed into the configuration file 
 
 The FullChain runs the analysis in the following order:
+(if not mention sudeband optimization and systematic errors study)
 2.1) with class Selection (in Selection directory)
      Preliminary Selection (can be skipped with anPars.noPreSelection=1)
      Extra Selection (can be skipped with anPars.noExtraSelection)
@@ -151,7 +149,7 @@ and text configuration file config.txt
 -- config.txt is location dependednt file (up to date for UNL tier 3 as it is)
 the syntax rules are written in the file
 
---TConfiguration.h/.C - class TConfiguration. Contains locations and names of directories and files in the package. Also contains some constants (photon Pt binning information and unhidden blinding constants).
+--TConfiguration.h/.C - class TConfiguration. Contains locations and names of directories and files in the package. Also contains some constants (photon Pt binning information and unhidden blinding constants). it has struct with analysis parameters (FullChainParameters anPars) and ideally all the parameters to be changed for analysis, main checking and debugging purposes should be there
 
 --TInputSample.h/.C - class TInputSample. A class for input sample structure (input file names, proper cross sections, colors for plots etc)
 
@@ -186,7 +184,8 @@ they are not compiled in Include/rootlogon.C so most of them are not up to date 
 e) WGammaOutput
 
 the output root files and plots should be stored here
-More precise pathes should be listed in /Configuration
+More precise paths should be listed in /Configuration
+(but sometimes hardcoded or partically hardcoded)
 
 ##############################
 f) SearchForOverlapInMC

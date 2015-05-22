@@ -31,17 +31,17 @@ DoFullChain(){
 }
 #end of DoFullChain
 
-echo Will DO ELECTRON ZGamma
-DoFullChain ELECTRON ZGamma logs/log20150320/log_
-echo DONE ELECTRON ZGamma
+#echo Will DO ELECTRON ZGamma
+#DoFullChain ELECTRON ZGamma logs/log20150320/log_
+#echo DONE ELECTRON ZGamma
 
-echo Will DO ELECTRON WGamma
-DoFullChain ELECTRON WGamma logs/log20150320/log_
-echo DONE ELECTRON WGamma
+#echo Will DO ELECTRON WGamma
+#DoFullChain ELECTRON WGamma logs/log20150320/log_
+#echo DONE ELECTRON WGamma
 
-echo Will DO MUON ZGamma
-DoFullChain MUON ZGamma logs/log20150320/log_
-echo DONE MUON ZGamma
+#echo Will DO MUON ZGamma
+#DoFullChain MUON ZGamma logs/log20150320/log_
+#echo DONE MUON ZGamma
 
 echo Will DO MUON WGamma
 DoFullChain MUON WGamma logs/log20150320/log_
