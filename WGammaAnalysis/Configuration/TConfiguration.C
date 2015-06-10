@@ -15,6 +15,7 @@ TConfiguration::TConfiguration()
   _selectedNameBase[PRELIMINARY_FOR_TEMPLATE_METHOD]="PreliminaryForTemplateMethodSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_UNFOLDING]="PreliminaryForUnfoldingSelected/selected";
   _selectedNameBase[FSR]="FsrSelected/selected";
+  _selectedNameBase[FSR_EXCLUDED]="FsrExcludedSelected/selected";
   _selectedNameBase[FULLY]="FullySelected/selected";
 }
 

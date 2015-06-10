@@ -74,6 +74,7 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
 
 }// end of FullChain::SetDefaultFullChainParameters
 
+
 void FullChain::SetAnalysisKinParameters(TConfiguration::AnalysisParameters& anPars)
 {
     anPars.varKin="phoEt";
@@ -94,7 +95,7 @@ void FullChain::SetAnalysisKinParameters(TConfiguration::AnalysisParameters& anP
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   _config.GetPhoPtBinsLimits(anPars.kinBinLims);
 
-}
+}//end of FullChain::SetAnalysisKinParameters
 
 void FullChain::SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin)
 {
@@ -219,11 +220,11 @@ void FullChain::SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters
 
   if (varKin=="Mpholeplep"){
     anPars.varKin=varKin;
-    anPars.nKinBins=11;
+    anPars.nKinBins=40;
 //    anPars.nKinBins=2;
     anPars.kinBinLims=new float[anPars.nKinBins+1];
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=80+2*ib;
+      anPars.kinBinLims[ib]=70+2*ib;
   }
 
   if (varKin=="Mpholep1" || varKin=="Mpholep2"){
