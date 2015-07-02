@@ -39,11 +39,11 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 
   for (int ieta=conf.BARREL; ieta<=conf.ENDCAP; ieta++){
     
-    hSbL[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsLowerHistName(ieta));
-    hSbU[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsUpperHistName(ieta));
+//    hSbL[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsLowerHistName(ieta));
+//    hSbU[ieta] = (TH1F*)fSbs->Get(conf.GetSidebandsUpperHistName(ieta));
     for (int ikin=1; ikin<=anPars.nKinBins; ikin++){
-        pars.sideband[ikin][ieta]=hSbL[ieta]->GetBinContent(ikin);
-        pars.sidebandUp[ikin][ieta]=hSbU[ieta]->GetBinContent(ikin);
+//        pars.sideband[ikin][ieta]=hSbL[ieta]->GetBinContent(ikin);
+//        pars.sidebandUp[ikin][ieta]=hSbU[ieta]->GetBinContent(ikin);
     }//end of loop over ikin
     
   }// end of loop over ieta
@@ -136,7 +136,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
     return;
   }
   pars.thresholdCombineTrueTemplates=29.9;
-  pars.thresholdCombineFakeTemplates=54.9;
+  pars.thresholdCombineFakeTemplates=10000;
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
     pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
     for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
@@ -148,10 +148,10 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
 //      if (pars.kinBinLims[ikb]>29) pars.combineTrueTempl[ikb][ieta]=1;
 //      if (pars.kinBinLims[ikb]>54) pars.combineFakeTempl[ikb][ieta]=1;
     } 
-    pars.sideband[ikb][config.BARREL]=0.011;
-    pars.sideband[ikb][config.ENDCAP]=0.033;
-    pars.sidebandUp[ikb][config.BARREL]=0.014;//0.018;
-    pars.sidebandUp[ikb][config.ENDCAP]=0.044;//0.053;
+    pars.sideband[ikb][config.BARREL]=0.000;
+    pars.sideband[ikb][config.ENDCAP]=0.000;
+    pars.sidebandUp[ikb][config.BARREL]=0.011;//0.018;
+    pars.sidebandUp[ikb][config.ENDCAP]=0.033;//0.053;
       //for these arrays, nFitBins[ikin][ieta], 
       //maxVarFit[ikin][ieta], sideband[ikin][ieta]
       // ikin=0 stands for total fit (e.g. 15-500)
@@ -183,7 +183,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
-  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.SIGMC);
+  TString strSign="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.SIGMC);
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
 
@@ -192,8 +192,8 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake="../WGammaOutput/MERGED/selected_WGamma_ForTemplates.root";
-  if (isMCclosure) strFake="../WGammaOutput/MERGED/selected_WGamma_ForTemplates_MCclosure.root";
+  TString strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 

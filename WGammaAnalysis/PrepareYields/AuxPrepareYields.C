@@ -109,7 +109,6 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   //bool SetOneYieldSource(int sourceType, TString name, TString label, int color, TString fileName, TString treeName);
   
   //int selStage=config.FSR;//config.FULLY;
-  //int selStage=config.FSR_EXCLUDED;
   int selStage=config.FULLY;
   //int selStage=config.PRELIMINARY_FOR_TEMPLATE_METHOD;
 

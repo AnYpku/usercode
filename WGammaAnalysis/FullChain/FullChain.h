@@ -12,13 +12,11 @@ class FullChain
     FullChain();
     virtual ~FullChain();
 
-
     void SetDefaultFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin="phoEt");
-
     void SetAnalysisKinParameters(TConfiguration::AnalysisParameters& anPars);
 
     void SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin);
- 
+
     void RunAnalysis(TConfiguration::AnalysisParameters& anPars);
 
   private:

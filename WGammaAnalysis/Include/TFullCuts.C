@@ -496,20 +496,12 @@ TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int blind, int p
   return cut;
 }//end of RangeFullCut
 
-TCut TFullCuts::RangeFsrCut()
+TCut TFullCuts::RangeFsrCut(int channel)
 {
   TCut cut;
 //  cut = "Mpholeplep<101 && Mpholeplep>81 && (lep1PhoDeltaR<0.8 || lep2PhoDeltaR<0.8)";
   cut = "Mpholeplep<101 && Mpholeplep>81 && lep1PhoDeltaR>0.4";
-  cut = cut && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
-  return cut;
-}
-
-TCut TFullCuts::RangeFsrExcludedCut()
-{
-  TCut cut;
-  cut = "Mpholeplep>105 && Mleplep>80 && lep1PhoDeltaR>0.7 && lep2PhoDeltaR>0.7";
-  cut = cut && RangeDeltaR(_config.Z_GAMMA) && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
+  cut = cut && _photon.RangePhoton(2012, _photon.WP_LOOSE, 0, 0);// 0 - no sigmaIEtaIEta cut
   return cut;
 }
 
