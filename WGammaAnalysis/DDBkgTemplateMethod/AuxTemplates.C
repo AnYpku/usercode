@@ -216,6 +216,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
     pars.cutNominal[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta) 
                     && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
     pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut; 
+    //pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CH_RandCone, ieta);//TCut;
       //charged isolation cut as applied during selection procedure;
     pars.cutSidebandVarNominalRange[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut;
       //phoSigmaIEtaIEta cut as applied during selection procedure;

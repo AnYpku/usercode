@@ -231,10 +231,11 @@ TCut TPhotonCuts::RangeSigmaIEtaIEta(int year, int wp, int ieta)
 
 TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType, int ieta)
 {
-  if (isoType==ISO_CHorTRK) return "1";
+//  if (isoType==ISO_CHorTRK) return "1";
   TString strIso;
   if (year==2011 && isoType==ISO_CHorTRK) strIso="phoTrkIsoHollowDR04Corr";
   if (year==2012 && isoType==ISO_CHorTRK) strIso="phoSCRChIsoCorr";//"phoPFChIsoCorr";
+  if (year==2012 && isoType==ISO_CH_RandCone) strIso="phoRandConeChIsoCorr";//"phoPFChIsoCorr";
   if (year==2011 && isoType==ISO_NEUorHCAL) strIso="phoHcalIsoDR04Corr";
   if (year==2012 && isoType==ISO_NEUorHCAL) strIso="phoPFNeuIsoCorr";
   if (year==2011 && isoType==ISO_PHOorECAL) strIso="phoEcalIsoDR04Corr";
@@ -276,7 +277,7 @@ TCut TPhotonCuts::RangeOneIsolation(int year, int wp, int isoType, int ieta)
   else cut = (cutB && cutIsoBStr) || (cutE && cutIsoEStr);
   std::cout<<"TPhotonCuts: year="<<year<<", wp="<<wp<<", isoType="<<isoType<<", ieta="<<ieta<<", cut="<<cut.GetTitle()<<std::endl;
   return cut;
-}
+}// end of TPhotonCuts::RangeOneIsolation
 
 TCut TPhotonCuts::RangeHoverE(int year)
 {

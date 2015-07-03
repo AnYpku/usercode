@@ -65,7 +65,7 @@ class TPhotonCuts
 
     const static int _nWP=3;
     enum {WP_LOOSE, WP_MEDIUM, WP_TIGHT};
-    enum {ISO_CHorTRK, ISO_NEUorHCAL, ISO_PHOorECAL};
+    enum {ISO_CHorTRK, ISO_NEUorHCAL, ISO_PHOorECAL, ISO_CH_RandCone};
 
   private:
 

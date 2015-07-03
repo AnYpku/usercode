@@ -47,7 +47,7 @@
   anPars.noDDBkgComputation[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.MUON][conf.W_GAMMA]=1;
-  anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=0;
+  anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;
   anPars.noCalcAccAndEff[conf.MUON][conf.W_GAMMA]=1;
@@ -79,7 +79,7 @@
   anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.ELECTRON][conf.W_GAMMA]=1;
-  anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=0;
+  anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;
   anPars.noCalcAccAndEff[conf.ELECTRON][conf.W_GAMMA]=1;

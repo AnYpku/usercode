@@ -118,7 +118,7 @@ class TTemplates
     void PrintHistogramsBinByBin(TH1D* hist[nKinBinsMax][3]);
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
     void ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint=0);
-    void ComputeOneYield(int ikin, int ieta, bool noPrint, bool isTrueGamma, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
+    void ComputeTrueYield(int ikin, int ieta, bool noPrint, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
 
     void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
@@ -141,6 +141,7 @@ class TTemplates
     TCut FitVarFitRangeCut(int ikin, int ieta);
     TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
+    float EffFromTree(int ikin, int ieta, bool noPrint);
 
     TRandom _random;
 
@@ -155,10 +156,14 @@ class TTemplates
     TH1D* _hTrueReference[nKinBinsMax][3];
     TH1D* _hFakeReference[nKinBinsMax][3];
     TH1D* _hData[nKinBinsMax][3];
+    
     TH1D* _hSumm[nKinBinsMax][3];
     TH1D* _hRatio[nKinBinsMax][3];
     RooPlot* _plotter[nKinBinsMax][3];
     double _chi2ToNDF[nKinBinsMax][3];
+
+    double _nDataFullSelVal[nKinBinsMax][3];
+    double _nDataFullSelErr[nKinBinsMax][3];
 
     double _nFakeFromFitVal[nKinBinsMax][3];
     double _nFakeFromFitErr[nKinBinsMax][3];
