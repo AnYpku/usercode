@@ -413,20 +413,30 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
       }
 
     if (vgamma==config.W_GAMMA) return;
+
     // FSR selected, Z_GAMMA only
       TString fOutName4=config.GetSelectedName(config.FSR,channel,vgamma,config.UNBLIND,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
       TFile fOut4(fOutName4,"recreate");
       _tr4 = new TTree("selectedEvents","selected events, one candidate per event");
-//      _trReduced = _tr->CopyTree(fullCut.RangeFsrCut(channel,wp));
-      _tr4 = _tr->CopyTree(fullCut.RangeFsrCut(channel));
-
+      _tr4 = _tr->CopyTree(fullCut.RangeFsrCut());
       std::cout<<std::endl;
-      std::cout<<"full Selection cut:      "<<fullCut.RangeFsrCut(channel).GetTitle()<<std::endl;
+      std::cout<<"full Selection cut:      "<<fullCut.RangeFsrCut().GetTitle()<<std::endl;
       std::cout<<std::endl;
-      
 //      PickHardestPhotonInEvent(_tr4, _trReduced);
-
       _tr4->Write();
+
+    // FSR_EXCLUDED selected, Z_GAMMA only
+      TString fOutName5=config.GetSelectedName(config.FSR_EXCLUDED,channel,vgamma,config.UNBLIND,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+      TFile fOut5(fOutName5,"recreate");
+      _tr5 = new TTree("selectedEvents","selected events, one candidate per event");
+      _tr5 = _tr->CopyTree(fullCut.RangeFsrExcludedCut());
+      std::cout<<std::endl;
+      std::cout<<"full Selection cut:      "<<fullCut.RangeFsrExcludedCut().GetTitle()<<std::endl;
+      std::cout<<std::endl;
+//      PickHardestPhotonInEvent(_tr5, _trReduced);
+      _tr5->Write();
+
+
 
 }// end of ExtraSelectionOne
 

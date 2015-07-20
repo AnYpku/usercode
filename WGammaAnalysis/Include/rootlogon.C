@@ -26,10 +26,10 @@
   gROOT->ProcessLine(".L ../Selection/Selection.C+");
 
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
-  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesSyst.C+");
+//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesSyst.C+");
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplates.C+");
-  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesPickSideband.C+");
-  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TComputeSystDueToSbVariation.C+");
+//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesPickSideband.C+");
+//  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TComputeSystDueToSbVariation.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
   gROOT->ProcessLine(".L ../PrepareYields/TSubtractBackground.C+");

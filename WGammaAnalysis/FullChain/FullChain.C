@@ -314,22 +314,22 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
     }//end of loop over ivg
   }//end of loop over ich
 
-  for (int ich=0; ich<=1; ich++){
-    for (int ivg=0; ivg<=1; ivg++){
-      for (int itp=0; itp<=1; itp++){
-        if (anPars.noSystDDBkgSidebandVariation[ich][ivg][itp]) continue;
-        TString strAffix=TString("Syst DDBkg Sideband Variation ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg)+TString(" ")+conf.StrTempl(itp);
-        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
-        anPars.channel=ich;
-        anPars.vgamma=ivg;
-        anPars.templFits=itp;
-        AuxTemplatesSystSidebandVariation(anPars,0);// 0 - no isMCclosure
-       std::cout<<"%_%  DONE "<<strAffix<<std::endl;
-       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
-      }//end of loop over itp
-    }//end of loop over ivg
-  }//end of loop over ich    
+//  for (int ich=0; ich<=1; ich++){
+//    for (int ivg=0; ivg<=1; ivg++){
+//      for (int itp=0; itp<=1; itp++){
+//        if (anPars.noSystDDBkgSidebandVariation[ich][ivg][itp]) continue;
+//        TString strAffix=TString("Syst DDBkg Sideband Variation ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg)+TString(" ")+conf.StrTempl(itp);
+//        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+//        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+//        anPars.channel=ich;
+//        anPars.vgamma=ivg;
+//        anPars.templFits=itp;
+//        AuxTemplatesSystSidebandVariation(anPars,0);// 0 - no isMCclosure
+//       std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+//       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
+//      }//end of loop over itp
+//    }//end of loop over ivg
+//  }//end of loop over ich    
 
   for (int ich=0; ich<=1; ich++){
     for (int ivg=0; ivg<=1; ivg++){

@@ -104,6 +104,7 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
   canvName+=StrLabelEta(ieta);
   canv= new TCanvas(canvName,canvName,800,800);
   TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",strDD+TString(" DD vs MC"));
 
   TH1F* hSum;
@@ -154,6 +155,7 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
   canvName+=StrLabelEta(ieta);
   _canvDATAvsDDsum[ieta]= new TCanvas(canvName,canvName,800,800);
   TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",TString("DATAvsDDsum"));
   TH1F* hSum;
 
@@ -184,6 +186,136 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
   _canvDATAvsDDsum[ieta]->Write();
 }// end of CompareDATAvsDDsum
 
+void TSubtractBackground::CompareDATAvsBKGplusSIGMC(int ieta)
+{
+  _pyPars.fOut->cd(); 
+  TString canvName=TString("DATAvsBkgPlusSigMC");
+  canvName+=StrLabelEta(ieta);
+  _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,800);
+  TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  legend->SetFillColor(0);
+  // prepare sum of real-photon bkg MC
+  TH1F* hSumBkgMC;
+  bool hSumStartedMC=0;
+  int isSign=-1;
+  for (int is=0; is<_sources.size(); is++){
+    if (_sources[is].sourceType==SIGMC) isSign=is;
+    if (_sources[is].sourceType!=BKGMC_TRUE) continue;
+    std::cout<<TString("Compare DATAvsBkgPlusSigMC: processing isource ")<<_sources[is].name<<std::endl;
+    if (!hSumStartedMC){
+      hSumBkgMC=(TH1F*)_sources[is].histBlind[ieta]->Clone("hSum_WholeMC");
+      hSumStartedMC=1;
+    }
+    else hSumBkgMC->Add(_sources[is].histBlind[ieta]);
+    //legend->AddEntry(_sources[is].histBlind[ieta],_sources[is].label);
+  }//end of loop over is
+
+  // form THStack out of real bkg MC + fake DD + signal MC 
+
+  THStack* mcHists = new THStack("mcHistsTot",TString("DATAvsBkgPlusSigMC"));
+  TH1F* hSum;
+  bool hSumStarted=0;
+
+  // add real gamma MC background
+  if (hSumStartedMC){
+    hSumBkgMC->SetLineColor(_sourceDDTrue[0].color);
+    hSumBkgMC->SetFillColor(_sourceDDTrue[0].color);
+    mcHists->Add(hSumBkgMC);
+    legend->AddEntry(hSumBkgMC,"real #gamma bkg MC","f");
+    hSum=(TH1F*)hSumBkgMC->Clone("hSum_WholeBkgPlusMC");  
+    hSumStarted=1;  
+  }// end of if (hSumStartedMC)
+
+  // add fake gamma DD background
+  mcHists->Add(_sourceDDFake[0].hist[ieta]);
+  legend->AddEntry(_sourceDDFake[0].hist[ieta],_sourceDDFake[0].label,"f");
+  if (!hSumStarted){
+    hSum=(TH1F*)_sourceDDFake[0].hist[ieta]->Clone("hSum_WholeBkgPlusMC");
+    hSumStarted=1;
+  }
+  else hSum->Add(_sourceDDFake[0].hist[ieta]);
+  hSumStarted=1;
+
+  // add signal MC
+  if (isSign!=-1) {
+    mcHists->Add(_sources[isSign].histBlind[ieta]);  
+    legend->AddEntry(_sources[isSign].histBlind[ieta],_sources[isSign].label);  
+    if (!hSumStarted){
+      hSum=(TH1F*)_sources[isSign].histBlind[ieta]->Clone("hSum_WholeMC");
+      hSumStarted=1;
+    }
+    else hSum->Add(_sources[isSign].histBlind[ieta]);
+  }
+
+  int isData=-1;
+
+  for (int is=0; is<_sources.size(); is++)
+    if (_sources[is].sourceType==DATA) isData=is;
+
+  if (isData==-1) return;
+  legend->AddEntry(_sources[isData].hist[ieta],_sources[isData].label,"l");
+  
+  _sources[isData].hist[ieta]->SetTitle("");
+
+  _sourceDDFake[0].hist[ieta]->SetLineColor(_sourceDDFake[0].color);
+
+  CompareStackVsHist(TString("DATA vs (DD fake + MC real)"), _sources[isData].hist[ieta], hSum, legend, _canvDATAvsBKGplusSIGMC[ieta], 1, mcHists);
+
+  _sourceDDFake[0].hist[ieta]->SetLineColor(1);
+
+  _canvDATAvsBKGplusSIGMC[ieta]->Write();
+
+
+}// end of CompareDATAvsBKGplusSIGMC
+
+void TSubtractBackground::CompareBkgSubtrDATAvsSIGMC(int ieta)
+{
+
+  _pyPars.fOut->cd(); 
+  TString canvName=TString("BkgSubtrDATAvsSIGMC_")+_pyPars.strPlotsBaseName;
+  canvName+=StrLabelEta(ieta);
+  _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,800);
+  TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  legend->SetFillColor(0);
+  THStack* mcHists = new THStack("mcHistsTot",TString("BkgSubtrDATAvsSIGMC"));
+
+  TH1F* hSum;
+  bool hSumStarted=0;
+
+  int isSign=-1;
+
+  for (int is=0; is<_sources.size(); is++){
+    if (_sources[is].sourceType==SIGMC); 
+    else continue;
+    std::cout<<TString("Compare BkgSubtrDATA vs SIGMC: processing isource ")<<_sources[is].name<<std::endl;
+    hSum=(TH1F*)_sources[is].histBlind[ieta]->Clone("hSum_WholeMC");
+    hSumStarted=1;
+    _sources[is].histBlind[ieta]->SetLineWidth(2);
+    legend->AddEntry(_sources[is].histBlind[ieta],_sources[is].label,"l");
+  }//end of loop over is
+
+//  if (isSign!=-1 && bkgType==BKGMC_TRUE) {
+//    mcHists->Add(_sources[isSign].histBlind[ieta]);  
+//    legend->AddEntry(_sources[isSign].histBlind[ieta],_sources[isSign].label);  
+//    if (!hSumStarted){
+//      hSum=(TH1F*)_sources[isSign].histBlind[ieta]->Clone("hSum_WholeMC");
+//      hSumStarted=1;
+//    }
+//    else hSum->Add(_sources[isSign].histBlind[ieta]);
+//  }
+
+  TH1F* hists[_nDDsources];
+  for (int ih=0; ih<_nDDsources; ih++){
+    legend->AddEntry(_sourceBkgSubtrData[ih].hist[ieta],"DATA - BKG","l");
+    _sourceBkgSubtrData[ih].hist[ieta]->SetTitle("");
+    hists[ih]=_sourceBkgSubtrData[ih].hist[ieta];
+  }
+
+  CompareStackVsHist(TString("BkgSubtrDATA vs SIGMC"), _nDDsources, hists, hSum, legend, _canvDATAvsBKGplusSIGMC[ieta]);
+
+  _canvDATAvsBKGplusSIGMC[ieta]->Write();
+}// end of CompareBkgSubtrDATAvsSIGMC
+
 void TSubtractBackground::PlotPrintSave()
 {
 
@@ -194,6 +326,7 @@ void TSubtractBackground::PlotPrintSave()
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
       CompareFakeDDvsMC(ieta);
       CompareTrueDDvsMC(ieta);
+      //CompareBkgSubtrDATAvsSIGMC(ieta);
     }
     return;
   }
@@ -204,6 +337,8 @@ void TSubtractBackground::PlotPrintSave()
     CompareTotalDATAvsMC(ieta);
     CompareFakeDDvsMC(ieta);
     CompareTrueDDvsMC(ieta);
+    CompareDATAvsBKGplusSIGMC(ieta);
+    CompareBkgSubtrDATAvsSIGMC(ieta);
     if (ieta!=_COMMON) CompareDATAvsDDsum(ieta);
   }
 

@@ -4,6 +4,7 @@
 #include "TLegend.h"
 #include "TCanvas.h"
 #include "TLine.h"
+#include "TLatex.h"
 
 #include "../Configuration/TConfiguration.h"
 
@@ -48,11 +49,11 @@ void CompareCS(int vgamma)
   hOtto1D[config.MUON]->SetLineColor(7);
   hOtto1D[config.ELECTRON]->SetLineColor(8);
 
-  TLegend* leg = new TLegend(0.55,0.55,0.90,0.90);
+  TLegend* leg = new TLegend(0.45,0.70,0.99,0.95,config.StrVgType(vgamma));
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
     leg->AddEntry(hMeasured1D[ich],config.StrChannel(ich)+TString(", measured"),"l");
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
-    leg->AddEntry(hTheory1D[ich],config.StrChannel(ich)+TString(", theory"),"l");
+    leg->AddEntry(hTheory1D[ich],config.StrChannel(ich)+TString(", MC-based"),"l");
   if (vgamma==config.Z_GAMMA){
     for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
       leg->AddEntry(hOtto1D[ich],config.StrChannel(ich)+TString(", Otto"),"l");
@@ -60,13 +61,25 @@ void CompareCS(int vgamma)
   leg->SetFillColor(0);
 
 
+  TString txt_CMS_Preliminary = "#scale[1.4]{#font[61]{CMS}} #font[52]{Preliminary}";
+  TString strHeader=txt_CMS_Preliminary;
+
+  // differential cross section
+
   TString canvTitle = "c_CS_Compare_";
   canvTitle+=config.StrVgType(vgamma);
   TCanvas* canv = new TCanvas(canvTitle,canvTitle,600,600);
   canv->cd();
   canv->SetLogx();  canv->SetLogy();
-  hMeasured1D[config.MUON]->SetTitle(("PRELIMINARY: d#sigma/dP_{T}^{#gamma}, fb/GeV, ")+TString(config.StrVgType(vgamma)));
-    hMeasured1D[config.MUON]->GetXaxis()->SetTitle("p_{T}^{#gamma}, GeV/c");
+  canv->SetLeftMargin(0.15);
+  strHeader = txt_CMS_Preliminary;
+  hMeasured1D[config.MUON]->SetTitle("");
+  hMeasured1D[config.MUON]->GetXaxis()->SetTitle("p_{T}^{#gamma}, GeV/c");
+  if (vgamma==config.W_GAMMA) hMeasured1D[config.MUON]->GetYaxis()->SetRangeUser(0.1,1000);
+  if (vgamma==config.Z_GAMMA) hMeasured1D[config.MUON]->GetYaxis()->SetRangeUser(0.01,250);
+  hMeasured1D[config.MUON]->GetYaxis()->SetTitle("d#sigma/dP_{T}^{#gamma}, fb/GeV");
+  hMeasured1D[config.MUON]->GetYaxis()->SetTitleOffset(1.6);
+  hMeasured1D[config.MUON]->GetYaxis()->SetMoreLogLabels(0);
   hMeasured1D[config.MUON]->Draw("EP");
   hMeasured1D[config.ELECTRON]->Draw("EP same");
   hTheory1D[config.MUON]->Draw("EP same");
@@ -76,23 +89,33 @@ void CompareCS(int vgamma)
     hOtto1D[config.ELECTRON]->Draw("EP same");
   }
   leg->Draw("same");
+  TLatex* text = new TLatex(0.15,0.93,strHeader);
+  text->SetNDC();
+  text->SetTextSize(0.04);
+  text->Draw("same");
 
   canv->SaveAs(TString("compareCS")+config.StrVgType(vgamma)+TString(".png"));
   canv->SaveAs(TString("compareCS")+config.StrVgType(vgamma)+TString(".pdf"));
+
+  // ratio muon/electron
 
   TString canvTitle1 = "c_CS_Ratio_";
   canvTitle1+=config.StrVgType(vgamma);
   TCanvas* canv1 = new TCanvas(canvTitle1,canvTitle1,600,600);
   canv1->SetLogx();
+  canv1->SetLeftMargin(0.15);
   TH1F* hRatioMuEle = (TH1F*)hMeasured1D[config.MUON]->Clone("hRatioMuEle");
   hRatioMuEle->Divide(hMeasured1D[config.ELECTRON]);
   hRatioMuEle->SetLineWidth(2);
   hRatioMuEle->SetLineColor(1);
-    hRatioMuEle->GetXaxis()->SetTitle("p_{T}^{#gamma}, GeV/c");
-  hRatioMuEle->SetTitle(("PRELIMINARY: d#sigma/dP_{T}^{#gamma} muon/electron, ")+TString(config.StrVgType(vgamma)));
+  hRatioMuEle->GetXaxis()->SetTitle("p_{T}^{#gamma}, GeV/c");
+  hRatioMuEle->GetYaxis()->SetTitle("(d#sigma_{#mu}/dP_{T}^{#gamma}):(d#sigma_{e}/dP_{T}^{#gamma})");
+  hRatioMuEle->GetYaxis()->SetTitleOffset(1.6);
+//  hRatioMuEle->SetTitle(txt_CMS_Preliminary+(" d#sigma/dP_{T}^{#gamma} muon/electron, ")+TString(config.StrVgType(vgamma)));
 //  TLegend* leg1 = new TLegend(0.55,0.80,0.90,0.90);
 //  leg1->AddEntry(hRatioMuEle,"mu/ele","l");
-  hRatioMuEle->GetYaxis()->SetRangeUser(0.5,1.8);
+  hRatioMuEle->GetYaxis()->SetRangeUser(0.5,1.5);
+  hRatioMuEle->SetTitle("");
   hRatioMuEle->Draw("EP");
 //  leg1->Draw("same");
   hRatioMuEle->Draw("EP same");
@@ -100,17 +123,29 @@ void CompareCS(int vgamma)
   line1->SetLineWidth(2);
   line1->SetLineStyle(9);
   line1->Draw("same");
+  strHeader = txt_CMS_Preliminary; 
+  TLatex* text1 = new TLatex(0.15,0.93,strHeader);
+  text1->SetNDC();
+  text1->SetTextSize(0.04);
+  text1->Draw("same");
+  TLatex* textVg = new TLatex(0.70,0.80,config.StrVgType(vgamma));
+  textVg->SetNDC();
+  textVg->SetTextSize(0.04);
+  textVg->Draw("same");
   canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".png"));
   canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".pdf"));
+
+  // ratio measured/Otto
 
   if (vgamma==config.Z_GAMMA){
     TString canvTitle2 = "c_CS_Ratio_Otto_";
     canvTitle2+=config.StrVgType(vgamma);
     TCanvas* canv2 = new TCanvas(canvTitle2,canvTitle2,600,600);
     canv2->SetLogx();
+    canv2->SetLeftMargin(0.15);
     TH1F* hRatioMuOtto = (TH1F*)hMeasured1D[config.MUON]->Clone("hRatioMuOtto");
-    hRatioMuOtto->SetTitle("PRELIMINARY: Z#gamma check: d#sigma/dP_{T}^{#gamma} meas./approved ");
-    hRatioMuOtto->GetYaxis()->SetRangeUser(0.60,1.40);
+    hRatioMuOtto->SetTitle(txt_CMS_Preliminary+" Z#gamma check: d#sigma/dP_{T}^{#gamma} meas./approved ");
+    hRatioMuOtto->GetYaxis()->SetRangeUser(0.50,1.50);
     hRatioMuOtto->Divide(hOtto1D[config.MUON]);
     hRatioMuOtto->SetLineWidth(2);
     hRatioMuOtto->SetLineColor(4);   
@@ -126,8 +161,8 @@ void CompareCS(int vgamma)
     hRatioMuOtto->Draw("EP");
     line1->Draw("same");
     leg2->Draw("same");
-    hRatioMuOtto->GetYaxis()->SetRangeUser(0.4,3.0);
-    hRatioEleOtto->GetYaxis()->SetRangeUser(0.4,3.0);
+    hRatioMuOtto->GetYaxis()->SetRangeUser(0.3,3.0);
+    hRatioEleOtto->GetYaxis()->SetRangeUser(0.3,3.0);
     hRatioMuOtto->Draw("EP same");
     hRatioEleOtto->SetLineStyle(7);
     hRatioEleOtto->Draw("EP same");
@@ -136,13 +171,17 @@ void CompareCS(int vgamma)
   } // end of (vgamma==config.Z_GAMMA)
 
 
+  // ratio measured/MCbased
+
     TString canvTitle3 = "c_CS_Ratio_Theory_";
     canvTitle3+=config.StrVgType(vgamma);
     TCanvas* canv3 = new TCanvas(canvTitle3,canvTitle3,600,600);
     canv3->SetLogx();
+    canv3->SetLeftMargin(0.15);
     TH1F* hRatioMuTheory = (TH1F*)hMeasured1D[config.MUON]->Clone("hRatioMuTheory");
     TH1F* hRatioEleTheory = (TH1F*)hMeasured1D[config.ELECTRON]->Clone("hRatioEleTheory");
-    hRatioEleTheory->SetTitle(TString("PRELIMINARY: d#sigma/dP_{T}^{#gamma}, meas./MC-based, ")+config.StrVgType(vgamma));
+    hRatioEleTheory->SetTitle("");
+//    hRatioEleTheory->SetTitle(txt_CMS_Preliminary+TString(" d#sigma/dP_{T}^{#gamma}, meas./MC-based, ")+config.StrVgType(vgamma));
 //    hRatioMuTheory->GetYaxis()->SetRangeUser(0.60,1.40);
     hRatioMuTheory->Divide(hTheory1D[config.MUON]);
     hRatioMuTheory->SetLineWidth(2);
@@ -150,25 +189,34 @@ void CompareCS(int vgamma)
     hRatioEleTheory->Divide(hTheory1D[config.ELECTRON]);
     hRatioEleTheory->SetLineWidth(3);
     hRatioEleTheory->SetLineColor(809); 
-    TLegend* leg3 = new TLegend(0.55,0.70,0.90,0.90);
+    TLegend* leg3 = new TLegend(0.60,0.70,0.98,0.95,config.StrVgType(vgamma));
     leg3->AddEntry(hRatioMuTheory,"muon","l");
     leg3->AddEntry(hRatioEleTheory,"electron","l");  
     leg3->SetFillColor(0);
-    hRatioMuTheory->GetYaxis()->SetRangeUser(0.4,3.0);
+    hRatioMuTheory->GetYaxis()->SetRangeUser(0.3,2.7);
     hRatioEleTheory->GetXaxis()->SetTitle("p_{T}^{#gamma}, GeV/c");
-    hRatioEleTheory->GetYaxis()->SetRangeUser(0.4,3.0);
+    hRatioEleTheory->GetYaxis()->SetRangeUser(0.3,2.7);
+    hRatioEleTheory->GetYaxis()->SetTitle("(d#sigma_{meas.}/dP_{T}^{#gamma}):(d#sigma_{MC-based}/dP_{T}^{#gamma})");
+    hRatioEleTheory->GetYaxis()->SetTitleOffset(1.6);
     hRatioEleTheory->Draw("EP");
     line1->Draw("same");
     leg3->Draw("same");
     hRatioMuTheory->Draw("EP same");
     hRatioEleTheory->SetLineStyle(7);
     hRatioEleTheory->Draw("EP same");
+  strHeader = txt_CMS_Preliminary;
+  TLatex* text3 = new TLatex(0.15,0.93,strHeader);
+  text3->SetNDC();
+  text3->SetTextSize(0.04);
+  text3->Draw("same");
+  canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".png"));
+  canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".pdf"));
     canv3->SaveAs(TString("compareCSratioTheory")+config.StrVgType(vgamma)+TString(".png"));
     canv3->SaveAs(TString("compareCSratioTheory")+config.StrVgType(vgamma)+TString(".pdf"));
 
   std::cout<<std::endl;
   std::cout<<"Total Cross section: "<<std::endl;
-  std::cout<<"theory mu: "<<thTotalCSval[0]<<", theory ele: "<<thTotalCSval[1]<<", meas mu: "<<hMeasuredTotal[0]->GetBinContent(1)<<"+-"<<hMeasuredTotal[0]->GetBinError(1)<<", meas ele: "<<hMeasuredTotal[1]->GetBinContent(1)<<"+-"<<hMeasuredTotal[1]->GetBinError(1)<<std::endl;
+  std::cout<<"theory mu: "<<thTotalCSval[0]<<", MC-based ele: "<<thTotalCSval[1]<<", meas mu: "<<hMeasuredTotal[0]->GetBinContent(1)<<"+-"<<hMeasuredTotal[0]->GetBinError(1)<<", meas ele: "<<hMeasuredTotal[1]->GetBinContent(1)<<"+-"<<hMeasuredTotal[1]->GetBinError(1)<<std::endl;
   if (vgamma==config.Z_GAMMA) std::cout<<"Otto mu: 2066+-"<<0.055*2066<<", Otto ele: 2087+-"<<0.058*2087<<std::endl;
   std::cout<<std::endl;
 

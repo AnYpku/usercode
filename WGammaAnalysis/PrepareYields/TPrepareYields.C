@@ -167,6 +167,7 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   canvName+=StrLabelEta(ieta);
   _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,800);
   TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot","DATA vs MC");
 
   int isData=-1;
@@ -223,6 +224,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, TH1F* hist1, TH1F* hi
 void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hist1[_nHistsMax], TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack, THStack* stack)
 //if isStack then hist2 must be sum of histograms in the stack
 {
+
   canv->Divide(1,2);
   TPad* pad1 = (TPad*)canv->GetPad(1);
   TPad* pad2 = (TPad*)canv->GetPad(2);
@@ -247,7 +249,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
       max=hist1[ih]->GetMaximum();
   }
 
-  if (_pyPars.doLogY) min=1;
+  if (_pyPars.doLogY) {min=1; if (!isStack) min=10;}
   else min=0;
 //  float min = 0.3*hist1->GetMinimum();
 //  if (min>0.3*hist2->GetMinimum())
@@ -259,10 +261,10 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   if (isStack) hist2->SetFillStyle(0);
   hist1[0]->GetYaxis()->SetRangeUser(min,max);
   hist1[0]->SetStats(0);
-  if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(); hist1[0]->GetYaxis()->SetNoExponent();}
+  if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(0); hist1[0]->GetYaxis()->SetNoExponent();}
   hist1[0]->Draw("P");
   if (isStack) stack->Draw("HIST same"); 
-  else hist2->Draw("HIST same");
+  else{hist2->SetLineWidth(2); hist2->Draw("EP same");}
  
   for (int ih=0; ih<nHists1; ih++){
     hist1[ih]->SetLineWidth(2);
@@ -279,24 +281,31 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   plotTitle.ReplaceAll("blindCOMBINED_","");
   plotTitle.ReplaceAll("_"," ");
   plotTitle.ReplaceAll("  "," ");
-  plotTitle.ReplaceAll("TrueDDvsMC","True #gamma, DD-fits vs MC,");
-  plotTitle.ReplaceAll("TotalDATAvsMC","DATA vs MC,");
+  plotTitle.ReplaceAll("TrueDDvsMC","Real #gamma DD-fits vs MC.");
+  plotTitle.ReplaceAll("FakeDDvsMC","Fake #gamma DD-fits vs MC.");
+  plotTitle.ReplaceAll("TotalDATAvsMC","DATA vs MC.");
+  plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(DATA - BKG) vs SIGMC.");
+  plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","DATA vs (BKG + SIGMC).");
+
+//  plotTitle.ReplaceAll("CHISO","");
+  plotTitle.ReplaceAll("CHISO Endcap MUON WGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel MUON WGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO Endcap MUON ZGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel MUON ZGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO Endcap ELECTRON WGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel ELECTRON WGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO Endcap ELECTRON ZGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel ELECTRON ZGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO EtaCommon MUON WGamma","EB+EE");
+  plotTitle.ReplaceAll("CHISO EtaCommon MUON ZGamma","EB+EE");
+  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON WGamma","EB+EE");
+  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON ZGamma","EB+EE");
+  plotTitle.ReplaceAll("EtaCommon","EB+EE");
   plotTitle.ReplaceAll("CHISO","");
-  plotTitle.ReplaceAll("Endcap MUON WGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel MUON WGamma","Barrel");
-  plotTitle.ReplaceAll("Endcap MUON ZGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel MUON ZGamma","Barrel");
-  plotTitle.ReplaceAll("Endcap ELECTRON WGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel ELECTRON WGamma","Barrel");
-  plotTitle.ReplaceAll("Endcap ELECTRON ZGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel ELECTRON ZGamma","Barrel");
-  plotTitle.ReplaceAll("EtaCommon MUON WGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon MUON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon ELECTRON WGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon ELECTRON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("WGamma","W#gamma,");
-  plotTitle.ReplaceAll("ZGamma","Z#gamma,");
-//  plotTitle.ReplaceAll("MUON","#mu+e merged,");
+
+  plotTitle.ReplaceAll("WGamma","W#gamma");
+  plotTitle.ReplaceAll("ZGamma","Z#gamma");
+
   TLatex* latexTitle = new TLatex(0.15,0.95,plotTitle);
   latexTitle->SetNDC();
   latexTitle->Draw("same");
@@ -350,8 +359,6 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   line->Draw("same");
 
   TString nameForSave=_pyPars.strPlotsDir;//+_pyPars.strPlotsBaseName;
-//  std::cout<<"_pyPars.strPlotsDir="<<_pyPars.strPlotsDir<<std::endl;
-//  std::cout<<"_pyPars.strPlotsBaseName="<<_pyPars.strPlotsBaseName<<std::endl;
   nameForSave+="c_";
   nameForSave+=canv->GetTitle();
   nameForSave+="_";
@@ -365,6 +372,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   canv->SaveAs(nameForSave);
   nameForSave.ReplaceAll(".pdf",".root");
   canv->SaveAs(nameForSave);
+
 }// end of CompareStackVsHist
 
 

@@ -31,11 +31,13 @@ class TSubtractBackground: public TPrepareYields
     void CompareTrueDDvsMC(int ieta);
     void CompareDDvsMC(int ieta, TString strDD, int bkgType, YieldsSource sourceDD[_nHistsMax], TCanvas* canv);
     void CompareDATAvsDDsum(int ieta);
-//    void CompareBkgSubtrDATAvsSIGMC(int ieta);
+    void CompareDATAvsBKGplusSIGMC(int ieta);
+    void CompareBkgSubtrDATAvsSIGMC(int ieta);
 
     TCanvas* _canvFakeDDvsMC[3];
     TCanvas* _canvTrueDDvsMC[3];
     TCanvas* _canvBkgSubtrDATAvsSIGMC[3];
+    TCanvas* _canvDATAvsBKGplusSIGMC[3];
     TCanvas* _canvDATAvsDDsum[3];
 };
 

@@ -24,6 +24,7 @@ class TConfiguration
           PRELIMINARY_FOR_TEMPLATE_METHOD,
           PRELIMINARY_FOR_UNFOLDING,
           FSR,
+          FSR_EXCLUDED,
           FULLY};//selection stage
     enum {TEMPL_CHISO=0, TEMPL_SIHIH=1, TEMPL_OVERLAY=2};
       // template fits: from I_ch (with random cone isolation method)
@@ -168,7 +169,7 @@ static const TString _outputDir="../WGammaOutput/";
 //selected files, directory and file names
 //(these files will be output of the script Selection)
 //names are listed in the constructor for now
-TString _selectedNameBase[5];
+TString _selectedNameBase[6];
 
 //////////////////////////////////////////
 //yields

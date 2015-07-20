@@ -68,7 +68,8 @@ public:
   TCut RangeDeltaR(int vgamma);
   TCut RangeForTemplateMethodCut(int year, int channel, int vgamma, int blind, int phoWP);
   TCut RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP);
-  TCut RangeFsrCut(int channel);
+  TCut RangeFsrCut();
+  TCut RangeFsrExcludedCut();
 
 private:
 
