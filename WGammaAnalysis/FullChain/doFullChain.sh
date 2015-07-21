@@ -11,9 +11,25 @@ MergeMUONandELECTRON(){
 }
 
 MergeForTemplates(){
+
+  # FsrExcluded (to get fake-photon template)
   MergeMUONandELECTRON ZGamma FsrExcludedSelected selected_ZGamma_UNblind_DATA.root
   MergeMUONandELECTRON ZGamma FsrExcludedSelected selected_ZGammaSIGMC.root
   MergeMUONandELECTRON ZGamma FsrExcludedSelected selected_ZGammaBKGMC_DYjets_to_ll.root
+
+  # Fsr (to get real-photon templates if SIHIH fits)
+  MergeMUONandELECTRON ZGamma FsrSelected selected_ZGamma_UNblind_DATA.root
+  MergeMUONandELECTRON ZGamma FsrSelected selected_ZGammaSIGMC.root
+  MergeMUONandELECTRON ZGamma FsrSelected selected_ZGammaBKGMC_DYjets_to_ll.root
+
+  # Fully (to prepare certai plots)
+  MergeMUONandELECTRON ZGamma FullySelected selected_ZGamma_UNblind_DATA.root
+  MergeMUONandELECTRON ZGamma FullySelected selected_ZGammaSIGMC.root
+  MergeMUONandELECTRON ZGamma FullySelected selected_ZGammaBKGMC_DYjets_to_ll.root
+
+  # No SIHIH and CHISO cuts (to get real-photon templates if CHISO fits)
+  MergeMUONandELECTRON ZGamma PreliminaryForTemplateMethodSelected selected_ZGamma_UNblind_DATA.root
+  MergeMUONandELECTRON WGamma PreliminaryForTemplateMethodSelected selected_WGamma_UNblind_DATA.root
 }
 
 DoFullChainPart1(){
@@ -45,10 +61,10 @@ DoFullChainPart2(){
 #DoFullChainPart1 MUON ZGamma logs/log20150320/log_
 #DoFullChainPart1 MUON WGamma logs/log20150320/log_
 
-#MergeForTemplates
+MergeForTemplates
 
-DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
-DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
-DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-DoFullChainPart2 MUON WGamma logs/log20150320/log_
+#DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
+#DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
+#DoFullChainPart2 MUON ZGamma logs/log20150320/log_
+#DoFullChainPart2 MUON WGamma logs/log20150320/log_
 

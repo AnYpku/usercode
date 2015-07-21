@@ -48,7 +48,7 @@ class TConfiguration
       int phoWP;
       TCut cutAdd;
 
-      int blind[2][2];//channel, vgamma
+      int blind[3][2];//channel, vgamma
 
       bool noPreSelection[2][2];//channel, vgamma
       bool noExtraSelection[2][2];//channel, vgamma

@@ -1,12 +1,14 @@
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
 
+#include <iostream>
+
 #include "TPrepareYields.h"
 #include "TSubtractBackground.h"
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage);
 
-void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
+void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=TConfiguration::FULLY)
 {
   TConfiguration conf;
   TPrepareYields prep;
@@ -14,7 +16,8 @@ void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosu
 
   pars.strFileOut=conf.GetYieldsMCtruthFileName(anPars.channel, anPars.vgamma, anPars.varKin);
 
-  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure);
+  std::cout<<"AuxPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, selStage);
 
   prep.PlotPrintSave();
   
@@ -52,7 +55,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
 
   pars.strFileOut=conf.GetYieldsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin);
 
-  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure);
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, conf.FULLY);
 
   TConfiguration config;
 
@@ -67,7 +70,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
   prep.PlotPrintSave();
 }// end of AuxSubtractBackground
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage)
 {
   TConfiguration config;
   TPhotonCuts photon;
@@ -94,6 +97,10 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
 
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
   pars.strPlotsBaseName=TString("c_")+config.StrChannel(anPars.channel)+TString("_")+config.StrVgType(anPars.vgamma)+TString("_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
+  std::cout<<"AuxPrepareYieldsCommon: selStage="<<config.StrSelectionStage(selStage)<<std::endl;
+  pars.strSelStage="";
+  if (selStage!=config.FULLY) pars.strSelStage=config.StrSelectionStage(selStage);
+  std::cout<<"pars.strSelStage="<<pars.strSelStage<<std::endl;
 
   for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
     pars.strYieldsName1D_BkgSubtrData[ieta]=config.GetYieldsBkgSubtrDataName(config.ONEDI, ieta);
@@ -107,10 +114,6 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   prep.SetPars(pars);
 
   //bool SetOneYieldSource(int sourceType, TString name, TString label, int color, TString fileName, TString treeName);
-  
-  //int selStage=config.FSR;//config.FULLY;
-  int selStage=config.FULLY;
-  //int selStage=config.PRELIMINARY_FOR_TEMPLATE_METHOD;
 
   TString strYieldsName1D[3];
   TString strYieldsNameTot[3];

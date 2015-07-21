@@ -40,6 +40,7 @@ class TPrepareYields
       TCut cutWeight;//should be set up inside
       TString strPlotsDir;
       TString strPlotsBaseName;
+      TString strSelStage;
       int templFits;
       TString strYieldsName1D_BkgSubtrData[3];
       TString strYieldsNameTot_BkgSubtrData[3];

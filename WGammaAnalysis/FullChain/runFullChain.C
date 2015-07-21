@@ -31,7 +31,7 @@
   TPhotonCuts photon; 
   anPars.phoWP=photon.WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
   anPars.isDebugMode=0;
-  anPars.sampleMode=Selection::DATA;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+  anPars.sampleMode=Selection::ALL;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
 //  anPars.sampleMode=Selection::NOTSPECIFIED; anPars.analyzedSamples="ttbarjets ttbarg";
   anPars.cutAdd="1";//"phoEt<40";
 //  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
@@ -50,22 +50,22 @@
   anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.MUON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;
-  anPars.noCalcAccAndEff[conf.MUON][conf.W_GAMMA]=0;
-  anPars.noCalcCrossSection[conf.MUON][conf.W_GAMMA]=0;
+  anPars.noCalcAccAndEff[conf.MUON][conf.W_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.MUON][conf.W_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
 
   // [conf.MUON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.MUON][conf.Z_GAMMA]=1;
-  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noExtraSelection[conf.MUON][conf.Z_GAMMA]=0;
   anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.MUON][conf.Z_GAMMA]=1;
   anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.MUON][conf.Z_GAMMA][conf.TEMPL_OVERLAY]=1;
-  anPars.noCalcAccAndEff[conf.MUON][conf.Z_GAMMA]=0;
-  anPars.noCalcCrossSection[conf.MUON][conf.Z_GAMMA]=0;
+  anPars.noCalcAccAndEff[conf.MUON][conf.Z_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.MUON][conf.Z_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.MUON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
 
@@ -78,22 +78,22 @@
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_OVERLAY]=1;
-  anPars.noCalcAccAndEff[conf.ELECTRON][conf.W_GAMMA]=0;
-  anPars.noCalcCrossSection[conf.ELECTRON][conf.W_GAMMA]=0;
+  anPars.noCalcAccAndEff[conf.ELECTRON][conf.W_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.ELECTRON][conf.W_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
 
   // [conf.ELECTRON][conf.Z_GAMMA]
   anPars.noPreSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
-  anPars.noExtraSelection[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noExtraSelection[conf.ELECTRON][conf.Z_GAMMA]=0;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.ELECTRON][conf.Z_GAMMA]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noSubtractBackground[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_OVERLAY]=1;
-  anPars.noCalcAccAndEff[conf.ELECTRON][conf.Z_GAMMA]=0;
-  anPars.noCalcCrossSection[conf.ELECTRON][conf.Z_GAMMA]=0;
+  anPars.noCalcAccAndEff[conf.ELECTRON][conf.Z_GAMMA]=1;
+  anPars.noCalcCrossSection[conf.ELECTRON][conf.Z_GAMMA]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noSystDDBkgSidebandVariation[conf.ELECTRON][conf.Z_GAMMA][conf.TEMPL_SIHIH]=1;
 

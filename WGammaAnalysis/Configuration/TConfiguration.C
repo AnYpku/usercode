@@ -26,7 +26,7 @@ TConfiguration::~TConfiguration()
 TString TConfiguration::StrChannel(int channel){
   if (channel==MUON) return "MUON";
   if (channel==ELECTRON) return "ELECTRON";
-  if (channel==BOTH_CHANNELS) return "BOTH_CHANNELS";
+  if (channel==BOTH_CHANNELS) return "ChannelsMERGED";
   return "";
 }
  
@@ -70,6 +70,8 @@ TString TConfiguration::StrSelectionStage(int sel){
   if (sel==VERY_PRELIMINARY) return "VERY_PRELIMINARY"; 
   if (sel==PRELIMINARY_FOR_TEMPLATE_METHOD) return "PRELIMINARY_FOR_TEMPLATE_METHOD"; 
   if (sel==PRELIMINARY_FOR_UNFOLDING) return "PRELIMINARY_FOR_UNFOLDING"; 
+  if (sel==FSR_EXCLUDED) return "FSR_EXCLUDED";
+  if (sel==FSR) return "FSR";
   if (sel==FULLY) return "FULLY";
   return ""; 
 }

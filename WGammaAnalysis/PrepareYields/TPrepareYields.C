@@ -301,6 +301,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON WGamma","EB+EE");
   plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON ZGamma","EB+EE");
   plotTitle.ReplaceAll("EtaCommon","EB+EE");
+  plotTitle.ReplaceAll("ChannelsMERGED","#mu+e");
   plotTitle.ReplaceAll("CHISO","");
 
   plotTitle.ReplaceAll("WGamma","W#gamma");
@@ -363,9 +364,11 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   nameForSave+=canv->GetTitle();
   nameForSave+="_";
   nameForSave+=_pyPars.varKin;
+  nameForSave+=_pyPars.strSelStage;
   nameForSave.ReplaceAll(" ","");
   if (_pyPars.isMCclosure) nameForSave+="_MCclosure";
   std::cout<<"nameForSave="<<nameForSave<<std::endl;
+  std::cout<<"pars.strSelStage="<<_pyPars.strSelStage<<std::endl;
   nameForSave+=".png";
   canv->SaveAs(nameForSave);
   nameForSave.ReplaceAll(".png",".pdf");
