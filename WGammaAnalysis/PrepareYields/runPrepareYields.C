@@ -40,10 +40,10 @@
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_COMBINED;
   anPars.blind[conf.ELECTRON][conf.Z_GAMMA]=conf.UNBLIND;
 
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.ELECTRON;
   anPars.vgamma=conf.Z_GAMMA;
   //void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=config.FULLY)
-  int selStage=conf.FSR_EXCLUDED;
+  int selStage=conf.FSR;
   std::cout<<"runPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
   AuxPrepareYields(anPars,0,selStage); 
 

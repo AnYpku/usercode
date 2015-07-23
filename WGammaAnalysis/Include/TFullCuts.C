@@ -500,7 +500,7 @@ TCut TFullCuts::RangeFsrCut()
 {
   TCut cut;
 //  cut = "Mpholeplep<101 && Mpholeplep>81 && (lep1PhoDeltaR<0.8 || lep2PhoDeltaR<0.8)";
-  cut = "Mpholeplep<101 && Mpholeplep>81 && lep1PhoDeltaR>0.4";
+  cut = "Mpholeplep<101 && Mpholeplep>81 && lep1PhoDeltaR>0.4 && Mleplep<80 && lep1PhoDeltaR<1.0";
   cut = cut && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
   return cut;
 }

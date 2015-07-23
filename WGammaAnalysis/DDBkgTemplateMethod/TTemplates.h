@@ -121,7 +121,7 @@ class TTemplates
     void ComputeTrueYield(int ikin, int ieta, bool noPrint, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
 
-    void SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint=0, TH1D* hLeak=0);
+    void SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint=0, TH1D* hLeak=0);
 
     void NewHistograms(int ikin, int ieta, bool noPrint);
     bool SetFakeTemplate(int ikin, int ieta, bool noPrint);

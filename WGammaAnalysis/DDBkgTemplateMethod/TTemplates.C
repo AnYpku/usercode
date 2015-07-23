@@ -1,7 +1,7 @@
 #include "TTemplates.h"
   //this class
 //#include "../Include/TPhotonCuts.h"
-//#include "../Include/TMathTools.h"
+#include "../Include/TMathTools.h"
 //#include "../Configuration/TConfiguration.h"
 //#include "../Configuration/TInputSample.h"
 //#include "../Configuration/TAllInputSamples.h"
@@ -226,20 +226,40 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
   return 1;
 }//end of SetHists()
 
-void TTemplates::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool noPrint, TH1D* hLeak)
+void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint, TH1D* hLeak)
 {
+  TCut cutKinTrue=CutKinBin(ikin); 
+  if (_pars.thresholdCombineTrueTemplates<_pars.kinBinLims[0]) cutKinTrue="1";
+  else if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineTrueTemplates && ikin>0){
+     TString strCutKin=_pars.varKin;
+     strCutKin+=">";
+     strCutKin+=_pars.thresholdCombineTrueTemplates;
+     cutKinTrue=TCut(strCutKin);
+  }
+  TCut cutKinFake=CutKinBin(ikin); 
+  if (_pars.thresholdCombineFakeTemplates<_pars.kinBinLims[0]) cutKinFake="1";
+  else if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineFakeTemplates && ikin>0){
+       TString strCutKin=_pars.varKin;
+       strCutKin+=">";
+       strCutKin+=_pars.thresholdCombineFakeTemplates;
+       cutKinFake=TCut(strCutKin);
+  }
+
   TString name=hTemplate->GetName();
+  TCut cutTrue=cutExceptKin && cutKinTrue;
+  TCut cutFake=cutExceptKin && cutKinFake;
 
-  if (isTrueGamma) _pars.treeTrue->Draw(_pars.varTrueTempl+(">>")+name,cut*_pars.cutWeight,"goff");
+  if (isTrueGamma) _pars.treeTrue->Draw(_pars.varTrueTempl+(">>")+name,cutTrue*_pars.cutWeight,"goff");
 
-  else _pars.treeFake->Draw(_pars.varFakeTempl+(">>")+name,cut*_pars.cutWeight,"goff");
+  else _pars.treeFake->Draw(_pars.varFakeTempl+(">>")+name,cutFake*_pars.cutWeight,"goff");
   if (!noPrint) {
     std::cout<<std::endl;
     std::cout<<"hTemplate->GetName()="<<hTemplate->GetName()<<std::endl;
     std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl;
-    if (isTrueGamma) std::cout<<"_pars.treeTrue->GetEntries(cut)="<<_pars.treeTrue->GetEntries(cut*_pars.cutWeight)<<std::endl;
-    else std::cout<<"_pars.treeFake->GetEntries(cut)="<<_pars.treeFake->GetEntries(cut*_pars.cutWeight)<<std::endl;
-    
+    if (isTrueGamma) std::cout<<"_pars.treeTrue->GetEntries(cut)="<<_pars.treeTrue->GetEntries(cutTrue*_pars.cutWeight)<<std::endl;
+    else std::cout<<"_pars.treeFake->GetEntries(cut)="<<_pars.treeFake->GetEntries(cutFake*_pars.cutWeight)<<std::endl;
+    std::cout<<"cutKinTrue="<<cutKinTrue.GetTitle()<<std::endl;
+    std::cout<<"cutKinFake="<<cutKinFake.GetTitle()<<std::endl;    
   }
 
   if (isTrueGamma) return;
@@ -247,16 +267,25 @@ void TTemplates::SetTemplate(bool isTrueGamma, TH1D* hTemplate, TCut cut, bool n
 
 
   TString strNameLeak=hLeak->GetName();
-  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cut*_pars.cutWeight,"goff");
-  hTemplate->Add(hLeak,-1);
+
+  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
+  float normFromSign = hLeak->GetSumOfWeights();
+  _pars.treeTrue->Draw(_pars.varTrueTempl+TString(">>")+strNameLeak,cutTrue*_pars.cutWeight,"goff");  
+  float normFromTrue = hLeak->GetSumOfWeights();
+  float norm;
+  if (normFromTrue==0) float norm = 0; else norm = normFromSign/normFromTrue;
+  std::cout<<"hLeak normalization: normFromSign="<<normFromSign<<", normFromTrue="<<normFromTrue<<std::endl;
+//  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cut*_pars.cutWeight,"goff");
+  hTemplate->Add(hLeak,-norm);
 
   if (!noPrint){
 
-    std::cout<<"(cut*_pars.cutWeight)->GetTitle()="<<(cut*_pars.cutWeight).GetTitle()<<std::endl;  
+    std::cout<<"(cutTrue*_pars.cutWeight)->GetTitle()="<<(cutTrue*_pars.cutWeight).GetTitle()<<std::endl;  
+    std::cout<<"(cutFake*_pars.cutWeight)->GetTitle()="<<(cutFake*_pars.cutWeight).GetTitle()<<std::endl;  
     hLeak->Print();
     std::cout<<"hLeak->GetName()="<<hLeak->GetName()<<std::endl;  
-    std::cout<<"hLeak->GetSumOfWeights()="<<hLeak->GetSumOfWeights()<<std::endl;  
-    std::cout<<"_pars.treeSign->GetEntries(cut)="<<_pars.treeSign->GetEntries(cut*_pars.cutWeight)<<std::endl; 
+    std::cout<<"hLeak->GetSumOfWeights()*norm="<<hLeak->GetSumOfWeights()*norm<<std::endl;  
+    std::cout<<"_pars.treeSign->GetEntries(cutFake)="<<_pars.treeSign->GetEntries(cutFake*_pars.cutWeight)<<std::endl; 
     std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl; 
 /*
     TH1F* histTempr = new TH1F("histTempr","histTempr",1,_pars.treeSign->GetMinimum(_pars.varWeight)-1,_pars.treeSign->GetMaximum(_pars.varWeight)+1);
@@ -281,20 +310,14 @@ bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<"Will SetFakeTemplate:"<<std::endl;
     std::cout<<std::endl;
   }
-  TCut cutKin=CutKinBin(ikin); 
-  if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineFakeTemplates && ikin>0){
-     TString strCutKin=_pars.varKin;
-     strCutKin+=">";
-     strCutKin+=_pars.thresholdCombineFakeTemplates;
-     cutKin=TCut(strCutKin);
-  }
-  TCut cut = _pars.cutAdd && CutEtaBin(ieta) && cutKin && SidebandCut(ikin,ieta);
+
+  TCut cutExceptKin = _pars.cutAdd && CutEtaBin(ieta) && SidebandCut(ikin,ieta);
   if (!noPrint) {
     std::cout<<"cutSideband="<<SidebandCut(ikin,ieta).GetTitle()<<std::endl;
-    std::cout<<"fake template cut=(cutAdd && cutEta && cutKin && cutSideband)*cutWeight="<<cut.GetTitle()<<std::endl;
+    std::cout<<"fake template cutExceptKin=(cutAdd && cutEta && cutSideband)*cutWeight="<<cutExceptKin.GetTitle()<<std::endl;
   }
-  if (!noPrint) std::cout<<"Fake template cut="<<cut.GetTitle()<<std::endl;
-  SetTemplate(0,_hFake[ikin][ieta], cut, noPrint, _hLeak[ikin][ieta]);
+  if (!noPrint) std::cout<<"Fake template cutExceptKin="<<cutExceptKin.GetTitle()<<std::endl;
+  SetTemplate(ikin,ieta,0,_hFake[ikin][ieta], cutExceptKin, noPrint, _hLeak[ikin][ieta]);
   // "0" for fake gamma template
   if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
     float num = 100.0*_hLeak[ikin][ieta]->GetSumOfWeights();
@@ -323,24 +346,17 @@ void TTemplates::SetTrueTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<"Will SetTrueTemplate:"<<std::endl;
     std::cout<<std::endl;
   }
-  TCut cutKin=CutKinBin(ikin); 
-  if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineTrueTemplates && ikin>0){
-     TString strCutKin=_pars.varKin;
-     strCutKin+=">";
-     strCutKin+=_pars.thresholdCombineTrueTemplates;
-     cutKin=TCut(strCutKin);
-  }
-  TCut cut = _pars.cutAdd && CutEtaBin(ieta) && cutKin && SidebandVarNominalCut(ieta);// && cutSignal;;
+
+  TCut cutExceptKin = _pars.cutAdd && CutEtaBin(ieta) && SidebandVarNominalCut(ieta);// && cutSignal;;
   if (!noPrint) {
     std::cout<<"cutEta="<<CutEtaBin(ieta).GetTitle()<<std::endl;
-    std::cout<<"cutKin="<<cutKin.GetTitle()<<std::endl;
     std::cout<<"cutWeight="<<_pars.cutWeight.GetTitle()<<std::endl;
     std::cout<<"cutAdd="<<_pars.cutAdd.GetTitle()<<std::endl;
     std::cout<<"SidebandVarNominalCut(ieta)="<<SidebandVarNominalCut(ieta)<<std::endl;
-    std::cout<<"true template cut=(cutAdd && cutEta && cutKin && SidebandVarNominalCut())*cutWeight="<<cut.GetTitle()<<std::endl;
+    std::cout<<"true template cutExceptKin=(cutAdd && cutEta && SidebandVarNominalCut())*cutWeight="<<cutExceptKin.GetTitle()<<std::endl;
   }
 //  _fOutTemp->cd();
-  SetTemplate(1,_hTrue[ikin][ieta],cut,noPrint);
+  SetTemplate(ikin, ieta, 1, _hTrue[ikin][ieta],cutExceptKin,noPrint);
   // "1" for true gamma template
 }//end of SetTrueTemplate
 
@@ -1258,8 +1274,18 @@ float TTemplates::EffFromTree(int ikin, int ieta, bool noPrint)
   float eff;
   TCut cutSidebandVar;
   cutSidebandVar=_pars.cutSidebandVarNominalRange[ieta];
-  TCut cutTot = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta) && CutKinBin(ikin) && FitVarFitRangeCut(ikin,ieta);
-  TCut cutPassed = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta) && CutKinBin(ikin) && _pars.cutNominalExceptSidebandVar[ieta];
+
+  TCut cutKin=CutKinBin(ikin); 
+  if (_pars.thresholdCombineTrueTemplates<_pars.kinBinLims[0]) cutKin="1";
+  else if (_pars.kinBinLims[ikin-1]>_pars.thresholdCombineTrueTemplates && ikin>0){
+     TString strCutKin=_pars.varKin;
+     strCutKin+=">";
+     strCutKin+=_pars.thresholdCombineTrueTemplates;
+     cutKin=TCut(strCutKin);
+  }
+
+  TCut cutTot = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta) && cutKin && FitVarFitRangeCut(ikin,ieta);
+  TCut cutPassed = _pars.cutAdd && cutSidebandVar && CutEtaBin(ieta) && cutKin && _pars.cutNominalExceptSidebandVar[ieta];
   std::cout<<setprecision(2)<<std::endl;
   std::cout<<StrLabelEta(ieta)<<": "<<std::endl;
   std::cout<<"cutAdd="<<_pars.cutAdd.GetTitle()<<std::endl;
@@ -1273,15 +1299,20 @@ float TTemplates::EffFromTree(int ikin, int ieta, bool noPrint)
   std::cout<<"cutPassed="<<cutPassed.GetTitle()<<std::endl;
   std::cout<<"cutTot="<<cutTot.GetTitle()<<std::endl;
   TString nameHistT=TString("histPassedT")+StrLabelKin(ikin)+StrLabelEta(ieta);
-  TH1F* hSignPassed = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
-  _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutPassed*_pars.cutWeight,"goff");
+  TH1F* hTruePassed = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
+  _pars.treeTrue->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutPassed*_pars.cutWeight,"goff");
   nameHistT=TString("histTotT")+StrLabelKin(ikin)+StrLabelEta(ieta);
-  TH1F* hSignTot = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
-  _pars.treeSign->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutTot*_pars.cutWeight,"goff");
-  TH1F* hEff = (TH1F*)hSignPassed->Clone();
-  hEff->Divide(hSignTot);
-  eff=hEff->GetBinContent(1);
-  delete hSignPassed;
-  delete hSignTot;
+  TH1F* hTrueTot = new TH1F(nameHistT,nameHistT,1,-3.0,3.0);
+  _pars.treeTrue->Draw(_pars.varPhoEta+TString(">>")+nameHistT,cutTot*_pars.cutWeight,"goff");
+  TH1F* hEff = (TH1F*)hTruePassed->Clone();
+  hEff->Divide(hTrueTot);
+  eff=hTruePassed->GetBinContent(1)/hTrueTot->GetBinContent(1);
+  TMathTools math;
+  float effErr=math.ErrOfTwoIndependent("x1/(x1+x2)", hTruePassed->GetBinContent(1), hTrueTot->GetBinContent(1)-hTruePassed->GetBinContent(1), hTruePassed->GetBinError(1), hTrueTot->GetBinError(1));
+  std::cout<<"hTruePassed->GetBinContent(1)="<<hTruePassed->GetBinContent(1)<<"+-"<<hTruePassed->GetBinError(1)<<std::endl;
+  std::cout<<"hTrueTot->GetBinContent(1)="<<hTrueTot->GetBinContent(1)<<"+-"<<hTrueTot->GetBinError(1)<<std::endl;
+  std::cout<<"EffFromTree="<<eff<<"+-"<<effErr<<std::endl;
+  delete hTruePassed;
+  delete hTrueTot;
   return eff;
 }// end of EffFromTree

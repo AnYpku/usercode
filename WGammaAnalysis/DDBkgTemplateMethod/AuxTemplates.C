@@ -104,8 +104,8 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   TConfiguration config;
   TPhotonCuts photon;
 
-  pars.thresholdCombineTrueTemplates=29.9;
-  pars.thresholdCombineFakeTemplates=10000;
+  pars.thresholdCombineTrueTemplates=10;//combine all
+  pars.thresholdCombineFakeTemplates=10000;//never combine
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
     pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
     for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
@@ -137,13 +137,13 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
 
-  TString strTrue="../WGammaOutput/MERGED/selected_WGamma_ForTemplates.root";
-  if (isMCclosure) strTrue="../WGammaOutput/MERGED/selected_WGamma_ForTemplates_MCclosure.root";
+  TString strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
   TString strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
-  if (isMCclosure) strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -156,9 +156,10 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   if (!pars.treeFakeRef) return;
 
   pars.varSideband="phoSigmaIEtaIEta";//TString
-  pars.varTrueTempl="phoRandConeChIsoCorr";//"phoRandConeChIso04Corr";//TString
-  pars.varFakeTempl="phoSCRChIsoCorr";//"phoSCRChIso04Corr";//TString
-  pars.varFit="phoSCRChIsoCorr";//"phoSCRChIso04Corr"; //TString
+//  pars.varTrueTempl="phoRandConeChIsoCorr";//"phoRandConeChIso04Corr";//TString
+  pars.varTrueTempl="phoPFChIsoCorr";//"phoRandConeChIso04Corr";//TString
+  pars.varFakeTempl="phoPFChIsoCorr";//"phoSCRChIso04Corr";//TString
+  pars.varFit="phoPFChIsoCorr";//"phoSCRChIso04Corr"; //TString
 
 //  pars.cutWeight="weight";//TCut; weight for signal MC tree
 

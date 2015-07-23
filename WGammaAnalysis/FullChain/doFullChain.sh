@@ -17,7 +17,7 @@ MergeForTemplates(){
   MergeMUONandELECTRON ZGamma FsrExcludedSelected selected_ZGammaSIGMC.root
   MergeMUONandELECTRON ZGamma FsrExcludedSelected selected_ZGammaBKGMC_DYjets_to_ll.root
 
-  # Fsr (to get real-photon templates if SIHIH fits)
+  # Fsr (to (possibly) get real-photon templates)
   MergeMUONandELECTRON ZGamma FsrSelected selected_ZGamma_UNblind_DATA.root
   MergeMUONandELECTRON ZGamma FsrSelected selected_ZGammaSIGMC.root
   MergeMUONandELECTRON ZGamma FsrSelected selected_ZGammaBKGMC_DYjets_to_ll.root
@@ -30,6 +30,8 @@ MergeForTemplates(){
   # No SIHIH and CHISO cuts (to get real-photon templates if CHISO fits)
   MergeMUONandELECTRON ZGamma PreliminaryForTemplateMethodSelected selected_ZGamma_UNblind_DATA.root
   MergeMUONandELECTRON WGamma PreliminaryForTemplateMethodSelected selected_WGamma_UNblind_DATA.root
+  MergeMUONandELECTRON ZGamma PreliminaryForTemplateMethodSelected selected_ZGammaSIGMC.root
+  MergeMUONandELECTRON WGamma PreliminaryForTemplateMethodSelected selected_WGammaSIGMC.root
 }
 
 DoFullChainPart1(){
@@ -50,8 +52,8 @@ DoFullChainPart1(){
 
 DoFullChainPart2(){
   echo WILL DO: 'DoFullChainPart2()' $1 $2
-  root -l  AuxFchTemplateFitsData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-  root -l  AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l   AuxFchTemplateFitsData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l   AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
   echo DONE: 'DoFullChainPart2()' $1 $2
 }
 #end of DoFullChainPart2
@@ -61,10 +63,10 @@ DoFullChainPart2(){
 #DoFullChainPart1 MUON ZGamma logs/log20150320/log_
 #DoFullChainPart1 MUON WGamma logs/log20150320/log_
 
-MergeForTemplates
+#MergeForTemplates
 
-#DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
-#DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
-#DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-#DoFullChainPart2 MUON WGamma logs/log20150320/log_
+DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
+DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
+DoFullChainPart2 MUON ZGamma logs/log20150320/log_
+DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
