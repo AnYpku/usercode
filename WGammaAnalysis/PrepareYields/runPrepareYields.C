@@ -40,7 +40,7 @@
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_COMBINED;
   anPars.blind[conf.ELECTRON][conf.Z_GAMMA]=conf.UNBLIND;
 
-  anPars.channel=conf.ELECTRON;
+  anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   //void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=config.FULLY)
   int selStage=conf.FSR;

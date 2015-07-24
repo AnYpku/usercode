@@ -15,6 +15,7 @@ float DifferenceInOneBin(TH1F* h1, TH1F* h2, int ib);
 
 void CompareCS(int vgamma)
 {
+
   TFile* fCS[2]; //MUON, ELECTRON
   TH1F* hMeasured1D[2];
   TH1F* hTheory1D[2];
@@ -50,6 +51,7 @@ void CompareCS(int vgamma)
   hOtto1D[config.ELECTRON]->SetLineColor(8);
 
   TLegend* leg = new TLegend(0.45,0.70,0.99,0.95,config.StrVgType(vgamma));
+
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
     leg->AddEntry(hMeasured1D[ich],config.StrChannel(ich)+TString(", measured"),"l");
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
@@ -58,6 +60,7 @@ void CompareCS(int vgamma)
     for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
       leg->AddEntry(hOtto1D[ich],config.StrChannel(ich)+TString(", Otto"),"l");
   }
+
   leg->SetFillColor(0);
 
 
