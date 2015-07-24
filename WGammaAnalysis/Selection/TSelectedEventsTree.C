@@ -5,6 +5,7 @@
 #include "../Include/TFullCuts.h" //this package
 #include "../Include/TMetTools.h" //this package
 #include "../Include/TMathTools.h"
+#include "../Include/TScaleFactors.h"
 #include "../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.hh"
 #include "TTree.h" //ROOT class
 #include "TFile.h" //ROOT class
@@ -45,6 +46,7 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
     tree->Branch(TString("lepton")+stril+TString("Id2011"),&_lepId2011[il],TString("lepton")+stril+TString("Id2011/O"));
     tree->Branch(TString("lepton")+stril+TString("Isolation2012"),&_lepIsolation2012[il],TString("lepton")+stril+TString("Isolation2012/F"));
     tree->Branch(TString("lepton")+stril+TString("Isolation2011"),&_lepIsolation2011[il],TString("lepton")+stril+TString("Isolation2011/F"));
+    tree->Branch(TString("lepton")+stril+TString("SF"),&_lepSF[il],TString("lepton")+stril+TString("SF/F"));
 //    tree->Branch(TString("lepton")+stril+TString("Trg"),&_lepTrg[il],TString("lepton")+stril+TString("Trg/I"));
 
 //    tree->Branch(TString("trgMatch")+stril+TString("IsoMu24eta2p1"),&_trgMatchIsoMu24eta2p1[il],TString("trgMatch")+stril+TString("IsoMu24eta2p1/O"));
@@ -83,6 +85,8 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("phoHoverE12",&_phoHoverE12,"phoHoverE12/F");
   tree->Branch("phoHoverE",&_phoHoverE,"phoHoverE/F");
   tree->Branch("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,"phoSigmaIEtaIEta/F");
+
+  tree->Branch("phoSF",&_phoSF,"phoSF/F");
 
   tree->Branch("phoPFChIsoCorr",&_phoPFChIsoCorr,"phoPFChIsoCorr/F");
   tree->Branch("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,"phoPFNeuIsoCorr/F");
@@ -152,6 +156,7 @@ void TSelectedEventsTree::SetAsInputTree(TTree* tree)
     tree->SetBranchAddress(TString("lepton")+stril+TString("Id2011"),&_lepId2011[il],&_b_lepId2011[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Isolation2012"),&_lepIsolation2012[il],&_b_lepIsolation2012[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Isolation2011"),&_lepIsolation2011[il],&_b_lepIsolation2011[il]);
+    tree->SetBranchAddress(TString("lepton")+stril+TString("SF"),&_lepSF[il],&_b_lepSF[il]);
 //    tree->SetBranchAddress(TString("lepton")+stril+TString("Trg"),&_lepTrg[il],&_b_lepTrg[il]);
  //   tree->SetBranchAddress(TString("trgMatch")+stril+TString("IsoMu24eta2p1"),&_trgMatchIsoMu24eta2p1[il],&_b_trgMatchIsoMu24eta2p1[il]);
 //    tree->SetBranchAddress(TString("trgMatch")+stril+TString("IsoMu24"),&_trgMatchIsoMu24[il],&_b_trgMatchIsoMu24[il]);
@@ -188,6 +193,8 @@ tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il
   tree->SetBranchAddress("phoHoverE12",&_phoHoverE12,&_b_phoHoverE12);
   tree->SetBranchAddress("phoHoverE",&_phoHoverE,&_b_phoHoverE);
   tree->SetBranchAddress("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,&_b_phoSigmaIEtaIEta);
+
+  tree->SetBranchAddress("phoSF",&_phoSF,&_b_phoSF);
 
   tree->SetBranchAddress("phoPFChIsoCorr",&_phoPFChIsoCorr,&_b_phoPFChIsoCorr);
   tree->SetBranchAddress("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,&_b_phoPFNeuIsoCorr);
@@ -311,7 +318,18 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
   _rho2011=leaf.rho2011;
   _run=leaf.run;
   _inputFileN=inputFileN;
-  _weight=weight;
+  TScaleFactors sf;
+  _phoSF=1.0; _lepSF[0]=1.0; _lepSF[1]=1.0;
+  if (sample!=_config.DATA){
+    _phoSF = sf.SF_MediumPhoID(_phoEt,_phoSCEta);
+    if (channel==_config.MUON) _lepSF[0]=sf.SF_MuonIso(_lepPt[0],_lepEta[0])*sf.SF_MuonID(_lepPt[0],_lepEta[0]);
+    if (channel==_config.ELECTRON) _lepSF[0]=sf.SF_MediumEleID(_lepPt[0],_lepSCEta[0]);
+    if (cand.ilep2>=0 && _Mleplep>0){// means Z_GAMMA
+      if (channel==_config.MUON) _lepSF[1]=sf.SF_MuonIso(_lepPt[1],_lepEta[1])*sf.SF_MuonID(_lepPt[1],_lepEta[1]);
+      if (channel==_config.ELECTRON) _lepSF[1]=sf.SF_MediumEleID(_lepPt[1],_lepSCEta[1]);    
+    } 
+  }// end of if (sample==!_config.DATA)
+  _weight=weight*_phoSF*_lepSF[0]*_lepSF[1];
   _PUweight=PUweight;
   _PU=PU;
   _nMC=leaf.nMC;

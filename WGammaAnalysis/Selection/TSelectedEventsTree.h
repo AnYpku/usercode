@@ -60,6 +60,7 @@ class TSelectedEventsTree
    // bool _trgMatchEle27WP80[2];//0th bit of eleTrg[iele]
    // bool _trgMatchEle17Ele8[2];//2nd bit of eleTrg[iele]
     bool _lepTrgMatch[2];
+    float _lepSF[2];
     bool _hasMoreLeptons;
 //    int _HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
 //    int _HLT_IsoMu24_v;//HLT[HLTIndex[19]]
@@ -85,6 +86,8 @@ class TSelectedEventsTree
     float _phoHoverE;//for 2011 cuts
     float _phoHoverE12;
     float _phoSigmaIEtaIEta;
+
+    float _phoSF;
 
     float _phoPFChIsoCorr;
     float _phoPFNeuIsoCorr;
@@ -155,6 +158,7 @@ class TSelectedEventsTree
 //    TBranch* _b_trgMatchEle27WP80[2];//0th bit of eleTrg[iele]
 //    TBranch* _b_trgMatchEle17Ele8[2];//2nd bit of eleTrg[iele]
     TBranch* _b_lepTrgMatch[2];
+    TBranch* _b_lepSF[2];
     TBranch* _b_hasMoreLeptons;
 //    TBranch* _b_HLT_IsoMu24_eta2p1_;//HLT[HLTIndex[18]]
 //    TBranch* _b_HLT_IsoMu24_v;//HLT[HLTIndex[19]]
@@ -180,6 +184,8 @@ class TSelectedEventsTree
     TBranch* _b_phoHoverE;//for 2011 cuts
     TBranch* _b_phoHoverE12;
     TBranch* _b_phoSigmaIEtaIEta;
+
+    TBranch* _b_phoSF;
 
     TBranch* _b_phoPFChIsoCorr;
     TBranch* _b_phoPFNeuIsoCorr;
