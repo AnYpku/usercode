@@ -321,8 +321,10 @@ bool TFullCuts::CheckDRandProceed(int channel, int vgamma, bool isVJets, int& ic
       if (!_passedPhoton[ipho]) continue;
       if (_isEvForCheck)
         std::cout<<"passed ipho="<<ipho<<std::endl;
-      if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON)
-        {  if (!ZMassWindowCut(ipho,_ilepLead)) continue; }
+//      if (vgamma==_config.W_GAMMA && channel==_config.ELECTRON)
+//        {  if (!ZMassWindowCut(ipho,_ilepLead)) continue; }
+//    Zmass window cut will be applied during ExtraSelection step
+//    e->gamma enriched sample will be used for e->gamma background estimation
       _passed.zMassWindow++;
       if (_isEvForCheck)
         std::cout<<"passed zMassWindow"<<std::endl;
@@ -419,6 +421,13 @@ TCut TFullCuts::RangeMetRelatedCut(int year, int channel)
   return cut;
 }
 
+TCut TFullCuts::RangeZmassWindowCut()
+{
+  // for W_GAMMA ELECTRON only
+  TCut cut="Mpholep1<70 || Mpholep1>110";
+  return cut;
+}//end of RangeZmassWindowCut
+
 TCut TFullCuts::RangePhoEt()
 {
 //  TString cutStr="phoEt>";
@@ -474,6 +483,7 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
   TCut cut = cutPhoton && RangeDeltaR(vgamma); 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year,channel);
+    if (channel==_config.ELECTRON) cut = cut && RangeZmassWindowCut();
   }
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
@@ -482,13 +492,30 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
   return cut;
 }// end of RangeForTemplateMethodCut
 
+TCut TFullCuts::RangeForEtoGamma(int phoWP){
+  // for WGamma ELECTRON only
+
+  //TCut RangePhoton(int year, int wp, 
+  //         bool doSigmaIEtaIEtaCut=1, bool doChOrTrkIsoCut=1, 
+  //         bool doNeuOrHcalIsoCut=1, bool doPhoOrEcalIsoCut=1, 
+  //         bool doHoverECut=1, bool doElectronVetoCut=1);
+
+  TCut cutPhoton=_photon.RangePhoton(2012, phoWP, 1, 1, 1, 1, 1, 0);
+  // doElectronVetoCut is not applied to enrich the sample with e->gamma events
+
+  TCut cut = cutPhoton && RangeDeltaR(_config.W_GAMMA) && RangeMetRelatedCut(2012,_config.ELECTRON); 
+  cut = cut && (!RangeZmassWindowCut());// to enrich sample with e->gamma events
+  return cut;
+}// end of RangeForEtoGamma(int phoWP)
+
 TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP){
   //all cuts 
   TCut cutPhoton=_photon.RangePhoton(year, phoWP);
   TCut cut = cutPhoton && RangeDeltaR(vgamma); 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year,channel);
-  }
+    if (channel==_config.ELECTRON) cut = cut && RangeZmassWindowCut();
+  }// end of (vgamma==_config.W_GAMMA)
   if (year==2011) 
     cut = cut && RangeExtraLeptonPt2011();
   if (blind!=_config.UNBLIND)
@@ -508,8 +535,8 @@ TCut TFullCuts::RangeFsrCut()
 TCut TFullCuts::RangeFsrExcludedCut()
 {
   TCut cut;
-  cut = "Mpholeplep>105 && Mleplep>80 && lep1PhoDeltaR>0.7 && lep2PhoDeltaR>0.7";
-  cut = cut && RangeDeltaR(_config.Z_GAMMA) && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
+  cut = "Mleplep>80 && Mleplep<110 && lep1PhoDeltaR>1.0 && lep2PhoDeltaR>1.0";
+  cut = cut && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
   return cut;
 }
 

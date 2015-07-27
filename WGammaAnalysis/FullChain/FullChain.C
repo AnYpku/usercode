@@ -5,6 +5,7 @@
 #include "../Configuration/TAllInputSamples.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Selection/Selection.h"
+#include "../DDBkgEtoGamma/TEtoGamma.h"
 #include "../DDBkgTemplateMethod/TTemplates.h"
 #include "../DDBkgTemplateMethod/AuxTemplates.C"
 #include "../PrepareYields/TPrepareYields.h"
@@ -47,6 +48,8 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
   anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_COMBINED;
   anPars.blind[conf.ELECTRON][conf.Z_GAMMA]=conf.UNBLIND;
+
+  anPars.noDDBkgEtoGamma=1;
 
   for (int ich=0; ich<=1; ich++){
     for (int ivg=0; ivg<=1; ivg++){
@@ -345,6 +348,18 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
     }//end of loop over ivg
   }//end of loop over ich   
 
+  if (anPars.noDDBkgEtoGamma); 
+  else{
+    std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+    std::cout<<"%^%  WILL DO e->gamma DD estimation"<<std::endl;
+    anPars.channel=conf.ELECTRON;
+    anPars.vgamma=conf.W_GAMMA;
+    TEtoGamma etg(anPars); 
+    etg.ComputePlotSave();
+    std::cout<<"%_%  DONE e->gamma DD estimation"<<std::endl;
+    std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl; 
+  }//end of if (anPars.noDDBkgEtoGamma)  
+
   for (int ich=0; ich<=1; ich++){
     for (int ivg=0; ivg<=1; ivg++){
       for (int itp=0; itp<=2; itp++){
@@ -361,7 +376,6 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
       }//end of loop over itp
     }//end of loop over ivg
   }//end of loop over ich  
-
 
   for (int ich=0; ich<=1; ich++){
     for (int ivg=0; ivg<=1; ivg++){

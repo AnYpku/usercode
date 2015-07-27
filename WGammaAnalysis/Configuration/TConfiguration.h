@@ -22,6 +22,7 @@ class TConfiguration
     enum {TOTAL, ONEDI, TWODI};//csMode
     enum {VERY_PRELIMINARY,
           PRELIMINARY_FOR_TEMPLATE_METHOD,
+          PRELIMINARY_FOR_E_TO_GAMMA,
           PRELIMINARY_FOR_UNFOLDING,
           FSR,
           FSR_EXCLUDED,
@@ -53,6 +54,7 @@ class TConfiguration
       bool noPreSelection[2][2];//channel, vgamma
       bool noExtraSelection[2][2];//channel, vgamma
       bool noDDBkgComputation[2][2][2];//channel, vgamma, different templates
+      bool noDDBkgEtoGamma;
       bool noPrepareYields[2][2];//channel, vgamma
       bool noSubtractBackground[2][2][3];//channel, vgamma, different templates
       bool noCalcAccAndEff[2][2];//channel, vgamma
@@ -93,10 +95,12 @@ class TConfiguration
     TString GetYieldsSelectedName(int csMode, int etaBin, int sample, TString sourceName="");
     TString GetYieldsDDTemplateFakeName(int csMode, int etaBin);
     TString GetYieldsDDTemplateTrueName(int csMode, int etaBin);
+    TString GetYieldsDDBkgEtoGamma(int csMode, int etaBin);
     TString GetYieldsBkgSubtrDataName(int csMode, int etaBin=COMMON);
     TString GetYieldsSignalMCGenBinsName(int csMode, int etaBin=COMMON);
 
     TString GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin);
+    TString GetDDBkgEtoGammaFileName(TString strKin);
 
     TString GetSidebandsFileName(int channel, int vgamma, int templ, TString strKin);
     TString GetSidebandsLowerHistName(int ieta);
@@ -169,7 +173,7 @@ static const TString _outputDir="../WGammaOutput/";
 //selected files, directory and file names
 //(these files will be output of the script Selection)
 //names are listed in the constructor for now
-TString _selectedNameBase[6];
+TString _selectedNameBase[7];
 
 //////////////////////////////////////////
 //yields
@@ -178,15 +182,13 @@ static const TString _yieldsFileName="YieldsAndBackground/yields";
 static const TString _yieldsSelectedName="yieldsSelected";
 static const TString _yieldsDDTemplateFakeName="yieldsDDFake";
 static const TString _yieldsDDTemplateTrueName="yieldsDDTrue";
-//static const TString _yieldsSignalName="yieldsSignal";
-//static const TString _yieldsSelectedSignalMCGenName="yieldsSelectedSignalMCGen";
-
 
 //////////////////////////////////////////
 //data driven background estimation
 //
 static const TString _DDTemplateFileName="YieldsAndBackground/DDTemplate";
-//_yieldsDDTemplateBkgHist are also here
+static const TString _DDBkgEtoGammaFileName="YieldsAndBackground/DDEtoGamma";
+
 
 //////////////////////////////////////////
 //acceptance and efficiency

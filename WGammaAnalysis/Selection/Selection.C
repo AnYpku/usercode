@@ -392,6 +392,20 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
       _tr2->Write();
       std::cout<<"Will be saved to file:      "<<fOutName2<<std::endl;
 
+    // Preliminary for e->gamma selected
+    if (channel==config.ELECTRON && vgamma==config.W_GAMMA && blind==config.UNBLIND){
+      TString fOutName2_2=config.GetSelectedName(config.PRELIMINARY_FOR_E_TO_GAMMA,config.ELECTRON,config.W_GAMMA,config.UNBLIND,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+      TFile fOut2_2(fOutName2_2,"recreate");
+      std::cout<<"For TemplateMethodCut Selection cut:      "<<fullCut.RangeForEtoGamma(wp).GetTitle()<<std::endl;
+      _tr2_2 = new TTree("selectedEvents","selected events, one candidate per event");
+      _trReduced = _tr->CopyTree(fullCut.RangeForEtoGamma(wp));
+
+      PickHardestPhotonInEvent(_tr2_2, _trReduced, blind);
+
+      _tr2_2->Write();
+      std::cout<<"Will be saved to file:      "<<fOutName2_2<<std::endl;
+    }//end of if (channel==config.ELECTRON && vgamma==config.W_GAMMA)
+
     
     // Fully selected
       TString fOutName3=config.GetSelectedName(config.FULLY,channel,vgamma,blind,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
@@ -411,6 +425,7 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
         std::cout<<"before hardest photon selection: "<<_trReduced->GetEntries()<<std::endl;
         std::cout<<"after  hardest photon selection: "<<_tr3->GetEntries()<<std::endl;
       }
+
 
     if (vgamma==config.W_GAMMA) return;
 

@@ -271,6 +271,9 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
     hist1[ih]->Draw("EP same");
   }
   legend->Draw("same");
+  hist1[0]->GetYaxis()->Draw("same");
+  hist1[0]->GetXaxis()->Draw("same");
+
 
   plotTitle=canv->GetTitle();
   plotTitle+=TString(" ")+_pyPars.strPlotsBaseName;

@@ -43,9 +43,40 @@
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   //void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=config.FULLY)
-  int selStage=conf.FSR;
+
+  int selStage=conf.FSR_EXCLUDED;
   std::cout<<"runPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
+  fch.SetDefaultFullChainParameters(anPars,"phoEt");
+  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.vgamma=conf.Z_GAMMA;
+  anPars.cutAdd="(phoSCEta>-1.4442 && phoSCEta<1.4442) && phoSigmaIEtaIEta<0.011 || ( phoSCEta*phoSCEta<2.5*2.5 && phoSCEta*phoSCEta>1.5*1.5 && phoSigmaIEtaIEta<0.033)";
+  AuxPrepareYields(anPars,0,selStage);
+  anPars.cutAdd="1";
+
+/*
+  int selStage=conf.FULLY;
+  std::cout<<"runPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
+
+  fch.SetDefaultFullChainParameters(anPars,"Mpholeplep");
+  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.vgamma=conf.Z_GAMMA;
   AuxPrepareYields(anPars,0,selStage); 
+
+  fch.SetDefaultFullChainParameters(anPars,"Mleplep");
+  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.vgamma=conf.Z_GAMMA;
+  AuxPrepareYields(anPars,0,selStage); 
+
+  fch.SetDefaultFullChainParameters(anPars,"lep1PhoDeltaR");
+  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.vgamma=conf.Z_GAMMA;
+  AuxPrepareYields(anPars,0,selStage);
+
+  fch.SetDefaultFullChainParameters(anPars,"lep2PhoDeltaR");
+  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.vgamma=conf.Z_GAMMA;
+  AuxPrepareYields(anPars,0,selStage);
+*/
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

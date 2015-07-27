@@ -31,6 +31,7 @@
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplates.C+");
 //  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesPickSideband.C+");
 //  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TComputeSystDueToSbVariation.C+");
+  gROOT->ProcessLine(".L ../DDBkgEtoGamma/TEtoGamma.C+");
 
   gROOT->ProcessLine(".L ../PrepareYields/TPrepareYields.C+");
   gROOT->ProcessLine(".L ../PrepareYields/TSubtractBackground.C+");

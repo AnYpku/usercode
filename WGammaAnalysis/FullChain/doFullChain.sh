@@ -45,7 +45,7 @@ DoFullChainPart1(){
   echo WILL DO: 'DoFullChainPart1()' $1 $2
  #root -l -b -q AuxFchPreliminarySelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PreliminarySelection.log 2>&1&
   root -l -b -q AuxFchExtraSelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_ExtraSelection.log 2>&1&
-  root -l -b -q AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
+ #root -l -b -q AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
   echo DONE: 'DoFullChainPart1()' $1 $2
 }
 #end of DoFullChainPart2
@@ -61,11 +61,15 @@ DoFullChainPart2(){
 #end of DoFullChainPart2
 
 # Full Chain starts here:
+# DoFullChainPart1 include selection and PrepareYields MC based only:
 
 #DoFullChainPart1 ELECTRON ZGamma logs/log20150320/log_
 #DoFullChainPart1 ELECTRON WGamma logs/log20150320/log_
 #DoFullChainPart1 MUON ZGamma logs/log20150320/log_
 #DoFullChainPart1 MUON WGamma logs/log20150320/log_
+
+# DD e->gamma bkg estimation for W_GAMMA ELECTRON only: 
+root -l -b -q AuxFchBkgEtoGamma.C+
 
 #MergeForTemplates
 
@@ -74,5 +78,5 @@ DoFullChainPart2(){
 #DoFullChainPart2 MUON ZGamma logs/log20150320/log_
 #DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
-root -l runCompareCS.C
+#root -l runCompareCS.C
 

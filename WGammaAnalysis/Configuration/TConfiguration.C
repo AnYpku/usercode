@@ -13,6 +13,7 @@ TConfiguration::TConfiguration()
 {
   _selectedNameBase[VERY_PRELIMINARY]="VeryPreliminarySelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_TEMPLATE_METHOD]="PreliminaryForTemplateMethodSelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA]="PreliminaryForEtoGammaSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_UNFOLDING]="PreliminaryForUnfoldingSelected/selected";
   _selectedNameBase[FSR]="FsrSelected/selected";
   _selectedNameBase[FSR_EXCLUDED]="FsrExcludedSelected/selected";
@@ -69,6 +70,7 @@ TString TConfiguration::StrCsMode(int csMode){
 TString TConfiguration::StrSelectionStage(int sel){
   if (sel==VERY_PRELIMINARY) return "VERY_PRELIMINARY"; 
   if (sel==PRELIMINARY_FOR_TEMPLATE_METHOD) return "PRELIMINARY_FOR_TEMPLATE_METHOD"; 
+  if (sel==PRELIMINARY_FOR_E_TO_GAMMA) return "PRELIMINARY_FOR_E_TO_GAMMA";
   if (sel==PRELIMINARY_FOR_UNFOLDING) return "PRELIMINARY_FOR_UNFOLDING"; 
   if (sel==FSR_EXCLUDED) return "FSR_EXCLUDED";
   if (sel==FSR) return "FSR";
@@ -107,6 +109,7 @@ void TConfiguration::Print()
   std::cout<<"GetSelectedHistName s: "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(TOTAL,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,DATA,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,SIGMC,"[sourceName]")<<", "<<GetYieldsSelectedName(ONEDI,BARREL,BKGMC,"[sourceName]")<<std::endl;
   std::cout<<std::endl;
   std::cout<<"GetDDTemplateFileName s"<<GetDDTemplateFileName(MUON,W_GAMMA,TEMPL_CHISO,"WMt")<<std::endl;
+  std::cout<<"GetDDEtoGammaFileName s"<<GetDDBkgEtoGammaFileName("phoEt")<<std::endl;
 
 }
 
@@ -172,6 +175,10 @@ TString TConfiguration::GetYieldsDDTemplateTrueName(int csMode, int etaBin){
   return _yieldsDDTemplateTrueName+StrCsMode(csMode)+StrEtaBin(etaBin);
 }
 
+TString TConfiguration::GetYieldsDDBkgEtoGamma(int csMode, int etaBin){
+  return TString("yieldsBkgEtoGamma")+StrCsMode(csMode)+StrEtaBin(etaBin);
+}
+
 TString TConfiguration::GetYieldsBkgSubtrDataName(int csMode, int etaBin){
   return TString("yieldsBkgSubtrData_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
 }
@@ -182,6 +189,9 @@ TString TConfiguration::GetYieldsSignalMCGenBinsName(int csMode, int etaBin){
 
 TString TConfiguration::GetDDTemplateFileName(int channel, int vgamma, int templ, TString strKin){
   return GetOutputDirName(channel,vgamma)+_DDTemplateFileName+TString("_")+StrVgType(vgamma)+TString("_")+StrTempl(templ)+TString("_")+strKin+TString("_.root");}
+
+TString TConfiguration::GetDDBkgEtoGammaFileName(TString strKin){
+  return GetOutputDirName(ELECTRON,W_GAMMA)+_DDBkgEtoGammaFileName+TString("_")+StrVgType(W_GAMMA)+TString("_")+strKin+TString("_.root");}
 
 TString TConfiguration::GetAccXEffFileName(int channel, int vgamma){
   return GetOutputDirName(channel, vgamma)+_accXeffFileName;}
