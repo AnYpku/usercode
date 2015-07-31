@@ -390,15 +390,6 @@ bool TFullCuts::IsOverlapVJetsVGamma(int channel)
   return isOverlap;
 }
 
-//float TFullCuts::DeltaR(float phi1, float eta1, float phi2, float eta2) 
-//{ 
-//  float deta=fabs(eta1-eta2);
-//  float dphi=fabs(phi1-phi2);
-//  for (dphi=fabs(phi1-phi2); dphi>=2*TMath::Pi(); dphi=dphi-2*TMath::Pi());
-//  float dR=sqrt(deta*deta+dphi*dphi);
-//  return dR;
-//}
-
 float TFullCuts::GetWMtCut(int year, int channel)
 {
   if (year==2012) return _WMtCut2012[channel];
@@ -412,8 +403,8 @@ TCut TFullCuts::RangeMoreLeptonsVeto(){
 
 TCut TFullCuts::RangeMetRelatedCut(int year, int channel)
 {
-//  TString cutStr="WMt>";
-  TString cutStr="sqrt(2*lepton1Pt*pfMET_notSmeared*(1-cos(lepton1Phi-pfMETPhi_notSmeared)))>";
+  TString cutStr="WMt>";
+//  TString cutStr="sqrt(2*lepton1Pt*pfMET_notSmeared*(1-cos(lepton1Phi-pfMETPhi_notSmeared)))>";
 //_WMt = sqrt(2*_lepPt[0]*_pfMET*(1-cos(_lepPhi[0]-_pfMETPhi)));
   if (year==2012) cutStr+=_WMtCut2012[channel];
   else if (year==2011) cutStr+=_WMtCut2011;
