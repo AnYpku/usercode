@@ -27,12 +27,18 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
 {
   TConfiguration config;
   TString fileName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,templFits,anPars.varKin);
-  TString strYields1DTrue[3], strYields1DFake[3], strYieldTotTrue[3], strYieldTotFake[3];
+  TString fileNameEtoGamma=config.GetDDBkgEtoGammaFileName(anPars.varKin);
+  TString strYields1DTrue[3], strYields1DFake[3], strYieldTotTrue[3], strYieldTotFake[3], strYields1DEtoGamma[3], strYieldsTotEtoGamma[3];
   for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
    strYields1DFake[ieta]=config.GetYieldsDDTemplateFakeName(config.ONEDI,ieta);
    strYieldTotFake[ieta]=config.GetYieldsDDTemplateFakeName(config.TOTAL,ieta);
    strYields1DTrue[ieta]=config.GetYieldsDDTemplateTrueName(config.ONEDI,ieta);
    strYieldTotTrue[ieta]=config.GetYieldsDDTemplateTrueName(config.TOTAL,ieta);
+   strYields1DEtoGamma[ieta]=config.GetYieldsDDBkgEtoGamma(config.ONEDI,ieta);
+   strYieldsTotEtoGamma[ieta]=config.GetYieldsDDBkgEtoGamma(config.TOTAL,ieta);
+  }// end of loop over ieta
+  if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA) {
+    prep.SetYieldsDataDrivenEtoGamma("DD_EtoGamma", "DD e#rightarrow#gamma", 44, fileNameEtoGamma, strYields1DEtoGamma, strYieldsTotEtoGamma);
   }
   TString name = TString("DD_true")+config.StrTempl(templFits);
   name.ReplaceAll("TEMPL_","_");
@@ -42,9 +48,10 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
   label.ReplaceAll(" CHISO",", I_{ch} fits");
   prep.SetYieldsDataDrivenTrue(name, label, 3, fileName, strYields1DTrue, strYieldTotTrue);
   name.ReplaceAll("true","fake");
-  label.ReplaceAll("true","fake");
+  label.ReplaceAll("true","jets#rightarrow#gamma");
   prep.SetYieldsDataDrivenFake(name, label, 4, fileName, strYields1DFake, strYieldTotFake);
   prep.Increase_nDDsources();
+
 }// end of AuxSubtractBackgroundOneTempl
 
 void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
@@ -93,7 +100,7 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
     pars.doLogX=1;  pars.doLogY=1;
   }
   pars.varKinLabel=anPars.varKin;
-  if (anPars.varKin=="phoEt") pars.varKinLabel="Pt_#gamma";
+  if (anPars.varKin=="phoEt") pars.varKinLabel="P_{T}^{#gamma}, GeV";
 
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
   pars.strPlotsBaseName=TString("c_")+config.StrChannel(anPars.channel)+TString("_")+config.StrVgType(anPars.vgamma)+TString("_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
@@ -110,6 +117,10 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   }
 
   pars.isMCclosure=isMCclosure;
+  pars.doEtoGammaSubtr=0;
+  if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA) {
+    pars.doEtoGammaSubtr=1;
+  }
 
   prep.SetPars(pars);
 

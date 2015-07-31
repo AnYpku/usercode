@@ -17,6 +17,11 @@ void TSubtractBackground::Increase_nDDsources(){
   _nDDsources++;
 }
 
+void TSubtractBackground::SetYieldsDataDrivenEtoGamma(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
+{
+  SetYieldsDataDriven(_sourceDDEtoGamma, name, label, color, fileName,  strYieldsName1D, strYieldsNameTot);
+}
+
 void TSubtractBackground::SetYieldsDataDrivenTrue(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
 {
   SetYieldsDataDriven(_sourceDDTrue[_nDDsources], name, label, color, fileName,  strYieldsName1D, strYieldsNameTot);
@@ -29,6 +34,7 @@ void TSubtractBackground::SetYieldsDataDrivenFake(TString name, TString label, i
 
 void TSubtractBackground::SetYieldsDataDriven(YieldsSource& source, TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3])
 {
+
   _pyPars.fOut->cd(); 
   source.sourceType=DATA_DRIVEN;
   source.tr=0;
@@ -40,6 +46,7 @@ void TSubtractBackground::SetYieldsDataDriven(YieldsSource& source, TString name
     std::cout<<"ERROR in TSubtractBackground::SetYieldsDataDriven: file "<<fileName<<" can't be open"<<std::endl;
     return;
   }
+
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     source.hist[ieta]=(TH1F*)f->Get(strYieldsName1D[ieta]);
     for(int ib=1; ib<=source.hist[ieta]->GetNbinsX(); ib++){
@@ -59,7 +66,9 @@ void TSubtractBackground::SetYieldsDataDriven(YieldsSource& source, TString name
     TH1F* hTot = (TH1F*)f->Get(strYieldsNameTot[ieta]);
 //    source.yieldTotVal[ieta]=hTot->GetBinContent(1)*_pyPars.blindFraction;
 //    source.yieldTotErr[ieta]=hTot->GetBinError(1)*_pyPars.blindFraction;
+
   }// end of loop over ieta
+
 }//end of SetYieldsDataDriven
 
 void TSubtractBackground::SubtractBackground()
@@ -80,6 +89,11 @@ void TSubtractBackground::SubtractBackground()
         _sourceBkgSubtrData[isDD].yieldTotVal[ieta]-=_sources[i].yieldTotVal[ieta];
         _sourceBkgSubtrData[isDD].yieldTotErr[ieta]+=_sources[i].yieldTotErr[ieta]*_sources[i].yieldTotErr[ieta];
       }//end of loop over i
+      if (_pyPars.doEtoGammaSubtr){ // for W_GAMMA ELECTRON only
+        _sourceBkgSubtrData[isDD].hist[ieta]->Add(_sourceDDEtoGamma.hist[ieta],-1);
+        _sourceBkgSubtrData[isDD].yieldTotVal[ieta]-=_sourceDDEtoGamma.yieldTotVal[ieta];
+        _sourceBkgSubtrData[isDD].yieldTotErr[ieta]+=_sourceDDEtoGamma.yieldTotErr[ieta]*_sourceDDEtoGamma.yieldTotErr[ieta];
+      }// end of if (_pyPars.doEtoGammaSubtr)
       _sourceBkgSubtrData[isDD].yieldTotErr[ieta]=sqrt(_sourceBkgSubtrData[isDD].yieldTotErr[ieta]);
     }//end of loop over ieta
   }//end of loop over isDD
@@ -226,6 +240,19 @@ void TSubtractBackground::CompareDATAvsBKGplusSIGMC(int ieta)
     hSumStarted=1;  
   }// end of if (hSumStartedMC)
 
+
+  if (_pyPars.doEtoGammaSubtr){//W_GAMMA ELECTRON
+  // add e->gamma DD background
+    mcHists->Add(_sourceDDEtoGamma.hist[ieta]);
+    legend->AddEntry(_sourceDDEtoGamma.hist[ieta],_sourceDDEtoGamma.label,"f");
+    if (!hSumStarted){
+      hSum=(TH1F*)_sourceDDEtoGamma.hist[ieta]->Clone("hSum_WholeBkgPlusMC");
+      hSumStarted=1;
+    }
+    else hSum->Add(_sourceDDEtoGamma.hist[ieta]);
+    hSumStarted=1;
+  }//end of if (_pyPars.doEtoGammaSubtr)
+
   // add fake gamma DD background
   mcHists->Add(_sourceDDFake[0].hist[ieta]);
   legend->AddEntry(_sourceDDFake[0].hist[ieta],_sourceDDFake[0].label,"f");
@@ -355,6 +382,7 @@ void TSubtractBackground::PlotPrintSave()
     for (int is=0; is<_nDDsources; is++){
       PrintYieldsOne(_sourceDDFake[is].name+TString(": "), _sourceDDFake[is].yieldTotVal[ieta], _sourceDDFake[is].yieldTotErr[ieta], _sourceDDFake[is].hist[ieta]);
       PrintYieldsOne(_sourceDDTrue[is].name+TString(": "), _sourceDDTrue[is].yieldTotVal[ieta], _sourceDDTrue[is].yieldTotErr[ieta], _sourceDDTrue[is].hist[ieta]);
+      if (_pyPars.doEtoGammaSubtr) PrintYieldsOne(_sourceDDEtoGamma.name+TString(": "), _sourceDDEtoGamma.yieldTotVal[ieta], _sourceDDEtoGamma.yieldTotErr[ieta], _sourceDDEtoGamma.hist[ieta]);
       PrintYieldsOne(_sourceBkgSubtrData[is].name+TString(": "), _sourceBkgSubtrData[is].yieldTotVal[ieta], _sourceBkgSubtrData[is].yieldTotErr[ieta], _sourceBkgSubtrData[is].hist[ieta]);
     }//end of loop over is   
     std::cout<<std::endl; 

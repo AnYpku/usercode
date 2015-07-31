@@ -268,15 +268,17 @@ void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTempla
 
   TString strNameLeak=hLeak->GetName();
 
+//  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
+//  float normFromSign = hLeak->GetSumOfWeights();
+//  _pars.treeTrue->Draw(_pars.varTrueTempl+TString(">>")+strNameLeak,cutTrue*_pars.cutWeight,"goff");  
+//  float normFromTrue = hLeak->GetSumOfWeights();
+//  float norm;
+//  if (normFromTrue==0) float norm = 0; else norm = normFromSign/normFromTrue;
+//  std::cout<<"hLeak normalization: normFromSign="<<normFromSign<<", normFromTrue="<<normFromTrue<<std::endl;
+//  hTemplate->Add(hLeak,-norm);
+
   _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
-  float normFromSign = hLeak->GetSumOfWeights();
-  _pars.treeTrue->Draw(_pars.varTrueTempl+TString(">>")+strNameLeak,cutTrue*_pars.cutWeight,"goff");  
-  float normFromTrue = hLeak->GetSumOfWeights();
-  float norm;
-  if (normFromTrue==0) float norm = 0; else norm = normFromSign/normFromTrue;
-  std::cout<<"hLeak normalization: normFromSign="<<normFromSign<<", normFromTrue="<<normFromTrue<<std::endl;
-//  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cut*_pars.cutWeight,"goff");
-  hTemplate->Add(hLeak,-norm);
+  hTemplate->Add(hLeak,-1);
 
   if (!noPrint){
 
@@ -284,7 +286,7 @@ void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTempla
     std::cout<<"(cutFake*_pars.cutWeight)->GetTitle()="<<(cutFake*_pars.cutWeight).GetTitle()<<std::endl;  
     hLeak->Print();
     std::cout<<"hLeak->GetName()="<<hLeak->GetName()<<std::endl;  
-    std::cout<<"hLeak->GetSumOfWeights()*norm="<<hLeak->GetSumOfWeights()*norm<<std::endl;  
+//    std::cout<<"hLeak->GetSumOfWeights()*norm="<<hLeak->GetSumOfWeights()*norm<<std::endl;  
     std::cout<<"_pars.treeSign->GetEntries(cutFake)="<<_pars.treeSign->GetEntries(cutFake*_pars.cutWeight)<<std::endl; 
     std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl; 
 /*

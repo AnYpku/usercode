@@ -225,6 +225,10 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
 //if isStack then hist2 must be sum of histograms in the stack
 {
 
+  std::cout<<std::endl;
+  std::cout<<"###########"<<std::endl;
+  std::cout<<"CompareStackVsHist; canv = "<<canv->GetTitle()<<std::endl;
+
   canv->Divide(1,2);
   TPad* pad1 = (TPad*)canv->GetPad(1);
   TPad* pad2 = (TPad*)canv->GetPad(2);
@@ -242,37 +246,68 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   if (_pyPars.doLogY) pad1->SetLogy();
   pad1->cd();
 
+  // Divide over bin width
+  for (int ih=0; ih<nHists1; ih++){
+    hist1[ih]->SetLineWidth(2);
+    hist1[ih]->SetMarkerStyle(24);
+    hist1[ih]->SetMarkerColor(hist1[ih]->GetLineColor());
+    std::cout<<"(hist1[ih]) h->GetSumOfWeights()="<<hist1[ih]->GetSumOfWeights()<<std::endl;
+    DivideOverBinWidth(hist1[ih]);
+    std::cout<<"(hist1[ih]) h->GetSumOfWeights()="<<hist1[ih]->GetSumOfWeights()<<std::endl;
+  }// end of loop over ih
+  if (isStack){ 
+    int nHists = stack->GetHists()->GetEntries();
+    for (int ih=0; ih<nHists; ih++){
+      std::cout<<"(from stack) h->GetSumOfWeights()="<<(TH1F*)stack->GetHists()->At(ih)<<std::endl;
+      DivideOverBinWidth((TH1F*)stack->GetHists()->At(ih));
+      std::cout<<"(from stack) h->GetSumOfWeights()="<<(TH1F*)stack->GetHists()->At(ih)<<std::endl;
+    }//end of loop over ih
+  }// end of isStack
+  hist2->SetLineWidth(2); 
+  std::cout<<"(hist2) h->GetSumOfWeights()="<<hist2->GetSumOfWeights()<<std::endl;
+  DivideOverBinWidth(hist2);
+  std::cout<<"(hist2) h->GetSumOfWeights()="<<hist2->GetSumOfWeights()<<std::endl;
+
+
+
   float max = hist2->GetMaximum();
-  float min;
+  float min = hist2->GetMinimum();
   for (int ih=0; ih<nHists1; ih++){
     if (hist1[ih]->GetMaximum()>max)
       max=hist1[ih]->GetMaximum();
+    if (hist1[ih]->GetMinimum()<min)
+      min=hist1[ih]->GetMinimum();
   }
-
-  if (_pyPars.doLogY) {min=1; if (!isStack) min=10;}
-  else min=0;
-//  float min = 0.3*hist1->GetMinimum();
-//  if (min>0.3*hist2->GetMinimum())
-//    min=0.3*hist2->GetMinimum();
-  if (!_pyPars.doLogX) min=0;
+  std::cout<<"min="<<min<<", max="<<max<<std::endl;
+  if (_pyPars.doLogY) {min=min/10;}
+  else min=min/2;
+  if (min<0){
+    if (_pyPars.doLogY) {min=0.001;}
+    else min=0;
+  }
   max=1.2*max;
+
 
   if (isStack) hist2->SetLineColor(2);
   if (isStack) hist2->SetFillStyle(0);
   hist1[0]->GetYaxis()->SetRangeUser(min,max);
+  hist1[0]->GetYaxis()->SetTitle("N_{events}/(bin width)");
+  hist1[0]->GetYaxis()->SetTitleOffset(1.3);
   hist1[0]->SetStats(0);
-  if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(0); hist1[0]->GetYaxis()->SetNoExponent();}
+  if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(0); hist1[0]->GetYaxis()->SetNoExponent(); }
   hist1[0]->Draw("P");
-  if (isStack) stack->Draw("HIST same"); 
-  else{hist2->SetLineWidth(2); hist2->Draw("EP same");}
+  if (isStack){ 
+    stack->Draw("HIST same"); 
+  }// end of isStack
+  else{hist2->Draw("EP same");}
  
   for (int ih=0; ih<nHists1; ih++){
-    hist1[ih]->SetLineWidth(2);
     hist1[ih]->Draw("EP same");
   }
   legend->Draw("same");
   hist1[0]->GetYaxis()->Draw("same");
   hist1[0]->GetXaxis()->Draw("same");
+  pad1->RedrawAxis();
 
 
   plotTitle=canv->GetTitle();
@@ -339,6 +374,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
         min=hRatio[ih]->GetBinContent(ib)-hRatio[ih]->GetBinError(ib);
     }// end of loop over ib
   }// end of loop over ih
+  if (max>2) max=2;
 
   std::cout<<"ratio min = "<<min<<", ratio max = "<<max<<std::endl;
   hRatio[0]->GetYaxis()->SetRangeUser(min,max);
@@ -378,6 +414,28 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   canv->SaveAs(nameForSave);
   nameForSave.ReplaceAll(".pdf",".root");
   canv->SaveAs(nameForSave);
+
+  // Multiply by bin width
+  for (int ih=0; ih<nHists1; ih++){
+    std::cout<<"(hist1[ih]) h->GetSumOfWeights()="<<hist1[ih]->GetSumOfWeights()<<std::endl;
+    MultiplyByBinWidth(hist1[ih]);
+    std::cout<<"(hist1[ih]) h->GetSumOfWeights()="<<hist1[ih]->GetSumOfWeights()<<std::endl;
+  }// end of loop over ih
+  if (isStack){ 
+    int nHists = stack->GetHists()->GetEntries();
+    for (int ih=0; ih<nHists; ih++){
+      std::cout<<"(from stack) h->GetSumOfWeights()="<<(TH1F*)stack->GetHists()->At(ih)<<std::endl;
+      MultiplyByBinWidth((TH1F*)stack->GetHists()->At(ih));
+      std::cout<<"(from stack) h->GetSumOfWeights()="<<(TH1F*)stack->GetHists()->At(ih)<<std::endl;
+    }//end of loop over ih
+  }// end of isStack
+  std::cout<<"(hist2) h->GetSumOfWeights()="<<hist2->GetSumOfWeights()<<std::endl;
+  MultiplyByBinWidth(hist2);
+  std::cout<<"(hist2) h->GetSumOfWeights()="<<hist2->GetSumOfWeights()<<std::endl;
+
+  std::cout<<"###########"<<std::endl;
+  std::cout<<std::endl;
+
 
 }// end of CompareStackVsHist
 
@@ -437,3 +495,31 @@ void TPrepareYields::PrepareMCtruth(int ieta, int bkgType)
   hSum->Write(hSumName);
 
 }// end of PrepareTrueGammaMCtruth
+
+void TPrepareYields::DivideOverBinWidth(TH1F* h){
+    std::cout<<h->GetName()<<" ( "<<h->GetTitle()<<" ) will be divided over bin width"<<std::endl;
+    std::cout<<"h->GetSumOfWeights()="<<h->GetSumOfWeights()<<std::endl;
+    for (int ib=1; ib<=h->GetNbinsX(); ib++){
+      float cont,err,width;
+      cont = h->GetBinContent(ib);
+      err = h->GetBinError(ib);
+      width = h->GetBinWidth(ib);
+      h->SetBinContent(ib,cont/width);
+      h->SetBinError(ib,err/width);
+    }// end of loop over ib
+    std::cout<<"h->GetSumOfWeights()="<<h->GetSumOfWeights()<<std::endl;
+}// end of DivideOverBinWidth
+
+void TPrepareYields::MultiplyByBinWidth(TH1F* h){
+    std::cout<<h->GetName()<<" ( "<<h->GetTitle()<<" ) will be multiplied by bin width"<<std::endl;
+    std::cout<<"h->GetSumOfWeights()="<<h->GetSumOfWeights()<<std::endl;
+    for (int ib=1; ib<=h->GetNbinsX(); ib++){
+      float cont,err,width;
+      cont = h->GetBinContent(ib);
+      err = h->GetBinError(ib);
+      width = h->GetBinWidth(ib);
+      h->SetBinContent(ib,cont*width);
+      h->SetBinError(ib,err*width);
+    }// end of loop over ib
+    std::cout<<"h->GetSumOfWeights()="<<h->GetSumOfWeights()<<std::endl;
+}// end of MultiplyByBinWidth

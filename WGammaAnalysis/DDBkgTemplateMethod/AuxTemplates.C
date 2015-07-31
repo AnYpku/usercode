@@ -133,7 +133,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
-  TString strSign="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.SIGMC);
+  TString strSign="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
 

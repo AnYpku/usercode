@@ -22,6 +22,7 @@ class TPrepareYields
     enum {DATA, SIGMC, BKGMC, BKGMC_TRUE, BKGMC_FAKE, DATA_DRIVEN};//sourceType
 
     struct PrepareYieldsPars{
+      bool doEtoGammaSubtr;
       TString varKin;
       TString varKinGen;
       int nKinBins; 
@@ -89,6 +90,8 @@ class TPrepareYields
     void CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hist1[_nHistsMax], TH1F* hist2, TLegend* legend, TCanvas* canv, bool isStack=0, THStack* stack=0);
 
     void PrintYieldsOne(TString strYieldType, float totVal, float totErr, TH1F* yieldHist);
+    void DivideOverBinWidth(TH1F* h);
+    void MultiplyByBinWidth(TH1F* h);
 
 
 

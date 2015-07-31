@@ -11,6 +11,7 @@ class TSubtractBackground: public TPrepareYields
 
     void SetYieldsDataDrivenTrue(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
     void SetYieldsDataDrivenFake(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
+    void SetYieldsDataDrivenEtoGamma(TString name, TString label, int color, TString fileName, TString strYieldsName1D[3], TString strYieldsNameTot[3]);
     void Increase_nDDsources();
 
     void SubtractBackground();
@@ -23,6 +24,7 @@ class TSubtractBackground: public TPrepareYields
 
     int _nDDsources;
     YieldsSource _sourceDDTrue[_nHistsMax];
+    YieldsSource _sourceDDEtoGamma;
     YieldsSource _sourceDDFake[_nHistsMax];
     YieldsSource _sourceBkgSubtrData[_nHistsMax];
 

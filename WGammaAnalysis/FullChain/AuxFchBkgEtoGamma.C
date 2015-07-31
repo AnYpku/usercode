@@ -9,6 +9,7 @@ void AuxFchBkgEtoGamma()
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
+TConfiguration conf;
   FullChain fch;
   TConfiguration::AnalysisParameters anPars;
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
