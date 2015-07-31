@@ -259,7 +259,14 @@ void FullChain::SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=-TMath::Pi()+0.25*TMath::Pi()*ib;
  }
-}
+  if (varKin=="phoPFChIsoCorr"){
+    anPars.varKin=varKin;
+    anPars.nKinBins=20;
+    anPars.kinBinLims=new float[anPars.nKinBins+1];
+    for (int ib=0; ib<anPars.nKinBins+1; ib++)
+      anPars.kinBinLims[ib]=0+1*ib;
+  }
+}// end of SetDefaultFullChainParameters
 
 void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
 {

@@ -7,7 +7,8 @@
   time.Start("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
 
-  QuickPrepareYields_WMt();
+//  QuickPrepareYields_FSRandISR_Ich();
+//  QuickPrepareYields_WMt();
 //  QuickPrepareYields_FSRandISR();
 //  QuickPrepareYields_EtoGammaEnriched();
 
