@@ -31,6 +31,8 @@ class Unfolding
        bool ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfold::Algorithm alg, int NSmears);
 
        bool PlotAndStore();
+       bool PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitle);
+       bool PlotTH2D(TH2D* hist2D, TString saveName);
 
 
      private:

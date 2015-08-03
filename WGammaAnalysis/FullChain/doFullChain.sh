@@ -83,5 +83,6 @@ DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
 DoFullChainPart2 MUON ZGamma logs/log20150320/log_
 DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
+root -l -b -q runReplotResponseMatrix.C
 root -l -b -q runCompareCS.C
 

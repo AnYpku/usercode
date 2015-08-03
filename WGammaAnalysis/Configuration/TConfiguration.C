@@ -310,7 +310,7 @@ int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed){
 }
 
 void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed){
-  lims[0]=0.0;
+  lims[0]=10.0;
   std::cout<<"TConfiguration::GetPhoPtUnfBinsLimits:"<<std::endl;
   std::cout<<"isOverflowUsed="<<isOverflowUsed<<std::endl;
   std::cout<<"_nPhoPtBins="<<_nPhoPtBins<<std::endl;

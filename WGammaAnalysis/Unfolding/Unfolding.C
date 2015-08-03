@@ -31,6 +31,8 @@
 #include "TMatrixDEigen.h"
 #include "TStyle.h"
 #include "TRandom.h"
+#include "TLatex.h"
+#include "TLine.h"
   // ROOT class
 #include "../RooUnfold/src/RooUnfoldResponse.h"
 #include "../RooUnfold/src/RooUnfold.h"
@@ -340,8 +342,14 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
     errSystV[i-1]=errSyst[i];
   }
 
-  TCanvas* c = new TCanvas("errCovStat","errCovStat");
-  errCovStat.Draw("COLZ");
+  TConfiguration config;
+  TString strAffix = "_";
+  strAffix+=config.StrChannel(_channel);
+  strAffix+="_";
+  strAffix+=config.StrVgType(_vgamma);
+  PlotMatrixAsTH2D(errCovStat, "matrCovarianceStat",TString("Covariance Matrix")+strAffix);
+//  TCanvas* c = new TCanvas("errCovStat","errCovStat");
+//  errCovStat.Draw("COLZ");
 
   std::cout<<"Input yields:"<<std::endl;
   for (int i=1; i<=_nBinsGen; i++){
@@ -491,70 +499,48 @@ bool Unfolding::PlotAndStore()
 
   _fOut->cd();
 
-  float limsRecDraw[_nBinsRec+1];
-  float limsGenDraw[_nBinsGen+1];
- 
-
-   if (_phoPtLimitsRec[0]==0) limsRecDraw[0]= _phoPtLimitsRec[1]/2;
-  else limsRecDraw[0]= _phoPtLimitsRec[0];
-  if (_phoPtLimitsGen[0]==0) limsGenDraw[0]= _phoPtLimitsGen[1]/2;
-  else limsGenDraw[0]= _phoPtLimitsGen[0];
-  for (int ir=1; ir<=_nBinsRec; ir++)
-    limsRecDraw[ir]= _phoPtLimitsRec[ir];
-  for (int ig=1; ig<=_nBinsRec; ig++)
-    limsGenDraw[ig]= _phoPtLimitsGen[ig];
-
   TString strAffixTitle=TString("_")+_config.StrChannel(_channel)+TString("_")+_config.StrVgType(_vgamma)+TString("_");
 
-  TH2D* histEventCountDraw = new TH2D(TString("histEventCount")+strAffixTitle,TString("Migration Matrix: Counts (no weights)")+strAffixTitle,_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
-  TH2D* histMigrMatrixDraw = new TH2D(TString("histMigrMatrix")+strAffixTitle,TString("Migration Matrix: no normalization")+strAffixTitle,_nBinsRec,limsRecDraw,_nBinsGen,limsGenDraw);
-  histEventCountDraw->GetXaxis()->SetTitle("phoEt reco, GeV");
-  histEventCountDraw->GetYaxis()->SetTitle("phoEt gen, GeV");
-  histMigrMatrixDraw->GetXaxis()->SetTitle("phoEt reco, GeV");
-  histMigrMatrixDraw->GetYaxis()->SetTitle("phoEt gen, GeV");
+  _histMigrMatrixNotNormalized->SetTitle(TString("Migration Matrix: Counts (no weights)")+strAffixTitle);
+  _histEventCountMigrMatrix->SetTitle(TString("Migration Matrix: not normalized")+strAffixTitle);
+  PlotTH2D(_histMigrMatrixNotNormalized, TString("cMigrMatrix")+strAffixTitle);
+  PlotTH2D(_histEventCountMigrMatrix, TString("cEventCount")+strAffixTitle);
 
-
-  for (int ir=1; ir<_nBinsRec+1; ir++)
-    for (int ig=1; ig<_nBinsGen+1; ig++){
-      histEventCountDraw->SetBinContent(ir,ig,_histEventCountMigrMatrix->GetBinContent(ir,ig));
-      histMigrMatrixDraw->SetBinContent(ir,ig,_histMigrMatrixNotNormalized->GetBinContent(ir,ig));
-
-    }
+  TH2D* hResponse = (TH2D*)_histMigrMatrixNotNormalized->Clone("hResponse");
+  for (int ig=1; ig<=_nBinsGen; ig++){
+    float sum=0;
+    for (int ir=1; ir<=_nBinsRec; ir++){
+      sum+=_histMigrMatrixNotNormalized->GetBinContent(ir,ig);
+    }// end of loop over ig
+    if (sum==0) sum=1.0;
+    for (int ir=1; ir<=_nBinsRec; ir++){
+      hResponse->SetBinContent(ir,ig,_histMigrMatrixNotNormalized->GetBinContent(ir,ig)/sum);
+      hResponse->SetBinError(ir,ig,_histMigrMatrixNotNormalized->GetBinError(ir,ig)/sum);
+    }// end of loop over ig
+  }// end of loop over ir
+  hResponse->SetTitle(TString("Response Matrix: normalized by N_{gen} ")+strAffixTitle);
+  PlotTH2D(hResponse, TString("cResponseMatr")+strAffixTitle);
  
-  TStyle* style = new TStyle("style","style");
-
-  style->SetPalette(1);
-  style->SetPaintTextFormat("0.1f");
-
-  style->SetPaintTextFormat("g");
- 
- 
-  TCanvas* cEventCount = new TCanvas(TString("cEventCount")+strAffixTitle,TString("cEventCount")+strAffixTitle);
-  cEventCount->SetLogx();
-  cEventCount->SetLogy();
-  histEventCountDraw->SetStats(0);
-  histEventCountDraw->GetXaxis()->SetMoreLogLabels(1);
-  histEventCountDraw->GetYaxis()->SetMoreLogLabels(1);
-  histEventCountDraw->GetXaxis()->SetNoExponent(1);
-  histEventCountDraw->GetYaxis()->SetNoExponent();
-  histEventCountDraw->SetMarkerSize(1);
-  histEventCountDraw->Draw("COLZ TEXT");
-
-  TCanvas* cMigrMatrix = new TCanvas(TString("cMigrMatrix")+strAffixTitle,TString("cMigrMatrix")+strAffixTitle);
-  cMigrMatrix->SetLogx();
-  cMigrMatrix->SetLogy();
-  histMigrMatrixDraw->SetStats(0);
-  histMigrMatrixDraw->GetXaxis()->SetMoreLogLabels(1);
-  histMigrMatrixDraw->GetYaxis()->SetMoreLogLabels(1);
-  histMigrMatrixDraw->GetXaxis()->SetNoExponent(1);
-  histMigrMatrixDraw->GetYaxis()->SetNoExponent();
-  histMigrMatrixDraw->SetMarkerSize(1);
-  histMigrMatrixDraw->Draw("COLZ TEXT");
-
-
-  TCanvas* cPtSpectra = new TCanvas(TString("cPtSpectra")+strAffixTitle,TString("cPtSpectra")+strAffixTitle);
-  cPtSpectra->SetLogx();
-  cPtSpectra->SetLogy();
+  TCanvas* cPtSpectra = new TCanvas(TString("cPtSpectra")+strAffixTitle,TString("cPtSpectra")+strAffixTitle,600,600);
+  cPtSpectra->Divide(2,1);
+  TPad* pad1 = (TPad*)cPtSpectra->GetPad(1);
+  TPad* pad2 = (TPad*)cPtSpectra->GetPad(2);
+  pad1->SetLogx();
+  pad1->SetLogy();
+  pad2->SetLogx();
+  pad1->SetPad(0,0.3,1.0,1.0);
+  pad2->SetPad(0,0,  1.0,0.28);
+  pad1->SetLeftMargin(0.18);
+  pad1->SetTopMargin(0.08);
+  pad1->SetRightMargin(0.07);
+  pad1->SetBottomMargin(0.01); // All X axis labels and titles are thus cut off
+  pad2->SetLeftMargin(0.18);
+  pad2->SetTopMargin(0.01);
+  pad2->SetRightMargin(0.07);
+  pad2->SetBottomMargin(0.45);
+  pad1->SetLogx();
+  pad1->SetLogy();
+  pad1->cd();
   _histYieldsRec->GetXaxis()->SetMoreLogLabels();
   _histYieldsRec->GetXaxis()->SetNoExponent();
   _histYieldsRec->SetLineColor(1);
@@ -563,6 +549,28 @@ bool Unfolding::PlotAndStore()
   _histYieldsGen->SetLineColor(4);
   _histYieldsGen->SetLineWidth(2);
   _histYieldsGen->Draw("same");
+  pad2->cd();
+  TH1F* hRatio = (TH1F*) _histYieldsRec->Clone("hRatio");
+  hRatio->Divide(_histYieldsGen);
+  float max=1.1; float min=0.9;
+  for (int ib=1; ib<=hRatio->GetNbinsX(); ib++){
+    if (hRatio->GetBinContent(ib)+hRatio->GetBinError(ib)>max) 
+      max=hRatio->GetBinContent(ib)+hRatio->GetBinError(ib);
+    if (hRatio->GetBinContent(ib)-hRatio->GetBinError(ib)<min) 
+      min=hRatio->GetBinContent(ib)-hRatio->GetBinError(ib);
+  }// end of loop over ib
+  min=0.7; max=1.3;
+  hRatio->SetStats(0);
+  hRatio->SetLineWidth(2);
+  hRatio->GetYaxis()->SetRangeUser(min,max);
+  hRatio->GetYaxis()->SetLabelSize(0.1);
+  hRatio->GetXaxis()->SetLabelSize(0.1);
+  hRatio->GetXaxis()->SetTitleOffset(1.0);
+  hRatio->GetXaxis()->SetTitleSize(0.12);
+  hRatio->GetXaxis()->SetMoreLogLabels();
+  hRatio->GetXaxis()->SetNoExponent();
+  hRatio->SetTitle("; P_{T}^{#gamma}, GeV;");
+  hRatio->Draw();
 /*
   int nBinsAnalysis = _config.GetNPhoPtBins(); 
   float* limsAnalysis = new float[nBinsAnalysis+1];
@@ -621,6 +629,7 @@ bool Unfolding::PlotAndStore()
 
 //  _histYieldsRec->Write(_config.GetYieldsRec1DName());
 //  _histYieldsGen->Write(_config.GetYieldsGen1DName());
+/*
   cEventCount->Write("cEventCount");
   cMigrMatrix->Write("cMigrMatrix");
 
@@ -641,6 +650,90 @@ bool Unfolding::PlotAndStore()
   cMigrMatrix->SaveAs(nameSave);
   nameSave.ReplaceAll(".pdf",".root");
   cMigrMatrix->SaveAs(nameSave);
-
+*/
   return 1;
-}
+}// end of PlotAndStore
+
+bool Unfolding::PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitle){
+
+  TString hName=TString("h")+saveName;
+  hName.ReplaceAll("/","_");
+  hName.ReplaceAll(".","_");
+  hName.ReplaceAll("__","_");
+  TH2D* hist2D = new TH2D(hName,hName,_nBinsRec,_phoPtLimitsRec,_nBinsGen,_phoPtLimitsGen);   
+  for (int ir=1; ir<_nBinsRec+1; ir++)
+    for (int ig=1; ig<_nBinsGen+1; ig++){
+      hist2D->SetBinContent(ir,ig,matr(ir-1,ig-1));
+    }
+  hist2D->SetTitle(hTitle);
+  PlotTH2D(hist2D,saveName);
+  return 1;
+}//end of PlotMatrixAsTH2D
+
+bool Unfolding::PlotTH2D(TH2D* hist2D, TString saveName){
+
+  TStyle* style = new TStyle("style","style");
+  style->SetPalette(1);
+  style->SetPaintTextFormat("0.1f");
+  style->SetPaintTextFormat("g");
+
+  hist2D->GetXaxis()->SetTitle("P_{T}^{#gamma} reco, GeV");
+  hist2D->GetYaxis()->SetTitle("P_{T}^{#gamma} gen, GeV");
+  TString canvName=saveName;
+  canvName.ReplaceAll("/","_");
+  canvName.ReplaceAll(".","_");
+  canvName.ReplaceAll("__","_");
+  int canvWidth=1000;
+  int canvHeight=600; 
+  TConfiguration conf;
+//  if (fabs(_phoPtLimitsGen[_nBinsGen]-conf.GetPhoPtMax())<0.01) canvWidth=canvWidth*1.2;
+  hist2D->GetYaxis()->SetMoreLogLabels(1);
+//  if (fabs(_phoPtLimitsRec[_nBinsRec]-conf.GetPhoPtMax())<0.01){
+//    hist2D->GetYaxis()->SetMoreLogLabels(0);
+//    canvHeight=canvHeight*1.2;
+//  }
+  TCanvas* canv = new TCanvas(canvName,canvName,canvWidth,canvHeight);
+  canv->SetLogx();
+  canv->SetLogy();
+  canv->SetRightMargin(0.12);
+  canv->SetLeftMargin(0.10);
+  canv->SetBottomMargin(0.11);
+  canv->SetTopMargin(0.12);
+  TString hTitle = hist2D->GetTitle();
+  hTitle.ReplaceAll("_MUON_"," MUON ");
+  hTitle.ReplaceAll("_ELECTRON_"," ELECTRON ");
+  hTitle.ReplaceAll("Gamma_","Gamma ");
+  hTitle.ReplaceAll("Gamma","#gamma");
+  TLatex* titleLatex =  new TLatex(0.09,0.94,hTitle);
+  titleLatex->SetNDC();
+  titleLatex->SetTextFont(62);
+  titleLatex->SetTextSize(0.05);
+  hist2D->SetTitle("");
+  hist2D->SetStats(0);
+  hist2D->GetXaxis()->SetMoreLogLabels(1);
+  hist2D->GetXaxis()->SetNoExponent(1);
+  hist2D->GetYaxis()->SetNoExponent();
+  hist2D->GetYaxis()->SetTitleOffset(1.00);
+  hist2D->GetXaxis()->SetTitleOffset(1.05);
+  hist2D->GetXaxis()->SetRangeUser(10,499);
+  hist2D->GetYaxis()->SetRangeUser(10,499);
+  hist2D->SetMarkerSize(1);
+  hist2D->Draw("COLZ TEXT");
+  titleLatex->Draw("same");
+  // horizontal lines
+  for (int ig=1; ig<=_nBinsGen; ig++){
+    TLine* line = new TLine(_phoPtLimitsRec[0],_phoPtLimitsGen[ig],500,_phoPtLimitsGen[ig]);
+    line->Draw("same");
+  }//end of loop over ig
+  // vertical lines
+  for (int ir=1; ir<=_nBinsRec; ir++){
+    TLine* line = new TLine(_phoPtLimitsRec[ir],_phoPtLimitsGen[0],_phoPtLimitsRec[ir],500);
+    line->Draw("same");
+  }//end of loop over ig
+  TString strDir=_config.GetPlotsDirName(_channel,_vgamma,_config.PLOTS_CONSTANTS);
+  saveName=strDir+saveName;
+  canv->SaveAs(saveName+TString(".png"));
+  canv->SaveAs(saveName+TString(".pdf"));
+  canv->SaveAs(saveName+TString(".root"));
+  return 1;
+}//end of PlotMatrixAsTH2D
