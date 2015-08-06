@@ -126,11 +126,11 @@ void CalcAccAndEff::ComputeAccTimesEff()
   for (int ib=1; ib<=nHbins; ib++){
     std::cout<<_Hnumerator1D->GetBinLowEdge(ib)<<"-";
     std::cout<<_Hnumerator1D->GetBinLowEdge(ib)+_Hnumerator1D->GetBinWidth(ib)<<" ";
-    if (_Hdenominator1D->GetBinContent(ib)!=0){
       std::cout<<"("<<_Hnumerator1D->GetBinContent(ib)<<"+-"<<_Hnumerator1D->GetBinError(ib);
       std::cout<<")/("<<_Hdenominator1D->GetBinContent(ib)<<"+-"<<_Hdenominator1D->GetBinError(ib)<<")=";
+    if (_Hdenominator1D->GetBinContent(ib)!=0){
       std::cout<<_HaccXeff1D->GetBinContent(ib)<<"+-"<<_HaccXeff1D->GetBinError(ib);
-    }    
+    } 
     std::cout<<std::endl;
 
     long neventsVal =  _HdenominatorNoWeight1D->GetBinContent(ib);
@@ -317,7 +317,7 @@ bool CalcAccAndEff::PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int i
     if (dRIgen<0.3) Igen+=leaf.mcPt->at(imc);
   }// end of imc  
   if (!(Igen<5)) return 0; _passed.phoIgen++;
-  if (!(leaf.mcEt->at(imcPho)>15)) return 0; _passed.phoPt++;
+//  if (!(leaf.mcEt->at(imcPho)>15)) return 0; _passed.phoPt++;
 
   return 1;
 }// end of PassedPhaseSpaceCut()

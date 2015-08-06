@@ -109,13 +109,12 @@ void QuickPrepareYields_WMt(){
   cut = cut && cutPt;
 
   fch.SetDefaultFullChainParameters(anPars,"WMt");
-    anPars.nKinBins=40;
-    anPars.kinBinLims=new float[anPars.nKinBins+1];
-    for (int ib=0; ib<anPars.nKinBins+1; ib++)
-      anPars.kinBinLims[ib]=0+5*ib;
+  anPars.nKinBins=40;
+  anPars.kinBinLims=new float[anPars.nKinBins+1];
+  for (int ib=0; ib<anPars.nKinBins+1; ib++)
+    anPars.kinBinLims[ib]=0+5*ib;
 
-  anPars.cutAdd=cut;//"phoEt<40";
-//  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
+  anPars.cutAdd=cut;
 
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.blind[conf.MUON][conf.W_GAMMA]=conf.UNBLIND;

@@ -305,21 +305,21 @@ int TConfiguration::GetNPhoPtUnfBins(bool isOverflowUsed){
   std::cout<<"TConfiguration::GetNPhoPtUnfBins:"<<std::endl;
   std::cout<<"isOverflowUsed="<<isOverflowUsed<<std::endl;
   std::cout<<" GetNPhoPtBins()="<< GetNPhoPtBins()<<std::endl;
-  if (isOverflowUsed) return GetNPhoPtBins()+2;
-  return GetNPhoPtBins()+1;
+  if (isOverflowUsed) return GetNPhoPtBins()+1;
+  return GetNPhoPtBins()+0;
 }
 
 void TConfiguration::GetPhoPtUnfBinsLimits(float* lims, bool isOverflowUsed){
-  lims[0]=10.0;
+//  lims[0]=10.0;
   std::cout<<"TConfiguration::GetPhoPtUnfBinsLimits:"<<std::endl;
   std::cout<<"isOverflowUsed="<<isOverflowUsed<<std::endl;
   std::cout<<"_nPhoPtBins="<<_nPhoPtBins<<std::endl;
   for (int i=0; i<_nPhoPtBins+1; i++){
-    lims[i+1]=_phoPtBinsLimits[i];
-    std::cout<<"lims["<<i+1<<"]="<<lims[i+1]<<std::endl;
+    lims[i]=_phoPtBinsLimits[i];
+    std::cout<<"lims["<<i<<"]="<<lims[i]<<std::endl;
   }
   if (isOverflowUsed) 
-    lims[_nPhoPtBins+2]=_phoPtMax;
+    lims[_nPhoPtBins+1]=_phoPtMax;
 }// end of TConfiguration::GetPhoPtUnfBinsLimits
 
 int TConfiguration::FindPhoPtUnfBinByPhoPt(float pt, bool isOverflowUsed){

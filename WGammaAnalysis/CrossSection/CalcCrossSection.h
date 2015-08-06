@@ -8,6 +8,7 @@
 #include <string>
   //C++
 #include "TH1F.h"
+#include "TH2D.h"
 #include "TFile.h"
 
 class CalcCrossSection
@@ -23,7 +24,7 @@ class CalcCrossSection
        void    DivideOverLumi();
        void    DivideOverBinWidth();
        void    Plot();
-       void    Print(TString strYields);
+       void    Print(TString strYields, TH1F* hTot, TH1F* h1D);
 
 
 
@@ -35,8 +36,27 @@ class CalcCrossSection
        TAllInputSamples* _INPUT;
        TConfiguration _config;
        TFile* _fOut;
-       TH1F* _signalYieldTotal;
-       TH1F* _signalYields1D;
+
+       TH1F* _yieldTOT_bkgSubtr;
+       TH1F* _yields1D_bkgSubtr;
+
+       TH1F* _yieldTOT_unfolded;
+       TH1F* _yields1D_unfolded;
+       TH2D* _covMatrix;
+
+       TH1F* _yieldTOT_accXeffCorr;
+       TH1F* _yields1D_accXeffCorr;
+       TH2D* _covMatrix_accXeffCorr;
+
+       TH1F* _yieldTOT_overLumi;
+       TH1F* _yields1D_overLumi;
+       TH2D* _covMatrix_overLumi;
+
+       TH1F* _crossSectionTOT;
+       TH1F* _crossSection1D;
+       TH2D* _covMatrix_overBinWidth;
+
+
        float _lumi;
   };
 

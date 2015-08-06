@@ -47,7 +47,7 @@ CalcCrossSection::~CalcCrossSection()
 void CalcCrossSection::Calc()
 {
   GetSignalYields();
-    ApplyUnfolding();
+  ApplyUnfolding();
   ApplyAccXEff();
   DivideOverLumi();
   DivideOverBinWidth();
@@ -60,12 +60,11 @@ void CalcCrossSection::GetSignalYields()
   std::cout<<"file with signal yields: "<<_config.GetYieldsFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt")<<std::endl;
   std::cout<<"total yields: "<<_config.GetYieldsBkgSubtrDataName(_config.TOTAL)<<std::endl;
   std::cout<<"1D yields: "<<_config.GetYieldsBkgSubtrDataName(_config.ONEDI)<<std::endl;
-  _signalYieldTotal=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
-  _signalYields1D=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
+  _yieldTOT_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
+  _yields1D_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
+  _yields1D_bkgSubtr->Print();
   _fOut->cd();
-  //  _signalYieldTotal->Write(_config.GetCSname(_channel,_config.TOTAL)); 
-  // _signalYields1D->Write(_config.GetCSname(_channel,_config.ONEDI));
-  Print("Signal Yields:");
+  Print("Bkg Subtr Yields:",_yieldTOT_bkgSubtr,_yields1D_bkgSubtr);
 }// end of GetSignalYields()
 
 void CalcCrossSection::ApplyUnfolding()
@@ -78,7 +77,7 @@ void CalcCrossSection::ApplyUnfolding()
   }
 //  TH1D sign1D;
 //  _signalYields1D->Copy(sign1D);
-  TH1D* signInput1D = (TH1D*)_signalYields1D;
+  TH1D* signInput1D = (TH1D*)_yields1D_bkgSubtr;
   TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone("hUnfolded");
   isOk = unf.ApplyRooUnfold(signInput1D,signUnfolded1D);
   if (!isOk){
@@ -86,9 +85,10 @@ void CalcCrossSection::ApplyUnfolding()
     return;
   } 
   unf.PlotAndStore();
-  Print("Yields before Unfolding:");
-  _signalYields1D=(TH1F*)signUnfolded1D;
-  Print("Unfolded Yields:");
+  Print("Yields before Unfolding:",_yieldTOT_bkgSubtr,_yields1D_bkgSubtr);
+  _yields1D_unfolded=(TH1F*)signUnfolded1D->Clone("hUnfolded1D");
+  _yieldTOT_unfolded=(TH1F*)_yieldTOT_bkgSubtr->Clone("hBkgSubtrTOT"); // no unfolding for total
+  Print("Unfolded Yields: ",_yieldTOT_unfolded,_yields1D_unfolded);
 //  unf.PlotAndStore();
 }// end of ApplyUnfolding()
 
@@ -97,36 +97,42 @@ void CalcCrossSection::ApplyAccXEff()
   TFile* f = new TFile(_config.GetAccXEffFileName(_channel,_vgamma));
   TH1F* hAccXEffTot = (TH1F*)f->Get(_config.GetAccXEffName(_config.TOTAL));
   TH1F* hAccXEff1D = (TH1F*)f->Get(_config.GetAccXEffName(_config.ONEDI));
-  _signalYieldTotal->Divide(hAccXEffTot);
-  _signalYields1D->Divide(hAccXEff1D);
-  Print("Acc X Eff Corrected Yields:");
+  _yieldTOT_accXeffCorr=(TH1F*)_yieldTOT_unfolded->Clone("hAccXEffCorrTOT");
+  _yields1D_accXeffCorr=(TH1F*)_yields1D_unfolded->Clone("hAccXEffCorr1D");
+  _yieldTOT_accXeffCorr->Divide(hAccXEffTot);
+  _yields1D_accXeffCorr->Divide(hAccXEff1D);
+  Print("Acc X Eff Corrected Yields: ",_yieldTOT_accXeffCorr,_yields1D_accXeffCorr);
 }// end of ApplyAccXEff()
 
 void CalcCrossSection::DivideOverLumi()
 {
-  float cont=_signalYieldTotal->GetBinContent(1);
-  float err=_signalYieldTotal->GetBinError(1);
-  _signalYieldTotal->SetBinContent(1,1000*cont/_lumi);
-  _signalYieldTotal->SetBinError(1,1000*err/_lumi);
-  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
-    cont=_signalYields1D->GetBinContent(ib);
-    err=_signalYields1D->GetBinError(ib);
-    _signalYields1D->SetBinContent(ib,cont/_lumi);
-    _signalYields1D->SetBinError(ib,err/_lumi);
+  _yieldTOT_overLumi=(TH1F*)_yieldTOT_accXeffCorr->Clone("hOverLumiTOT");
+  _yields1D_overLumi=(TH1F*)_yields1D_accXeffCorr->Clone("hOverLumi1D");
+  float cont=_yieldTOT_accXeffCorr->GetBinContent(1);
+  float err=_yieldTOT_accXeffCorr->GetBinError(1);
+  _yieldTOT_overLumi->SetBinContent(1,1000*cont/_lumi);
+  _yieldTOT_overLumi->SetBinError(1,1000*err/_lumi);
+  for (int ib=1; ib<=_yields1D_accXeffCorr->GetNbinsX(); ib++){
+    cont=_yields1D_overLumi->GetBinContent(ib);
+    err=_yields1D_overLumi->GetBinError(ib);
+    _yields1D_overLumi->SetBinContent(ib,cont/_lumi);
+    _yields1D_overLumi->SetBinError(ib,err/_lumi);
   }
-  Print("Yields over Lumi (pb):");
+  Print("Yields over Lumi (pb): ",_yieldTOT_overLumi,_yields1D_overLumi);
 }// end of DivideOverLumi()
 
 void CalcCrossSection::DivideOverBinWidth()
 {
-  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
-    float cont=_signalYields1D->GetBinContent(ib);
-    float err=_signalYields1D->GetBinError(ib);
-    float width=_signalYields1D->GetBinWidth(ib);
-    _signalYields1D->SetBinContent(ib,cont/width);
-    _signalYields1D->SetBinError(ib,err/width);
+  _crossSectionTOT=(TH1F*)_yieldTOT_overLumi->Clone("crossSectionTOT");
+  _crossSection1D=(TH1F*)_yields1D_overLumi->Clone("crossSection1D");
+  for (int ib=1; ib<=_yields1D_overLumi->GetNbinsX(); ib++){
+    float cont=_yields1D_overLumi->GetBinContent(ib);
+    float err=_yields1D_overLumi->GetBinError(ib);
+    float width=_yields1D_overLumi->GetBinWidth(ib);
+    _crossSection1D->SetBinContent(ib,cont/width);
+    _crossSection1D->SetBinError(ib,err/width); 
   }
-  Print("Total (pb) and differential(pb/GeV) cross sections:");
+  Print("Total (pb) and differential(pb/GeV) cross sections: ",_crossSectionTOT,_crossSection1D);
 }// end of DivideOverBinWidth()
 
 void CalcCrossSection::Plot()
@@ -154,47 +160,47 @@ void CalcCrossSection::Plot()
   pad2->SetTopMargin(0.01);
   pad2->SetRightMargin(0.07);
   pad2->SetBottomMargin(0.45);
- TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
+  TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
   TFile* fTheory = new TFile(fName);
   TH1F* hTheory = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
   // Multiply by 1000, pb -> fb
-  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
+  for (int ib=1; ib<=_crossSection1D->GetNbinsX(); ib++){
     float cont; float err;
-    cont = _signalYields1D->GetBinContent(ib);
-    err = _signalYields1D->GetBinError(ib);
-    _signalYields1D->SetBinContent(ib,1000*cont);
-    _signalYields1D->SetBinError(ib,1000*err);
+    cont = _crossSection1D->GetBinContent(ib);
+    err = _crossSection1D->GetBinError(ib);
+    _crossSection1D->SetBinContent(ib,1000*cont);
+    _crossSection1D->SetBinError(ib,1000*err);
     cont = hTheory->GetBinContent(ib);
     err = hTheory->GetBinError(ib);
     hTheory->SetBinContent(ib,1000*cont);
     hTheory->SetBinError(ib,1000*err);
   }// end of loop over ib
-   Print("Total (pb) and differential(fb/GeV) cross sections:");
+   Print("Total (pb) and differential(fb/GeV) cross sections: ", _crossSectionTOT, _crossSection1D);
   pad1->cd();
-  _signalYields1D->GetXaxis()->SetNoExponent();
-  _signalYields1D->GetXaxis()->SetMoreLogLabels();
-  _signalYields1D->SetLineWidth(2);
+  _crossSection1D->GetXaxis()->SetNoExponent();
+  _crossSection1D->GetXaxis()->SetMoreLogLabels();
+  _crossSection1D->SetLineWidth(2);
   TString strTitle="PRELIMINARY: d#sigma/dP_{T}^{#gamma}, fb/GeV, ";
   strTitle+=_config.StrChannel(_channel);
   strTitle+=" ";
   strTitle+=_config.StrVgType(_vgamma);
   strTitle+=" ";
   strTitle+=_config.StrBlindType(_blind);
-  _signalYields1D->SetTitle(strTitle);
-  _signalYields1D->SetStats(0);
-  _signalYields1D->Draw();
+  _crossSection1D->SetTitle(strTitle);
+  _crossSection1D->SetStats(0);
+  _crossSection1D->Draw();
   // Plot theory Cross section
   hTheory->SetLineWidth(2);
   hTheory->SetLineColor(2);
   hTheory->Draw("same");
-  _signalYields1D->Draw("same");
+  _crossSection1D->Draw("same");
   TLegend *leg = new TLegend(0.70,0.70,0.95,0.95);
-  leg->AddEntry(_signalYields1D,"measured CS","l");
+  leg->AddEntry(_crossSection1D,"measured CS","l");
   leg->AddEntry(hTheory,"theory CS","l");
   leg->Draw("same");
 
   pad2->cd();
-  TH1F* hRatio = (TH1F*) _signalYields1D->Clone("hRatio");
+  TH1F* hRatio = (TH1F*) _crossSection1D->Clone("hRatio");
   hRatio->Divide(hTheory);
   float max=1.1; float min=0.9;
   for (int ib=1; ib<=hRatio->GetNbinsX(); ib++){
@@ -231,20 +237,21 @@ void CalcCrossSection::Plot()
   canv->SaveAs(nameSave);
 
   _fOut->cd();
-  _signalYieldTotal->Write(_config.GetCSname(_channel,_config.TOTAL)); 
-  _signalYields1D->Write(_config.GetCSname(_channel,_config.ONEDI));
+  _crossSectionTOT->Write(_config.GetCSname(_channel,_config.TOTAL)); 
+  _crossSection1D->Write(_config.GetCSname(_channel,_config.ONEDI));
   hTheory->Write(_config.GetTheoryCSname(_config.ONEDI));
   
 }// end of Plot()
 
-void CalcCrossSection::Print(TString strYields)
+void CalcCrossSection::Print(TString strYields, TH1F* hTot, TH1F* h1D)
 {
   std::cout<<std::endl;
   std::cout<<strYields<<std::endl;
-  std::cout<<"tot: "<<_signalYieldTotal->GetBinContent(1)<<"+-"<<_signalYieldTotal->GetBinError(1)<<std::endl;
+  std::cout<<"tot: "<<hTot->GetBinContent(1)<<"+-"<<hTot->GetBinError(1)<<std::endl;
   std::cout<<"1D: "<<std::endl;
-  for (int ib=1; ib<=_signalYields1D->GetNbinsX(); ib++){
-    std::cout<<_signalYields1D->GetBinLowEdge(ib)<<"-"<<_signalYields1D->GetBinLowEdge(ib)+_signalYields1D->GetBinWidth(ib)<<": "<<_signalYields1D->GetBinContent(ib)<<"+-"<<_signalYields1D->GetBinError(ib)<<std::endl;
+  for (int ib=1; ib<=h1D->GetNbinsX(); ib++){
+    if (hTot->GetBinContent(1)<15000) std::cout<<std::setprecision(2);
+    std::cout<<h1D->GetBinLowEdge(ib)<<"-"<<h1D->GetBinLowEdge(ib)+h1D->GetBinWidth(ib)<<": "<<h1D->GetBinContent(ib)<<"+-"<<h1D->GetBinError(ib)<<std::endl;
   }
   std::cout<<std::endl;
 }// end of Print()

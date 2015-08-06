@@ -95,8 +95,16 @@ void TSubtractBackground::SubtractBackground()
         _sourceBkgSubtrData[isDD].yieldTotErr[ieta]+=_sourceDDEtoGamma.yieldTotErr[ieta]*_sourceDDEtoGamma.yieldTotErr[ieta];
       }// end of if (_pyPars.doEtoGammaSubtr)
       _sourceBkgSubtrData[isDD].yieldTotErr[ieta]=sqrt(_sourceBkgSubtrData[isDD].yieldTotErr[ieta]);
+
+//      // if yield<0, set yield=0
+      for (int ib=1; ib<=_sourceBkgSubtrData[isDD].hist[ieta]->GetNbinsX(); ib++){
+        if (_sourceBkgSubtrData[isDD].hist[ieta]->GetBinContent(ib)<0)
+          _sourceBkgSubtrData[isDD].hist[ieta]->SetBinContent(ib,0);
+      }//end of loop over ib     
+
     }//end of loop over ieta
   }//end of loop over isDD
+
   std::cout<<"#####################"<<std::endl;
 }// end of SubtractBackground
 
@@ -117,7 +125,7 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
   TString canvName=strDD+TString("DDvsMC_")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
   canv= new TCanvas(canvName,canvName,800,800);
-  TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  TLegend* legend = new TLegend(0.65,0.60,0.90,0.90);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",strDD+TString(" DD vs MC"));
 
@@ -168,7 +176,7 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
   TString canvName=TString("DATAvsDDsum");
   canvName+=StrLabelEta(ieta);
   _canvDATAvsDDsum[ieta]= new TCanvas(canvName,canvName,800,800);
-  TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  TLegend* legend = new TLegend(0.60,0.65,0.90,0.90);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",TString("DATAvsDDsum"));
   TH1F* hSum;
@@ -206,7 +214,7 @@ void TSubtractBackground::CompareDATAvsBKGplusSIGMC(int ieta)
   TString canvName=TString("DATAvsBkgPlusSigMC");
   canvName+=StrLabelEta(ieta);
   _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,800);
-  TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  TLegend* legend = new TLegend(0.60,0.65,0.90,0.90);
   legend->SetFillColor(0);
   // prepare sum of real-photon bkg MC
   TH1F* hSumBkgMC;
@@ -302,7 +310,7 @@ void TSubtractBackground::CompareBkgSubtrDATAvsSIGMC(int ieta)
   TString canvName=TString("BkgSubtrDATAvsSIGMC_")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
   _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,800);
-  TLegend* legend = new TLegend(0.7,0.7,0.95,0.95);
+  TLegend* legend = new TLegend(0.60,0.75,0.90,0.90);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",TString("BkgSubtrDATAvsSIGMC"));
 
@@ -353,7 +361,7 @@ void TSubtractBackground::PlotPrintSave()
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
       CompareFakeDDvsMC(ieta);
       CompareTrueDDvsMC(ieta);
-      //CompareBkgSubtrDATAvsSIGMC(ieta);
+      CompareBkgSubtrDATAvsSIGMC(ieta);
     }
     return;
   }

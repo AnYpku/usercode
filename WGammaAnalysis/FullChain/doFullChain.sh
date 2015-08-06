@@ -85,4 +85,5 @@ DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
 root -l -b -q runReplotResponseMatrix.C
 root -l -b -q runCompareCS.C
-
+mv compareCS*WGamma* ../WGammaOutput/ChannelsMERGED_WGamma/Plots/CrossSection/
+mv compareCS*ZGamma* ../WGammaOutput/ChannelsMERGED_ZGamma/Plots/CrossSection/

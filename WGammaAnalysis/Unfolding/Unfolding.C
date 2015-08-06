@@ -351,15 +351,24 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
 //  TCanvas* c = new TCanvas("errCovStat","errCovStat");
 //  errCovStat.Draw("COLZ");
 
-  std::cout<<"Input yields:"<<std::endl;
-  for (int i=1; i<=_nBinsGen; i++){
-    std::cout<<std::setprecision(0)<<histInputYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histInputYields->GetBinError(i)<<std::endl;
+  std::cout<<"Yields: (MC-gen), (MC-rec), (data-input), (data-unfolded)"<<std::endl;
+  for (int i=1; i<=_nBinsRec; i++){
+    std::cout<<std::setprecision(0);
+    std::cout<<_histYieldsGen->GetBinLowEdge(i)<<"-"<<_histYieldsGen->GetBinLowEdge(i)+_histYieldsGen->GetBinWidth(i)<<" ";
+    std::cout<<_histYieldsGen->GetBinContent(i)<<"+-"<<_histYieldsGen->GetBinError(i)<<" ";
+    std::cout<<_histYieldsRec->GetBinLowEdge(i)<<"-"<<_histYieldsRec->GetBinLowEdge(i)+_histYieldsRec->GetBinWidth(i)<<" ";
+    std::cout<<_histYieldsRec->GetBinContent(i)<<"+-"<<_histYieldsRec->GetBinError(i)<<" ";
+    std::cout<<histInputYields->GetBinLowEdge(i)<<"-"<<histInputYields->GetBinLowEdge(i)+histInputYields->GetBinWidth(i)<<" ";
+    std::cout<<histInputYields->GetBinContent(i)<<"+-"<<histInputYields->GetBinError(i)<<" ";
+    std::cout<<unfoldedYields->GetBinLowEdge(i)<<"-"<<unfoldedYields->GetBinLowEdge(i)+unfoldedYields->GetBinWidth(i)<<" ";
+    std::cout<<unfoldedYields->GetBinContent(i)<<"+-"<<unfoldedYields->GetBinError(i)<<" ";
+    std::cout<<std::endl;
   }
-  std::cout<<"Unfolded yields:"<<std::endl;
-  for (int i=1; i<=_nBinsGen; i++){
-    std::cout<<std::setprecision(0)<<histUnfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histUnfoldedYields->GetBinError(i)<<"+-"<<std::setprecision(0)<<errSyst[i];
-    std::cout<<" = "<<std::setprecision(0)<<unfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<unfoldedYields->GetBinError(i)<<std::endl;
-  }
+//  std::cout<<"Unfolded yields:"<<std::endl;
+//  for (int i=1; i<=_nBinsGen; i++){
+//    std::cout<<std::setprecision(0)<<histUnfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histUnfoldedYields->GetBinError(i)<<"+-"<<std::setprecision(0)<<errSyst[i];
+//    std::cout<<" = "<<std::setprecision(0)<<unfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<unfoldedYields->GetBinError(i)<<std::endl;
+//  }
 
   std::cout<<std::endl<<"DoRooUnfold() ends here"<<std::endl;
   std::cout<<"#######################"<<std::endl;
@@ -507,13 +516,13 @@ bool Unfolding::PlotAndStore()
   PlotTH2D(_histEventCountMigrMatrix, TString("cEventCount")+strAffixTitle);
 
   TH2D* hResponse = (TH2D*)_histMigrMatrixNotNormalized->Clone("hResponse");
-  for (int ig=1; ig<=_nBinsGen; ig++){
+  for (int ir=1; ir<=_nBinsRec; ir++){
     float sum=0;
-    for (int ir=1; ir<=_nBinsRec; ir++){
+    for (int ig=1; ig<=_nBinsGen; ig++){
       sum+=_histMigrMatrixNotNormalized->GetBinContent(ir,ig);
     }// end of loop over ig
     if (sum==0) sum=1.0;
-    for (int ir=1; ir<=_nBinsRec; ir++){
+    for (int ig=1; ig<=_nBinsGen; ig++){
       hResponse->SetBinContent(ir,ig,_histMigrMatrixNotNormalized->GetBinContent(ir,ig)/sum);
       hResponse->SetBinError(ir,ig,_histMigrMatrixNotNormalized->GetBinError(ir,ig)/sum);
     }// end of loop over ig
