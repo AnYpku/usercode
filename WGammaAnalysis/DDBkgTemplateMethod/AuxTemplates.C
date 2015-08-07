@@ -53,7 +53,8 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut
   pars.cutAdd=anPars.cutAdd;
-  pars.noLeakSubtr=0;
+  pars.noLeakSubtrTrueToFake=0;
+  pars.noLeakSubtrFakeToTrue=0;
 
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
@@ -104,7 +105,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   TConfiguration config;
   TPhotonCuts photon;
 
-  pars.thresholdCombineTrueTemplates=10;//combine all
+  pars.thresholdCombineTrueTemplates=0;//combine all
   pars.thresholdCombineFakeTemplates=10000;//never combine
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
     pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
@@ -136,6 +137,10 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   TString strSign="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
   if (!pars.treeSign) return;
+
+  TString strFakeToTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
+  pars.treeFakeToTrue=LoadOneTree("leak_FakeToTrue", strFakeToTrue, pars.fFakeToTrue); 
+  if (!pars.treeFakeToTrue) return;
 
   TString strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
   if (isMCclosure) strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";

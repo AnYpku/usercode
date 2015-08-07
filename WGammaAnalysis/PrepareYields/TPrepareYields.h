@@ -93,6 +93,9 @@ class TPrepareYields
     void DivideOverBinWidth(TH1F* h);
     void MultiplyByBinWidth(TH1F* h);
 
+    TString PlotTitleReplaceAll(TString strTitle);
+    TString TitleOfXAxis();
+
 
 
     TH1F* _sigMCGenYields[3];

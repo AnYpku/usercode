@@ -33,11 +33,13 @@ class TTemplates
       TFile* fData;
       TFile* fSign;//treeSign has to be consistent with treeFake
       TFile* fFakeRef;
+      TFile* fFakeToTrue;// to be consistent with fTrue
       TTree* treeTrue;
       TTree* treeFake;
       TTree* treeData;
       TTree* treeSign;//treeSign has to be consistent with treeFake
       TTree* treeFakeRef;
+      TTree* treeFakeToTrue;// to be consistent with treeFake
       int nKinBins;
       float kinBinLims[nKinBinsMax];
       int nFitBins[nKinBinsMax][2];
@@ -57,7 +59,8 @@ class TTemplates
       TCut cutNominalExceptSidebandVar[2];
       TCut cutSidebandVarNominalRange[2];
       TCut cutWeight;
-      bool noLeakSubtr;
+      bool noLeakSubtrTrueToFake;// real-g leakage to fake
+      bool noLeakSubtrFakeToTrue;// fake-g leakage to real
       bool isMCclosureMode;
       bool isRooFit;// RooFit or standard ROOT fits
       TFile* fOutForSave;
@@ -121,7 +124,7 @@ class TTemplates
     void ComputeTrueYield(int ikin, int ieta, bool noPrint, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
 
-    void SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint=0, TH1D* hLeak=0);
+    void SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint, bool noLeak, TH1D* hLeak);
 
     void NewHistograms(int ikin, int ieta, bool noPrint);
     bool SetFakeTemplate(int ikin, int ieta, bool noPrint);
@@ -148,7 +151,8 @@ class TTemplates
     TH1D* _hTrue[nKinBinsMax][3];
     TH1D* _hFake[nKinBinsMax][3];
     TH1D* _hFakeMCtruth[nKinBinsMax][3];
-    TH1D* _hLeak[nKinBinsMax][3];
+    TH1D* _hLeakTrueToFake[nKinBinsMax][3];
+    TH1D* _hLeakFakeToTrue[nKinBinsMax][3];
     TH1D* _hSign[nKinBinsMax][3];
     double _leakFraction[nKinBinsMax][3];
     double _testMCtruthKolmogorov[nKinBinsMax][3];

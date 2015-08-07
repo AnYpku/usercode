@@ -167,7 +167,10 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   TString canvName="TotalDATAvsMC";
   canvName+=StrLabelEta(ieta);
   _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,800);
-  TLegend* legend = new TLegend(0.65,0.50,0.90,0.90);
+  TLegend* legend;
+  if (_pyPars.varKin=="Mleplep" || _pyPars.varKin=="lep2PhoDeltaR")
+    legend = new TLegend(0.25,0.50,0.50,0.90);
+  else legend = new TLegend(0.65,0.50,0.90,0.90);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot","DATA vs MC");
 
@@ -333,38 +336,8 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
 
   plotTitle=canv->GetTitle();
   plotTitle+=TString(" ")+_pyPars.strPlotsBaseName;
-  plotTitle.ReplaceAll("c_","");
-  plotTitle.ReplaceAll("TEMPL_","");
-  plotTitle.ReplaceAll("UNblind_","");
-  plotTitle.ReplaceAll("blindPRESCALE_","");
-  plotTitle.ReplaceAll("blindCOMBINED_","");
-  plotTitle.ReplaceAll("_"," ");
-  plotTitle.ReplaceAll("  "," ");
-  plotTitle.ReplaceAll("TrueDDvsMC","Real #gamma DD-fits vs MC.");
-  plotTitle.ReplaceAll("FakeDDvsMC","Fake #gamma DD-fits vs MC.");
-  plotTitle.ReplaceAll("TotalDATAvsMC","DATA vs MC.");
-  plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(DATA - BKG) vs SIGMC.");
-  plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","DATA vs (BKG + SIGMC).");
+  plotTitle=PlotTitleReplaceAll(plotTitle);
 
-//  plotTitle.ReplaceAll("CHISO","");
-  plotTitle.ReplaceAll("CHISO Endcap MUON WGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel MUON WGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO Endcap MUON ZGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel MUON ZGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO Endcap ELECTRON WGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel ELECTRON WGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO Endcap ELECTRON ZGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel ELECTRON ZGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO EtaCommon MUON WGamma","EB+EE");
-  plotTitle.ReplaceAll("CHISO EtaCommon MUON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON WGamma","EB+EE");
-  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon","EB+EE");
-  plotTitle.ReplaceAll("ChannelsMERGED","#mu+e");
-  plotTitle.ReplaceAll("CHISO","");
-
-  plotTitle.ReplaceAll("WGamma","W#gamma");
-  plotTitle.ReplaceAll("ZGamma","Z#gamma");
 
   TLatex* latexTitle = new TLatex(0.15,0.95,plotTitle);
   latexTitle->SetNDC();
@@ -396,6 +369,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
     }// end of loop over ib
   }// end of loop over ih
   if (max>2) max=2;
+  min=0.5; max=1.9;
 
   std::cout<<"ratio min = "<<min<<", ratio max = "<<max<<std::endl;
   hRatio[0]->GetYaxis()->SetRangeUser(min,max);
@@ -407,7 +381,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   hRatio[0]->GetXaxis()->SetNoExponent();
 
   hRatio[0]->Draw();
-  hRatio[0]->SetTitle(TString("; ")+_pyPars.varKinLabel+TString(" ;"));
+  hRatio[0]->SetTitle(TString("; ")+TitleOfXAxis()+TString(" ;"));
 
   for (int ih=0; ih<nHists1; ih++){
     hRatio[ih]->Draw("EP same");
@@ -473,6 +447,64 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
 
 
 }// end of CompareStackVsHist
+
+TString TPrepareYields::PlotTitleReplaceAll(TString strTitle){
+
+  TString plotTitle = strTitle;
+
+  plotTitle.ReplaceAll("c_","");
+  plotTitle.ReplaceAll("TEMPL_","");
+  plotTitle.ReplaceAll("UNblind_","");
+  plotTitle.ReplaceAll("blindPRESCALE_","");
+  plotTitle.ReplaceAll("blindCOMBINED_","");
+  plotTitle.ReplaceAll("_"," ");
+  plotTitle.ReplaceAll("  "," ");
+  plotTitle.ReplaceAll("TrueDDvsMC","Real #gamma DD-fits vs MC.");
+  plotTitle.ReplaceAll("FakeDDvsMC","Fake #gamma DD-fits vs MC.");
+  plotTitle.ReplaceAll("TotalDATAvsMC","DATA vs MC.");
+  plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(DATA - BKG) vs SIGMC.");
+  plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","DATA vs (BKG + SIGMC).");
+
+  plotTitle.ReplaceAll("CHISO Endcap MUON WGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel MUON WGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO Endcap MUON ZGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel MUON ZGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO Endcap ELECTRON WGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel ELECTRON WGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO Endcap ELECTRON ZGamma","Endcap");
+  plotTitle.ReplaceAll("CHISO Barrel ELECTRON ZGamma","Barrel");
+  plotTitle.ReplaceAll("CHISO EtaCommon MUON WGamma","EB+EE");
+  plotTitle.ReplaceAll("CHISO EtaCommon MUON ZGamma","EB+EE");
+  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON WGamma","EB+EE");
+  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON ZGamma","EB+EE");
+  plotTitle.ReplaceAll("EtaCommon","EB+EE");
+  plotTitle.ReplaceAll("ChannelsMERGED","#mu+e");
+  plotTitle.ReplaceAll("CHISO","");
+
+  plotTitle.ReplaceAll("WGamma","W#gamma");
+  plotTitle.ReplaceAll("ZGamma","Z#gamma");
+
+  return plotTitle;
+
+}// end of PlotTitleReplaceAll
+
+TString TPrepareYields::TitleOfXAxis(){
+
+  if (_pyPars.varKin=="phoEt") return "P_{T}^{#gamma}, GeV";
+  if (_pyPars.varKin=="WMt") return "M_{T}^{W}, GeV";
+  if (_pyPars.varKin=="Mleplep") return "M_{ll}, GeV";
+  if (_pyPars.varKin=="Mpholeplep") return "M_{ll#gamma}, GeV";
+  if (_pyPars.varKin=="Mpholep1") return "M_{l#gamma}, GeV";
+  if (_pyPars.varKin=="lep1PhoDeltaR") return "#DeltaR(l,#gamma)";
+  if (_pyPars.varKin=="lep2PhoDeltaR") return "#DeltaR(l_{2},#gamma)";
+  if (_pyPars.varKin=="phoPFChIsoCorr") return "I_{chHad}^{#gamma}, GeV";
+  if (_pyPars.varKin=="phoSCRChIsoCorr") return "I_{chHad-SCR}^{#gamma}, GeV";
+  if (_pyPars.varKin=="phoRandConeChIsoCorr") return "I_{chHad-RandCone}^{#gamma}, GeV";
+  if (_pyPars.varKin=="phoSCEta") return "#eta^{#gamma}";
+
+  return _pyPars.varKin;
+
+}// end of PlotTitleReplaceAll
 
 
 TCut TPrepareYields::CutEta(int ieta)

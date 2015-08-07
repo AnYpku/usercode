@@ -102,7 +102,7 @@ void TTemplates::PrintPars()
   std::cout<<"cutBarrel="<<_pars.cutBarrel.GetTitle()<<std::endl;
   std::cout<<"cutEndcap="<<_pars.cutEndcap.GetTitle()<<std::endl;
   std::cout<<"cutWeight="<<_pars.cutWeight.GetTitle()<<std::endl;
-  std::cout<<"noLeakSubtr="<<_pars.noLeakSubtr<<std::endl;
+  std::cout<<"noLeakSubtr="<<_pars.noLeakSubtrTrueToFake<<std::endl;
   std::cout<<"isRooFit="<<_pars.isRooFit<<std::endl;
   std::cout<<"strFileOutName="<<_pars.strFileOutName<<std::endl;
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
@@ -226,7 +226,7 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
   return 1;
 }//end of SetHists()
 
-void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint, TH1D* hLeak)
+void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint, bool noLeak, TH1D* hLeak)
 {
   TCut cutKinTrue=CutKinBin(ikin); 
   if (_pars.thresholdCombineTrueTemplates<_pars.kinBinLims[0]) cutKinTrue="1";
@@ -249,24 +249,64 @@ void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTempla
   TCut cutTrue=cutExceptKin && cutKinTrue;
   TCut cutFake=cutExceptKin && cutKinFake;
 
-  if (isTrueGamma) _pars.treeTrue->Draw(_pars.varTrueTempl+(">>")+name,cutTrue*_pars.cutWeight,"goff");
-
-  else _pars.treeFake->Draw(_pars.varFakeTempl+(">>")+name,cutFake*_pars.cutWeight,"goff");
-  if (!noPrint) {
-    std::cout<<std::endl;
-    std::cout<<"hTemplate->GetName()="<<hTemplate->GetName()<<std::endl;
-    std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl;
-    if (isTrueGamma) std::cout<<"_pars.treeTrue->GetEntries(cut)="<<_pars.treeTrue->GetEntries(cutTrue*_pars.cutWeight)<<std::endl;
-    else std::cout<<"_pars.treeFake->GetEntries(cut)="<<_pars.treeFake->GetEntries(cutFake*_pars.cutWeight)<<std::endl;
-    std::cout<<"cutKinTrue="<<cutKinTrue.GetTitle()<<std::endl;
-    std::cout<<"cutKinFake="<<cutKinFake.GetTitle()<<std::endl;    
+  TTree* treeTempl;
+  TTree* treeLeak;
+  TCut cut;
+  TString varTempl;
+  if (isTrueGamma){
+    treeTempl=_pars.treeTrue;
+    cut = cutTrue*_pars.cutWeight;
+    if (!noLeak) treeLeak=_pars.treeFakeToTrue;
+    varTempl=_pars.varTrueTempl;
+  }
+  else{
+    treeTempl=_pars.treeFake;
+    cut = cutFake*_pars.cutWeight;
+    if (!noLeak) treeLeak=_pars.treeSign;
+    varTempl=_pars.varFakeTempl;
   }
 
-  if (isTrueGamma) return;
-  if (_pars.noLeakSubtr) return;
+  treeTempl->Draw(varTempl+(">>")+name,cut,"goff");
+
+//if (isTrueGamma) _pars.treeTrue->Draw(_pars.varTrueTempl+(">>")+name,cutTrue*_pars.cutWeight,"goff");
+//  else _pars.treeFake->Draw(_pars.varFakeTempl+(">>")+name,cutFake*_pars.cutWeight,"goff");
+
+  if (!noPrint) {
+    std::cout<<std::endl;
+    if (isTrueGamma) std::cout<<"Set Real-Gamma Template:"<<std::endl;
+    else std::cout<<"Set Fake-Gamma Template:"<<std::endl;
+    std::cout<<"hTemplate->GetName()="<<hTemplate->GetName()<<std::endl;
+    std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl;
+    std::cout<<"treeTempl->GetEntries(cut)="<<treeTempl->GetEntries(cut)<<std::endl;
+    std::cout<<"cut="<<cut.GetTitle()<<std::endl;
+    std::cout<<std::endl;
+  }
+
+//  if (isTrueGamma) return;
+//  if (_pars.noLeakSubtrTrueToFake) return;
+  if (noLeak) return;
 
 
   TString strNameLeak=hLeak->GetName();
+
+
+
+//  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
+  treeLeak->Draw(varTempl+TString(">>")+strNameLeak,cut,"goff");
+  hTemplate->Add(hLeak,-1);
+
+  for (int ib=1; ib<hTemplate->GetNbinsX(); ib++){
+    if (hTemplate->GetBinContent(ib)<0) hTemplate->SetBinContent(ib,0);
+  }//end of loop over ib
+
+  if (!noPrint){
+    hLeak->Print();
+    std::cout<<"hLeak->GetName()="<<hLeak->GetName()<<std::endl;  
+//    std::cout<<"hLeak->GetSumOfWeights()*norm="<<hLeak->GetSumOfWeights()*norm<<std::endl;  
+    std::cout<<"treeLeak->GetEntries(cut)="<<treeLeak->GetEntries(cut)<<std::endl; 
+    std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl; 
+    std::cout<<std::endl;
+  }
 
 //  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
 //  float normFromSign = hLeak->GetSumOfWeights();
@@ -277,33 +317,7 @@ void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTempla
 //  std::cout<<"hLeak normalization: normFromSign="<<normFromSign<<", normFromTrue="<<normFromTrue<<std::endl;
 //  hTemplate->Add(hLeak,-norm);
 
-  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
-  hTemplate->Add(hLeak,-1);
-
-  if (!noPrint){
-
-    std::cout<<"(cutTrue*_pars.cutWeight)->GetTitle()="<<(cutTrue*_pars.cutWeight).GetTitle()<<std::endl;  
-    std::cout<<"(cutFake*_pars.cutWeight)->GetTitle()="<<(cutFake*_pars.cutWeight).GetTitle()<<std::endl;  
-    hLeak->Print();
-    std::cout<<"hLeak->GetName()="<<hLeak->GetName()<<std::endl;  
-//    std::cout<<"hLeak->GetSumOfWeights()*norm="<<hLeak->GetSumOfWeights()*norm<<std::endl;  
-    std::cout<<"_pars.treeSign->GetEntries(cutFake)="<<_pars.treeSign->GetEntries(cutFake*_pars.cutWeight)<<std::endl; 
-    std::cout<<"hTemplate->GetSumOfWeights()="<<hTemplate->GetSumOfWeights()<<std::endl; 
-/*
-    TH1F* histTempr = new TH1F("histTempr","histTempr",1,_pars.treeSign->GetMinimum(_pars.varWeight)-1,_pars.treeSign->GetMaximum(_pars.varWeight)+1);
-    histTempr->Sumw2();
-    _pars.treeSign->Draw(_pars.varWeight+TString(">>histTempr"),cut*_pars.cutWeight,"goff");
-    std::cout<<std::fixed;
-    std::cout<<hLeak->GetTitle()<<" Template, mean weight =";
-    std::cout<<std::setprecision(2)<<histTempr->GetMean()<<"+-";
-    std::cout<<std::setprecision(2)<<histTempr->GetRMS()<<"; ";
-    std::cout<<"_pars.treeSign->GetEntries(cut*_pars.cutWeight)="<<_pars.treeSign->GetEntries(cut*_pars.cutWeight);
-    std::cout<<std::endl;
-    std::cout<<std::endl;
-    delete histTempr;
-*/
-  }
-}
+}// end of SetTemplate
 
 bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
 {
@@ -319,11 +333,11 @@ bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<"fake template cutExceptKin=(cutAdd && cutEta && cutSideband)*cutWeight="<<cutExceptKin.GetTitle()<<std::endl;
   }
   if (!noPrint) std::cout<<"Fake template cutExceptKin="<<cutExceptKin.GetTitle()<<std::endl;
-  SetTemplate(ikin,ieta,0,_hFake[ikin][ieta], cutExceptKin, noPrint, _hLeak[ikin][ieta]);
+  SetTemplate(ikin,ieta,0,_hFake[ikin][ieta], cutExceptKin, noPrint, _pars.noLeakSubtrTrueToFake, _hLeakTrueToFake[ikin][ieta]);
   // "0" for fake gamma template
   if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
-    float num = 100.0*_hLeak[ikin][ieta]->GetSumOfWeights();
-    float den = _hLeak[ikin][ieta]->GetSumOfWeights()+_hFake[ikin][ieta]->GetSumOfWeights();
+    float num = 100.0*_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights();
+    float den = _hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()+_hFake[ikin][ieta]->GetSumOfWeights();
     _leakFraction[ikin][ieta]=num/den;
   }
   if (_hFake[ikin][ieta]->GetSumOfWeights()==0){
@@ -332,7 +346,7 @@ bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
   }
   if (_pars.isMCclosureMode && _leakFraction[ikin][ieta]>_acceptableLeakFraction[ikin][ieta]){
     std::cout<<"_hFake[ikin][ieta]->GetSumOfWeights()="<<_hFake[ikin][ieta]->GetSumOfWeights()<<"; ";
-    std::cout<<"_hLeak[ikin][ieta]->GetSumOfWeights()="<<_hLeak[ikin][ieta]->GetSumOfWeights()<<"; ";
+    std::cout<<"_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()="<<_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()<<"; ";
     std::cout<<"_leakFraction[ikin][ieta]="<<_leakFraction[ikin][ieta]<<"; ";
     std::cout<<"_acceptableFraction[ikin][ieta]="<<_acceptableLeakFraction[ikin][ieta]<<"; ";
     std::cout<<"return 0;"<<std::endl;
@@ -358,7 +372,7 @@ void TTemplates::SetTrueTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<"true template cutExceptKin=(cutAdd && cutEta && SidebandVarNominalCut())*cutWeight="<<cutExceptKin.GetTitle()<<std::endl;
   }
 //  _fOutTemp->cd();
-  SetTemplate(ikin, ieta, 1, _hTrue[ikin][ieta],cutExceptKin,noPrint);
+  SetTemplate(ikin, ieta, 1, _hTrue[ikin][ieta],cutExceptKin,noPrint,_pars.noLeakSubtrFakeToTrue, _hLeakFakeToTrue[ikin][ieta]);
   // "1" for true gamma template
 }//end of SetTrueTemplate
 
@@ -582,10 +596,13 @@ void TTemplates::NewHistograms(int ikin, int ieta, bool noPrint){
   name+="_Fake"; 
   _hFake[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hFake[ikin][ieta]->Sumw2();
-  name.ReplaceAll("_Fake","_Leak");
-  _hLeak[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
-  _hLeak[ikin][ieta]->Sumw2();
-  name.ReplaceAll("_Leak","_Data");
+  name.ReplaceAll("_Fake","_LeakTrueToFake");
+  _hLeakTrueToFake[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
+  _hLeakTrueToFake[ikin][ieta]->Sumw2();
+  name.ReplaceAll("_LeakTrueToFake","_LeakFakeToTrue");
+  _hLeakFakeToTrue[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
+  _hLeakFakeToTrue[ikin][ieta]->Sumw2();
+  name.ReplaceAll("_LeakFakeToTrue","_Data");
   _hData[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hData[ikin][ieta]->Sumw2();
   name.ReplaceAll("_Data","_Sign");
@@ -606,7 +623,8 @@ void TTemplates::DeleteHistograms(int ikin, int ieta){
     std::cout<<std::endl;
   
   delete  _hFake[ikin][ieta];
-  delete  _hLeak[ikin][ieta]; 
+  delete  _hLeakTrueToFake[ikin][ieta]; 
+  delete  _hLeakFakeToTrue[ikin][ieta]; 
   delete  _hData[ikin][ieta]; 
   delete  _hSign[ikin][ieta]; 
   delete  _hTrue[ikin][ieta]; 
@@ -775,9 +793,10 @@ void TTemplates::FitOneRooFit(int ikin, int ieta, bool noPrint, bool noPlot)
     std::cout<<"Histograms (hTrue, hTrueReference, hFake, hFakeReference, hLeak, hData):"<<std::endl;
     PrintOneHistogramBinByBin(_hTrue, ikin, ieta);
     PrintOneHistogramBinByBin(_hTrueReference, ikin, ieta);
+    PrintOneHistogramBinByBin(_hLeakFakeToTrue, ikin, ieta);
     PrintOneHistogramBinByBin(_hFake, ikin, ieta);
     PrintOneHistogramBinByBin(_hFakeReference, ikin, ieta);
-    PrintOneHistogramBinByBin(_hLeak, ikin, ieta);
+    PrintOneHistogramBinByBin(_hLeakTrueToFake, ikin, ieta);
     PrintOneHistogramBinByBin(_hData, ikin, ieta);
     std::cout<<"_leakFraction[ikin][ieta]="<<_leakFraction[ikin][ieta]<<std::endl;
   }
@@ -909,7 +928,7 @@ void TTemplates::PrintYieldsAndChi2()
       std::cout<<_nTrueFromFitVal[ikin][ieta]<<"+-";
       std::cout<<_nTrueFromFitErr[ikin][ieta]<<"; ";
       if (_hFake[ikin][ieta]->GetSumOfWeights()!=0){
-        _leakFraction[ikin][ieta]=100.0*_hLeak[ikin][ieta]->GetSumOfWeights()/(_hLeak[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights());
+        _leakFraction[ikin][ieta]=100.0*_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()/(_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()+_hFakeReference[ikin][ieta]->GetSumOfWeights());
         std::cout<<_leakFraction[ikin][ieta]<<"%; ";
       }
     }

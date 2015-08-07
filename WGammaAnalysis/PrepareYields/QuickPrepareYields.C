@@ -18,7 +18,7 @@ void QuickPrepareYields_FSRandISR_Ich(){
   anPars.vgamma=conf.Z_GAMMA;
   anPars.blind[conf.BOTH_CHANNELS][conf.Z_GAMMA]=conf.UNBLIND;
 
-  anPars.cutAdd="phoEt>15";
+  anPars.cutAdd="1";
   int selStage=conf.FSR_EXCLUDED;
   AuxPrepareYields(anPars,0,selStage);
 

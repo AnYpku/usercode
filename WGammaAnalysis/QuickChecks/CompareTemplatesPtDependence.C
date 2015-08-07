@@ -38,8 +38,10 @@ void DrawTemplates(bool isTrue, TTree* tr, TString strName, TString strLabel, TS
 {
 
 // varIso - phoRandConeChIsoCorr for True, phoSCRChIsoCorr for fake
-  const int nPtBins = 7;
-  const double lims[nPtBins+1]={10,15,20,25,30,35,45,55};
+  const int nPtBins = 5;
+  const double lims[nPtBins+1]={10,15,20,25,55,500};
+//  const int nPtBins = 8;
+//  const double lims[nPtBins+1]={10,15,20,25,30,35,45,55,500};
   //const int nPtBins = 4;
   //const double lims[nPtBins+1]={15,20,25,30,35};
   //const int nPtBins = 12;
@@ -70,7 +72,7 @@ void DrawTemplates(bool isTrue, TTree* tr, TString strName, TString strLabel, TS
     if (ieta==1) canvNameBase+="_Endcap_";
     TCanvas* canv = new TCanvas(canvNameBase,canvNameBase, 600, 600);
     TLegend* leg;
-    leg = new TLegend(0.53,0.53,0.87,0.87);
+    leg = new TLegend(0.53,0.37,0.87,0.87);
 
 
     for (int ipt=0; ipt<nPtBins; ipt++){
@@ -137,6 +139,7 @@ void DrawTemplates(bool isTrue, TTree* tr, TString strName, TString strLabel, TS
     TString axLabel;
     if (varIso=="phoSCRChIsoCorr") axLabel="I_{ch-SCR}, GeV";
     if (varIso=="phoRandConeChIsoCorr") axLabel="I_{ch-RandCone}, GeV";
+    if (varIso=="phoPFChIsoCorr") axLabel="I_{chHad}^{#gamma}, GeV";
     hists[0][ieta]->GetXaxis()->SetTitle(axLabel);
     hists[0][ieta]->Draw("EP");
     for (int ipt=0; ipt<nPtBins; ipt++){
@@ -169,7 +172,7 @@ void CompareFakeTemplates()
   TTree* tr1=(TTree*)f1->Get("selectedEvents");
   TFile* f1Leak = new TFile("../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root");
   TTree* tr1Leak=(TTree*)f1Leak->Get("selectedEvents");
-  DrawTemplates(0, tr1, "Zg_FakeTemplPtDep", "Z#gamma ISR I_{ch-SCR}", "phoSCRChIsoCorr",tr1Leak);
+  DrawTemplates(0, tr1, "Zg_FakeTemplPtDep", "Z#gamma ISR I_{chHad}^{#gamma}", "phoPFChIsoCorr",tr1Leak);
 }// end of CompareFakeTemplatesDiffSources
 
 void CompareTrueTemplates()
@@ -180,14 +183,14 @@ void CompareTrueTemplates()
   //DrawTemplates(1, tr1, "Wg_TrueTemplPtDep", "W#gamma I_{ch-RandCone}", "phoRandConeChIsoCorr");
 
   // real photon templates from Zg FSR
-//  TFile* f2 = new TFile("../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root");
-//  TTree* tr2=(TTree*)f2->Get("selectedEvents");
-//  DrawTemplates(1, tr2, "ZgFSR_TrueTemplPtDep", "Z#gamma FSR I_{ch-SCR}", "phoSCRChIsoCorr");
+  TFile* f2 = new TFile("../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root");
+  TTree* tr2=(TTree*)f2->Get("selectedEvents");
+  DrawTemplates(1, tr2, "ZgFSR_TrueTemplPtDep", "Z#gamma FSR I_{chHad}^{#gamma}", "phoPFChIsoCorr");
 
   // real photon templates from Zg MC
-  TFile* f3 = new TFile("../WGammaOutput/ChannelsMERGED_ZGamma/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root");
-  TTree* tr3=(TTree*)f3->Get("selectedEvents");
-  DrawTemplates(1, tr3, "ZgMC_TrueTemplPtDep_PFnoSCR", "Z#gamma (MC) I_{ch-PF}", "phoPFChIsoCorr");
+//  TFile* f3 = new TFile("../WGammaOutput/ChannelsMERGED_ZGamma/PreliminaryForTemplateMethodSelected/selected_ZGammaSIGMC.root");
+//  TTree* tr3=(TTree*)f3->Get("selectedEvents");
+//  DrawTemplates(1, tr3, "ZgMC_TrueTemplPtDep_PFnoSCR", "Z#gamma (MC) I_{chHad}^{#gamma}", "phoPFChIsoCorr");
   
   //void DrawTemplates(bool isTrue, TTree* tr, TString strName, TString strLabel, TString varIso, TTree* trLeak=0)
 
