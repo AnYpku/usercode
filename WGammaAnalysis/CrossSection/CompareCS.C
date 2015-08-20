@@ -43,10 +43,11 @@ void CompareCS(int vgamma)
     }//end of ib
   }//end of loop over ich
 
-  hMeasured1D[config.MUON]->SetLineColor(1);
-  hMeasured1D[config.MUON]->SetMarkerColor(1);
-  hMeasured1D[config.ELECTRON]->SetLineColor(4);
-  hMeasured1D[config.ELECTRON]->SetMarkerColor(4);
+  hMeasured1D[config.MUON]->SetLineColor(4);
+  hMeasured1D[config.MUON]->SetMarkerColor(4);
+  hMeasured1D[config.ELECTRON]->SetLineColor(809);
+  hMeasured1D[config.ELECTRON]->SetLineStyle(7);
+  hMeasured1D[config.ELECTRON]->SetMarkerColor(809);
   hTheory1D[config.MUON]->SetLineColor(2);
   hTheory1D[config.ELECTRON]->SetLineColor(6);
   hOtto1D[config.MUON]->SetLineColor(7);
@@ -196,12 +197,12 @@ void CompareCS(int vgamma)
 //    hRatioMuTheory->GetYaxis()->SetRangeUser(0.60,1.40);
     hRatioMuTheory->Divide(hTheory1D[config.MUON]);
     hRatioMuTheory->SetLineWidth(2);
-    hRatioMuTheory->SetLineColor(4);   
-    hRatioMuTheory->SetMarkerColor(4); 
+//    hRatioMuTheory->SetLineColor(4);   
+//    hRatioMuTheory->SetMarkerColor(4); 
     hRatioEleTheory->Divide(hTheory1D[config.ELECTRON]);
     hRatioEleTheory->SetLineWidth(3);
-    hRatioEleTheory->SetLineColor(809); 
-    hRatioEleTheory->SetMarkerColor(809); 
+//    hRatioEleTheory->SetLineColor(809); 
+//    hRatioEleTheory->SetMarkerColor(809); 
     TLegend* leg3 = new TLegend(0.60,0.70,0.98,0.95,config.StrVgType(vgamma));
     leg3->AddEntry(hRatioMuTheory,"muon","l");
     leg3->AddEntry(hRatioEleTheory,"electron","l");  

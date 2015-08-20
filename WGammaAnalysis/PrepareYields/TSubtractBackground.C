@@ -42,6 +42,7 @@ void TSubtractBackground::SetYieldsDataDriven(YieldsSource& source, TString name
   source.label=label;
   source.color=color;
   TFile* f = new TFile(fileName);
+  std::cout<<"TSubtractBackground::SetYieldsDataDriven: fileName: "<<fileName<<std::endl;
   if (!f->IsOpen()){
     std::cout<<"ERROR in TSubtractBackground::SetYieldsDataDriven: file "<<fileName<<" can't be open"<<std::endl;
     return;
@@ -75,6 +76,7 @@ void TSubtractBackground::SubtractBackground()
 {
   std::cout<<"#####################"<<std::endl;
   std::cout<<"Subtract Background"<<std::endl;
+  int is_data=-1;
   for (int isDD=0; isDD<_nDDsources; isDD++){
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
       _sourceBkgSubtrData[isDD].hist[ieta] = (TH1F*)_sourceDDTrue[isDD].hist[ieta]->Clone(_pyPars.strYieldsName1D_BkgSubtrData[ieta]);
@@ -84,6 +86,7 @@ void TSubtractBackground::SubtractBackground()
       _sourceBkgSubtrData[isDD].hist[ieta]->SetName(_pyPars.strYieldsName1D_BkgSubtrData[ieta]);
       int nBins = _sourceBkgSubtrData[isDD].hist[ieta]->GetNbinsX();
       for (int i=0; i<_sources.size(); i++){
+        if (_sources[i].sourceType==DATA) is_data=i;;
         if (_sources[i].sourceType!=BKGMC_TRUE) continue;
         _sourceBkgSubtrData[isDD].hist[ieta]->Add(_sources[i].histBlind[ieta],-1);
         _sourceBkgSubtrData[isDD].yieldTotVal[ieta]-=_sources[i].yieldTotVal[ieta];
@@ -97,10 +100,21 @@ void TSubtractBackground::SubtractBackground()
       _sourceBkgSubtrData[isDD].yieldTotErr[ieta]=sqrt(_sourceBkgSubtrData[isDD].yieldTotErr[ieta]);
 
 //      // if yield<0, set yield=0
+ 
+      std::cout<<std::endl;     
+      std::cout<<"Error replaced by stat only. ieta="<<ieta<<std::endl;
       for (int ib=1; ib<=_sourceBkgSubtrData[isDD].hist[ieta]->GetNbinsX(); ib++){
         if (_sourceBkgSubtrData[isDD].hist[ieta]->GetBinContent(ib)<0)
           _sourceBkgSubtrData[isDD].hist[ieta]->SetBinContent(ib,0);
-      }//end of loop over ib     
+        if (is_data<0) continue;
+        float err = _sources[is_data].histBlind[ieta]->GetBinError(ib);
+        std::cout<<"ib="<<ib<<", nData = "<<_sources[is_data].histBlind[ieta]->GetBinContent(ib)<<"+-"<<_sources[is_data].histBlind[ieta]->GetBinError(ib)<<"; sqrt("<<_sources[is_data].histBlind[ieta]->GetBinContent(ib)<<")="<<sqrt(_sources[is_data].histBlind[ieta]->GetBinContent(ib))<<"; ";
+        std::cout<<"nBkgSubtr = "<<_sourceBkgSubtrData[isDD].hist[ieta]->GetBinContent(ib)<<"+-"<<_sourceBkgSubtrData[isDD].hist[ieta]->GetBinError(ib)<<"; ";
+        _sourceBkgSubtrData[isDD].hist[ieta]->SetBinError(ib,err);
+        std::cout<<"nBkgSubtr becomes = "<<_sourceBkgSubtrData[isDD].hist[ieta]->GetBinContent(ib)<<"+-"<<_sourceBkgSubtrData[isDD].hist[ieta]->GetBinError(ib)<<"; ";
+        std::cout<<std::endl;
+      }//end of loop over ib   
+      std::cout<<std::endl;   
 
     }//end of loop over ieta
   }//end of loop over isDD
@@ -173,7 +187,7 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
 void TSubtractBackground::CompareDATAvsDDsum(int ieta)
 {
   _pyPars.fOut->cd(); 
-  TString canvName=TString("DATAvsDDsum");
+  TString canvName=TString("DATAvsDDsum")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
   _canvDATAvsDDsum[ieta]= new TCanvas(canvName,canvName,800,800);
   TLegend* legend = new TLegend(0.60,0.65,0.90,0.90);
@@ -211,7 +225,7 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
 void TSubtractBackground::CompareDATAvsBKGplusSIGMC(int ieta)
 {
   _pyPars.fOut->cd(); 
-  TString canvName=TString("DATAvsBkgPlusSigMC");
+  TString canvName=TString("DATAvsBkgPlusSigMC")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
   _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,800);
   TLegend* legend = new TLegend(0.60,0.65,0.90,0.90);
@@ -341,7 +355,9 @@ void TSubtractBackground::CompareBkgSubtrDATAvsSIGMC(int ieta)
 
   TH1F* hists[_nDDsources];
   for (int ih=0; ih<_nDDsources; ih++){
-    legend->AddEntry(_sourceBkgSubtrData[ih].hist[ieta],"DATA - BKG","l");
+    TString label = _sourceDDTrue[ih].label;
+    label.ReplaceAll("DD_true","DATA - BKG");
+    legend->AddEntry(_sourceBkgSubtrData[ih].hist[ieta],label,"l");
     _sourceBkgSubtrData[ih].hist[ieta]->SetTitle("");
     hists[ih]=_sourceBkgSubtrData[ih].hist[ieta];
   }

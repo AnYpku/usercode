@@ -200,6 +200,7 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
   bool hasBadBins=CheckTemplates(ikin, ieta, badBins, noPrint);
   if (!noPrint)     std::cout<<"CheckTemplates done; hasBadBins="<<hasBadBins<<std::endl;
 
+//  if (_pars.varFit=="phoSigmaIEtaIEta");
   while (hasBadBins){
     std::cout<<"try to rebin"<<std::endl;
     DeleteHistograms(ikin, ieta);
@@ -262,7 +263,7 @@ void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTempla
   else{
     treeTempl=_pars.treeFake;
     cut = cutFake*_pars.cutWeight;
-    if (!noLeak) treeLeak=_pars.treeSign;
+    if (!noLeak) treeLeak=_pars.treeTrueToFake;
     varTempl=_pars.varFakeTempl;
   }
 
@@ -291,7 +292,7 @@ void TTemplates::SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTempla
 
 
 
-//  _pars.treeSign->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
+//  _pars.treeTrueToFake->Draw(_pars.varFakeTempl+TString(">>")+strNameLeak,cutFake*_pars.cutWeight,"goff");
   treeLeak->Draw(varTempl+TString(">>")+strNameLeak,cut,"goff");
   hTemplate->Add(hLeak,-1);
 
@@ -471,6 +472,9 @@ bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPr
   if (nBins<=8) NeffEv=3;
   if (nBins<=6) NeffEv=1;
   if (nBins<=3) NeffEv=0.01;
+
+  if (_pars.varFit=="phoSigmaIEtaIEta") NeffEv=1;
+  if (nBins<=3) NeffEv=0.01;
   
   float errRateAllowed=sqrt(NeffEv)/NeffEv;
 
@@ -483,22 +487,30 @@ bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPr
 
     badBins[i]=0;
     if (contD<0) {std::cout<<i<<": contD<0; "; badBins[i]=1; hasBadBin=1;}
-    if (contT<0) {std::cout<<i<<": contT<0; "; badBins[i]=1; hasBadBin=1;}
-    if (contF<0) {std::cout<<i<<": contF<0; "; badBins[i]=1; hasBadBin=1;}
-    if (contD==0 && (contT+contF)>0) {std::cout<<i<<": contD==0;"; badBins[i]=1; hasBadBin=1;}
-    if (contD>0 && (contT+contF)==0) {std::cout<<i<<": contT+contF==0;"; badBins[i]=1; hasBadBin=1;}
-    if (errD>errRateAllowed*contD) {
+    else if (contT<0) {std::cout<<i<<": contT<0; "; badBins[i]=1; hasBadBin=1;}
+    else if (contF<0) {std::cout<<i<<": contF<0; "; badBins[i]=1; hasBadBin=1;}
+    else if (contD>0 && (contT+contF)==0) {std::cout<<i<<": contT+contF==0;"; badBins[i]=1; hasBadBin=1;}
+    else if (errD>errRateAllowed*contD) {
       // corresponds to 10 events for unweighted hist
-      std::cout<<i<<": errD>"<<errRateAllowed<<"*contD="<<errD<<">"<<errRateAllowed<<"*"<<contD;
-      std::cout<<"="<<errRateAllowed*contD<<"; ";
+      std::cout<<i<<": errD="<<errD<<">"<<errRateAllowed<<"*"<<contD<<"="<<errRateAllowed*contD<<"; ";
       badBins[i]=1; hasBadBin=1;
     }//end of errD>0.32*contD
+    else if (_pars.varFit=="phoSigmaIEtaIEta");
+    else if (contD==0 && (contT+contF)>0) {std::cout<<i<<": contD==0;"; badBins[i]=1; hasBadBin=1;}
+    if (badBins[i]==1) {
+      std::cout<<std::setprecision(3)<<"varFit bin: "<<_hData[ikin][ieta]->GetBinLowEdge(i)<<"-"<<_hData[ikin][ieta]->GetBinLowEdge(i)+_hData[ikin][ieta]->GetBinWidth(i);
+      std::cout<<std::setprecision(2);
+      std::cout<<", _hData="<<contD<<"+-"<<errD;
+      std::cout<<", _hTrue="<<contT<<"+-"<<_hTrue[ikin][ieta]->GetBinError(i);
+      std::cout<<", _hFake="<<contF<<"+-"<<_hFake[ikin][ieta]->GetBinError(i)<<std::endl;
+    }// end of if (badBins[i]==1)
   }//end of loop over i
   std::cout<<std::endl;
   if (!hasBadBin) {
     if (!noPrint) std::cout<<"CheckTemplates: all bins are OK"<<std::endl;
     return hasBadBin;
   }
+  else {std::cout<<"CheckTemplates: bad bins found"<<std::endl;}
   return hasBadBin;
 }//end of CheckTemplates
 
@@ -526,7 +538,14 @@ bool TTemplates::RebinTemplates(int ikin, int ieta, bool badBins[150], bool noPr
       if (!firstBadBin) firstBadBin=i;
     }
   }// end of loop over i
-  if (1.0*(nFitBins-firstBadBin)/nFitBins<0.25) {
+  if (_pars.varFit=="phoSigmaIEtaIEta" && 1.0*firstBadBin/nFitBins<0.25) {
+    std::cout<<"Rebin by rejecting first bins; firstBadBin = "<<firstBadBin<<", (nBins-badBin)/nBins = "<<1.0*(nFitBins-firstBadBin)/nFitBins<<std::endl;
+    _pars.nFitBins[ikin][ieta]=nFitBins-firstBadBin;
+    _pars.minVarFit[ikin][ieta]=min+unit*(firstBadBin+1);
+    _pars.maxVarFit[ikin][ieta]=max;  
+//    return 0;
+  }
+  else if (1.0*(nFitBins-firstBadBin)/nFitBins<0.25) {
     std::cout<<"Rebin by rejecting tail; firstBadBin = "<<firstBadBin<<", (nBins-badBin)/nBins = "<<1.0*(nFitBins-firstBadBin)/nFitBins<<std::endl;
     _pars.nFitBins[ikin][ieta]=firstBadBin-1;
     _pars.minVarFit[ikin][ieta]=min;
@@ -692,13 +711,13 @@ void TTemplates::FitOneROOT(int ikin, int ieta, bool noPrint, bool noPlot)
 
   float nMax = _hData[ikin][ieta]->GetSumOfWeights();
   float nSign = _hSign[ikin][ieta]->GetSumOfWeights();
-  float nTrueStart = 0.5*nMax;//nSign;
-  float nFakeStart = 0.5*nMax;//nMax - nSign;
+  float nTrueStart = nSign;//nSign;
+  float nFakeStart = nMax - nSign;//nMax - nSign;
   if (nTrueStart<=0 || nFakeStart<=0){nTrueStart=0.5*nMax; nFakeStart=0.5*nMax;}
-  std::cout<<"some true and fake parameters: nTrueStart="<<nTrueStart<<", nFakeStart="<<nFakeStart<<", nSign="<<nSign<<", nMax="<<nMax<<std::endl;
+//  std::cout<<"some true and fake parameters: nTrueStart="<<nTrueStart<<", nFakeStart="<<nFakeStart<<", nSign="<<nSign<<", nMax="<<nMax<<std::endl;
   funcTempl->SetParameters(nTrueStart,nFakeStart);
-  funcTempl->SetParLimits(0,0,nMax);
-  funcTempl->SetParLimits(1,0,nMax);
+  funcTempl->SetParLimits(0,0.05*nMax,0.95*nMax);
+  funcTempl->SetParLimits(1,0.05*nMax,0.95*nMax);
   funcTempl->SetParNames("nTrue","nFake");
   
   _hData[ikin][ieta]->Fit("FuncTempl","L");
@@ -809,11 +828,11 @@ void TTemplates::FitOneRooFit(int ikin, int ieta, bool noPrint, bool noPlot)
 
   //load data
   RooArgSet argSetData(rooVarFit,rooVarSideband,rooPhoEta,rooKin,rooWeight);
-  RooRealVar rooNTrue("nTrue","n True",nTrueStart,0,nMax);
+  RooRealVar rooNTrue("nTrue","n True",nTrueStart,0*nMax,1*nMax);
   RooExtendPdf eTruePdf("eTrue","extended True",truePdf,rooNTrue);
-  RooRealVar rooNFake("nFake","n Fake",nFakeStart,0,nMax);
+  RooRealVar rooNFake("nFake","n Fake",nFakeStart,0*nMax,1*nMax);
   RooExtendPdf eFakePdf("eFake","extended Fake",fakePdf,rooNFake);
-//  RooAddPdf fullPdf("fitModel","fit model",RooArgList(eTruePdf,eFakePdf));
+  // RooAddPdf fullPdf("fitModel","fit model",RooArgList(eTruePdf,eFakePdf));
   RooAddPdf fullPdf("fitModel","fit model",RooArgList(truePdf,fakePdf),RooArgList(rooNTrue,rooNFake));
   std::cout<<"fullPdf.getNorm()="<<fullPdf.getNorm()<<std::endl;
   std::cout<<"dataHist.sumEntries()="<<dataHist.sumEntries()<<std::endl;
@@ -1207,6 +1226,7 @@ TCut TTemplates::FitVarFitRangeCut(int ikin, int ieta)
 void TTemplates::SaveYields()
 {
   _pars.fOutForSave->cd();
+  std::cout<<"TTemplates::SaveYield: will save yields to "<<_pars.fOutForSave->GetTitle()<<std::endl;
 
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     //write fake yields computed from fit

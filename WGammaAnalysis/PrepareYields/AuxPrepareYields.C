@@ -47,6 +47,7 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
   label.ReplaceAll(" SIHIH",", #sigma_{i#etai#eta} fits");
   label.ReplaceAll(" CHISO",", I_{ch} fits");
   prep.SetYieldsDataDrivenTrue(name, label, 3, fileName, strYields1DTrue, strYieldTotTrue);
+
   name.ReplaceAll("true","fake");
   label.ReplaceAll("true","jets#rightarrow#gamma");
   prep.SetYieldsDataDrivenFake(name, label, 4, fileName, strYields1DFake, strYieldTotFake);
@@ -75,6 +76,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
 
   prep.SubtractBackground();
   prep.PlotPrintSave();
+
 }// end of AuxSubtractBackground
 
 void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage)

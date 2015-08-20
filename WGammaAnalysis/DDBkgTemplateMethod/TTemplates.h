@@ -28,18 +28,15 @@ class TTemplates
       TString varFit; 
       TString varPhoEta;
       TString varWeight;
-      TFile* fTrue;
-      TFile* fFake;
-      TFile* fData;
-      TFile* fSign;//treeSign has to be consistent with treeFake
-      TFile* fFakeRef;
-      TFile* fFakeToTrue;// to be consistent with fTrue
-      TTree* treeTrue;
-      TTree* treeFake;
-      TTree* treeData;
-      TTree* treeSign;//treeSign has to be consistent with treeFake
-      TTree* treeFakeRef;
-      TTree* treeFakeToTrue;// to be consistent with treeFake
+
+      TFile* fTrue; TTree* treeTrue; // real-gamma template
+      TFile* fFake; TTree* treeFake; // fake-gamma template
+      TFile* fData; TTree* treeData; // data-to-fit
+      TFile* fSign; TTree* treeSign; // signal MC corresponding to data-to-fit
+      TFile* fTrueToFake; TTree* treeTrueToFake; //leak of real-gamma to fake template
+      TFile* fFakeToTrue; TTree* treeFakeToTrue; //leak of fake-gamma to real template
+      TFile* fFakeRef; TTree* treeFakeRef; // MC-truth fake distribution (for MC-closure test)
+
       int nKinBins;
       float kinBinLims[nKinBinsMax];
       int nFitBins[nKinBinsMax][2];

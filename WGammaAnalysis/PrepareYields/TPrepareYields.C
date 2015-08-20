@@ -480,6 +480,7 @@ TString TPrepareYields::PlotTitleReplaceAll(TString strTitle){
   plotTitle.ReplaceAll("EtaCommon","EB+EE");
   plotTitle.ReplaceAll("ChannelsMERGED","#mu+e");
   plotTitle.ReplaceAll("CHISO","");
+  plotTitle.ReplaceAll("SIHIH","");
 
   plotTitle.ReplaceAll("WGamma","W#gamma");
   plotTitle.ReplaceAll("ZGamma","Z#gamma");

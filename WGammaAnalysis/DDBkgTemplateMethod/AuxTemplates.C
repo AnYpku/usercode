@@ -33,10 +33,6 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
     return;
   }
 
-  pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
-    //the histograms with extracted yields will be saved here
-
-
   for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
     pars.strTrueYieldsTot[ieta]=config.GetYieldsDDTemplateTrueName(config.TOTAL,ieta);
     pars.strTrueYields1D[ieta] =config.GetYieldsDDTemplateTrueName(config.ONEDI,ieta);
@@ -58,21 +54,6 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 
   pars.varPhoEta="phoSCEta";//TString
   pars.varWeight="weight";//TString
-
-  for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
-    pars.cutNominal[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta) 
-                    && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
-    pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut; 
-    //pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CH_RandCone, ieta);//TCut;
-      //charged isolation cut as applied during selection procedure;
-    pars.cutSidebandVarNominalRange[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut;
-      //phoSigmaIEtaIEta cut as applied during selection procedure;
-    std::cout<<"in AuxTemplatesRandomCone"<<std::endl;
-    std::cout<<"ieta="<<config.StrEtaBin(ieta)<<std::endl;
-    std::cout<<"cutNominal="<<pars.cutNominal[ieta].GetTitle()<<std::endl;
-    std::cout<<"cutNominalExceptSidebandVar="<<pars.cutNominalExceptSidebandVar[ieta].GetTitle()<<std::endl;
-    std::cout<<"cutSidebandVarNominalRange="<<pars.cutSidebandVarNominalRange[ieta].GetTitle()<<std::endl;
-  }
 
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_TEMPL_FITS);
 
@@ -134,9 +115,14 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
-  TString strSign="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
-  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
+  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC);
+  if (isMCclosure) strSign.ReplaceAll(".root","_MCclosure.root");
+  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign);
   if (!pars.treeSign) return;
+
+  TString strTrueToFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
+  pars.treeTrueToFake=LoadOneTree("leak_TrueToFake", strTrueToFake, pars.fTrueToFake); 
+  if (!pars.treeTrueToFake) return;
 
   TString strFakeToTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
   pars.treeFakeToTrue=LoadOneTree("leak_FakeToTrue", strFakeToTrue, pars.fFakeToTrue); 
@@ -160,6 +146,10 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
+  pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
+    //the histograms with extracted yields will be saved here
+
+
   pars.varSideband="phoSigmaIEtaIEta";//TString
 //  pars.varTrueTempl="phoRandConeChIsoCorr";//"phoRandConeChIso04Corr";//TString
   pars.varTrueTempl="phoPFChIsoCorr";//"phoRandConeChIso04Corr";//TString
@@ -167,6 +157,21 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.varFit="phoPFChIsoCorr";//"phoSCRChIso04Corr"; //TString
 
 //  pars.cutWeight="weight";//TCut; weight for signal MC tree
+
+  for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
+    pars.cutNominal[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta) 
+                    && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
+    pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut; 
+    //pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CH_RandCone, ieta);//TCut;
+      //charged isolation cut as applied during selection procedure;
+    pars.cutSidebandVarNominalRange[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut;
+      //phoSigmaIEtaIEta cut as applied during selection procedure;
+    std::cout<<"in AuxTemplatesRandomCone"<<std::endl;
+    std::cout<<"ieta="<<config.StrEtaBin(ieta)<<std::endl;
+    std::cout<<"cutNominal="<<pars.cutNominal[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutNominalExceptSidebandVar="<<pars.cutNominalExceptSidebandVar[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutSidebandVarNominalRange="<<pars.cutSidebandVarNominalRange[ieta].GetTitle()<<std::endl;
+  }
 
 }// end of SetParsChIsoTempl()
 
@@ -178,10 +183,10 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   TConfiguration config;
   TPhotonCuts photon;
 
-  pars.thresholdCombineTrueTemplates=54.9;
+  pars.thresholdCombineTrueTemplates=29.9;
   pars.thresholdCombineFakeTemplates=54.9;
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
-    pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
+    pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 10-15-20-25-30-35-45-55-65-75-85-95-120-500
     pars.nFitBins[ikb][config.BARREL]=32;
     pars.minVarFit[ikb][config.BARREL]=0.005;
     pars.maxVarFit[ikb][config.BARREL]=0.021;
@@ -202,17 +207,23 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
-  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.SIGMC);
-  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign); 
+  TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC);
+  pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign);
   if (!pars.treeSign) return;
 
-  TString strTrue=config.GetSelectedName(config.FSR,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
-//  TString strTrue=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.SIGMC);
+  TString strTrueToFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
+  pars.treeTrueToFake=LoadOneTree("leak_TrueToFake", strTrueToFake, pars.fTrueToFake); 
+  if (!pars.treeTrueToFake) return;
+
+  TString strFakeToTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
+  pars.treeFakeToTrue=LoadOneTree("leak_FakeToTrue", strFakeToTrue, pars.fFakeToTrue); 
+  if (!pars.treeFakeToTrue) return;
+
+  TString strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,config.UNBLIND,config.DATA);
-//  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
+  TString strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -224,11 +235,30 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
+  pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
+    //the histograms with extracted yields will be saved here
 
-  pars.varSideband="phoSCRChIsoCorr";//TString
+
+
+  pars.varSideband="phoPFChIsoCorr";//TString
   pars.varTrueTempl="phoSigmaIEtaIEta";//TString
   pars.varFakeTempl="phoSigmaIEtaIEta";//TString
   pars.varFit="phoSigmaIEtaIEta"; //TString
+
+  for (int ieta=config.BARREL; ieta<=config.ENDCAP; ieta++){
+    pars.cutNominal[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta) 
+                    && photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
+    pars.cutNominalExceptSidebandVar[ieta]=photon.RangeSigmaIEtaIEta(2012, anPars.phoWP, ieta);//TCut; 
+    //pars.cutNominalExceptSidebandVar[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CH_RandCone, ieta);//TCut;
+      //charged isolation cut as applied during selection procedure;
+    pars.cutSidebandVarNominalRange[ieta]=photon.RangeOneIsolation(2012,anPars.phoWP,photon.ISO_CHorTRK, ieta);//TCut;
+      //phoSigmaIEtaIEta cut as applied during selection procedure;
+    std::cout<<"in AuxTemplatesRandomCone"<<std::endl;
+    std::cout<<"ieta="<<config.StrEtaBin(ieta)<<std::endl;
+    std::cout<<"cutNominal="<<pars.cutNominal[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutNominalExceptSidebandVar="<<pars.cutNominalExceptSidebandVar[ieta].GetTitle()<<std::endl;
+    std::cout<<"cutSidebandVarNominalRange="<<pars.cutSidebandVarNominalRange[ieta].GetTitle()<<std::endl;
+  }
 
 }// end of SetParsSigmaIEtaIEtaTempl()
 
