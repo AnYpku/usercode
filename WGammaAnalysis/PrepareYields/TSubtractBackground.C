@@ -429,7 +429,11 @@ void TSubtractBackground::PlotPrintSave()
     hBkgSubtrDataTot[ieta] = new TH1F(hTotName, hTotName, 1, lowEdge, upEdge);
     float totVal=0;
     float totErr=0;
-    for (int ib=1; ib<=nBins; ib++){
+
+    // write of yields total
+    // very first bin is underflow (10-15 GeV)
+    // need to start with 2nd bin (15-20 GeV)
+    for (int ib=2; ib<=nBins; ib++){
       totVal+= _sourceBkgSubtrData[0].hist[ieta]->GetBinContent(ib);
       totErr+= _sourceBkgSubtrData[0].hist[ieta]->GetBinError(ib)*_sourceBkgSubtrData[0].hist[ieta]->GetBinError(ib);
     }// end of loop over ib
@@ -437,6 +441,7 @@ void TSubtractBackground::PlotPrintSave()
     hBkgSubtrDataTot[ieta]->SetBinContent(1,totVal);
     hBkgSubtrDataTot[ieta]->SetBinError(1,totErr);
     hBkgSubtrDataTot[ieta]->Write();
+
   }// end of loop over ieta
 
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){

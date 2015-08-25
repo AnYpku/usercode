@@ -144,15 +144,13 @@ void CalcAccAndEff::ComputeAccTimesEff()
   std::cout<<"denTot = "<<_denTot<<", ";
   std::cout<<"denNoWeightTot = "<<_denNoWeightTot<<", ";
   std::cout<<std::setprecision(3)<<"csTheoryTot = "<<_csTheoryTot<<std::endl;
-  std::cout<<std::setprecision(0);
 
   _fOut->cd();
   std::cout<<"den, denNoWeight, csTheory 1D"<<std::endl;
   for (int ib=1; ib<=nHbins; ib++){
-    std::cout<<_Hdenominator1D->GetBinContent(ib)<<", ";
-    std::cout<<_HdenominatorNoWeight1D->GetBinContent(ib)<<", ";
-    std::cout<<std::setprecision(3)<<_HcsTheory1D->GetBinContent(ib);
-    std::cout<<std::setprecision(0);
+    std::cout<<std::setprecision(3)<<_Hdenominator1D->GetBinContent(ib)<<", ";
+    std::cout<<std::setprecision(0)<<_HdenominatorNoWeight1D->GetBinContent(ib)<<", ";
+    std::cout<<std::setprecision(0)<<_HcsTheory1D->GetBinContent(ib);
     std::cout<<std::endl;
   }// end of loop over ib
 
@@ -209,10 +207,13 @@ void CalcAccAndEff::LoopOverTreeEvents()
      if (mcPattern>=0) _mcPatternPos[mcPattern]++;
      
      if (PassedPhaseSpaceCut(_eventTree.treeLeaf, imcPho, imcLep1, imcLep2)){
-       _denTot+=_lumiWeight;
        _Hdenominator1D->Fill(_eventTree.treeLeaf.mcEt->at(imcPho),_lumiWeight);
-       _denNoWeightTot+=1;
        _HdenominatorNoWeight1D->Fill(_eventTree.treeLeaf.mcEt->at(imcPho));
+
+//       // if phoEt>15
+//       if ()
+//       _denTot+=_lumiWeight;
+//       _denNoWeightTot+=1;
      } 
 
   } //end of loop over events in the tree
@@ -271,6 +272,16 @@ int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPh
       }
     }// end of loop over iv
   }// end of else
+
+  if (IsFSR(leaf,imcPho,lepID,bosonID)){
+    for (int imc=0; imc<leaf.nMC; imc++){
+      if (_vgamma==_config.W_GAMMA &&
+          fabs(leaf.mcPID->at(imc))==lepID && 
+          fabs(leaf.mcGMomPID->at(imc))==bosonID &&
+          fabs(leaf.mcMomPID->at(imc))==lepID) 
+      imcLep1=imc;
+    }// end of loop over imc
+  }//end of IsFSR()
 
   //  if (imcPho==-1 || imcLep1==-1){return patt;}
   //  if (_vgamma==_config.Z_GAMMA && imcLep1==-1){return patt;}
@@ -356,10 +367,15 @@ void CalcAccAndEff::ComputeNumerator()
   TString fName = _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_CHISO, "phoEt");
   TFile* fYields = new TFile(fName);
   _Hnumerator1D = (TH1F*)fYields->Get(_config.GetYieldsSignalMCGenBinsName(_config.ONEDI, _config.COMMON));
+
+
+    // compute numerator for accXeff total
+    // very first bin is underflow (10-15 GeV)
+    // need to start with 2nd bin (15-20 GeV)
   TH1F* hTemp = (TH1F*)fYields->Get(_config.GetYieldsSelectedName(_config.ONEDI, _config.COMMON, _config.SIGMC));
   _numTot=0;
   _numTotErr=0;
-  for (int ib=1; ib<=hTemp->GetNbinsX(); ib++){
+  for (int ib=2; ib<=hTemp->GetNbinsX(); ib++){
     _numTot += hTemp->GetBinContent(ib);
     _numTotErr = hTemp->GetBinError(ib)*hTemp->GetBinError(ib);
   }
@@ -403,7 +419,20 @@ void CalcAccAndEff::ComputeDenominator()
 
   PrintPassedLevels();
 
-  _denTotErr=sqrt(_denTot);
+//  _denTotErr=sqrt(_denTot);
+
+
+    // compute denominator for accXeff total
+    // very first bin is underflow (10-15 GeV)
+    // need to start with 2nd bin (15-20 GeV)
+  for (int ib=2; ib<=_Hdenominator1D->GetNbinsX(); ib++){
+    _denTot += _Hdenominator1D->GetBinContent(ib);
+    _denTotErr += _Hdenominator1D->GetBinError(ib)*_Hdenominator1D->GetBinError(ib);
+    _denNoWeightTot += _HdenominatorNoWeight1D->GetBinContent(ib);
+  }
+  _denTotErr=sqrt(_denTotErr);
+  _denNoWeightTotErr=sqrt(_denNoWeightTot);
+
   std::cout<<"_mcPatternNeg="<<_mcPatternNeg<<std::endl;
   for (int ip=0; ip<_nPosPatts; ip++){
     std::cout<<"_mcPatternPos["<<ip<<"]="<<_mcPatternPos[ip]<<", ("<<_strPattern[ip]<<")"<<std::endl;
@@ -434,6 +463,8 @@ void CalcAccAndEff::PlotAndSaveOutput()
   HaccXeffTot->SetBinError(1,_accXeffTotErr);
   HcsTheoryTot->SetBinContent(1,_csTheoryTot);
   HcsTheoryTot->SetBinError(1,_csTheoryTotErr);
+  std::cout<<"HaccXeffTot="<<HaccXeffTot->GetBinContent(1)<<std::endl;
+  std::cout<<"HcsTheoryTot="<<HcsTheoryTot->GetBinContent(1)<<std::endl;
   HaccXeffTot->Write();
   HcsTheoryTot->Write();
 }// end of PlotAndSaveOutput

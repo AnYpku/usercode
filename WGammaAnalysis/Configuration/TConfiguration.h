@@ -115,6 +115,8 @@ class TConfiguration
     TString GetCrossSectionFileName(int channel, int vgamma);
     TString GetCSname(int channel, int csMode);
 
+    TString GetSystCHISOvsSIHIHname(int csMode, int etaBin);
+
 //    TString GetUnfoldingFileName(int channel);
 //    TString GetMatrUnfo1DName();
 //    TString GetMatrMigr1DName();

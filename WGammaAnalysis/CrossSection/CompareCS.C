@@ -38,7 +38,7 @@ void CompareCS(int vgamma)
     hTheory1D[ich]->SetLineWidth(2);
     hMeasured1D[ich]->SetLineWidth(2);
     hOtto1D[ich]->SetLineWidth(2);
-    for (int ib=1; ib<=hTheory1D[ich]->GetNbinsX(); ib++){
+    for (int ib=2; ib<=hTheory1D[ich]->GetNbinsX(); ib++){
       thTotalCSval[ich]+=hTheory1D[ich]->GetBinContent(ib)*hTheory1D[ich]->GetBinWidth(ib);
     }//end of ib
   }//end of loop over ich
@@ -84,6 +84,7 @@ void CompareCS(int vgamma)
   if (vgamma==config.W_GAMMA) hMeasured1D[config.MUON]->GetYaxis()->SetRangeUser(0.1,1000);
   if (vgamma==config.Z_GAMMA) hMeasured1D[config.MUON]->GetYaxis()->SetRangeUser(0.01,250);
   hMeasured1D[config.MUON]->GetXaxis()->SetRangeUser(15,500);
+  hMeasured1D[config.ELECTRON]->GetXaxis()->SetRangeUser(15,500);
   hMeasured1D[config.MUON]->GetYaxis()->SetTitle("d#sigma/dP_{T}^{#gamma}, fb/GeV");
   hMeasured1D[config.MUON]->GetYaxis()->SetTitleOffset(1.6);
   hMeasured1D[config.MUON]->GetYaxis()->SetMoreLogLabels(0);

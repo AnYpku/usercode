@@ -183,6 +183,10 @@ TString TConfiguration::GetYieldsBkgSubtrDataName(int csMode, int etaBin){
   return TString("yieldsBkgSubtrData_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
 }
 
+TString TConfiguration::GetSystCHISOvsSIHIHname(int csMode, int etaBin){
+  return TString("systCHISOvsSIHIH_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
+}
+
 TString TConfiguration::GetYieldsSignalMCGenBinsName(int csMode, int etaBin){
   return TString("yieldsSignalMCGenBins_")+StrCsMode(csMode)+TString("_")+StrEtaBin(etaBin);
 }
