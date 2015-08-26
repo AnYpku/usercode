@@ -25,14 +25,14 @@ class Unfolding
 
        bool PrepareMigrationMatrix();
 
-       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg=RooUnfold::kBayes);
-       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV);
+       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TString strAnnex);
+       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV, TString strAnnex);
        bool ComputeSystErrors(TH1D* histInputYields, float* errSyst,RooUnfold::Algorithm alg, int NSmears);
        bool ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfold::Algorithm alg, int NSmears);
 
-       bool PlotAndStore();
-       bool PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitle);
-       bool PlotTH2D(TH2D* hist2D, TString saveName);
+       bool PlotAndStore(TString strAnnex);
+       bool PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitle, TString strAnnex);
+       bool PlotTH2D(TH2D* hist2D, TString saveName, TString strAnnex);
 
 
      private:

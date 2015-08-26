@@ -12,6 +12,7 @@
 #include "../PrepareYields/AuxPrepareYields.C"
 #include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
 #include "../CrossSection/CalcCrossSection.h"
+#include "../CrossSection/AuxCrossSection.C"
 
 #include <iostream>
 
@@ -407,8 +408,9 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
       std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
       anPars.channel=ich;
       anPars.vgamma=ivg;
-      CalcCrossSection cs(anPars.channel, anPars.vgamma, anPars.blind[ich][ivg], anPars.configfile);
-      cs.Calc();
+      AuxCrossSection(anPars,ich,ivg);
+//      CalcCrossSection cs(anPars.channel, anPars.vgamma, anPars.blind[ich][ivg], anPars.configfile);
+//      cs.Calc();
       std::cout<<"%_%  DONE "<<strAffix<<std::endl;
       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
     }// end of loop over ivg

@@ -1,3 +1,5 @@
+#include "../Configuration/TConfiguration.h"
+
 #include "TSubtractBackground.h"
 
 #include <iostream>
@@ -379,18 +381,16 @@ void TSubtractBackground::PlotPrintSave()
       CompareTrueDDvsMC(ieta);
       CompareBkgSubtrDATAvsSIGMC(ieta);
     }
-    return;
   }
-
-  // if _nDDsources==1, proceed
-
-  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
-    CompareTotalDATAvsMC(ieta);
-    CompareFakeDDvsMC(ieta);
-    CompareTrueDDvsMC(ieta);
-    CompareDATAvsBKGplusSIGMC(ieta);
-    CompareBkgSubtrDATAvsSIGMC(ieta);
-    if (ieta!=_COMMON) CompareDATAvsDDsum(ieta);
+  else {
+    for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+      CompareTotalDATAvsMC(ieta);
+      CompareFakeDDvsMC(ieta);
+      CompareTrueDDvsMC(ieta);
+      CompareDATAvsBKGplusSIGMC(ieta);
+      CompareBkgSubtrDATAvsSIGMC(ieta);
+      if (ieta!=_COMMON) CompareDATAvsDDsum(ieta);
+    }
   }
 
   //Print Yields
@@ -417,11 +417,15 @@ void TSubtractBackground::PlotPrintSave()
   for (int is=0; is<_sources.size(); is++){
     if (_sources[is].sourceType==SIGMC) isSign=is;
   }
+
+  // Write to output file
+
   _pyPars.fOut->cd(); 
   TH1F* hBkgSubtrDataTot[3];
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     _sourceBkgSubtrData[0].hist[ieta]->Write();
       //let's say "0" corresponds to result of CHISO fits
+
     TString hTotName =  _pyPars.strYieldsNameTot_BkgSubtrData[ieta];
     float lowEdge =  _sourceBkgSubtrData[0].hist[ieta]->GetBinLowEdge(1);
     int nBins = _sourceBkgSubtrData[0].hist[ieta]->GetNbinsX();
@@ -453,5 +457,32 @@ void TSubtractBackground::PlotPrintSave()
     _sigMCGenYields[ieta]->Write(_pyPars.strYieldsName1D_SignalMCGenBins[ieta]);
   }
 
+  //Write syst error due to CHISO vs SIHIH fits
+  TConfiguration conf;
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    TString strSyst=conf.GetSystCHISOvsSIHIHname(conf.ONEDI, ieta);
+    TH1F* hSystCHISOvsSIHIH1D = (TH1F*)_sourceBkgSubtrData[0].hist[ieta]->Clone(strSyst);
+    hSystCHISOvsSIHIH1D->SetTitle(strSyst);
 
+    TString strSystTot=conf.GetSystCHISOvsSIHIHname(conf.TOTAL, ieta);
+    TH1F* hSystCHISOvsSIHIHTot = new TH1F(strSystTot,strSystTot,1,15.0,500.0);
+    float spreadTot=0;
+    std::cout<<"hSyst (CHISO-SIHIH); ieta="<<StrLabelEta(ieta)<<std::endl;
+    for (int ib=1; ib<=hSystCHISOvsSIHIH1D->GetNbinsX(); ib++){
+      hSystCHISOvsSIHIH1D->SetBinContent(ib,0);
+      float spread;
+      if (_nDDsources==1) spread=0;
+      else spread=fabs(_sourceBkgSubtrData[0].hist[ieta]->GetBinContent(ib)-_sourceBkgSubtrData[1].hist[ieta]->GetBinContent(ib));
+      hSystCHISOvsSIHIH1D->SetBinError(ib,spread);
+      if (ib>1) spreadTot+=spread*spread; 
+      std::cout<<"ib="<<ib<<", val="<<_sourceBkgSubtrData[0].hist[ieta]->GetBinContent(ib)<<"+-"<<_sourceBkgSubtrData[0].hist[ieta]->GetBinError(ib)<<", syst="<<hSystCHISOvsSIHIH1D->GetBinError(ib)<<std::endl;
+    }//end of loop over ib
+    spreadTot=sqrt(spreadTot);
+    hSystCHISOvsSIHIH1D->Write();
+    hSystCHISOvsSIHIHTot->SetBinContent(1,0);
+    hSystCHISOvsSIHIHTot->SetBinError(1,spreadTot);
+    hSystCHISOvsSIHIHTot->Write();
+    delete hSystCHISOvsSIHIHTot;
+  }//end of loop over ieta
+  std::cout<<"everything written to "<<_pyPars.fOut->GetName()<<std::endl;
 }// end of PlotPrintSave()

@@ -16,15 +16,50 @@ class CalcCrossSection
      public:
     CalcCrossSection (int channel, int vgamma, int blind, string configfile="../Configuration/config.txt");
 
+       enum{ERR_STAT,ERR_SYST};
+
+       struct FromYieldToCS{
+
+         int errType;
+
+         TString title;
+         TString name;
+
+         TH1F* yieldTOT_bkgSubtr;
+         TH1F* yields1D_bkgSubtr;
+
+         TH1F* yieldTOT_unfolded;
+         TH1F* yields1D_unfolded;
+         TH2D* covMatrix;
+
+         TH1F* yieldTOT_accXeffCorr;
+         TH1F* yields1D_accXeffCorr;
+         TH2D* covMatrix_accXeffCorr;
+
+         TH1F* yieldTOT_overLumi;
+         TH1F* yields1D_overLumi;
+         TH2D* covMatrix_overLumi;
+
+         TH1F* crossSectionTOT;
+         TH1F* crossSection1D;
+//         TH2D* covMatrix_overBinWidth;
+
+       };
+
        virtual ~CalcCrossSection();
        void    Calc();
+
        void    GetSignalYields();
-       void    ApplyUnfolding();
-       void    ApplyAccXEff();
-       void    DivideOverLumi();
-       void    DivideOverBinWidth();
-       void    Plot();
+       void    GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TString str1D, TString strTOT);
+
+       void    ApplyUnfolding(FromYieldToCS& yCS);
+       void    ApplyAccXEff(FromYieldToCS& yCS);
+       void    DivideOverLumi(FromYieldToCS& yCS);
+       void    DivideOverBinWidth(FromYieldToCS& yCS);
+       void    Plot(FromYieldToCS& yCS);
        void    Print(TString strYields, TH1F* hTot, TH1F* h1D);
+
+       void    PrintLatexAll();
 
 
 
@@ -37,24 +72,15 @@ class CalcCrossSection
        TConfiguration _config;
        TFile* _fOut;
 
-       TH1F* _yieldTOT_bkgSubtr;
-       TH1F* _yields1D_bkgSubtr;
 
-       TH1F* _yieldTOT_unfolded;
-       TH1F* _yields1D_unfolded;
-       TH2D* _covMatrix;
+       FromYieldToCS _yCSstat;
+       FromYieldToCS _yCSsyst_CHISOvsSIHIH;
+       FromYieldToCS _yCSsyst_RealTemplStat;
+       FromYieldToCS _yCSsyst_FakeTemplStat;
+       FromYieldToCS _yCSsyst_etogStat;
+       FromYieldToCS _yCSsyst_accXeff_MCstat;
 
-       TH1F* _yieldTOT_accXeffCorr;
-       TH1F* _yields1D_accXeffCorr;
-       TH2D* _covMatrix_accXeffCorr;
-
-       TH1F* _yieldTOT_overLumi;
-       TH1F* _yields1D_overLumi;
-       TH2D* _covMatrix_overLumi;
-
-       TH1F* _crossSectionTOT;
-       TH1F* _crossSection1D;
-       TH2D* _covMatrix_overBinWidth;
+       FromYieldToCS _yCSstatPLUSsyst;
 
 
        float _lumi;

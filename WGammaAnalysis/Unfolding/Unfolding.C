@@ -84,7 +84,7 @@ bool Unfolding::TestDifferentMethods()
   TVectorD errStatInv(_nBinsGen);
   TVectorD errSystInv(_nBinsGen);
   TVectorD errCovStatVInv(_nBinsGen);
-  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv);
+  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv,"testInvert");
 
   TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",_nBinsGen,_phoPtLimitsGen);
   TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
@@ -92,7 +92,7 @@ bool Unfolding::TestDifferentMethods()
   TVectorD errSystDAg(_nBinsGen);
   TVectorD errCovStatVDAg(_nBinsGen);
 //  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes);
-  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg,"testBayes");
 //  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 
   std::cout<<std::endl;
@@ -283,7 +283,7 @@ bool Unfolding::PrepareMigrationMatrix()
   return 1;
 }// end of PrepareMigrationMatrix(...)
 
-bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg)
+bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TString strAnnex)
 {  
   std::cout<<"#######################"<<std::endl;
   std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
@@ -293,14 +293,14 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
   TVectorD errSystV(_nBinsGen);
   TVectorD errCovStatV(_nBinsGen);
 
-  bool isOk = ApplyRooUnfold(histInputYields,unfoldedYields,alg,errCovStat,errStatV, errSystV, errCovStatV);
+  bool isOk = ApplyRooUnfold(histInputYields,unfoldedYields,alg,errCovStat,errStatV, errSystV, errCovStatV, strAnnex);
 
   std::cout<<std::endl<<"DoRooUnfold() ends here"<<std::endl;
   std::cout<<"#######################"<<std::endl;
   return isOk;
 }// end of ApplyRooUnfold(...)
 
-bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV)
+bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV, TString strAnnex)
 {  
   std::cout<<"#######################"<<std::endl;
   std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
@@ -347,7 +347,9 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
   strAffix+=config.StrChannel(_channel);
   strAffix+="_";
   strAffix+=config.StrVgType(_vgamma);
-  PlotMatrixAsTH2D(errCovStat, "matrCovarianceStat",TString("Covariance Matrix")+strAffix);
+  strAffix+="_";
+
+  PlotMatrixAsTH2D(errCovStat, "matrCovarianceStat",TString("Covariance Matrix")+strAffix, strAnnex);
 //  TCanvas* c = new TCanvas("errCovStat","errCovStat");
 //  errCovStat.Draw("COLZ");
 
@@ -503,7 +505,7 @@ bool Unfolding::ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfo
   return 1;
 }
 
-bool Unfolding::PlotAndStore()
+bool Unfolding::PlotAndStore(TString strAnnex)
 {
 
   _fOut->cd();
@@ -512,8 +514,8 @@ bool Unfolding::PlotAndStore()
 
   _histMigrMatrixNotNormalized->SetTitle(TString("Migration Matrix: Counts (no weights)")+strAffixTitle);
   _histEventCountMigrMatrix->SetTitle(TString("Migration Matrix: not normalized")+strAffixTitle);
-  PlotTH2D(_histMigrMatrixNotNormalized, TString("cMigrMatrix")+strAffixTitle);
-  PlotTH2D(_histEventCountMigrMatrix, TString("cEventCount")+strAffixTitle);
+  PlotTH2D(_histMigrMatrixNotNormalized, TString("cMigrMatrix")+strAffixTitle, strAnnex);
+  PlotTH2D(_histEventCountMigrMatrix, TString("cEventCount")+strAffixTitle, strAnnex);
 
   TH2D* hResponse = (TH2D*)_histMigrMatrixNotNormalized->Clone("hResponse");
   for (int ir=1; ir<=_nBinsRec; ir++){
@@ -528,7 +530,7 @@ bool Unfolding::PlotAndStore()
     }// end of loop over ig
   }// end of loop over ir
   hResponse->SetTitle(TString("Response Matrix: normalized by N_{gen} ")+strAffixTitle);
-  PlotTH2D(hResponse, TString("cResponseMatr")+strAffixTitle);
+  PlotTH2D(hResponse, TString("cResponseMatr")+strAffixTitle, strAnnex);
  
   TCanvas* cPtSpectra = new TCanvas(TString("cPtSpectra")+strAffixTitle,TString("cPtSpectra")+strAffixTitle,600,600);
   cPtSpectra->Divide(2,1);
@@ -663,7 +665,7 @@ bool Unfolding::PlotAndStore()
   return 1;
 }// end of PlotAndStore
 
-bool Unfolding::PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitle){
+bool Unfolding::PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitle, TString strAnnex){
 
   TString hName=TString("h")+saveName;
   hName.ReplaceAll("/","_");
@@ -675,11 +677,11 @@ bool Unfolding::PlotMatrixAsTH2D(TMatrixD& matr, TString saveName, TString hTitl
       hist2D->SetBinContent(ir,ig,matr(ir-1,ig-1));
     }
   hist2D->SetTitle(hTitle);
-  PlotTH2D(hist2D,saveName);
+  PlotTH2D(hist2D,saveName,strAnnex);
   return 1;
 }//end of PlotMatrixAsTH2D
 
-bool Unfolding::PlotTH2D(TH2D* hist2D, TString saveName){
+bool Unfolding::PlotTH2D(TH2D* hist2D, TString saveName, TString strAnnex){
 
   TStyle* style = new TStyle("style","style");
   style->SetPalette(1);
@@ -740,7 +742,7 @@ bool Unfolding::PlotTH2D(TH2D* hist2D, TString saveName){
     line->Draw("same");
   }//end of loop over ig
   TString strDir=_config.GetPlotsDirName(_channel,_vgamma,_config.PLOTS_CONSTANTS);
-  saveName=strDir+saveName;
+  saveName=strDir+saveName+TString("_")+strAnnex;
   canv->SaveAs(saveName+TString(".png"));
   canv->SaveAs(saveName+TString(".pdf"));
   canv->SaveAs(saveName+TString(".root"));

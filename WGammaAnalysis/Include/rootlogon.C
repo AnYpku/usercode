@@ -42,6 +42,7 @@
   gROOT->ProcessLine(".L ../AcceptanceAndEfficiency/CalcAccAndEff.C+");
 
   gROOT->ProcessLine(".L ../CrossSection/CalcCrossSection.C+");
+  gROOT->ProcessLine(".L ../CrossSection/AuxCrossSection.C+");
 
   gROOT->ProcessLine(".L ../FullChain/FullChain.C+");
 //  gROOT->ProcessLine(".L ../FullChain/AuxFchPreliminarySelection.C+");
