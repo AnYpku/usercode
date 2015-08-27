@@ -1,5 +1,7 @@
 #include "TTemplates.h"
 #include "TTemplatesSyst.h"
+  //due to sideband variation
+#include "TTemplatesSystRandomizeTempl.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
 //this package
@@ -17,16 +19,35 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
 
 void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
 
+void SetParsGeneral(TConfiguration::AnalysisParameters &anPars, TTemplates::TemplatesPars &pars, bool isMCclosure);
+
+void AuxSysRandTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
+{
+  //this function is called in FullChain
+
+  TTemplates::TemplatesPars pars;
+  SetParsGeneral(anPars, pars, isMCclosure);
+  TTemplatesSystRandomizeTempl temp(pars);
+  temp.RandomizeTempl();
+  
+}// end of AuxSystRandTemplates()
 
 void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   //this function is called in FullChain
-  TConfiguration config;
-  TPhotonCuts photon;
 
   TTemplates::TemplatesPars pars;
+  SetParsGeneral(anPars, pars, isMCclosure);
+  TTemplates temp(pars);
+  temp.ComputeBackground();
+  
+}// end of AuxTemplates()
 
-  pars.varKin=anPars.varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
+void SetParsGeneral(TConfiguration::AnalysisParameters &anPars, TTemplates::TemplatesPars &pars, bool isMCclosure)
+{
+  TConfiguration config;
+  TPhotonCuts photon;
+ pars.varKin=anPars.varKin;// usually phoEt, could be any other kinematic variable availiable in treeData and treeSign
   pars.nKinBins=anPars.nKinBins;// number of analysis bins, max=50 (determined in TTemplates.h)
   if (anPars.nKinBins>TTemplates::nKinBinsMax){
     std::cout<<"nKinsBins="<<anPars.nKinBins<<", shouldn't exceed "<<TTemplates::nKinBinsMax<<std::endl;
@@ -62,11 +83,8 @@ void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 
   if (anPars.templFits==TConfiguration::TEMPL_CHISO) 
     SetParsChIsoTempl(pars, anPars, isMCclosure);
-  
-  TTemplates temp(pars);
-  temp.ComputeBackground();
-  
-}// end of AuxTemplates()
+
+}//end of SetParsGeneral
 
 
 TTree* LoadOneTree(TString strFileWithWhat, TString strFileName, TFile* f)

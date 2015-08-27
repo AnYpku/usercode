@@ -105,7 +105,6 @@ class TTemplates
 
 
     bool SetHists(int kinBin, int etaBin, bool noPrint=0);
-    void RandomizeTemplates(int ikin, int ieta);
 
     void FitOneRooFit(int kinBin, int etaBin, bool noPrint=0, bool noPlot=0);
 //    TH1D* _hFakeTemp;

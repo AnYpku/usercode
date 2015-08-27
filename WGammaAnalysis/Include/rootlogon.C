@@ -27,6 +27,7 @@
   gROOT->ProcessLine(".L ../Selection/Selection.C+");
 
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplates.C+");
+  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesSystRandomizeTempl.C+");
 //  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/TTemplatesSyst.C+");
   gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplates.C+");
 //  gROOT->ProcessLine(".L ../DDBkgTemplateMethod/AuxTemplatesPickSideband.C+");

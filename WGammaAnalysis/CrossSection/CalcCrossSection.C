@@ -62,7 +62,7 @@ void CalcCrossSection::PrintLatexAll()
     std::cout<<"  \\begin{center}"<<std::endl;
     std::cout<<"  \\caption{Cross section and errors}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
-    if (_channel==_config.ELECTRON && _channel==_config.W_GAMMA){
+    if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
       std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
       std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & err syst & accXeff\\\\ "<<std::endl;
       std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & $e\\rightarrow\\gamma$ stat. & MC stat \\\\ \\hline"<<std::endl;

@@ -650,22 +650,6 @@ void TTemplates::DeleteHistograms(int ikin, int ieta){
   delete  _hFakeMCtruth[ikin][ieta];
 }// end of DeleteHistograms
 
-void TTemplates::RandomizeTemplates(int ikin, int ieta)
-{
-  for (int ib=1; ib<_hTrueReference[ikin][ieta]->GetNbinsX(); ib++){
-    float mean = _hTrueReference[ikin][ieta]->GetBinContent(ib);
-    float sigma = _hTrueReference[ikin][ieta]->GetBinError(ib);
-    _hTrue[ikin][ieta]->SetBinContent(ib,_random.Gaus(mean,sigma));
-    _hTrue[ikin][ieta]->SetBinError(ib,sigma);
-  }
-  for (int ib=1; ib<_hFakeReference[ikin][ieta]->GetNbinsX(); ib++){
-    float mean = _hFakeReference[ikin][ieta]->GetBinContent(ib);
-    float sigma = _hFakeReference[ikin][ieta]->GetBinError(ib);
-    _hFake[ikin][ieta]->SetBinContent(ib,_random.Gaus(mean,sigma));
-    _hFake[ikin][ieta]->SetBinError(ib,sigma);
-  }
-}
-
 TString TTemplates::StrLabelEta(int ieta){
   if (ieta==_BARREL) return "_Barrel_";
   else if (ieta==_ENDCAP) return "_Endcap_";
