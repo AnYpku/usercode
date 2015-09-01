@@ -21,7 +21,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
 
 void SetParsGeneral(TConfiguration::AnalysisParameters &anPars, TTemplates::TemplatesPars &pars, bool isMCclosure);
 
-void AuxSysRandTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
+void AuxSystRandTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
   //this function is called in FullChain
 

@@ -54,6 +54,7 @@ class TConfiguration
       bool noPreSelection[2][2];//channel, vgamma
       bool noExtraSelection[2][2];//channel, vgamma
       bool noDDBkgComputation[2][2][2];//channel, vgamma, different templates
+      bool noDDBkgSystRandTempl[2][2][2];//channel, vgamma, different templates
       bool noDDBkgEtoGamma;
       bool noPrepareYields[2][2];//channel, vgamma
       bool noSubtractBackground[2][2][3];//channel, vgamma, different templates

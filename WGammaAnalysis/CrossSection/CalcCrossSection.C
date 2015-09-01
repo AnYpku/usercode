@@ -213,6 +213,15 @@ void CalcCrossSection::GetSignalYields()
   _yCSstat.yieldTOT_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
   _yCSstat.yields1D_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
   _yCSstat.yields1D_bkgSubtr->Print();
+ 
+//  if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
+//    TH1F* hSigMC = (TH1F*)fSig->Get("yieldsSelected_SIGMC__ONEDI_COMMON");
+//    // take underflow bin from signal MC for WGamma electron channel
+//   float cont = hSigMC->GetBinContent(1);
+//    float err = sqrt(hSigMC->GetBinError(1)*hSigMC->GetBinError(1)+0.2*cont*0.2*cont);
+//    _yCSstat.yields1D_bkgSubtr->SetBinContent(1,cont);
+//    _yCSstat.yields1D_bkgSubtr->SetBinError(1,err);
+//  }
   _fOut->cd();
   Print("Bkg Subtr Yields:",_yCSstat.yieldTOT_bkgSubtr,_yCSstat.yields1D_bkgSubtr);
 }// end of GetSignalYields()
@@ -234,6 +243,11 @@ void CalcCrossSection::GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TStrin
   for (int ib=1; ib<_yCSstat.yields1D_bkgSubtr->GetNbinsX(); ib++){
     yCS.yields1D_bkgSubtr->SetBinContent(ib,_yCSstat.yields1D_bkgSubtr->GetBinContent(ib));
   }//end of loop over ib
+
+//  if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
+//    yCS.yields1D_bkgSubtr->SetBinError(1,_yCSstat.yields1D_bkgSubtr->GetBinError(1));
+//  }
+
   Print("Bkg Subtr Yields:",yCS.yieldTOT_bkgSubtr,yCS.yields1D_bkgSubtr);
 
 }// end of GetYieldsSyst()

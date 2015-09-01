@@ -123,7 +123,7 @@ bool Unfolding::TestDifferentMethods()
   }
 
   std::cout<<std::endl;
-  std::cout<<"Stat Covariance Matrix, RooUnf inversion"<<std::endl;  
+  std::cout<<"Covariance Matrix, RooUnf inversion"<<std::endl;  
   for (int i=0; i<_nBinsGen; i++){
     for (int j=0; j<_nBinsGen; j++){
 //      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatInv(i,j)<<" ";
@@ -133,7 +133,7 @@ bool Unfolding::TestDifferentMethods()
   }
 
   std::cout<<std::endl;
-  std::cout<<"Stat Covariance Matrix, RooUnf D'Agostini"<<std::endl;  
+  std::cout<<"Covariance Matrix, RooUnf D'Agostini"<<std::endl;  
   for (int i=0; i<_nBinsGen; i++){
     for (int j=0; j<_nBinsGen; j++){
 //      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatDAg(i,j)<<" ";
@@ -349,9 +349,29 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
   strAffix+=config.StrVgType(_vgamma);
   strAffix+="_";
 
-  PlotMatrixAsTH2D(errCovStat, "matrCovarianceStat",TString("Covariance Matrix")+strAffix, strAnnex);
+  PlotMatrixAsTH2D(errCovStat, "matrCovariance",TString("Covariance Matrix")+strAffix, strAnnex);
 //  TCanvas* c = new TCanvas("errCovStat","errCovStat");
 //  errCovStat.Draw("COLZ");
+
+  TMatrixD matrCorrelation(errCovStat.GetNrows(),errCovStat.GetNcols());
+  std::cout<<"Correlation matrix"<<std::endl;
+  for (int i=0; i<errCovStat.GetNrows(); i++){
+    for (int j=0; j<errCovStat.GetNcols(); j++){
+      float Cij = errCovStat(i,j);
+      float Cii = errCovStat(i,i);
+      float Cjj = errCovStat(j,j);
+      if (i>=errCovStat.GetNcols()) Cjj = errCovStat(i,i);
+      if (j>=errCovStat.GetNrows()) Cii = errCovStat(j,j);
+      if ((Cii*Cjj)!=0) matrCorrelation(i,j)=Cij/sqrt(Cii*Cjj);
+      if ((Cii*Cjj)<0.0001 && Cij*Cij<0.0001) matrCorrelation(i,j)=0;
+      if ((Cii*Cjj)<0.0001 && Cij*Cij>0.0001) matrCorrelation(i,j)=10;      
+      std::cout<<std::setprecision(0)<<"i="<<i<<", j="<<j<<", Cij="<<Cij<<", Cii="<<Cii<<", Cjj="<<Cjj;
+      std::cout<<std::setprecision(3)<<", corr(i,j)="<<matrCorrelation(i,j)<<std::endl;
+      std::cout<<std::setprecision(0);
+    }//end of loop over j
+  }//end of loop over i
+
+  PlotMatrixAsTH2D(matrCorrelation, "matrCorrelation",TString("Correlation Matrix")+strAffix, strAnnex);
 
   std::cout<<"Yields: (MC-gen), (MC-rec), (data-input), (data-unfolded)"<<std::endl;
   for (int i=1; i<=_nBinsRec; i++){

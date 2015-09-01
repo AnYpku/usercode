@@ -58,6 +58,8 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
       anPars.noExtraSelection[ich][ivg]=1;
       anPars.noDDBkgComputation[ich][ivg][conf.TEMPL_CHISO]=1;
       anPars.noDDBkgComputation[ich][ivg][conf.TEMPL_SIHIH]=1;
+      anPars.noDDBkgSystRandTempl[ich][ivg][conf.TEMPL_CHISO]=1;
+      anPars.noDDBkgSystRandTempl[ich][ivg][conf.TEMPL_SIHIH]=1;
       anPars.noPrepareYields[ich][ivg]=1;
       anPars.noSubtractBackground[ich][ivg][conf.TEMPL_CHISO]=1;
       anPars.noSubtractBackground[ich][ivg][conf.TEMPL_SIHIH]=1;
@@ -324,6 +326,26 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
       }//end of loop over itp
     }//end of loop over ivg
   }//end of loop over ich
+
+  // syst due to template statistics
+  for (int ich=0; ich<=1; ich++){
+    for (int ivg=0; ivg<=1; ivg++){
+      for (int itp=0; itp<=1; itp++){
+        if (anPars.noDDBkgSystRandTempl[ich][ivg][itp]) continue;
+        TString strAffix=TString("DD jets->gamma, syst due to templ stat ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg)+TString(" ")+conf.StrTempl(itp);
+        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+        anPars.channel=ich;
+        anPars.vgamma=ivg;
+        anPars.templFits=itp;
+        AuxSystRandTemplates(anPars,0);// 0 - no isMCclosure
+        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+      }//end of loop over itp
+    }//end of loop over ivg
+  }//end of loop over ich
+
+
 
 //  for (int ich=0; ich<=1; ich++){
 //    for (int ivg=0; ivg<=1; ivg++){

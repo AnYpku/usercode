@@ -63,7 +63,7 @@
   gROOT->ProcessLine(".L ../SkimSplitMerge/SkimNEvents.C+");
 
   gStyle->SetPalette(1);
-  gStyle->SetPaintTextFormat("0.0f");
+  gStyle->SetPaintTextFormat("0.2f");
   gStyle->SetCanvasColor(kWhite); 
 
 }

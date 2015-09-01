@@ -57,11 +57,12 @@ DoFullChainPart1(){
 
 DoFullChainPart2(){
   echo WILL DO: 'DoFullChainPart2()' $1 $2
-  root -l   AuxFchTemplateFitsData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchCalcAccXEff.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchTemplateFitsData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchSystRandomizeTempl.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchCalcAccXEff.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
   echo DONE: 'DoFullChainPart2()' $1 $2
 }
 #end of DoFullChainPart2
@@ -69,22 +70,22 @@ DoFullChainPart2(){
 # Full Chain starts here:
 # DoFullChainPart1 include selection and PrepareYields MC based only:
 
-#DoFullChainPart1 ELECTRON ZGamma logs/log20150320/log_
-#DoFullChainPart1 ELECTRON WGamma logs/log20150320/log_
-#DoFullChainPart1 MUON ZGamma logs/log20150320/log_
-#DoFullChainPart1 MUON WGamma logs/log20150320/log_
+DoFullChainPart1 ELECTRON ZGamma logs/log20150320/log_
+DoFullChainPart1 ELECTRON WGamma logs/log20150320/log_
+DoFullChainPart1 MUON ZGamma logs/log20150320/log_
+DoFullChainPart1 MUON WGamma logs/log20150320/log_
 
 # DD e->gamma bkg estimation for W_GAMMA ELECTRON only: 
-#root -l -b -q AuxFchBkgEtoGamma.C+
+root -l -b -q AuxFchBkgEtoGamma.C+
 
-#MergeForTemplates
+MergeForTemplates
 
-#DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
+DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
 DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
-#DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-#DoFullChainPart2 MUON WGamma logs/log20150320/log_
+DoFullChainPart2 MUON ZGamma logs/log20150320/log_
+DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
-#root -l -b -q runReplotResponseMatrix.C
-#root -l runCompareCS.C
-#mv compareCS*WGamma* ../WGammaOutput/ChannelsMERGED_WGamma/Plots/CrossSection/
-#mv compareCS*ZGamma* ../WGammaOutput/ChannelsMERGED_ZGamma/Plots/CrossSection/
+root -l -b -q runReplotMigrationMatrix.C
+root -l runCompareCS.C
+mv compareCS*WGamma* ../WGammaOutput/ChannelsMERGED_WGamma/Plots/CrossSection/
+mv compareCS*ZGamma* ../WGammaOutput/ChannelsMERGED_ZGamma/Plots/CrossSection/

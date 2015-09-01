@@ -3,7 +3,7 @@
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
-void AuxFchTemplateFitsData(TString strChannel, TString strVGamma)
+void AuxFchSystRandomizeTempl(TString strChannel, TString strVGamma)
 {
   TBenchmark time;
   time.Start("time");
@@ -21,7 +21,7 @@ void AuxFchTemplateFitsData(TString strChannel, TString strVGamma)
   if (strVGamma=="WGamma") vgamma=conf.W_GAMMA;
   if (strVGamma=="ZGamma") vgamma=conf.Z_GAMMA;
 
-  anPars.noDDBkgComputation[channel][vgamma][conf.TEMPL_CHISO]=0;
+  anPars.noDDBkgSystRandTempl[channel][vgamma][conf.TEMPL_CHISO]=0;
 
   fch.RunAnalysis(anPars);
 
