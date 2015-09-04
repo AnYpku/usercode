@@ -22,7 +22,9 @@ class TElectronCuts
        TConfiguration _config;
   };
 
-  float _elePtCut=30;
+  float _elePtCut=30.;
+  float _elePtCutExtra=10.;
+  float _elePtCutZg=20.;
 
   float _dEtaIn_Cut[2][4]={0.007,0.007,0.004,0.004, //BARREL
                            0.010,0.009,0.007,0.005};//ENDCAP

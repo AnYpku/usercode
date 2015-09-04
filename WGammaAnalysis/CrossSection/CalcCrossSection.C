@@ -46,33 +46,95 @@ CalcCrossSection::~CalcCrossSection()
 
 }// end of ~CalcCrossSection()
 
-void CalcCrossSection::PrintLatexAll()
+void CalcCrossSection::PrintLatexAll_ErrInPercent()
 {
-
-  TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
-  TFile* fTheory = new TFile(fName);
-  TH1F* hTheory1D = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
-  TH1F* hTheoryTot = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.TOTAL));
 
   std::cout<<"==============================="<<std::endl;
   std::cout<<"||||========== Print Latex"<<std::endl;
+
+  std::cout<<"||||========== Table with err in %"<<std::endl;
 
 
     std::cout<<"\\begin{table}[h]"<<std::endl;
     std::cout<<"  \\scriptsize"<<std::endl;
     std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{Relative errors [\\%]. ";
+    std::cout<<_config.StrChannel(_channel)<<" "<<_config.StrVgType(_vgamma)<<"}"<<std::endl;
+                                  // bin | val | stat err | syst Ich vs sihih
+
+    // print |c|c|c|.....|c|
+    std::cout<<"  \\begin{tabular}{|c|";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType!=ERR_NONE) std::cout<<"c|";
+    std::cout<<"}"<<std::endl;
+
+    // print strUp
+    std::cout<<"    bin ";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType!=ERR_NONE) std::cout<<" & "<<_yCSarray[errT].strUp;
+    std::cout<<"\\\\"<<std::endl;
+    // print strDown
+    std::cout<<"    lims ";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType!=ERR_NONE) std::cout<<" & "<<_yCSarray[errT].strDown;
+    std::cout<<"\\\\ \\hline"<<std::endl;
+
+      std::cout<<"    ";
+      std::cout<<std::setprecision(0)<<"total ";
+    std::cout<<std::setprecision(0);
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType!=ERR_NONE) 
+        std::cout<<" & "<<100*_yCSarray[errT].crossSectionTOT->GetBinError(1)/_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1);
+
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    //loop over pt bins
+    for (int ib=1; ib<=_yCSarray[ERR_STAT].crossSection1D->GetNbinsX(); ib++){
+
+      if (ib==1) std::cout<<"%";
+
+      std::cout<<"    ";
+      std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)<<"-";
+      std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)+_yCSarray[ERR_STAT].crossSection1D->GetBinWidth(ib);
+
+      for (int errT=0; errT<Nerrs; errT++) 
+        if (_yCSarray[errT].errType!=ERR_NONE) 
+          std::cout<<" & "<<100*_yCSarray[errT].crossSection1D->GetBinError(ib)/_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
+
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    }//end of loop over ib
+
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:systInPercent_";
+    std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+    std::cout<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
+
+  std::cout<<"|||| end of Print Latex"<<std::endl;
+  std::cout<<"==============================="<<std::endl;
+
+}//end of PrintLatexAll_ErrInPercent()
+
+void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
+{
+  std::cout<<"==============================="<<std::endl;
+  std::cout<<"||||========== Print Latex"<<std::endl;
+
+  std::cout<<"||||========== Table with meas vs MCbased"<<std::endl;
+/*
+  TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
+  TFile* fTheory = new TFile(fName);
+  TH1F* hTheory1D = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
+  TH1F* hTheoryTot = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.TOTAL));
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
     std::cout<<"  \\caption{Cross section and errors}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
-    if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
-      std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|c|"<<std::endl;
-      std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & templ & err syst & accXeff\\\\ "<<std::endl;
-      std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & stat & $e\\rightarrow\\gamma$ stat. & MC stat \\\\ \\hline"<<std::endl;
-   }
-    else{
-      std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
-      std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & templ & accXeff\\\\ "<<std::endl;
-      std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & stat & MC stat\\\\ \\hline"<<std::endl;
-    }
+    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
+    std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & templ & accXeff\\\\ "<<std::endl;
+    std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & stat & MC stat\\\\ \\hline"<<std::endl;
+
 
 
       std::cout<<"    ";
@@ -129,107 +191,144 @@ void CalcCrossSection::PrintLatexAll()
     std::cout<<"  \\label{tab:sc_and_syst}"<<std::endl;
     std::cout<<"  \\end{center}"<<std::endl;
     std::cout<<"\\end{table}"<<std::endl;
-
+*/
   std::cout<<"|||| end of Print Latex"<<std::endl;
   std::cout<<"==============================="<<std::endl;
+
 }//end of PrintLatexAll()
 
 void CalcCrossSection::Calc()
 {
-  //_yCSstat
-  _yCSstat.errType=ERR_STAT;
-  _yCSstat.name="yield_pm_stat";
-  _yCSstat.title="yield+-stat";
-  std::cout<<" _yCSstat "<<_yCSstat.title<<std::endl;
-  GetSignalYields();
-  ApplyUnfolding(_yCSstat);
-  ApplyAccXEff(_yCSstat);
-  DivideOverLumi(_yCSstat);
-  DivideOverBinWidth(_yCSstat);
-  Plot(_yCSstat);
 
-  //_yCSsyst_CHISOvsSIHIH
-  _yCSsyst_CHISOvsSIHIH.errType=ERR_SYST;
-  _yCSsyst_CHISOvsSIHIH.title="|N_{Ich}-N_{#sigma{i#eta i#eta}}|";
-  _yCSsyst_CHISOvsSIHIH.name="syst_CHISOvsSIHIH";
-  std::cout<<" _yCSsyst_CHISOvsSIHIH "<<_yCSsyst_CHISOvsSIHIH.title<<std::endl;
-  GetYieldsSyst(_yCSsyst_CHISOvsSIHIH, 
+  int errT;
+
+  for (errT=0; errT<Nerrs; errT++){
+    _yCSarray[errT].errType=ERR_NONE;
+  }
+
+  errT=ERR_STAT;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].name="yield_pm_stat";
+  _yCSarray[errT].title="yield+-stat";
+  _yCSarray[errT].strUp="err";
+  _yCSarray[errT].strDown="stat";
+  std::cout<<"ERR_STAT "<<_yCSarray[errT].title<<std::endl;
+  GetSignalYields();
+  ApplyUnfolding(_yCSarray[errT]);
+  ApplyAccXEff(_yCSarray[errT]);
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);
+  Plot(_yCSarray[errT]);
+
+  errT=ERR_SYST_CHISOvsSIHIH;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].name="syst_CHISOvsSIHIH";
+  _yCSarray[errT].title="|N_{Ich}-N_{#sigma{i#eta i#eta}}|";
+  _yCSarray[errT].strUp="syst";
+  _yCSarray[errT].strDown="$|N_{Ich}-N_{\\sigma{i\\eta i\\eta}}|$";
+  std::cout<<"ERR_SYST_CHISOvsSIHIH "<<_yCSarray[errT].title<<std::endl;
+  GetYieldsSyst(_yCSarray[errT], 
     _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
     _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
     _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
-  ApplyUnfolding(_yCSsyst_CHISOvsSIHIH);
-  ApplyAccXEff(_yCSsyst_CHISOvsSIHIH);
-  DivideOverLumi(_yCSsyst_CHISOvsSIHIH);
-  DivideOverBinWidth(_yCSsyst_CHISOvsSIHIH);  
+  ApplyUnfolding(_yCSarray[errT]);
+  ApplyAccXEff(_yCSarray[errT]);
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);  
 
-  //_yCSsyst_TemplStat
-  _yCSsyst_TemplStat.errType=ERR_SYST;
-  _yCSsyst_TemplStat.title="template statistics";
-  _yCSsyst_TemplStat.name="syst_templStat";
-  std::cout<<" _yCSsyst_TemplStat "<<_yCSsyst_TemplStat.title<<std::endl;
+  errT=ERR_SYST_TemplStat;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="template statistics";
+  _yCSarray[errT].name="syst_templStat";
+  _yCSarray[errT].strUp="templ";
+  _yCSarray[errT].strDown="stat";
+  std::cout<<"ERR_SYST_TemplStat "<<_yCSarray[errT].title<<std::endl;
   TString strName=_config.GetDDTemplateFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt");
   strName.ReplaceAll(".root","_SystRand.root");
-  GetYieldsSyst(_yCSsyst_TemplStat, 
+  GetYieldsSyst(_yCSarray[errT], 
     strName, 
     _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON), 
     _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON));
-  ApplyUnfolding(_yCSsyst_TemplStat);
-  ApplyAccXEff(_yCSsyst_TemplStat);
-  DivideOverLumi(_yCSsyst_TemplStat);
-  DivideOverBinWidth(_yCSsyst_TemplStat);  
+  ApplyUnfolding(_yCSarray[errT]);
+  ApplyAccXEff(_yCSarray[errT]);
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);  
 
-  //  _yCSsyst_etogStat
   if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
-    _yCSsyst_etogStat.errType=ERR_SYST;  
-    _yCSsyst_etogStat.title="e#rightarrow#gamma, samples stat";
-    _yCSsyst_etogStat.name="syst_etog_stat";
-    std::cout<<" _yCSsyst_etogStat "<<_yCSsyst_etogStat.title<<std::endl;
-    GetYieldsSyst(_yCSsyst_etogStat, 
+    errT=ERR_SYST_etogStat;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="e#rightarrow#gamma, samples stat";
+    _yCSarray[errT].name="syst_etog_stat";
+    _yCSarray[errT].strUp="e\\rightarrow\\gamma samp.";
+    _yCSarray[errT].strDown="stat";
+    std::cout<<"ERR_SYST_etogStat "<<_yCSarray[errT].title<<std::endl;
+    GetYieldsSyst(_yCSarray[errT], 
     _config.GetDDBkgEtoGammaFileName("phoEt"), 
     _config.GetYieldsDDBkgEtoGamma(_config.ONEDI,_config.COMMON), 
     _config.GetYieldsDDBkgEtoGamma(_config.TOTAL,_config.COMMON));
-    ApplyUnfolding(_yCSsyst_etogStat);
-    ApplyAccXEff(_yCSsyst_etogStat);
-    DivideOverLumi(_yCSsyst_etogStat);
-    DivideOverBinWidth(_yCSsyst_etogStat);  
+    ApplyUnfolding(_yCSarray[errT]);
+    ApplyAccXEff(_yCSarray[errT]);
+    DivideOverLumi(_yCSarray[errT]);
+    DivideOverBinWidth(_yCSarray[errT]);  
   }// end of if (_channel==_config.ELECTRON && _channel==_config.W_GAMMA)
 
-  //  _yCSsyst_accXeff_MCstat.errType=ERR_SYST;
-  _yCSsyst_accXeff_MCstat.errType=ERR_SYST;
-  _yCSsyst_accXeff_MCstat.title="accXeff, MC stat";
-  _yCSsyst_accXeff_MCstat.name="syst_accXeff_MCstat";
+  errT=ERR_SYST_accXeff_MCstat;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="accXeff, MC stat";
+  _yCSarray[errT].name="syst_accXeff_MCstat";
+    _yCSarray[errT].strUp="accXeff";
+    _yCSarray[errT].strDown="MC stat";
+    std::cout<<"ERR_SYST_accXeff_MCstat "<<_yCSarray[errT].title<<std::endl;
   TFile* f = new TFile(_config.GetAccXEffFileName(_channel,_vgamma));
   TH1F* hAccXEffTot = (TH1F*)f->Get(_config.GetAccXEffName(_config.TOTAL));
   TH1F* hAccXEff1D = (TH1F*)f->Get(_config.GetAccXEffName(_config.ONEDI));
-  _yCSsyst_accXeff_MCstat.yieldTOT_accXeffCorr = (TH1F*)_yCSstat.yieldTOT_accXeffCorr->Clone("haccXeffTot");
-  _yCSsyst_accXeff_MCstat.yields1D_accXeffCorr = (TH1F*)_yCSstat.yields1D_accXeffCorr->Clone("haccXeff1D");
+  _yCSarray[errT].yieldTOT_accXeffCorr = (TH1F*)_yCSarray[ERR_STAT].yieldTOT_accXeffCorr->Clone("haccXeffTot");
+  _yCSarray[errT].yields1D_accXeffCorr = (TH1F*)_yCSarray[ERR_STAT].yields1D_accXeffCorr->Clone("haccXeff1D");
   float accXeffErr = hAccXEffTot->GetBinError(1);
   float accXeffVal = hAccXEffTot->GetBinContent(1);
-  float yieldVal = _yCSstat.yieldTOT_unfolded->GetBinContent(1);
-  _yCSsyst_accXeff_MCstat.yieldTOT_accXeffCorr->SetBinError(1,yieldVal*accXeffErr/(accXeffVal*accXeffVal));
-  for (int ib=1; ib<_yCSsyst_accXeff_MCstat.yields1D_accXeffCorr->GetNbinsX(); ib++){
+  float yieldVal = _yCSarray[ERR_STAT].yieldTOT_unfolded->GetBinContent(1);
+  _yCSarray[errT].yieldTOT_accXeffCorr->SetBinError(1,yieldVal*accXeffErr/(accXeffVal*accXeffVal));
+  for (int ib=1; ib<=_yCSarray[errT].yields1D_accXeffCorr->GetNbinsX(); ib++){
     accXeffErr = hAccXEff1D->GetBinError(ib);
     accXeffVal = hAccXEff1D->GetBinContent(ib);
-    yieldVal = _yCSstat.yields1D_unfolded->GetBinContent(ib);
-    _yCSsyst_accXeff_MCstat.yields1D_accXeffCorr->SetBinError(ib,yieldVal*accXeffErr/(accXeffVal*accXeffVal));
+    yieldVal = _yCSarray[ERR_STAT].yields1D_unfolded->GetBinContent(ib);
+    _yCSarray[errT].yields1D_accXeffCorr->SetBinError(ib,yieldVal*accXeffErr/(accXeffVal*accXeffVal));
   }//end of loop over ib  
-  DivideOverLumi(_yCSsyst_accXeff_MCstat);
-  DivideOverBinWidth(_yCSsyst_accXeff_MCstat);  
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);  
+
+  errT=ERR_SYST_LUMI;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="lumi +-2.6%";
+  _yCSarray[errT].name="syst_lumi";
+  _yCSarray[errT].strUp="syst";
+  _yCSarray[errT].strDown="lumi";
+  std::cout<<"ERR_SYST_LUMI "<<_yCSarray[errT].title<<std::endl;
+  _yCSarray[errT].crossSectionTOT = (TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone("hCSlumiSystTot");
+  _yCSarray[errT].crossSection1D = (TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone("hCSlumiSyst1D");
+  float cs = _yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1);
+  _yCSarray[errT].crossSectionTOT->SetBinError(1,_lumiErr*cs);
+  for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+    cs = _yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
+    _yCSarray[errT].crossSection1D->SetBinError(ib,_lumiErr*cs);
+  }//end of loop over ib  
+  Print("Lumi syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 
   // print table of all uncerntainties in Latex format
-  PrintLatexAll();
+  PrintLatexAll_ErrInPercent();
 
 }// Calc()
 
 void CalcCrossSection::GetSignalYields()
 {
+  int errT=ERR_STAT;
   TFile* fSig = new TFile(_config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_CHISO, "phoEt"));
   std::cout<<"file with signal yields: "<<_config.GetYieldsFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt")<<std::endl;
   std::cout<<"total yields: "<<_config.GetYieldsBkgSubtrDataName(_config.TOTAL)<<std::endl;
   std::cout<<"1D yields: "<<_config.GetYieldsBkgSubtrDataName(_config.ONEDI)<<std::endl;
-  _yCSstat.yieldTOT_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
-  _yCSstat.yields1D_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
-  _yCSstat.yields1D_bkgSubtr->Print();
+  _yCSarray[errT].yieldTOT_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
+  _yCSarray[errT].yields1D_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
+  _yCSarray[errT].yields1D_bkgSubtr->Print();
  
 //  if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
 //    TH1F* hSigMC = (TH1F*)fSig->Get("yieldsSelected_SIGMC__ONEDI_COMMON");
@@ -240,7 +339,7 @@ void CalcCrossSection::GetSignalYields()
 //    _yCSstat.yields1D_bkgSubtr->SetBinError(1,err);
 //  }
   _fOut->cd();
-  Print("Bkg Subtr Yields:",_yCSstat.yieldTOT_bkgSubtr,_yCSstat.yields1D_bkgSubtr);
+  Print("Bkg Subtr Yields:",_yCSarray[errT].yieldTOT_bkgSubtr,_yCSarray[errT].yields1D_bkgSubtr);
 }// end of GetSignalYields()
 
 void CalcCrossSection::GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TString str1D, TString strTOT)
@@ -256,9 +355,9 @@ void CalcCrossSection::GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TStrin
   yCS.yields1D_bkgSubtr->Print();
   _fOut->cd();
   // Assign histogram content to be equal to yields
-  yCS.yieldTOT_bkgSubtr->SetBinContent(1,_yCSstat.yieldTOT_bkgSubtr->GetBinContent(1));
-  for (int ib=1; ib<_yCSstat.yields1D_bkgSubtr->GetNbinsX(); ib++){
-    yCS.yields1D_bkgSubtr->SetBinContent(ib,_yCSstat.yields1D_bkgSubtr->GetBinContent(ib));
+  yCS.yieldTOT_bkgSubtr->SetBinContent(1,_yCSarray[ERR_STAT].yieldTOT_bkgSubtr->GetBinContent(1));
+  for (int ib=1; ib<_yCSarray[ERR_STAT].yields1D_bkgSubtr->GetNbinsX(); ib++){
+    yCS.yields1D_bkgSubtr->SetBinContent(ib,_yCSarray[ERR_STAT].yields1D_bkgSubtr->GetBinContent(ib));
   }//end of loop over ib
 
 //  if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){

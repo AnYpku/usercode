@@ -109,12 +109,12 @@ private:
   const static float _lePhoDeltaRCut = 0.7;//0.7;
   const static float _lePhoDeltaRPreCut = 0.4;//0.4;//for FSR selection
 
-  const static float _ZmassLeft = 70.; 
-  const static float _ZmassRight = 110.;
+//  const static float _ZmassLeft = 70.; 
+//  const static float _ZmassRight = 110.;
     // for Z-mass window cut for W_GAMMA in ELECTRON channel
 };
 
-  const static float _WMtCut2012[2] = {50.,70.};//MUON, ELECTRON //for 8 TeV
+  const static float _WMtCut2012[2] = {40.,70.};//MUON, ELECTRON //for 8 TeV
 
 #endif 
   //#ifndef TFullCuts_h

@@ -29,7 +29,7 @@ class TMuonCuts
 
      private:
        TConfiguration _config;
-       const static float _muPtCut=26.;
+       const static float _muPtCut=25.;
        const static float _extraMuPtCut=10.;
        const static float _muEtaCut=2.1;
        const static float _extraMuEtaCut=2.4;

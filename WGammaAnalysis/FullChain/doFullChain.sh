@@ -49,8 +49,8 @@ DoFullChainPart1(){
 #  
   echo WILL DO: 'DoFullChainPart1()' $1 $2
  #root -l -b -q AuxFchPreliminarySelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PreliminarySelection.log 2>&1&
-  root -l -b -q AuxFchExtraSelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_ExtraSelection.log 2>&1&
-  root -l -b -q AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
+#  root -l -b -q AuxFchExtraSelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_ExtraSelection.log 2>&1&
+#  root -l -b -q AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
   echo DONE: 'DoFullChainPart1()' $1 $2
 }
 #end of DoFullChainPart2
@@ -81,9 +81,9 @@ DoFullChainPart2(){
 #MergeForTemplates
 
 #DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
-#DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
+DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
 #DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-DoFullChainPart2 MUON WGamma logs/log20150320/log_
+#DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
 #root -l -b -q runReplotMigrationMatrix.C
 #root -l runCompareCS.C

@@ -16,7 +16,17 @@ class CalcCrossSection
      public:
     CalcCrossSection (int channel, int vgamma, int blind, string configfile="../Configuration/config.txt");
 
-       enum{ERR_STAT,ERR_SYST};
+       enum{ERR_STAT,
+            ERR_SYST_CHISOvsSIHIH,
+            ERR_SYST_TemplStat,
+            ERR_SYST_etogStat,
+            ERR_SYST_accXeff_MCstat,
+            ERR_SYST_LUMI,
+            ERR_NONE};
+      // FromYieldToCS _yCSsyst_CHISOvsSIHIH;
+      // FromYieldToCS _yCSsyst_TemplStat;
+      // FromYieldToCS _yCSsyst_etogStat;
+      // FromYieldToCS _yCSsyst_accXeff_MCstat;
 
        struct FromYieldToCS{
 
@@ -24,6 +34,8 @@ class CalcCrossSection
 
          TString title;
          TString name;
+         TString strUp;
+         TString strDown;
 
          TH1F* yieldTOT_bkgSubtr;
          TH1F* yields1D_bkgSubtr;
@@ -59,7 +71,8 @@ class CalcCrossSection
        void    Plot(FromYieldToCS& yCS);
        void    Print(TString strYields, TH1F* hTot, TH1F* h1D);
 
-       void    PrintLatexAll();
+       void    PrintLatexAll_ErrInPercent();
+       void    PrintLatexAll_MeasVsMCbased();
 
 
 
@@ -72,17 +85,20 @@ class CalcCrossSection
        TConfiguration _config;
        TFile* _fOut;
 
+       static const int Nerrs=10;
+       FromYieldToCS _yCSarray[Nerrs];
 
-       FromYieldToCS _yCSstat;
-       FromYieldToCS _yCSsyst_CHISOvsSIHIH;
-       FromYieldToCS _yCSsyst_TemplStat;
-       FromYieldToCS _yCSsyst_etogStat;
-       FromYieldToCS _yCSsyst_accXeff_MCstat;
+//       FromYieldToCS _yCSstat;
+//       FromYieldToCS _yCSsyst_CHISOvsSIHIH;
+//       FromYieldToCS _yCSsyst_TemplStat;
+//       FromYieldToCS _yCSsyst_etogStat;
+//      FromYieldToCS _yCSsyst_accXeff_MCstat;
 
-       FromYieldToCS _yCSstatPLUSsyst;
+//       FromYieldToCS _yCSstatPLUSsyst;
 
 
        float _lumi;
+       static const float _lumiErr=0.026;//2.6%
   };
 
 #endif 

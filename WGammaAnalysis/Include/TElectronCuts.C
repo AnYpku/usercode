@@ -14,11 +14,11 @@ bool TElectronCuts::HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele
 {
   for (int iele1=0; iele1<leaf.nEle; iele1++){
     if (iele1==iele) continue;
-    if ( PassedKinematics(_config.W_GAMMA,1,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1)) &&
+    if ( PassedKinematics(_config.W_GAMMA,0,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1)) &&
          EleID2012(leaf,iele1,ELE_VETO,isEvForCheck)){
       if (isEvForCheck){
         std::cout<<"HasMoreLeptons, check "<<iele1<<": "<<"pt="<<leaf.elePt->at(iele1)<<", eleSCEta="<<leaf.eleSCEta->at(iele1);
-        std::cout<<", PassedKin="<<PassedKinematics(_config.W_GAMMA,1,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1));
+        std::cout<<", PassedKin="<<PassedKinematics(_config.W_GAMMA,0,leaf.elePt->at(iele1),leaf.eleSCEta->at(iele1));
         std::cout<<", EleID2012(WP VETO)="<<EleID2012(leaf,iele1,ELE_VETO,isEvForCheck);
         std::cout<<std::endl;
       }
@@ -31,10 +31,15 @@ bool TElectronCuts::HasMoreElectrons(TEventTree::InputTreeLeaves& leaf, int iele
 bool TElectronCuts::PassedKinematics(int vgamma, bool isLead, float pt, float eta)
 {
   float elePtCut;
-  if (vgamma==_config.W_GAMMA) elePtCut=_elePtCut;
-  else if (vgamma==_config.Z_GAMMA) 
-    if (isLead) elePtCut=20.;
-    else elePtCut=20;
+  if (vgamma==_config.W_GAMMA){
+    if (isLead) elePtCut=_elePtCut;
+    else elePtCut=_elePtCutExtra;
+    // not lead for Wg means for 2nd electron veto
+  }
+  else if (vgamma==_config.Z_GAMMA){
+    if (isLead) elePtCut=_elePtCutZg;
+    else elePtCut=_elePtCutZg;
+  }
   if (!IsBarrel(eta) && !IsEndcap(eta)) return 0;
   if (!(pt>elePtCut)) return 0;
   return 1;

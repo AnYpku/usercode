@@ -223,7 +223,7 @@ bool TFullCuts::MLeptonLeptonCut(int channel)
   if((vlep1 + vlep2).M() > 50) return 1;
   return 0;
 }// end of MLeptonLeptonCut()
-
+/*
 bool TFullCuts::ZMassWindowCut(int ipho, int iele)
 {
   //only for W_GAMMA, ELECTRON channel
@@ -240,12 +240,13 @@ bool TFullCuts::ZMassWindowCut(int ipho, int iele)
   if (M>_ZmassLeft && M<_ZmassRight) return 0;
   return 1;
 }// end of ZMassWindowCut
-
+*/
 bool TFullCuts::TriggerCut(int channel, int vgamma)
 {
    if (channel==_config.MUON && vgamma==_config.W_GAMMA){
      if (_leaf.HLTIndex[18]>=0 && _leaf.HLT[_leaf.HLTIndex[18]]) return 1; 
      //_HLT_IsoMu24_eta2p1_
+     if (_leaf.HLTIndex[19]>=0 && _leaf.HLT[_leaf.HLTIndex[19]]) return 1; 
      else  return 0;
    }// MUON, W_GAMMA
 
@@ -277,6 +278,8 @@ bool TFullCuts::TriggerMatch(int channel, int vgamma, int ilep)
        return 1; 
      //_HLT_IsoMu24_eta2p1_
      //"muonTriggerMatchHLTIsoMu24eta2p1"
+     if (_leaf.HLTIndex[19]>=0 && _leaf.HLT[_leaf.HLTIndex[19]] && ((_leaf.muTrg->at(ilep)/2)%2) ) 
+       return 1; 
      else  return 0;
    }// MUON, W_GAMMA
 
