@@ -27,6 +27,7 @@ void AuxSystRandTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCc
 
   TTemplates::TemplatesPars pars;
   SetParsGeneral(anPars, pars, isMCclosure);
+  pars.noRebinTemplates=1;
   TTemplatesSystRandomizeTempl temp(pars);
   temp.RandomizeTempl();
   
@@ -66,6 +67,7 @@ void SetParsGeneral(TConfiguration::AnalysisParameters &anPars, TTemplates::Temp
 
   pars.isMCclosureMode=isMCclosure;
   pars.isRooFit=1;//0;
+  pars.noRebinTemplates=0;
 
   pars.cutBarrel=photon.RangeBarrel();//TCut
   pars.cutEndcap=photon.RangeEndcap();//TCut

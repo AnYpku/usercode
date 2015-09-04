@@ -14,7 +14,8 @@ class TTemplatesSystRandomizeTempl: public TTemplates
 {
   public:
 
-    static const int nRandPointsMax=10;
+    static const int nRandPointsTrue=20;//20;
+    static const int nRandPointsFake=100;//100;
 //    struct TemplatesRandomizePars{
 //      int nRandPoints;
 //    };
@@ -47,6 +48,8 @@ class TTemplatesSystRandomizeTempl: public TTemplates
     float _sumSquaresFake[nKinBinsMax][2];
     float _rmsTrue[nKinBinsMax][2];
     float _rmsFake[nKinBinsMax][2];
+    float _nTrueYieldsValRef[nKinBinsMax][2];
+    float _nFakeYieldsValRef[nKinBinsMax][2];
 
 };
 

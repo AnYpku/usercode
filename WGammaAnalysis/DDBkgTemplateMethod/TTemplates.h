@@ -56,10 +56,13 @@ class TTemplates
       TCut cutNominalExceptSidebandVar[2];
       TCut cutSidebandVarNominalRange[2];
       TCut cutWeight;
+
       bool noLeakSubtrTrueToFake;// real-g leakage to fake
       bool noLeakSubtrFakeToTrue;// fake-g leakage to real
       bool isMCclosureMode;
       bool isRooFit;// RooFit or standard ROOT fits
+      bool noRebinTemplates;
+
       TFile* fOutForSave;
       TString strFileOutName;
       TString strTrueYieldsTot[3];

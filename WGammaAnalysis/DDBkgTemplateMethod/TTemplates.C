@@ -201,7 +201,8 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
   if (!noPrint)     std::cout<<"CheckTemplates done; hasBadBins="<<hasBadBins<<std::endl;
 
 //  if (_pars.varFit=="phoSigmaIEtaIEta");
-  while (hasBadBins){
+  if (_pars.noRebinTemplates);
+  else while (hasBadBins){
     std::cout<<"try to rebin"<<std::endl;
     DeleteHistograms(ikin, ieta);
     RebinTemplates(ikin, ieta, badBins, noPrint);

@@ -36,19 +36,62 @@ TTemplatesSystRandomizeTempl::~TTemplatesSystRandomizeTempl()
 void TTemplatesSystRandomizeTempl::RandomizeTempl()
 {
 
-  //for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-   for (int ikin=7; ikin<=7; ikin++){
+  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
+//   for (int ikin=7; ikin<=7; ikin++){
     for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
       FitWithRandTemplatesKinEtaBin(ikin, ieta);
     }//end of loop over ieta
   }// end of loop over ikin
 
-//  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-   for (int ikin=7; ikin<=7; ikin++){
+  _pars.fOutForSave->cd();
+  TH1F* hTotTrueYield[3];
+  TH1F* h1DTrueYield[3];
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+
+    TString strTot=_pars.strTrueYieldsTot[ieta];
+
+    TString str1D=_pars.strTrueYields1D[ieta];
+
+    
+    if (ieta==_COMMON){
+      h1DTrueYield[_COMMON] = (TH1F*)h1DTrueYield[_BARREL]->Clone(str1D); h1DTrueYield[_COMMON]->SetTitle(str1D);
+      h1DTrueYield[_COMMON]->Add(h1DTrueYield[_ENDCAP]);
+      hTotTrueYield[_COMMON] = (TH1F*)hTotTrueYield[_BARREL]->Clone(strTot); hTotTrueYield[_COMMON]->SetTitle(strTot);
+      hTotTrueYield[_COMMON]->Add(hTotTrueYield[_ENDCAP]);
+      h1DTrueYield[_COMMON]->Write(str1D);
+      hTotTrueYield[_COMMON]->Write(strTot);
+      continue; 
+    }// end of if (ieta==_COMMON)
+
+   hTotTrueYield[ieta] = new TH1F(strTot,strTot,1,_pars.kinBinLims[0],_pars.kinBinLims[_pars.nKinBins]);
+   h1DTrueYield[ieta] = new TH1F(str1D,str1D,_pars.nKinBins,_pars.kinBinLims);
+   float contTot=0;
+   float errTot=0;
+   for (int ib=1; ib<_pars.nKinBins+1; ib++){  
+      float cont = _nTrueYieldsValRef[ib][ieta];
+      h1DTrueYield[ieta]->SetBinContent(ib,cont);
+      float err = sqrt(_rmsTrue[ib][ieta]*_rmsTrue[ib][ieta]+_rmsFake[ib][ieta]*_rmsFake[ib][ieta]);
+      h1DTrueYield[ieta]->SetBinError(ib,err);
+      if (ib==1) continue;
+      contTot+=cont;
+      errTot+=err*err;
+   }//end of loop over ib
+   errTot=sqrt(errTot);
+   hTotTrueYield[ieta]->SetBinContent(1,contTot);
+   hTotTrueYield[ieta]->SetBinError(1,errTot);
+   h1DTrueYield[ieta]->Write(str1D);
+   hTotTrueYield[ieta]->Write(strTot);
+
+  }//end of loop over ieta
+
+  for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
+//   for (int ikin=7; ikin<=7; ikin++){
     for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
-      PlotOneKinOneEtaBin(ikin, ieta);
-      std::cout<<"True: _nTrueYieldsVal="<<_nTrueYieldsVal[ikin][ieta]<<", _rms="<<_rmsTrue[ikin][ieta]<<", sumSuqares="<<_sumSquaresTrue[ikin][ieta]<<", nValues="<<_nValuesTrue[ikin][ieta]<<std::endl;
-      std::cout<<"Fake: _nFakeYieldsVal="<<_nFakeYieldsVal[ikin][ieta]<<", _rms[ikin][ieta]="<<_rmsFake[ikin][ieta]<<", sumSuqares="<<_sumSquaresFake[ikin][ieta]<<", nValues="<<_nValuesFake[ikin][ieta]<<std::endl;
+//      PlotOneKinOneEtaBin(ikin, ieta);
+          std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<std::endl;
+      std::cout<<"_nTrueYieldsValRef="<<_nTrueYieldsValRef[ikin][ieta]<<", _nFakeYieldsValRef="<<_nFakeYieldsValRef[ikin][ieta]<<std::endl;
+      std::cout<<"Fake templ variation: "<<"_rms[ikin][ieta]="<<_rmsFake[ikin][ieta]<<", sumSuqares="<<_sumSquaresFake[ikin][ieta]<<", nValues="<<_nValuesFake[ikin][ieta]<<std::endl;
+      std::cout<<"True templ variation: "<<"_rms="<<_rmsTrue[ikin][ieta]<<", sumSuqares="<<_sumSquaresTrue[ikin][ieta]<<", nValues="<<_nValuesTrue[ikin][ieta]<<std::endl;
     }//end of loop over ieta
   }// end of loop over ikin
 
@@ -90,13 +133,14 @@ void TTemplatesSystRandomizeTempl::PlotOneKinOneEtaBin(int ikin, int ieta)
 
 }// end of PlotOneKinOneEtaBin()
 
-
 void TTemplatesSystRandomizeTempl::RandomizeTrueTemplates(int ikin, int ieta)
 {
     std::cout<<"Randomize true templates"<<std::endl;
   for (int ib=1; ib<_hTrueReference[ikin][ieta]->GetNbinsX(); ib++){
     float mean = _hTrueReference[ikin][ieta]->GetBinContent(ib);
-    float sigma = _hTrueReference[ikin][ieta]->GetBinError(ib);
+    float err1 = _hTrueReference[ikin][ieta]->GetBinError(ib);
+    float err2 = 0.2*_hLeakFakeToTrue[ikin][ieta]->GetBinContent(ib);
+    float sigma = sqrt(err1*err1+err2*err2);
     float newmean=_random.Gaus(mean,sigma);
     _hTrue[ikin][ieta]->SetBinContent(ib,newmean);
     _hTrue[ikin][ieta]->SetBinError(ib,sigma);
@@ -110,7 +154,9 @@ void TTemplatesSystRandomizeTempl::RandomizeFakeTemplates(int ikin, int ieta)
     std::cout<<"Randomize fake templates"<<std::endl;
   for (int ib=1; ib<_hFakeReference[ikin][ieta]->GetNbinsX(); ib++){
     float mean = _hFakeReference[ikin][ieta]->GetBinContent(ib);
-    float sigma = _hFakeReference[ikin][ieta]->GetBinError(ib);
+    float err1 = _hFakeReference[ikin][ieta]->GetBinError(ib);
+    float err2 = 0.2*_hLeakTrueToFake[ikin][ieta]->GetBinContent(ib);
+    float sigma = sqrt(err1*err1+err2*err2);
     float newmean=_random.Gaus(mean,sigma);
     _hFake[ikin][ieta]->SetBinContent(ib,newmean);
     _hFake[ikin][ieta]->SetBinError(ib,sigma);
@@ -122,6 +168,8 @@ void TTemplatesSystRandomizeTempl::RandomizeFakeTemplates(int ikin, int ieta)
 void TTemplatesSystRandomizeTempl::FitWithRandTemplatesKinEtaBin(int ikin, int ieta)
 {
   bool isOk = ComputeBackgroundOne(ikin,ieta,0);
+  _nTrueYieldsValRef[ikin][ieta]=_nTrueYieldsVal[ikin][ieta];
+  _nFakeYieldsValRef[ikin][ieta]=_nFakeYieldsVal[ikin][ieta];
   TString hNameT=TString("hTrue_Syst")+StrLabelKin(ikin)+StrLabelEta(ieta);
   TString hNameF=TString("hFake_Syst")+StrLabelKin(ikin)+StrLabelEta(ieta);
   _hYieldsTrue[ikin][ieta] = new TH1F(hNameT,hNameT,50,0,3*_nTrueYieldsVal[ikin][ieta]);
@@ -134,28 +182,46 @@ void TTemplatesSystRandomizeTempl::FitWithRandTemplatesKinEtaBin(int ikin, int i
   _rmsTrue[ikin][ieta]=0;
   _rmsFake[ikin][ieta]=0;
 
-  for (int ip=0; ip<nRandPointsMax; ip++){
-    std::cout<<"FITS WITH RANDOMIZED TEMPLATES, rand point = "<<ip<<std::endl;
+    // True gamma templates
+
+  for (int ip=0; ip<nRandPointsTrue; ip++){
+    std::cout<<"FITS WITH RANDOMIZED TRUE TEMPLATES, rand point = "<<ip<<std::endl;
     std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<", ";
 
-    // True gamma templates
     RandomizeTrueTemplates(ikin, ieta);
-    bool isOk = ComputeBackgroundOne(ikin,ieta,0);
-    if (_nTrueYieldsErr[ikin][ieta]>0.5*_nTrueYieldsVal[ikin][ieta]) isOk=0;
+
+    if (_pars.isRooFit) FitOneRooFit(ikin, ieta);
+    else FitOneROOT(ikin, ieta);
+    ComputeYieldOneKinBin(ikin,ieta);
+
+    if (_nTrueYieldsErr[ikin][ieta]>_nTrueYieldsVal[ikin][ieta] &&
+        _nFakeYieldsErr[ikin][ieta]>_nFakeYieldsVal[ikin][ieta]) isOk=0;
     if (isOk){
       _hYieldsTrue[ikin][ieta]->Fill(_nTrueYieldsVal[ikin][ieta]);
       _nValuesTrue[ikin][ieta]++;
-      _sumSquaresTrue[ikin][ieta]+=_nTrueYieldsVal[ikin][ieta]*_nTrueYieldsVal[ikin][ieta];
+      float diff = (_nTrueYieldsVal[ikin][ieta]-_nTrueYieldsValRef[ikin][ieta]);
+      _sumSquaresTrue[ikin][ieta]+=diff*diff;
     }
 
+  }//end of loop over ip
     // Fake gamma templates
+
+  for (int ip=0; ip<nRandPointsFake; ip++){
+    std::cout<<"FITS WITH RANDOMIZED FAKE TEMPLATES, rand point = "<<ip<<std::endl;
+    std::cout<<StrLabelKin(ikin)<<StrLabelEta(ieta)<<", ";
     RandomizeFakeTemplates(ikin, ieta);
-    isOk = ComputeBackgroundOne(ikin,ieta,0);
-    if (_nFakeYieldsErr[ikin][ieta]>0.5*_nFakeYieldsVal[ikin][ieta]) isOk=0;
+
+    if (_pars.isRooFit) FitOneRooFit(ikin, ieta);
+    else FitOneROOT(ikin, ieta);
+    ComputeYieldOneKinBin(ikin,ieta);
+
+    if (_nTrueYieldsErr[ikin][ieta]>_nTrueYieldsVal[ikin][ieta] &&
+        _nFakeYieldsErr[ikin][ieta]>_nFakeYieldsVal[ikin][ieta]) isOk=0;
     if (isOk){
-      _hYieldsFake[ikin][ieta]->Fill(_nFakeYieldsVal[ikin][ieta]);
+      _hYieldsFake[ikin][ieta]->Fill(_nTrueYieldsVal[ikin][ieta]);
       _nValuesFake[ikin][ieta]++;
-      _sumSquaresFake[ikin][ieta]+=_nFakeYieldsVal[ikin][ieta]*_nFakeYieldsVal[ikin][ieta];
+      float diff = (_nTrueYieldsVal[ikin][ieta]-_nTrueYieldsValRef[ikin][ieta]);
+      _sumSquaresFake[ikin][ieta]+=diff*diff;
      }
 
   }//end of loop over ip

@@ -75,8 +75,7 @@ class CalcCrossSection
 
        FromYieldToCS _yCSstat;
        FromYieldToCS _yCSsyst_CHISOvsSIHIH;
-       FromYieldToCS _yCSsyst_RealTemplStat;
-       FromYieldToCS _yCSsyst_FakeTemplStat;
+       FromYieldToCS _yCSsyst_TemplStat;
        FromYieldToCS _yCSsyst_etogStat;
        FromYieldToCS _yCSsyst_accXeff_MCstat;
 

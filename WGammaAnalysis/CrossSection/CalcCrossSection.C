@@ -21,6 +21,7 @@
 #include "TAxis.h"
 #include "TLegend.h"
 #include "TLine.h"
+#include "TString.h"
   //ROOT class
 
 CalcCrossSection::CalcCrossSection(int channel, int vgamma, int blind, string configFile)
@@ -63,14 +64,14 @@ void CalcCrossSection::PrintLatexAll()
     std::cout<<"  \\caption{Cross section and errors}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
     if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
-      std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
-      std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & err syst & accXeff\\\\ "<<std::endl;
-      std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & $e\\rightarrow\\gamma$ stat. & MC stat \\\\ \\hline"<<std::endl;
+      std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|c|"<<std::endl;
+      std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & templ & err syst & accXeff\\\\ "<<std::endl;
+      std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & stat & $e\\rightarrow\\gamma$ stat. & MC stat \\\\ \\hline"<<std::endl;
    }
     else{
-      std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|}"<<std::endl;
-      std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & accXeff\\\\ "<<std::endl;
-      std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & MC stat\\\\ \\hline"<<std::endl;
+      std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
+      std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & templ & accXeff\\\\ "<<std::endl;
+      std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & stat & MC stat\\\\ \\hline"<<std::endl;
     }
 
 
@@ -84,6 +85,8 @@ void CalcCrossSection::PrintLatexAll()
       std::cout<<std::setprecision(0)<<_yCSstat.crossSectionTOT->GetBinError(1)<<" & ";
 
       std::cout<<std::setprecision(0)<<_yCSsyst_CHISOvsSIHIH.crossSectionTOT->GetBinError(1)<<" & ";
+
+      std::cout<<std::setprecision(0)<<_yCSsyst_TemplStat.crossSectionTOT->GetBinError(1)<<" & ";
 
       std::cout<<std::setprecision(0)<<_yCSsyst_accXeff_MCstat.crossSectionTOT->GetBinError(1);
 
@@ -112,6 +115,8 @@ void CalcCrossSection::PrintLatexAll()
 
       std::cout<<std::setprecision(pres)<<_yCSsyst_CHISOvsSIHIH.crossSection1D->GetBinError(ib)<<" & ";
 
+      std::cout<<std::setprecision(pres)<<_yCSsyst_TemplStat.crossSection1D->GetBinError(ib)<<" & ";
+
       std::cout<<std::setprecision(pres)<<_yCSsyst_accXeff_MCstat.crossSection1D->GetBinError(ib);
 
       if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA)
@@ -131,10 +136,6 @@ void CalcCrossSection::PrintLatexAll()
 
 void CalcCrossSection::Calc()
 {
-//  _yCSsyst_RealTemplStat.errType=ERR_SYST;
-//  _yCSsyst_FakeTemplStat.errType=ERR_SYST;
-//  _yCSsyst_etogStat.errType=ERR_SYST;
-
   //_yCSstat
   _yCSstat.errType=ERR_STAT;
   _yCSstat.name="yield_pm_stat";
@@ -160,6 +161,22 @@ void CalcCrossSection::Calc()
   ApplyAccXEff(_yCSsyst_CHISOvsSIHIH);
   DivideOverLumi(_yCSsyst_CHISOvsSIHIH);
   DivideOverBinWidth(_yCSsyst_CHISOvsSIHIH);  
+
+  //_yCSsyst_TemplStat
+  _yCSsyst_TemplStat.errType=ERR_SYST;
+  _yCSsyst_TemplStat.title="template statistics";
+  _yCSsyst_TemplStat.name="syst_templStat";
+  std::cout<<" _yCSsyst_TemplStat "<<_yCSsyst_TemplStat.title<<std::endl;
+  TString strName=_config.GetDDTemplateFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt");
+  strName.ReplaceAll(".root","_SystRand.root");
+  GetYieldsSyst(_yCSsyst_TemplStat, 
+    strName, 
+    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON), 
+    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON));
+  ApplyUnfolding(_yCSsyst_TemplStat);
+  ApplyAccXEff(_yCSsyst_TemplStat);
+  DivideOverLumi(_yCSsyst_TemplStat);
+  DivideOverBinWidth(_yCSsyst_TemplStat);  
 
   //  _yCSsyst_etogStat
   if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
