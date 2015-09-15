@@ -30,8 +30,8 @@
   TConfiguration conf;
   TPhotonCuts photon; 
   anPars.phoWP=photon.WP_MEDIUM;//WP_TIGHT, WP_MEDIUM, WP_LOOSE
-  anPars.isDebugMode=1;
-  anPars.sampleMode=Selection::SIGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
+  anPars.isDebugMode=0;
+  anPars.sampleMode=Selection::BKGMC;//SIGMC, DATA, BKGMC, ALL, MC, NOBKG, NOTSPECIFIED;
 //  anPars.sampleMode=Selection::NOTSPECIFIED; anPars.analyzedSamples="ttbarjets ttbarg";
   anPars.cutAdd="1";//"phoEt<40";
 //  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
@@ -44,7 +44,7 @@
 
   // [conf.ELECTRON][conf.W_GAMMA]
   anPars.noPreSelection[conf.ELECTRON][conf.W_GAMMA]=0;
-  anPars.noExtraSelection[conf.ELECTRON][conf.W_GAMMA]=0;
+  anPars.noExtraSelection[conf.ELECTRON][conf.W_GAMMA]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_CHISO]=1;
   anPars.noDDBkgComputation[conf.ELECTRON][conf.W_GAMMA][conf.TEMPL_SIHIH]=1;
   anPars.noPrepareYields[conf.ELECTRON][conf.W_GAMMA]=1;

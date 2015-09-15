@@ -121,7 +121,7 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
   std::cout<<"||||========== Print Latex"<<std::endl;
 
   std::cout<<"||||========== Table with meas vs MCbased"<<std::endl;
-/*
+
   TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
   TFile* fTheory = new TFile(fName);
   TH1F* hTheory1D = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
@@ -131,9 +131,9 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
     std::cout<<"  \\begin{center}"<<std::endl;
     std::cout<<"  \\caption{Cross section and errors}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
-    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
-    std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} & err & err syst & templ & accXeff\\\\ "<<std::endl;
-    std::cout<<"    lims & MC based &    meas.       & stat & $I_{ch}$ vs $\\sigma_{i\\eta i\\eta}$ & stat & MC stat\\\\ \\hline"<<std::endl;
+    std::cout<<"  \\begin{tabular}{|c|c|c|}"<<std::endl;
+    std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} \\\\ "<<std::endl;
+    std::cout<<"    lims & MC based &    meas.       \\\\ \\hline"<<std::endl;
 
 
 
@@ -142,28 +142,22 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
 
       std::cout<<std::setprecision(0)<<1000*hTheoryTot->GetBinContent(1)<<" & ";
 
-      std::cout<<std::setprecision(0)<<_yCSstat.crossSectionTOT->GetBinContent(1)<<" & ";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1)<<" \\pm ";
 
-      std::cout<<std::setprecision(0)<<_yCSstat.crossSectionTOT->GetBinError(1)<<" & ";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinError(1)<<" \\pm ";
 
-      std::cout<<std::setprecision(0)<<_yCSsyst_CHISOvsSIHIH.crossSectionTOT->GetBinError(1)<<" & ";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_SYST_SUM].crossSectionTOT->GetBinError(1);
 
-      std::cout<<std::setprecision(0)<<_yCSsyst_TemplStat.crossSectionTOT->GetBinError(1)<<" & ";
-
-      std::cout<<std::setprecision(0)<<_yCSsyst_accXeff_MCstat.crossSectionTOT->GetBinError(1);
-
-      if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA)
-        std::cout<<std::setprecision(0)<<" & "<<_yCSsyst_etogStat.crossSectionTOT->GetBinError(1);
       std::cout<<" \\\\ \\hline"<<std::endl;
     //loop over pt bins
-    for (int ib=1; ib<=_yCSstat.crossSection1D->GetNbinsX(); ib++){
+    for (int ib=1; ib<=_yCSarray[ERR_STAT].crossSection1D->GetNbinsX(); ib++){
 
       if (ib==1) std::cout<<"%";
 
       std::cout<<"    ";
-      std::cout<<std::setprecision(0)<<_yCSstat.crossSection1D->GetBinLowEdge(ib)<<"-"<<_yCSstat.crossSection1D->GetBinLowEdge(ib)+_yCSstat.crossSection1D->GetBinWidth(ib)<<" & ";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)<<"-"<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)+_yCSarray[ERR_STAT].crossSection1D->GetBinWidth(ib)<<" & ";
 
-      float cont = _yCSstat.crossSection1D->GetBinContent(ib);
+      float cont = _yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
       float pres=0;
       if (cont<10) pres=1; //0.1
       if (cont<1)  pres=2;
@@ -171,27 +165,24 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
 
       std::cout<<std::setprecision(pres)<<1000*hTheory1D->GetBinContent(ib)<<" & ";
    
-      std::cout<<std::setprecision(pres)<<cont<<" & ";
+      std::cout<<std::setprecision(pres)<<cont<<" \\pm ";
 
-      std::cout<<std::setprecision(pres)<<_yCSstat.crossSection1D->GetBinError(ib)<<" & ";
+      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_STAT].crossSection1D->GetBinError(ib)<<" \\pm ";
 
-      std::cout<<std::setprecision(pres)<<_yCSsyst_CHISOvsSIHIH.crossSection1D->GetBinError(ib)<<" & ";
+      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_SYST_SUM].crossSection1D->GetBinError(ib);
 
-      std::cout<<std::setprecision(pres)<<_yCSsyst_TemplStat.crossSection1D->GetBinError(ib)<<" & ";
 
-      std::cout<<std::setprecision(pres)<<_yCSsyst_accXeff_MCstat.crossSection1D->GetBinError(ib);
-
-      if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA)
-        std::cout<<std::setprecision(pres)<<" & "<<_yCSsyst_etogStat.crossSection1D->GetBinError(ib);
 
       std::cout<<" \\\\ \\hline"<<std::endl;
     }//end of loop over ib
 
     std::cout<<"  \\end{tabular}"<<std::endl;
-    std::cout<<"  \\label{tab:sc_and_syst}"<<std::endl;
+    std::cout<<"  \\label{tab:sc_mc_vs_meas_";
+    std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+    std::cout<<"}"<<std::endl;
     std::cout<<"  \\end{center}"<<std::endl;
     std::cout<<"\\end{table}"<<std::endl;
-*/
+
   std::cout<<"|||| end of Print Latex"<<std::endl;
   std::cout<<"==============================="<<std::endl;
 
@@ -314,8 +305,41 @@ void CalcCrossSection::Calc()
   }//end of loop over ib  
   Print("Lumi syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 
+  errT=ERR_SYST_SUM;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="sum of syst";
+  _yCSarray[errT].name="syst_sum";
+  _yCSarray[errT].strUp="syst";
+  _yCSarray[errT].strDown="total";
+  std::cout<<"ERR_SYST_SUM "<<_yCSarray[errT].title<<std::endl;
+  bool sumStarted=0;
+//  _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone();
+//  _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone();
+  float errTot=0;
+  for (int ieT=0; ieT<Nerrs; ieT++) {
+    if (_yCSarray[ieT].errType==ERR_STAT || _yCSarray[ieT].errType>=ERR_SYST_SUM) continue;
+    if (!sumStarted){
+       _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ieT].crossSectionTOT->Clone();
+       _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ieT].crossSection1D->Clone();
+       sumStarted=1;
+    }
+    else{
+//      _yCSarray[errT].crossSectionTOT->Add(_yCSarray[ieT].crossSectionTOT); 
+      _yCSarray[errT].crossSection1D->Add(_yCSarray[ieT].crossSection1D); 
+    }    
+    errTot+=_yCSarray[ieT].crossSectionTOT->GetBinError(1)*_yCSarray[ieT].crossSectionTOT->GetBinError(1);
+  }//end of loop over ieT
+  errTot=sqrt(errTot);
+  _yCSarray[errT].crossSectionTOT->SetBinContent(1,_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1));
+  _yCSarray[errT].crossSectionTOT->SetBinError(1,errTot);
+  for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+    _yCSarray[errT].crossSection1D->SetBinContent(ib,_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib));
+  }//end of loop over ib  
+
+
   // print table of all uncerntainties in Latex format
   PrintLatexAll_ErrInPercent();
+  PrintLatexAll_MeasVsMCbased();
 
 }// Calc()
 

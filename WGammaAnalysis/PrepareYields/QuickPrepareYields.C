@@ -41,7 +41,7 @@ void QuickPrepareYields_FSRandISR(){
 
   TConfiguration conf;
   TPhotonCuts photon;
-  TCut cut = photon.RangePhoton(2012, photon.WP_MEDIUM, 1, 0);
+  TCut cut = photon.RangePhoton(_config.MUON, _config.Z_GAMMA, 2012, photon.WP_MEDIUM, 1, 0, 1, 1, 1, 1);
   anPars.cutAdd=cut;//"phoEt<40";
 //  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
 
@@ -93,7 +93,7 @@ void QuickPrepareYields_FSRandISR(){
 
 }//end of QuickPrepareYields_FSRandISR
 
-void QuickPrepareYields_WMt(){
+void QuickPrepareYields_WMt(int channel){
 
   FullChain fch;
   TConfiguration::AnalysisParameters anPars;
@@ -103,10 +103,11 @@ void QuickPrepareYields_WMt(){
   TConfiguration conf;
   TPhotonCuts photon;
   TFullCuts fullcut;
-  TCut cut = photon.RangePhoton(2012, photon.WP_MEDIUM);
+  TCut cut = photon.RangePhoton(channel, conf.W_GAMMA, 2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
   cut = cut && fullcut.RangeDeltaR(conf.W_GAMMA);
   TCut cutPt("phoEt>15 && phoEt<45");
   cut = cut && cutPt;
+  if (channel==conf.ELECTRON) cut = cut && fullcut.RangeZmassWindowCut();
 
   fch.SetDefaultFullChainParameters(anPars,"WMt");
   anPars.nKinBins=40;
@@ -116,19 +117,12 @@ void QuickPrepareYields_WMt(){
 
   anPars.cutAdd=cut;
 
-  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
-  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.UNBLIND;
+  anPars.blind[channel][conf.W_GAMMA]=conf.UNBLIND;
   // UNBLIND is to open the VERY_PRELIMINARY files, blinding cut is further applied for plotting
   // blinding cut: fullcut.RangeBlinding(conf.BLIND_COMBINED);
   int selStage=conf.VERY_PRELIMINARY;
 
-  anPars.channel=conf.MUON;
-  anPars.vgamma=conf.W_GAMMA;
-  AuxPrepareYields(anPars,0,selStage); 
-
-  cut = cut && fullcut.RangeZmassWindowCut();
-  anPars.cutAdd=cut;
-  anPars.channel=conf.ELECTRON;
+  anPars.channel=channel;
   anPars.vgamma=conf.W_GAMMA;
   AuxPrepareYields(anPars,0,selStage); 
 
@@ -164,13 +158,11 @@ void QuickPrepareYields_EtoGammaEnriched(){
     anPars.kinBinLims[ib]=30+2*ib;//30-150 GeV
   TPhotonCuts photon;
   TFullCuts fullcut;
-  TCut cut = photon.RangePhoton(2012, photon.WP_MEDIUM);
+  TCut cut = photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
   anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
   selStage=conf.VERY_PRELIMINARY;
   AuxPrepareYields(anPars,0,selStage);
 
-  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.UNBLIND;
-  anPars.channel=conf.MUON; 
-  AuxPrepareYields(anPars,0,selStage);
+
 
 }//end of QuickPrepareYields_Mass_FSRandISR

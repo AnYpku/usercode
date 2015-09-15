@@ -197,7 +197,7 @@ int TFullCuts::FindGoodLeptonIndex(int channel, int vgamma, bool isLead)
       bool passKin = _electron.PassedKinematics(vgamma, isLead, _leaf.elePt->at(ilep),_leaf.eleSCEta->at(ilep));
       if (!passKin) continue;
       if (_isEvForCheck) std::cout<<"passed lepton kin"<<std::endl;
-      if (!_electron.EleID2012(_leaf,ilep,_electron.ELE_MEDIUM,_isEvForCheck)) continue;
+      if (!_electron.EleID2012(_leaf,ilep,_electron.ELE_TIGHT,_isEvForCheck)) continue;
       if (_isEvForCheck) std::cout<<"passed ele ID MEDIUM"<<std::endl;
     }
     _passed.leptonId++;
@@ -473,7 +473,7 @@ TCut TFullCuts::RangeDeltaR(int vgamma)
 
 TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int blind, int phoWP){
   //all cuts except phoSigmaIEtaIEta and phoChIso
-  TCut cutPhoton=_photon.RangePhoton(year, phoWP, 0, 0);
+  TCut cutPhoton=_photon.RangePhoton(channel,vgamma,year, phoWP, 0, 0, 1, 1, 1, 1);
   TCut cut = cutPhoton && RangeDeltaR(vgamma); 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year,channel);
@@ -494,7 +494,7 @@ TCut TFullCuts::RangeForEtoGamma(int phoWP){
   //         bool doNeuOrHcalIsoCut=1, bool doPhoOrEcalIsoCut=1, 
   //         bool doHoverECut=1, bool doElectronVetoCut=1);
 
-  TCut cutPhoton=_photon.RangePhoton(2012, phoWP, 1, 1, 1, 1, 1, 0);
+  TCut cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 0);
   // doElectronVetoCut is not applied to enrich the sample with e->gamma events
 
   TCut cut = cutPhoton && RangeDeltaR(_config.W_GAMMA) && RangeMetRelatedCut(2012,_config.ELECTRON); 
@@ -504,7 +504,7 @@ TCut TFullCuts::RangeForEtoGamma(int phoWP){
 
 TCut TFullCuts::RangeFullCut(int year, int channel, int vgamma, int blind, int phoWP){
   //all cuts 
-  TCut cutPhoton=_photon.RangePhoton(year, phoWP);
+  TCut cutPhoton=_photon.RangePhoton(channel,vgamma,year, phoWP, 1, 1, 1, 1, 1, 1);
   TCut cut = cutPhoton && RangeDeltaR(vgamma); 
   if (vgamma==_config.W_GAMMA) {
     cut = cut && RangeMetRelatedCut(year,channel);
@@ -522,7 +522,10 @@ TCut TFullCuts::RangeFsrCut()
   TCut cut;
 //  cut = "Mpholeplep<101 && Mpholeplep>81 && (lep1PhoDeltaR<0.8 || lep2PhoDeltaR<0.8)";
   cut = "Mpholeplep<101 && Mpholeplep>81 && lep1PhoDeltaR>0.4 && Mleplep<80 && lep1PhoDeltaR<1.0";
-  cut = cut && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
+  cut = cut && _photon.RangePhoton(_config.MUON, _config.Z_GAMMA, 2012, _photon.WP_MEDIUM, 0, 0, 1, 1, 1, 1);
+  // 0 - no sigmaIEtaIEta and chiso cuts
+  // for ZGamma: the same RangePhoton for muon and electron channels
+  // but we have to pass somethings to the function
   return cut;
 }
 
@@ -530,7 +533,10 @@ TCut TFullCuts::RangeFsrExcludedCut()
 {
   TCut cut;
   cut = "Mleplep>80 && Mleplep<110 && lep1PhoDeltaR>1.0 && lep2PhoDeltaR>1.0";
-  cut = cut && _photon.RangePhoton(2012, _photon.WP_MEDIUM, 0, 0);// 0 - no sigmaIEtaIEta cut
+  cut = cut && _photon.RangePhoton(_config.MUON, _config.Z_GAMMA, 2012, _photon.WP_MEDIUM, 0, 0, 1, 1, 1, 1);
+  // 0 - no sigmaIEtaIEta and chiso cuts
+  // for ZGamma: the same RangePhoton for muon and electron channels
+  // but we have to pass somethings to the function
   return cut;
 }
 

@@ -497,7 +497,7 @@ bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPr
       badBins[i]=1; hasBadBin=1;
     }//end of errD>0.32*contD
     else if (_pars.varFit=="phoSigmaIEtaIEta");
-    else if (contD==0 && (contT+contF)>0) {std::cout<<i<<": contD==0;"; badBins[i]=1; hasBadBin=1;}
+    else if (nBins>4 && contD==0 && (contT+contF)>0) {std::cout<<i<<": contD==0;"; badBins[i]=1; hasBadBin=1;}
     if (badBins[i]==1) {
       std::cout<<std::setprecision(3)<<"varFit bin: "<<_hData[ikin][ieta]->GetBinLowEdge(i)<<"-"<<_hData[ikin][ieta]->GetBinLowEdge(i)+_hData[ikin][ieta]->GetBinWidth(i);
       std::cout<<std::setprecision(2);

@@ -54,10 +54,10 @@ class TPhotonCuts
     TCut RangeHoverE(int year);
     TCut RangePhoEleVeto();
     TCut RangePhoHasPixelSeed();
-    TCut RangePhoton(int year, int wp, 
-           bool doSigmaIEtaIEtaCut=1, bool doChOrTrkIsoCut=1, 
-           bool doNeuOrHcalIsoCut=1, bool doPhoOrEcalIsoCut=1, 
-           bool doHoverECut=1, bool doElectronVetoCut=1);
+    TCut RangePhoton(int channel, int vgamma, int year, int wp, 
+           bool doSigmaIEtaIEtaCut, bool doChOrTrkIsoCut, 
+           bool doNeuOrHcalIsoCut, bool doPhoOrEcalIsoCut, 
+           bool doHoverECut, bool doElectronVetoCut);
 
     TCut RangeGenFakePhoton();
     TCut RangeGenTruePhoton();
@@ -70,6 +70,7 @@ class TPhotonCuts
   private:
 
     TMathTools _math;
+    TConfiguration _config;
 
     const static float _phoPtCut = 15.0;
       //WP - working point

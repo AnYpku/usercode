@@ -301,7 +301,7 @@ TCut TPhotonCuts::RangePhoHasPixelSeed()
   return cut;
 }
 
-TCut TPhotonCuts::RangePhoton(int year, int wp,  
+TCut TPhotonCuts::RangePhoton(int channel, int vgamma, int year, int wp,  
            bool doSigmaIEtaIEtaCut, bool doChOrTrkIsoCut, 
            bool doNeuOrHcalIsoCut, bool doPhoOrEcalIsoCut, 
            bool doHoverECut, bool doElectronVetoCut)
@@ -312,7 +312,11 @@ TCut TPhotonCuts::RangePhoton(int year, int wp,
   TCut cut="1";
   if (doSigmaIEtaIEtaCut) cut = cut && RangeSigmaIEtaIEta(year, wp);
   if (doHoverECut) cut = cut && RangeHoverE(year);
-  if (doElectronVetoCut) cut = cut && RangePhoEleVeto();
+  if (doElectronVetoCut) {
+    if (channel==_config.ELECTRON && vgamma==_config.W_GAMMA)
+      cut = cut && RangePhoHasPixelSeed();
+    else cut = cut && RangePhoEleVeto();
+  }//end of if (doElectronVetoCut)
   if (year==2011) cut = cut && RangePhoHasPixelSeed();
   if (doChOrTrkIsoCut){
     cut = cut && RangeOneIsolation(year,wp,ISO_CHorTRK);

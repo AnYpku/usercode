@@ -17,11 +17,14 @@ class CalcCrossSection
     CalcCrossSection (int channel, int vgamma, int blind, string configfile="../Configuration/config.txt");
 
        enum{ERR_STAT,
+
             ERR_SYST_CHISOvsSIHIH,
             ERR_SYST_TemplStat,
             ERR_SYST_etogStat,
             ERR_SYST_accXeff_MCstat,
             ERR_SYST_LUMI,
+
+            ERR_SYST_SUM,
             ERR_NONE};
       // FromYieldToCS _yCSsyst_CHISOvsSIHIH;
       // FromYieldToCS _yCSsyst_TemplStat;
@@ -87,6 +90,7 @@ class CalcCrossSection
 
        static const int Nerrs=10;
        FromYieldToCS _yCSarray[Nerrs];
+       FromYieldToCS _yCSallSyst;
 
 //       FromYieldToCS _yCSstat;
 //       FromYieldToCS _yCSsyst_CHISOvsSIHIH;
