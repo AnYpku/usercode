@@ -23,6 +23,7 @@ class CalcCrossSection
             ERR_SYST_etogStat,
             ERR_SYST_accXeff_MCstat,
             ERR_SYST_LUMI,
+            ERR_SYST_WMtCut,
 
             ERR_SYST_SUM,
             ERR_SUM,
@@ -89,7 +90,7 @@ class CalcCrossSection
        TConfiguration _config;
        TFile* _fOut;
 
-       static const int Nerrs=10;
+       static const int Nerrs=12;
        FromYieldToCS _yCSarray[Nerrs];
 //       FromYieldToCS _yCSallSyst;
 

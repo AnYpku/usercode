@@ -306,6 +306,50 @@ void CalcCrossSection::Calc()
   }//end of loop over ib  
   Print("Lumi syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 
+  if (_channel==_config.MUON && _vgamma==_config.W_GAMMA){
+    errT=ERR_SYST_WMtCut;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="WMt cut +-5GeV";
+    _yCSarray[errT].name="syst_WMt_cut";
+    _yCSarray[errT].strUp="WMt";
+    _yCSarray[errT].strDown="cut";
+    std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
+    _yCSarray[errT].crossSectionTOT = (TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone("hCSWMtSystTot");
+    _yCSarray[errT].crossSection1D = (TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone("hCSWMtSyst1D");
+    TString strWMtminus5GeV = _config.GetCrossSectionFileName(_channel, _vgamma);
+    strWMtminus5GeV.ReplaceAll("../WGammaOutput/","../../WGammaAnalysisAux21_WMtminus5GeV/WGammaOutput/");
+    TString strWMtplus5GeV = _config.GetCrossSectionFileName(_channel, _vgamma);
+    strWMtplus5GeV.ReplaceAll("../WGammaOutput/","../../WGammaAnalysisAux22_WMtplus5GeV/WGammaOutput/");
+    TFile fminus5GeV(strWMtminus5GeV);
+    TFile fplus5GeV(strWMtplus5GeV);
+    if (!fminus5GeV.IsOpen() || !fplus5GeV.IsOpen()) {_yCSarray[errT].errType=ERR_NONE;}
+    else{
+      TH1F* cs1D_WMtminus5GeV = (TH1F*)fminus5GeV.Get(_config.GetCSname(_channel, _config.ONEDI));
+      TH1F* csTOT_WMtminus5GeV = (TH1F*)fminus5GeV.Get(_config.GetCSname(_channel, _config.TOTAL));
+      TH1F* cs1D_WMtplus5GeV = (TH1F*)fplus5GeV.Get(_config.GetCSname(_channel, _config.ONEDI));
+      TH1F* csTOT_WMtplus5GeV = (TH1F*)fplus5GeV.Get(_config.GetCSname(_channel, _config.TOTAL));
+      float spreadTot1 = fabs(csTOT_WMtminus5GeV->GetBinContent(1)-csTOT_WMtplus5GeV->GetBinContent(1));
+      float spreadTot2 = fabs(csTOT_WMtminus5GeV->GetBinContent(1)-_yCSarray[errT].crossSectionTOT->GetBinContent(1));
+      float spreadTot3 = fabs(_yCSarray[errT].crossSectionTOT->GetBinContent(1)-csTOT_WMtplus5GeV->GetBinContent(1));
+      float spreadTot;
+      if (spreadTot1>spreadTot2) spreadTot=spreadTot1;
+      else spreadTot=spreadTot2;
+      if (spreadTot3>spreadTot) spreadTot=spreadTot3;
+      _yCSarray[errT].crossSectionTOT->SetBinError(1,spreadTot);
+      for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+        float spread1D1 = fabs(cs1D_WMtminus5GeV->GetBinContent(ib)-cs1D_WMtplus5GeV->GetBinContent(ib));
+        float spread1D2 = fabs(cs1D_WMtminus5GeV->GetBinContent(ib)-_yCSarray[errT].crossSection1D->GetBinContent(ib));
+        float spread1D3 = fabs(_yCSarray[errT].crossSection1D->GetBinContent(ib)-cs1D_WMtplus5GeV->GetBinContent(ib));
+        float spread1D;
+        if (spread1D1>spread1D2) spread1D=spread1D1;
+        else spread1D=spread1D2;
+        if (spread1D3>spread1D) spread1D=spread1D3;
+        _yCSarray[errT].crossSection1D->SetBinError(ib,spread1D);
+      }//end of loop over ib  
+    }
+    Print("WMtCut syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
+  }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
+
   errT=ERR_SYST_SUM;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].title="sum of syst";
