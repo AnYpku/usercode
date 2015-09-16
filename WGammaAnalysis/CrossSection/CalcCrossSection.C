@@ -21,6 +21,8 @@
 #include "TAxis.h"
 #include "TLegend.h"
 #include "TLine.h"
+#include "TLatex.h"
+#include "TText.h"
 #include "TString.h"
   //ROOT class
 
@@ -209,7 +211,6 @@ void CalcCrossSection::Calc()
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);
-  Plot(_yCSarray[errT]);
 
   errT=ERR_SYST_CHISOvsSIHIH;
   _yCSarray[errT].errType=errT;
@@ -336,6 +337,23 @@ void CalcCrossSection::Calc()
     _yCSarray[errT].crossSection1D->SetBinContent(ib,_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib));
   }//end of loop over ib  
 
+  errT=ERR_SUM;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="sum of syst and stat";
+  _yCSarray[errT].name="syst_and_stat_sum";
+  _yCSarray[errT].strUp="syst + stat";
+  _yCSarray[errT].strDown="total";
+  std::cout<<"ERR_SUM "<<_yCSarray[errT].title<<std::endl;
+  _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone();
+  _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone();
+  _yCSarray[errT].crossSectionTOT->Add(_yCSarray[ERR_SYST_SUM].crossSectionTOT); 
+  _yCSarray[errT].crossSection1D->Add(_yCSarray[ERR_SYST_SUM].crossSection1D); 
+  _yCSarray[errT].crossSectionTOT->SetBinContent(1,_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1));
+  for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+    _yCSarray[errT].crossSection1D->SetBinContent(ib,_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib));
+  }//end of loop over ib 
+
+  Plot();
 
   // print table of all uncerntainties in Latex format
   PrintLatexAll_ErrInPercent();
@@ -483,7 +501,7 @@ void CalcCrossSection::DivideOverBinWidth(FromYieldToCS& yCS)
   Print("Total (pb) and differential(pb/GeV) cross sections: ",yCS.crossSectionTOT,yCS.crossSection1D);
 }// end of DivideOverBinWidth()
 
-void CalcCrossSection::Plot(FromYieldToCS& yCS)
+void CalcCrossSection::Plot()
 {
   TString canvTitle="c_CS_";
   canvTitle+=_config.StrChannel(_channel);
@@ -512,10 +530,10 @@ void CalcCrossSection::Plot(FromYieldToCS& yCS)
   TFile* fTheory = new TFile(fName);
   TH1F* hTheory = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
   // Multiply by 1000, pb -> fb
-  for (int ib=1; ib<=yCS.crossSection1D->GetNbinsX(); ib++){
+  for (int ib=1; ib<=_yCSarray[ERR_SUM].crossSection1D->GetNbinsX(); ib++){
     float cont; float err;
-    cont = yCS.crossSection1D->GetBinContent(ib);
-    err = yCS.crossSection1D->GetBinError(ib);
+    cont = _yCSarray[ERR_SUM].crossSection1D->GetBinContent(ib);
+    err = _yCSarray[ERR_SUM].crossSection1D->GetBinError(ib);
 //    yCS.crossSection1D->SetBinContent(ib,1000*cont);
 //    yCS.crossSection1D->SetBinError(ib,1000*err);
     cont = hTheory->GetBinContent(ib);
@@ -523,32 +541,57 @@ void CalcCrossSection::Plot(FromYieldToCS& yCS)
     hTheory->SetBinContent(ib,1000*cont);
     hTheory->SetBinError(ib,1000*err);
   }// end of loop over ib
-   Print("Total (pb) and differential(fb/GeV) cross sections: ", yCS.crossSectionTOT, yCS.crossSection1D);
+   Print("Total (pb) and differential(fb/GeV) cross sections: ", _yCSarray[ERR_SUM].crossSectionTOT, _yCSarray[ERR_SUM].crossSection1D);
   pad1->cd();
-  yCS.crossSection1D->GetXaxis()->SetNoExponent();
-  yCS.crossSection1D->GetXaxis()->SetMoreLogLabels();
-  yCS.crossSection1D->SetLineWidth(2);
-  TString strTitle="PRELIMINARY: d#sigma/dP_{T}^{#gamma}, fb/GeV, ";
-  strTitle+=_config.StrChannel(_channel);
-  strTitle+=" ";
-  strTitle+=_config.StrVgType(_vgamma);
-  strTitle+=" ";
-  strTitle+=_config.StrBlindType(_blind);
-  yCS.crossSection1D->SetTitle(strTitle);
-  yCS.crossSection1D->SetStats(0);
-  yCS.crossSection1D->Draw();
+  _yCSarray[ERR_SUM].crossSection1D->GetXaxis()->SetNoExponent();
+  _yCSarray[ERR_SUM].crossSection1D->GetXaxis()->SetMoreLogLabels();
+  _yCSarray[ERR_SUM].crossSection1D->SetLineWidth(2);
+
+//  TString strTitle=" ";
+//  strTitle+=_config.StrChannel(_channel);
+//  strTitle+=" ";
+//  strTitle+=_config.StrVgType(_vgamma);
+//  strTitle+=" ";
+//  strTitle+=_config.StrBlindType(_blind);
+  _yCSarray[ERR_SUM].crossSection1D->SetTitle("; ; d#sigma/dP_{T}^{#gamma}, fb/GeV");
+  _yCSarray[ERR_SUM].crossSection1D->SetStats(0);
+//  _yCSarray[ERR_SUM].crossSection1D->GetYaxis()->SetTitle("d#sigma/dP_{T}^{#gamma}, fb/GeV");
+  _yCSarray[ERR_SUM].crossSection1D->Draw("E1");
+  _yCSarray[ERR_STAT].crossSection1D->SetLineWidth(2);
+ // _yCSarray[ERR_STAT].crossSection1D->SetLineColor(4);
+  _yCSarray[ERR_STAT].crossSection1D->Draw("E1 same");
   // Plot theory Cross section
   hTheory->SetLineWidth(2);
   hTheory->SetLineColor(2);
   hTheory->Draw("same");
-  yCS.crossSection1D->Draw("same");
-  TLegend *leg = new TLegend(0.70,0.70,0.95,0.95);
-  leg->AddEntry(yCS.crossSection1D,"measured CS","l");
-  leg->AddEntry(hTheory,"theory CS","l");
+  _yCSarray[ERR_SUM].crossSection1D->Draw("E1 same");
+  _yCSarray[ERR_STAT].crossSection1D->Draw("E1 same");
+  TLegend *leg = new TLegend(0.68,0.65,0.92,0.90, "d#sigma/dP_{T}^{#gamma}, fb/GeV");
+  leg->SetFillColor(0);
+  leg->AddEntry(_yCSarray[ERR_SUM].crossSection1D,"measured","l");
+  leg->AddEntry(hTheory,"MC-based","l");
   leg->Draw("same");
 
+  TString txt_CMS_Preliminary = "#scale[1.4]{#font[61]{CMS}} #font[52]{Preliminary}";
+  TString strHeader=txt_CMS_Preliminary;
+  TLatex* text = new TLatex(0.15,0.93,strHeader);
+  text->SetNDC();
+  text->SetTextSize(0.04);
+  text->Draw("same");
+
+  TString strTitle="";
+  strTitle+=_config.StrChannel(_channel);
+  strTitle+=" ";
+  strTitle+=_config.StrVgType(_vgamma);
+//  strTitle+=" ";
+//  strTitle+=_config.StrBlindType(_blind);
+  TText* text2 = new TText(0.35,0.83,strTitle);
+  text2->SetNDC();
+  text2->SetTextSize(0.04);
+  text2->Draw("same");
+
   pad2->cd();
-  TH1F* hRatio = (TH1F*) yCS.crossSection1D->Clone("hRatio");
+  TH1F* hRatio = (TH1F*) _yCSarray[ERR_SUM].crossSection1D->Clone("hRatio");
   hRatio->Divide(hTheory);
   float max=1.1; float min=0.9;
   for (int ib=1; ib<=hRatio->GetNbinsX(); ib++){
@@ -557,6 +600,7 @@ void CalcCrossSection::Plot(FromYieldToCS& yCS)
     if (hRatio->GetBinContent(ib)-hRatio->GetBinError(ib)<min) 
       min=hRatio->GetBinContent(ib)-hRatio->GetBinError(ib);
   }// end of loop over ib
+  min = 0.2; max = 1.8;
   hRatio->SetStats(0);
   hRatio->SetLineWidth(2);
   hRatio->GetYaxis()->SetRangeUser(min,max);
@@ -566,7 +610,7 @@ void CalcCrossSection::Plot(FromYieldToCS& yCS)
   hRatio->GetXaxis()->SetTitleSize(0.12);
   hRatio->GetXaxis()->SetMoreLogLabels();
   hRatio->GetXaxis()->SetNoExponent();
-  hRatio->SetTitle("; phoEt, GeV;");
+  hRatio->SetTitle("; P_{T}^{#gamma}, GeV;");
   hRatio->Draw();
 
   int nBins = hRatio->GetNbinsX();
@@ -585,8 +629,8 @@ void CalcCrossSection::Plot(FromYieldToCS& yCS)
   canv->SaveAs(nameSave);
 
   _fOut->cd();
-  yCS.crossSectionTOT->Write(_config.GetCSname(_channel,_config.TOTAL)); 
-  yCS.crossSection1D->Write(_config.GetCSname(_channel,_config.ONEDI));
+  _yCSarray[ERR_SUM].crossSectionTOT->Write(_config.GetCSname(_channel,_config.TOTAL)); 
+  _yCSarray[ERR_SUM].crossSection1D->Write(_config.GetCSname(_channel,_config.ONEDI));
   hTheory->Write(_config.GetTheoryCSname(_config.ONEDI));
   
 }// end of Plot()

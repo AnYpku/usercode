@@ -25,6 +25,7 @@ class CalcCrossSection
             ERR_SYST_LUMI,
 
             ERR_SYST_SUM,
+            ERR_SUM,
             ERR_NONE};
       // FromYieldToCS _yCSsyst_CHISOvsSIHIH;
       // FromYieldToCS _yCSsyst_TemplStat;
@@ -71,7 +72,7 @@ class CalcCrossSection
        void    ApplyAccXEff(FromYieldToCS& yCS);
        void    DivideOverLumi(FromYieldToCS& yCS);
        void    DivideOverBinWidth(FromYieldToCS& yCS);
-       void    Plot(FromYieldToCS& yCS);
+       void    Plot();
        void    Print(TString strYields, TH1F* hTot, TH1F* h1D);
 
        void    PrintLatexAll_ErrInPercent();
@@ -90,7 +91,7 @@ class CalcCrossSection
 
        static const int Nerrs=10;
        FromYieldToCS _yCSarray[Nerrs];
-       FromYieldToCS _yCSallSyst;
+//       FromYieldToCS _yCSallSyst;
 
 //       FromYieldToCS _yCSstat;
 //       FromYieldToCS _yCSsyst_CHISOvsSIHIH;
