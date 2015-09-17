@@ -43,37 +43,71 @@ float TScaleFactors::SF_MediumEleID(float pt, float eta) {
 
 // For Medium Photon ID:
 // https://indico.cern.ch/event/305105/contribution/3/material/slides/0.pdf 
-// (p-5 * p-8-Medium-colmn)
+// (slide 5)
 float TScaleFactors::SF_MediumPhoID(float pt, float eta){
   if( pt > 15 && pt <= 20){
-    if (fabs(eta) <= 0.8)                     { return 0.9424;}
-    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9879;}
-    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9929;}
-    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0084;}
+    if (fabs(eta) <= 0.8)                     { return 0.9462;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9919;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 1.0013;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0169;}
   }
   if( pt > 20 && pt <= 30 ){
-    if (fabs(eta) <= 0.8)                     { return 0.9592;}
-    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9682;}
-    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9841;}
-    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0052;}
+    if (fabs(eta) <= 0.8)                     { return 0.9639;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9730;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9835;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0046;}
   }
   if( pt > 30 && pt <= 40 ){
-    if (fabs(eta) <= 0.8)                     { return 0.9709;}
-    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9722;}
-    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9851;}
-    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.9974;}
+    if (fabs(eta) <= 0.8)                     { return 0.9764;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9777;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9919;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0043;}
   }
   if( pt > 40 && pt <= 50 ){
-    if (fabs(eta) <= 0.8)                     { return 0.9727;}
-    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9762;}
-    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9788;}
-    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.9893;}
+    if (fabs(eta) <= 0.8)                     { return 0.9804;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9840;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9959;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0066;}
   }
   if( pt > 50 ) {
-    if (fabs(eta) <= 0.8)                     { return 0.9732;}
-    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9767;}
-    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 1.0051;}
-    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0154;}
+    if (fabs(eta) <= 0.8)                     { return 0.9787;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.9822;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.9973;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 1.0075;}
+  }
+  return 1.0;
+}// end of SF_MediumPhoID
+
+float TScaleFactors::SF_Err_MediumPhoID(float pt, float eta){
+  if( pt > 15 && pt <= 20){
+    if (fabs(eta) <= 0.8)                     { return 0.0205;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.0205;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.0209;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.0206;}
+  }
+  if( pt > 20 && pt <= 30 ){
+    if (fabs(eta) <= 0.8)                     { return 0.0101;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.0101;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.0102;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.0102;}
+  }
+  if( pt > 30 && pt <= 40 ){
+    if (fabs(eta) <= 0.8)                     { return 0.0100;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.0100;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.0100;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.0101;}
+  }
+  if( pt > 40 && pt <= 50 ){
+    if (fabs(eta) <= 0.8)                     { return 0.0100;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.0100;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.0100;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.0100;}
+  }
+  if( pt > 50 ) {
+    if (fabs(eta) <= 0.8)                     { return 0.0100;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442){ return 0.0101;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.0101;}
+    if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.0101;}
   }
   return 1.0;
 }// end of SF_MediumPhoID
@@ -148,6 +182,65 @@ float TScaleFactors::SF_MuonIso(float pt, float eta){
   return 1.0;
 }// end of SF_MuonIso
 
+float TScaleFactors::SF_Err_MuonIso(float pt, float eta){
+  if(pt > 10 && pt < 20){
+    if(fabs(eta) < 0.9)                    { return 0.003;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.003;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.002;}
+  }
+  if(pt > 20 && pt < 25){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.002;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 25 && pt < 30){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 30 && pt < 35){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 35 && pt < 40){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 40 && pt < 45){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.000;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 45 && pt < 50){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.000;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 50 && pt < 60){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.000;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 60 && pt < 90){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 90 && pt < 140){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 140){
+    if(fabs(eta) < 0.9)                    { return 0.002;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.005;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.002;}
+  }
+  return 1.0;
+}// end of SF_Err_MuonIso
+
 float TScaleFactors::SF_MuonID(float pt, float eta){
   if(pt > 10 && pt < 20){
     if(fabs(eta) < 0.9)                    { return 0.970275;}
@@ -217,3 +310,57 @@ float TScaleFactors::SF_MuonID(float pt, float eta){
   }
   return 1.0;
 }//end of SF_MuonID
+
+float TScaleFactors::SF_Err_MuonID(float pt, float eta){
+  if(pt > 10 && pt < 20){
+    if(fabs(eta) < 0.9)                    { return 0.005;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.007;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.004;}
+  }
+  if(pt > 20 && pt < 25){
+    if(fabs(eta) < 0.9)                    { return 0.002;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.003;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 25 && pt < 30){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 30 && pt < 35){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 35 && pt < 40){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 40 && pt < 50){
+    if(fabs(eta) < 0.9)                    { return 0.000;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.000;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.000;}
+  }
+  if(pt > 50 && pt < 60){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.001;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.001;}
+  }
+  if(pt > 60 && pt < 90){
+    if(fabs(eta) < 0.9)                    { return 0.001;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.002;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.002;}
+  }
+  if(pt > 90 && pt < 140){
+    if(fabs(eta) < 0.9)                    { return 0.003;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.006;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.005;}
+  }
+  if(pt > 140){
+    if(fabs(eta) < 0.9)                    { return 0.017;}
+    if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.035;}
+    if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.030;}
+  }
+  return 1.0;
+}//end of SF_Err_MuonID

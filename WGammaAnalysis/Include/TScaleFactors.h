@@ -17,5 +17,9 @@ class TScaleFactors
     float SF_MuonIso(float pt, float eta);
     float SF_MuonID(float pt, float eta);
 
+    float SF_Err_MediumPhoID(float pt, float eta);
+    float SF_Err_MuonIso(float pt, float eta);
+    float SF_Err_MuonID(float pt, float eta);
+
 };
 #endif //TScaleFactors_h
