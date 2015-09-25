@@ -78,13 +78,14 @@ bool Unfolding::TestDifferentMethods()
   dataSignYields->SetBinContent(0,_histYieldsRecSmeared->GetBinContent(0));
   dataSignYields->SetBinError(0,_histYieldsRecSmeared->GetBinError(0));
   
+  bool doSyst=0;
 
   TH1D* unfYieldsRooUnfInv = new TH1D("unfYieldsInv","unfolded yields Inversion",_nBinsGen,_phoPtLimitsGen);
   TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
   TVectorD errStatInv(_nBinsGen);
   TVectorD errSystInv(_nBinsGen);
   TVectorD errCovStatVInv(_nBinsGen);
-  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv,"testInvert");
+  ApplyRooUnfold(doSyst, _histYieldsRec,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv,"testInvert");
 
   TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",_nBinsGen,_phoPtLimitsGen);
   TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
@@ -92,7 +93,7 @@ bool Unfolding::TestDifferentMethods()
   TVectorD errSystDAg(_nBinsGen);
   TVectorD errCovStatVDAg(_nBinsGen);
 //  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes);
-  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg,"testBayes");
+  ApplyRooUnfold(doSyst,_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg,"testBayes");
 //  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
 
   std::cout<<std::endl;
@@ -283,7 +284,7 @@ bool Unfolding::PrepareMigrationMatrix()
   return 1;
 }// end of PrepareMigrationMatrix(...)
 
-bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TString strAnnex)
+bool Unfolding::ApplyRooUnfold(bool doSyst, TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TString strAnnex)
 {  
   std::cout<<"#######################"<<std::endl;
   std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
@@ -293,14 +294,14 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
   TVectorD errSystV(_nBinsGen);
   TVectorD errCovStatV(_nBinsGen);
 
-  bool isOk = ApplyRooUnfold(histInputYields,unfoldedYields,alg,errCovStat,errStatV, errSystV, errCovStatV, strAnnex);
+  bool isOk = ApplyRooUnfold(doSyst, histInputYields,unfoldedYields,alg,errCovStat,errStatV, errSystV, errCovStatV, strAnnex);
 
   std::cout<<std::endl<<"DoRooUnfold() ends here"<<std::endl;
   std::cout<<"#######################"<<std::endl;
   return isOk;
 }// end of ApplyRooUnfold(...)
 
-bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV, TString strAnnex)
+bool Unfolding::ApplyRooUnfold(bool doSyst, TH1D* histInputYields, TH1D* unfoldedYields, RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV, TString strAnnex)
 {  
   std::cout<<"#######################"<<std::endl;
   std::cout<<"DoRooUnfold() starts here:"<<std::endl<<std::endl;
@@ -331,7 +332,7 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
     errSyst[i]=0;
 
   int NSmears=1000;
-  ComputeSystErrors(histInputYields, errSyst, alg, NSmears);
+//  ComputeSystErrors(histInputYields, errSyst, alg, NSmears);
 //  ComputeStatErrors(histInputYields, errStat, alg, NSmears);
 //  ComputeStatErrors(histInputYields, errSyst, alg, NSmears);
 
@@ -400,6 +401,8 @@ bool Unfolding::ApplyRooUnfold(TH1D* histInputYields, TH1D* unfoldedYields, RooU
 bool Unfolding::ComputeSystErrors(TH1D* histInputYields, float* errSyst, RooUnfold::Algorithm alg, int NSmears)
 {
 
+  std::cout<<"I'm compute syst errors"<<std::endl;
+
   //Compute errors due to finite MC statistics
 
   TString name="n";
@@ -414,7 +417,7 @@ bool Unfolding::ComputeSystErrors(TH1D* histInputYields, float* errSyst, RooUnfo
   TH1D* histYieldsGenSmeared = new TH1D(name,name,_nBinsGen,_phoPtLimitsGen);
 
 //  TH2D* histMigrMatrixSmeared = (TH2D*)_histMigrMatrixNotNormalized->Clone();
-// TH1D* histYieldsRecSmeared = (TH1D*)_histYieldsRec->Clone();
+//  TH1D* histYieldsRecSmeared = (TH1D*)_histYieldsRec->Clone();
 //  TH1D* histYieldsGenSmeared = (TH1D*)_histYieldsGen->Clone();
 
 

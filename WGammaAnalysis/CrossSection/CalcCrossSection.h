@@ -24,6 +24,9 @@ class CalcCrossSection
             ERR_SYST_accXeff_MCstat,
             ERR_SYST_LUMI,
             ERR_SYST_WMtCut,
+            ERR_SYST_PUweight,
+            ERR_SYST_SFs,
+            ERR_SYST_UNF_MCstat,
 
             ERR_SYST_SUM,
             ERR_SUM,
@@ -69,7 +72,9 @@ class CalcCrossSection
        void    GetSignalYields();
        void    GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TString str1D, TString strTOT);
 
-       void    ApplyUnfolding(FromYieldToCS& yCS);
+       void    ComputeSystByAnalysisVariation(int errT, TString strDir1, TString strDir2);
+
+       void    ApplyUnfolding(bool doSyst, FromYieldToCS& yCS);
        void    ApplyAccXEff(FromYieldToCS& yCS);
        void    DivideOverLumi(FromYieldToCS& yCS);
        void    DivideOverBinWidth(FromYieldToCS& yCS);
@@ -90,7 +95,7 @@ class CalcCrossSection
        TConfiguration _config;
        TFile* _fOut;
 
-       static const int Nerrs=12;
+       static const int Nerrs=15;
        FromYieldToCS _yCSarray[Nerrs];
 //       FromYieldToCS _yCSallSyst;
 

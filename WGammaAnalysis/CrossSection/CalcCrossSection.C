@@ -207,7 +207,7 @@ void CalcCrossSection::Calc()
   _yCSarray[errT].strDown="stat";
   std::cout<<"ERR_STAT "<<_yCSarray[errT].title<<std::endl;
   GetSignalYields();
-  ApplyUnfolding(_yCSarray[errT]);
+  ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);
@@ -223,7 +223,7 @@ void CalcCrossSection::Calc()
     _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
     _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
     _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
-  ApplyUnfolding(_yCSarray[errT]);
+  ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);  
@@ -241,7 +241,7 @@ void CalcCrossSection::Calc()
     strName, 
     _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON), 
     _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON));
-  ApplyUnfolding(_yCSarray[errT]);
+  ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);  
@@ -258,7 +258,7 @@ void CalcCrossSection::Calc()
     _config.GetDDBkgEtoGammaFileName("phoEt"), 
     _config.GetYieldsDDBkgEtoGamma(_config.ONEDI,_config.COMMON), 
     _config.GetYieldsDDBkgEtoGamma(_config.TOTAL,_config.COMMON));
-    ApplyUnfolding(_yCSarray[errT]);
+    ApplyUnfolding(0,_yCSarray[errT]);
     ApplyAccXEff(_yCSarray[errT]);
     DivideOverLumi(_yCSarray[errT]);
     DivideOverBinWidth(_yCSarray[errT]);  
@@ -307,6 +307,7 @@ void CalcCrossSection::Calc()
   Print("Lumi syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 
   if (_channel==_config.MUON && _vgamma==_config.W_GAMMA){
+
     errT=ERR_SYST_WMtCut;
     _yCSarray[errT].errType=errT;  
     _yCSarray[errT].title="WMt cut +-5GeV";
@@ -314,40 +315,26 @@ void CalcCrossSection::Calc()
     _yCSarray[errT].strUp="WMt";
     _yCSarray[errT].strDown="cut";
     std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
-    _yCSarray[errT].crossSectionTOT = (TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone("hCSWMtSystTot");
-    _yCSarray[errT].crossSection1D = (TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone("hCSWMtSyst1D");
-    TString strWMtminus5GeV = _config.GetCrossSectionFileName(_channel, _vgamma);
-    strWMtminus5GeV.ReplaceAll("../WGammaOutput/","../../WGammaAnalysisAux21_WMtminus5GeV/WGammaOutput/");
-    TString strWMtplus5GeV = _config.GetCrossSectionFileName(_channel, _vgamma);
-    strWMtplus5GeV.ReplaceAll("../WGammaOutput/","../../WGammaAnalysisAux22_WMtplus5GeV/WGammaOutput/");
-    TFile fminus5GeV(strWMtminus5GeV);
-    TFile fplus5GeV(strWMtplus5GeV);
-    if (!fminus5GeV.IsOpen() || !fplus5GeV.IsOpen()) {_yCSarray[errT].errType=ERR_NONE;}
-    else{
-      TH1F* cs1D_WMtminus5GeV = (TH1F*)fminus5GeV.Get(_config.GetCSname(_channel, _config.ONEDI));
-      TH1F* csTOT_WMtminus5GeV = (TH1F*)fminus5GeV.Get(_config.GetCSname(_channel, _config.TOTAL));
-      TH1F* cs1D_WMtplus5GeV = (TH1F*)fplus5GeV.Get(_config.GetCSname(_channel, _config.ONEDI));
-      TH1F* csTOT_WMtplus5GeV = (TH1F*)fplus5GeV.Get(_config.GetCSname(_channel, _config.TOTAL));
-      float spreadTot1 = fabs(csTOT_WMtminus5GeV->GetBinContent(1)-csTOT_WMtplus5GeV->GetBinContent(1));
-      float spreadTot2 = fabs(csTOT_WMtminus5GeV->GetBinContent(1)-_yCSarray[errT].crossSectionTOT->GetBinContent(1));
-      float spreadTot3 = fabs(_yCSarray[errT].crossSectionTOT->GetBinContent(1)-csTOT_WMtplus5GeV->GetBinContent(1));
-      float spreadTot;
-      if (spreadTot1>spreadTot2) spreadTot=spreadTot1;
-      else spreadTot=spreadTot2;
-      if (spreadTot3>spreadTot) spreadTot=spreadTot3;
-      _yCSarray[errT].crossSectionTOT->SetBinError(1,spreadTot);
-      for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
-        float spread1D1 = fabs(cs1D_WMtminus5GeV->GetBinContent(ib)-cs1D_WMtplus5GeV->GetBinContent(ib));
-        float spread1D2 = fabs(cs1D_WMtminus5GeV->GetBinContent(ib)-_yCSarray[errT].crossSection1D->GetBinContent(ib));
-        float spread1D3 = fabs(_yCSarray[errT].crossSection1D->GetBinContent(ib)-cs1D_WMtplus5GeV->GetBinContent(ib));
-        float spread1D;
-        if (spread1D1>spread1D2) spread1D=spread1D1;
-        else spread1D=spread1D2;
-        if (spread1D3>spread1D) spread1D=spread1D3;
-        _yCSarray[errT].crossSection1D->SetBinError(ib,spread1D);
-      }//end of loop over ib  
-    }
-    Print("WMtCut syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
+
+    errT=ERR_SYST_PUweight;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="PUweight +-5%";
+    _yCSarray[errT].name="syst_PUweight";
+    _yCSarray[errT].strUp="PU";
+    _yCSarray[errT].strDown="weight";
+    std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
+
+    errT=ERR_SYST_SFs;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="SFs +-1sigma";
+    _yCSarray[errT].name="syst_SFs";
+    _yCSarray[errT].strUp="SFs";
+    _yCSarray[errT].strDown="err";
+    std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
+
   }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
 
   errT=ERR_SYST_SUM;
@@ -405,6 +392,46 @@ void CalcCrossSection::Calc()
 
 }// Calc()
 
+void CalcCrossSection::ComputeSystByAnalysisVariation(int errT, TString strDir1, TString strDir2){
+    _yCSarray[errT].crossSectionTOT = (TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone(TString("hCS")+_yCSarray[errT].name+TString("Tot"));
+    _yCSarray[errT].crossSection1D = (TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone(TString("hCS")+_yCSarray[errT].name+TString("1D"));
+    TString str1 = _config.GetCrossSectionFileName(_channel, _vgamma);
+    str1.ReplaceAll("../WGammaOutput/",TString("../../")+strDir1+TString("/WGammaOutput/"));
+    TString str2 = _config.GetCrossSectionFileName(_channel, _vgamma);
+    str2.ReplaceAll("../WGammaOutput/",TString("../../")+strDir2+TString("/WGammaOutput/"));
+    TFile f1(str1);
+    TFile f2(str2);
+    if (!f1.IsOpen() || !f2.IsOpen()) {_yCSarray[errT].errType=ERR_NONE;}
+    else{
+      std::cout<<"syst "<<_yCSarray[errT].title<<" will be computed"<<std::endl;
+      TH1F* cs1D_1 = (TH1F*)f1.Get(_config.GetCSname(_channel, _config.ONEDI));
+      TH1F* csTOT_1 = (TH1F*)f1.Get(_config.GetCSname(_channel, _config.TOTAL));
+      TH1F* cs1D_2 = (TH1F*)f2.Get(_config.GetCSname(_channel, _config.ONEDI));
+      TH1F* csTOT_2 = (TH1F*)f2.Get(_config.GetCSname(_channel, _config.TOTAL));
+
+      float spreadTot1 = fabs(csTOT_1->GetBinContent(1)-csTOT_2->GetBinContent(1));
+      float spreadTot2 = fabs(csTOT_1->GetBinContent(1)-_yCSarray[errT].crossSectionTOT->GetBinContent(1));
+      float spreadTot3 = fabs(_yCSarray[errT].crossSectionTOT->GetBinContent(1)-csTOT_2->GetBinContent(1));
+      float spreadTot;
+      if (spreadTot1>spreadTot2) spreadTot=spreadTot1;
+      else spreadTot=spreadTot2;
+      if (spreadTot3>spreadTot) spreadTot=spreadTot3;
+      _yCSarray[errT].crossSectionTOT->SetBinError(1,spreadTot);
+      for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+        float spread1D1 = fabs(cs1D_1->GetBinContent(ib)-cs1D_2->GetBinContent(ib));
+        float spread1D2 = fabs(cs1D_1->GetBinContent(ib)-_yCSarray[errT].crossSection1D->GetBinContent(ib));
+        float spread1D3 = fabs(_yCSarray[errT].crossSection1D->GetBinContent(ib)-cs1D_2->GetBinContent(ib));
+        float spread1D;
+        if (spread1D1>spread1D2) spread1D=spread1D1;
+        else spread1D=spread1D2;
+        if (spread1D3>spread1D) spread1D=spread1D3;
+        _yCSarray[errT].crossSection1D->SetBinError(ib,spread1D);
+      }//end of loop over ib 
+
+    }
+    Print(_yCSarray[errT].title+TString(", cs: "),_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
+}// end of ComputeSystByAnalysisVariation()
+
 void CalcCrossSection::GetSignalYields()
 {
   int errT=ERR_STAT;
@@ -454,7 +481,7 @@ void CalcCrossSection::GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TStrin
 
 }// end of GetYieldsSyst()
 
-void CalcCrossSection::ApplyUnfolding(FromYieldToCS& yCS)
+void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
 {
   Unfolding unf(_channel,_vgamma);
   bool isOk = unf.PrepareMigrationMatrix();
@@ -466,7 +493,7 @@ void CalcCrossSection::ApplyUnfolding(FromYieldToCS& yCS)
 //  _signalYields1D->Copy(sign1D);
   TH1D* signInput1D = (TH1D*)yCS.yields1D_bkgSubtr;
   TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone("hUnfolded");
-  isOk = unf.ApplyRooUnfold(signInput1D,signUnfolded1D,RooUnfold::kInvert,yCS.name);
+  isOk = unf.ApplyRooUnfold(doSyst,signInput1D,signUnfolded1D,RooUnfold::kInvert,yCS.name);
   if (!isOk){
     std::cout<<"ERROR: ApplyRooUnfold() for Unfolding failed"<<std::endl;
     return;

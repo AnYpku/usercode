@@ -1,8 +1,12 @@
 #include "../Selection/TSelectedEventsTree.h"
 #include "../Configuration/TConfiguration.h"
+#include "../Configuration/TAllInputSamples.h"
+
 #include "TTree.h"
 #include "TFile.h"
 #include "TString.h"
+
+#include "iostream.h"
 
 //coef = 1.05, 0.95
 
@@ -10,38 +14,45 @@ void ChangePUweight(float coef, int channel, int vgamma, int sample, TString sou
 {
   TConfiguration conf;
   TFile* f = new TFile(conf.GetSelectedName(conf.VERY_PRELIMINARY, channel, vgamma, conf.UNBLIND, sample, sourceName),"UPDATE");
+  if (!f->IsOpen()) {
+    std::cout<<"file" <<conf.GetSelectedName(conf.VERY_PRELIMINARY, channel, vgamma, conf.UNBLIND, sample, sourceName)<< "isn't open"<<std::endl;
+    return;
+  }
   TTree* trInput = (TTree*)f->Get("selectedEvents");
-  TTree* trOutput = (TTree*)f->Get("selectedEvents");
+  TTree* trOutput = new TTree("selectedEventsNew","selected events new");
   TSelectedEventsTree selEvTree;
   selEvTree.SetAsInputTree(trInput);
   selEvTree.SetAsOutputTree(trOutput);
   long nEntries = trInput->GetEntries();
-  float weight;
+  float weight, PUweight;
   for (long ientry=0; ientry<nEntries; ientry++){
         trInput->GetEntry(ientry);
+        if ((ientry%50000)==0) std::cout<<"ientry="<<ientry<<std::endl;
         weight = coef*selEvTree._weight;
         PUweight = coef*selEvTree._PUweight;
         selEvTree._weight = weight;
         selEvTree._PUweight = PUweight;
         trOutput->Fill();
   }//end of loop over ientry
+  trInput->SetName("selectedEventsOld");
+  f->Delete("selectedEventsOld");
+  trOutput->SetName("selectedEvents");
   trOutput->Write();
 }//end of ChangePUweight
 
-void LoopOverVeryPreliminarySelectedFiles()
+void ChangePUweight_Files(float coef, int channel, int vgamma, std::string configfile)
 {
-  int nSources = _INPUT->nSources_; 
-  for (int iSource=0; iSource<nSources; iSource++)
-    {
-
-       std::cout<<"_channel="<<_channel<<"("<<_config.StrChannel(_channel)<<")";
-       std::cout<<", _vgamma="<<_vgamma<<"("<<_config.StrVgType(_vgamma)<<")"<<std::endl;
-       std::cout<<"_sample="<<_sample<<"("<<_config.StrSample(_sample)<<")";
-       std::cout<<", sourceName="<<_INPUT->allInputs_[iSource].sourceName_<<std::endl;
-       TTree* tree;
-       int inputFileNMax = _INPUT->allInputs_[iSource].nFiles_;
-
-       ChangePUweight(coef, _channel, _vgamma, _INPUT->allInputs_[iSource].sample_,_INPUT->allInputs_[iSource].sourceName_);
-
-    } //loop over iSource ends
+  TConfiguration conf;
+  TAllInputSamples INPUT(channel, vgamma, configfile);
+  int nSources = INPUT.nSources_; 
+  for (int iSource=0; iSource<nSources; iSource++){
+       int sample = INPUT.allInputs_[iSource].sample_;
+       if (sample==conf.DATA) continue;
+       if (sample==conf.SIGMC_UNSKIMMED) continue;
+       std::cout<<"channel="<<channel<<"("<<conf.StrChannel(channel)<<")";
+       std::cout<<", vgamma="<<vgamma<<"("<<conf.StrVgType(vgamma)<<")"<<std::endl;
+       std::cout<<"sample="<<sample<<"("<<conf.StrSample(sample)<<")";
+       std::cout<<", sourceName="<<INPUT.allInputs_[iSource].sourceName_<<std::endl;
+       ChangePUweight(coef, channel, vgamma, INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+  } //loop over iSource ends
 }//end of LoopOverVeryPreliminarySelectedFiles

@@ -322,11 +322,12 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
   _phoSF=1.0; _lepSF[0]=1.0; _lepSF[1]=1.0;
   if (sample!=_config.DATA){
     _phoSF = sf.SF_MediumPhoID(_phoEt,_phoSCEta);
+    if (channel==_config.ELECTRON) _phoSF*=sf.SF_PixelSeedVeto(_phoEt,_phoSCEta);
     if (channel==_config.MUON) _lepSF[0]=sf.SF_MuonIso(_lepPt[0],_lepEta[0])*sf.SF_MuonID(_lepPt[0],_lepEta[0]);
-    if (channel==_config.ELECTRON) _lepSF[0]=sf.SF_MediumEleID(_lepPt[0],_lepSCEta[0]);
+    if (channel==_config.ELECTRON) _lepSF[0]=sf.SF_TightEleID(_lepPt[0],_lepSCEta[0]);
     if (cand.ilep2>=0 && _Mleplep>0){// means Z_GAMMA
       if (channel==_config.MUON) _lepSF[1]=sf.SF_MuonIso(_lepPt[1],_lepEta[1])*sf.SF_MuonID(_lepPt[1],_lepEta[1]);
-      if (channel==_config.ELECTRON) _lepSF[1]=sf.SF_MediumEleID(_lepPt[1],_lepSCEta[1]);    
+      if (channel==_config.ELECTRON) _lepSF[1]=sf.SF_TightEleID(_lepPt[1],_lepSCEta[1]);    
     } 
   }// end of if (sample==!_config.DATA)
   _weight=weight*_phoSF*_lepSF[0]*_lepSF[1];

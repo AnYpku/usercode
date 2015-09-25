@@ -139,13 +139,13 @@ void TTemplatesSystRandomizeTempl::RandomizeTrueTemplates(int ikin, int ieta)
   for (int ib=1; ib<_hTrueReference[ikin][ieta]->GetNbinsX(); ib++){
     float mean = _hTrueReference[ikin][ieta]->GetBinContent(ib);
     float err1 = _hTrueReference[ikin][ieta]->GetBinError(ib);
-    float err2 = 0.2*_hLeakFakeToTrue[ikin][ieta]->GetBinContent(ib);
-    float sigma = sqrt(err1*err1+err2*err2);
-    float newmean=_random.Gaus(mean,sigma);
+//    float err2 = 0.2*_hLeakFakeToTrue[ikin][ieta]->GetBinContent(ib);
+//    float sigma = sqrt(err1*err1+err2*err2);
+    float newmean=_random.Gaus(mean,err1);
     _hTrue[ikin][ieta]->SetBinContent(ib,newmean);
-    _hTrue[ikin][ieta]->SetBinError(ib,sigma);
+    _hTrue[ikin][ieta]->SetBinError(ib,err1);
     _hFake[ikin][ieta]->SetBinContent(ib,_hFakeReference[ikin][ieta]->GetBinContent(ib));
-    std::cout<<"ib="<<ib<<", mean="<<mean<<", sigma="<<sigma<<", newmean="<<newmean<<std::endl;
+    std::cout<<"ib="<<ib<<", mean="<<mean<<", err1="<<err1<<", newmean="<<newmean<<std::endl;
   }// end of loop over ib
 }//end of RandomizeTrueTemplates
 
@@ -155,13 +155,13 @@ void TTemplatesSystRandomizeTempl::RandomizeFakeTemplates(int ikin, int ieta)
   for (int ib=1; ib<_hFakeReference[ikin][ieta]->GetNbinsX(); ib++){
     float mean = _hFakeReference[ikin][ieta]->GetBinContent(ib);
     float err1 = _hFakeReference[ikin][ieta]->GetBinError(ib);
-    float err2 = 0.2*_hLeakTrueToFake[ikin][ieta]->GetBinContent(ib);
-    float sigma = sqrt(err1*err1+err2*err2);
-    float newmean=_random.Gaus(mean,sigma);
+//    float err2 = 0.2*_hLeakTrueToFake[ikin][ieta]->GetBinContent(ib);
+//    float sigma = sqrt(err1*err1+err2*err2);
+    float newmean=_random.Gaus(mean,err1);
     _hFake[ikin][ieta]->SetBinContent(ib,newmean);
-    _hFake[ikin][ieta]->SetBinError(ib,sigma);
+    _hFake[ikin][ieta]->SetBinError(ib,err1);
     _hTrue[ikin][ieta]->SetBinContent(ib,_hTrueReference[ikin][ieta]->GetBinContent(ib));
-    std::cout<<"ib="<<ib<<", mean="<<mean<<", sigma="<<sigma<<", newmean="<<newmean<<std::endl;
+    std::cout<<"ib="<<ib<<", mean="<<mean<<", err1="<<err1<<", newmean="<<newmean<<std::endl;
   }// end of loop over ib
 }//end of RandomizeFakeTemplates
 
@@ -183,6 +183,7 @@ void TTemplatesSystRandomizeTempl::FitWithRandTemplatesKinEtaBin(int ikin, int i
   _rmsFake[ikin][ieta]=0;
 
     // True gamma templates
+
 
   for (int ip=0; ip<nRandPointsTrue; ip++){
     std::cout<<"FITS WITH RANDOMIZED TRUE TEMPLATES, rand point = "<<ip<<std::endl;

@@ -56,7 +56,8 @@
 //  gROOT->ProcessLine(".L ../FullChain/AuxFchTemplateFitsData.C+");
 //  gROOT->ProcessLine(".L ../FullChain/AuxFchSubtractBackgroundData.C+");
 
-  gROOT->ProcessLine(".L ../ChangeVeryPreliminarySelected/ChangePUweight.C");
+  gROOT->ProcessLine(".L ../ChangeVeryPreliminarySelected/ChangePUweight.C+");
+  gROOT->ProcessLine(".L ../ChangeVeryPreliminarySelected/ApplySF.C+");
 
 
   gROOT->ProcessLine(".L ../SkimSplitMerge/TInputOutputTree.C+");

@@ -25,8 +25,8 @@ class Unfolding
 
        bool PrepareMigrationMatrix();
 
-       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TString strAnnex);
-       bool ApplyRooUnfold(TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV, TString strAnnex);
+       bool ApplyRooUnfold(bool doSyst, TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TString strAnnex);
+       bool ApplyRooUnfold(bool doSyst, TH1D* inputYields, TH1D* unfoldedYields,RooUnfold::Algorithm alg, TMatrixD& errCovStat, TVectorD& errStatV, TVectorD& errSystV, TVectorD& errCovStatV, TString strAnnex);
        bool ComputeSystErrors(TH1D* histInputYields, float* errSyst,RooUnfold::Algorithm alg, int NSmears);
        bool ComputeStatErrors(TH1D* histInputYields, float* errStat, RooUnfold::Algorithm alg, int NSmears);
 

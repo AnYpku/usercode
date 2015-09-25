@@ -40,6 +40,58 @@ float TScaleFactors::SF_MediumEleID(float pt, float eta) {
   return 1.0;
 }// end of SF_MediumEleID
 
+//https://twiki.cern.ch/twiki/bin/view/Main/EGammaScaleFactors2012#2012_8_TeV_Jan22_Re_recoed_data
+float TScaleFactors::SF_TightEleID(float pt, float eta) {
+  if ( pt <= 40){
+    if (fabs(eta) <= 0.8)                       { return 0.978;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442)  { return 0.958;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0)  { return 0.909;}
+    if (fabs(eta) > 2.0 )    { return 0.987;}
+  }
+  if ( pt > 40 && pt <= 50){
+    if (fabs(eta) <= 0.8)                       { return 0.981;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442)  { return 0.969;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0)  { return 0.942;}
+    if (fabs(eta) > 2.0 )    { return 0.991;}
+  }
+  if ( pt > 50 ) {
+    if (fabs(eta) <= 0.8)                       { return 0.982;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442)  { return 0.969;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0)  { return 0.957;}
+    if (fabs(eta) > 2.0 )    { return 0.999;}
+  }
+  return 1.0;
+}// end of SF_TightEleID
+
+float TScaleFactors::SF_Err_TightEleID(float pt, float eta) {
+  return 0.0;
+}// end of SF_Err_TightEleID
+
+float TScaleFactors::SF_PixelSeedVeto(float pt, float eta){
+  if(fabs(eta) <= 1.4442){
+    if(pt > 15 && pt <= 20) {return 0.996;}
+    if(pt > 20 && pt <= 25) {return 0.994;}
+    if(pt > 25 && pt <= 30) {return 0.996;}
+    if(pt > 30 && pt <= 40) {return 0.999;}
+    if(pt > 40 && pt <= 50) {return 1.009;}
+    if(pt > 50 && pt <= 70) {return 0.993;}
+    if(pt > 70 )            {return 1.047;}
+  } else if(fabs(eta) > 1.566 && fabs(eta) <= 2.5){
+    if(pt > 15 && pt <= 20) {return 0.960;}
+    if(pt > 20 && pt <= 25) {return 0.977;}
+    if(pt > 25 && pt <= 30) {return 0.951;}
+    if(pt > 30 && pt <= 40) {return 1.029;}
+    if(pt > 40 && pt <= 50) {return 0.971;}
+    if(pt > 50 && pt <= 70) {return 0.965;}
+    if(pt > 70 )           {return 1.145;}
+  } 
+  return 1.0;
+}// end of SF_PixelSeedVeto(float pt, float eta)
+
+float TScaleFactors::SF_Err_PixelSeedVeto(float pt, float eta){
+  return 0.0;
+}// end of SF_Err_PixelSeedVeto(float pt, float eta)
+
 
 // For Medium Photon ID:
 // https://indico.cern.ch/event/305105/contribution/3/material/slides/0.pdf 
@@ -109,7 +161,7 @@ float TScaleFactors::SF_Err_MediumPhoID(float pt, float eta){
     if (fabs(eta) > 1.566 && fabs(eta) <= 2.0){ return 0.0101;}
     if (fabs(eta) > 2.0 && fabs(eta) <= 2.5)  { return 0.0101;}
   }
-  return 1.0;
+  return 0.0;
 }// end of SF_MediumPhoID
 
 float TScaleFactors::SF_MuonIso(float pt, float eta){
@@ -238,7 +290,7 @@ float TScaleFactors::SF_Err_MuonIso(float pt, float eta){
     if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.005;}
     if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.002;}
   }
-  return 1.0;
+  return 0.0;
 }// end of SF_Err_MuonIso
 
 float TScaleFactors::SF_MuonID(float pt, float eta){
@@ -362,5 +414,5 @@ float TScaleFactors::SF_Err_MuonID(float pt, float eta){
     if(fabs(eta) > 0.9 && fabs(eta) < 1.2) { return 0.035;}
     if(fabs(eta) > 1.2 && fabs(eta) < 2.1) { return 0.030;}
   }
-  return 1.0;
+  return 0.0;
 }//end of SF_Err_MuonID
