@@ -1,5 +1,6 @@
 #include "../Configuration/TConfiguration.h"
 #include "../FullChain/FullChain.h"
+#include "../PrepareYields/AuxPrepareYields.C"
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
@@ -21,12 +22,14 @@ void AuxFchSubtractBackgroundData(TString strChannel, TString strVGamma)
   if (strVGamma=="WGamma") vgamma=conf.W_GAMMA;
   if (strVGamma=="ZGamma") vgamma=conf.Z_GAMMA;
 
-  anPars.noSubtractBackground[channel][vgamma][conf.TEMPL_CHISO]=0;
-  anPars.noSubtractBackground[channel][vgamma][conf.TEMPL_SIHIH]=0;
-  anPars.noSubtractBackground[channel][vgamma][conf.TEMPL_OVERLAY]=0;
+  anPars.templFits=conf.TEMPL_CHISO;
+  AuxSubtractBackground(anPars,0); 
 
+  anPars.templFits=conf.TEMPL_SIHIH;
+  AuxSubtractBackground(anPars,0); 
 
-  fch.RunAnalysis(anPars);
+  anPars.templFits=conf.TEMPL_OVERLAY;
+  AuxSubtractBackground(anPars,0); 
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

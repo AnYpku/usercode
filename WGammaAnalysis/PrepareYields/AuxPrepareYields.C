@@ -15,19 +15,23 @@ void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosu
   TPrepareYields::PrepareYieldsPars pars;
 
   pars.strFileOut=conf.GetYieldsMCtruthFileName(anPars.channel, anPars.vgamma, anPars.varKin);
+  if (isMCclosure) pars.strFileOut.ReplaceAll(".root","_MCclosure.root");
 
   std::cout<<"AuxPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
   AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, selStage);
+
 
   prep.PlotPrintSave();
   
 }// end of AuxPrepareYields
 
-void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::AnalysisParameters &anPars, int templFits)
+void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::AnalysisParameters &anPars, int templFits, bool isMCclosure)
 {
   TConfiguration config;
   TString fileName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,templFits,anPars.varKin);
+  if (isMCclosure) fileName.ReplaceAll(".root","_MCclosure.root");
   TString fileNameEtoGamma=config.GetDDBkgEtoGammaFileName(anPars.varKin);
+  if (isMCclosure) fileNameEtoGamma.ReplaceAll(".root","_MCclosure.root");
   TString strYields1DTrue[3], strYields1DFake[3], strYieldTotTrue[3], strYieldTotFake[3], strYields1DEtoGamma[3], strYieldsTotEtoGamma[3];
   for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
    strYields1DFake[ieta]=config.GetYieldsDDTemplateFakeName(config.ONEDI,ieta);
@@ -62,17 +66,18 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
   TPrepareYields::PrepareYieldsPars pars;
 
   pars.strFileOut=conf.GetYieldsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin);
+  if (isMCclosure) pars.strFileOut.ReplaceAll(".root","_MCclosure.root");
 
   AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, conf.FULLY);
 
   TConfiguration config;
 
   if (anPars.templFits==config.TEMPL_OVERLAY){
-    AuxSubtractBackgroundOneTempl(prep, anPars, config.TEMPL_SIHIH);
-    AuxSubtractBackgroundOneTempl(prep, anPars, config.TEMPL_CHISO);
+    AuxSubtractBackgroundOneTempl(prep, anPars, config.TEMPL_SIHIH, isMCclosure);
+    AuxSubtractBackgroundOneTempl(prep, anPars, config.TEMPL_CHISO, isMCclosure);
   }
   else 
-    AuxSubtractBackgroundOneTempl(prep, anPars, anPars.templFits);
+    AuxSubtractBackgroundOneTempl(prep, anPars, anPars.templFits, isMCclosure);
 
   prep.SubtractBackground();
   prep.PlotPrintSave();
@@ -104,8 +109,11 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   pars.varKinLabel=anPars.varKin;
   if (anPars.varKin=="phoEt") pars.varKinLabel="P_{T}^{#gamma}, GeV";
 
+  pars.isMCclosure=isMCclosure;
+
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
   pars.strPlotsBaseName=TString("c_")+config.StrChannel(anPars.channel)+TString("_")+config.StrVgType(anPars.vgamma)+TString("_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
+  if (isMCclosure ) pars.strPlotsBaseName+="MCclosure_";
   std::cout<<"AuxPrepareYieldsCommon: selStage="<<config.StrSelectionStage(selStage)<<std::endl;
   pars.strSelStage="";
   if (selStage!=config.FULLY) pars.strSelStage=config.StrSelectionStage(selStage);
@@ -118,7 +126,7 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
     pars.strYieldsNameTot_SignalMCGenBins[ieta]=config.GetYieldsSignalMCGenBinsName(config.TOTAL, ieta);
   }
 
-  pars.isMCclosure=isMCclosure;
+
   pars.doEtoGammaSubtr=0;
   if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA) {
     pars.doEtoGammaSubtr=1;

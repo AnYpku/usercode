@@ -320,7 +320,8 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         anPars.templFits=itp;
-        AuxTemplates(anPars,0);// 0 - no isMCclosure
+//        AuxTemplates(anPars,0);// 0 - no isMCclosure
+        AuxTemplates(anPars,1);// 0 - no isMCclosure
         std::cout<<"%_%  DONE "<<strAffix<<std::endl;
         std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
       }//end of loop over itp
@@ -373,6 +374,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.channel=ich;
         anPars.vgamma=ivg;
         AuxPrepareYields(anPars,0); 
+        AuxPrepareYields(anPars,1); 
        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
     }//end of loop over ivg
@@ -401,6 +403,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
         anPars.vgamma=ivg;
         anPars.templFits=itp;
         AuxSubtractBackground(anPars,0); 
+        AuxSubtractBackground(anPars,1);
        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;   
       }//end of loop over itp

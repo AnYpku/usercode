@@ -15,7 +15,7 @@
 #include "TCut.h"
 //ROOT
 
-void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars);
+void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
 
 void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
 
@@ -81,7 +81,7 @@ void SetParsGeneral(TConfiguration::AnalysisParameters &anPars, TTemplates::Temp
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_TEMPL_FITS);
 
   if (anPars.templFits==TConfiguration::TEMPL_SIHIH) 
-    SetParsSigmaIEtaIEtaTempl(pars, anPars);
+    SetParsSigmaIEtaIEtaTempl(pars, anPars, isMCclosure);
 
   if (anPars.templFits==TConfiguration::TEMPL_CHISO) 
     SetParsChIsoTempl(pars, anPars, isMCclosure);
@@ -132,11 +132,11 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
 
   TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA);
   if (isMCclosure) strData.ReplaceAll(".root","_MCclosure.root");
+  if (isMCclosure) strData.ReplaceAll("blindCOMBINED","UNblind");
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
   TString strSign=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC);
-  if (isMCclosure) strSign.ReplaceAll(".root","_MCclosure.root");
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign);
   if (!pars.treeSign) return;
 
@@ -168,7 +168,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
     //the histograms with extracted yields will be saved here
-
+  if (isMCclosure) pars.strFileOutName.ReplaceAll(".root","_MCclosure.root");
 
   pars.varSideband="phoSigmaIEtaIEta";//TString
 //  pars.varTrueTempl="phoRandConeChIsoCorr";//"phoRandConeChIso04Corr";//TString
@@ -197,7 +197,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
 
 
 
-void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars)
+void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
 
   TConfiguration config;
@@ -224,6 +224,8 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   std::cout<<std::endl;
 
   TString strData=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.DATA);
+  if (isMCclosure) strData.ReplaceAll(".root","_MCclosure.root"); 
+  if (isMCclosure) strData.ReplaceAll("blindCOMBINED","UNblind"); 
   pars.treeData=LoadOneTree("data", strData, pars.fData);
   if (!pars.treeData) return;
 
@@ -240,10 +242,12 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   if (!pars.treeFakeToTrue) return;
 
   TString strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strTrue.ReplaceAll(".root","_MCclosure.root"); 
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
   TString strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strFake.ReplaceAll(".root","_MCclosure.root"); 
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -257,6 +261,7 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
     //the histograms with extracted yields will be saved here
+  if (isMCclosure) pars.strFileOutName.ReplaceAll(".root","_MCclosure.root");
 
 
 

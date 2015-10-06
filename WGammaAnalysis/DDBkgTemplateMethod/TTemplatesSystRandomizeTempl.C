@@ -158,6 +158,7 @@ void TTemplatesSystRandomizeTempl::RandomizeFakeTemplates(int ikin, int ieta)
 //    float err2 = 0.2*_hLeakTrueToFake[ikin][ieta]->GetBinContent(ib);
 //    float sigma = sqrt(err1*err1+err2*err2);
     float newmean=_random.Gaus(mean,err1);
+    if (newmean<0) newmean=0;
     _hFake[ikin][ieta]->SetBinContent(ib,newmean);
     _hFake[ikin][ieta]->SetBinError(ib,err1);
     _hTrue[ikin][ieta]->SetBinContent(ib,_hTrueReference[ikin][ieta]->GetBinContent(ib));

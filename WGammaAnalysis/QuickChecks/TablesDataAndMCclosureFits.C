@@ -117,17 +117,17 @@ void PrintTables()
 
   f_data_chiso="../WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_phoEt_.root";
   f_data_sihih="../WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_phoEt_.root";
-  f_MCcl_chiso="../../WGammaAnalysisAux20_Fit_phoEt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_phoEt_.root";
-  f_MCcl_sihih="../../WGammaAnalysisAux20_Fit_phoEt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_phoEt_.root";
+  f_MCcl_chiso="../WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_phoEt__MCclosure.root";
+  f_MCcl_sihih="../WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_phoEt__MCclosure.root";
   PrintTableOne("phoEt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "BARREL");
   PrintTableOne("phoEt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "ENDCAP");
 
-  f_data_chiso="../../WGammaAnalysisAux15_Fit_WMt_bins/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_WMt_.root";
-  f_data_sihih="../../WGammaAnalysisAux15_Fit_WMt_bins/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_WMt_.root";
-  f_MCcl_chiso="../../WGammaAnalysisAux18_Fit_WMt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_WMt_.root";
-  f_MCcl_sihih="../../WGammaAnalysisAux18_Fit_WMt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_WMt_.root";
-  PrintTableOne("WMt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "BARREL");
-  PrintTableOne("WMt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "ENDCAP");
+//  f_data_chiso="../../WGammaAnalysisAux15_Fit_WMt_bins/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_WMt_.root";
+//  f_data_sihih="../../WGammaAnalysisAux15_Fit_WMt_bins/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_WMt_.root";
+//  f_MCcl_chiso="../../WGammaAnalysisAux18_Fit_WMt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_WMt_.root";
+//  f_MCcl_sihih="../../WGammaAnalysisAux18_Fit_WMt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_WMt_.root";
+//  PrintTableOne("WMt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "BARREL");
+//  PrintTableOne("WMt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "ENDCAP");
 
 
 }//end of PrintTables()

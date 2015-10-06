@@ -25,5 +25,7 @@ MergeMCintoData(){
   MergeMCintoDataOne ../WGammaOutput/$1_$2/PreliminaryForTemplateMethodSelected/ $2
   MergeMCintoDataOne ../WGammaOutput/$1_$2/FullySelected/ $2
   MergeMCintoDataOne ../WGammaOutput/$1_$2/FsrSelected/ $2
+  MergeMCintoDataOne ../WGammaOutput/$1_$2/FsrExcludedSelected/ $2
+  MergeMCintoDataOne ../WGammaOutput/$1_$2/PreliminaryForEtoGammaSelected/ $2
 }
 # end of MergeMCintoData

@@ -1,10 +1,11 @@
 #include "../Configuration/TConfiguration.h"
 #include "../FullChain/FullChain.h"
-#include "../Selection/Selection.h"
+#include "../FullChain/FullChain.h"
+#include "../DDBkgTemplateMethod/AuxTemplates.C"
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
-void AuxFchExtraSelection(TString strChannel, TString strVGamma)
+void AuxFchTemplateFitsMCclosure_SIHIH(TString strChannel, TString strVGamma)
 {
   TBenchmark time;
   time.Start("time");
@@ -22,8 +23,9 @@ void AuxFchExtraSelection(TString strChannel, TString strVGamma)
   if (strVGamma=="WGamma") anPars.vgamma=conf.W_GAMMA;
   if (strVGamma=="ZGamma") anPars.vgamma=conf.Z_GAMMA;
 
-  Selection selection;
-  selection.ExtraSelection(anPars);
+  anPars.templFits=conf.TEMPL_SIHIH;
+
+  AuxTemplates(anPars,1);
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

@@ -346,14 +346,14 @@ bool TTemplates::SetFakeTemplate(int ikin, int ieta, bool noPrint)
     std::cout<<"_hFake[ikin][ieta]->GetSumOfWeights()==0; return 0;"<<std::endl;
     return 0;
   }
-  if (_pars.isMCclosureMode && _leakFraction[ikin][ieta]>_acceptableLeakFraction[ikin][ieta]){
-    std::cout<<"_hFake[ikin][ieta]->GetSumOfWeights()="<<_hFake[ikin][ieta]->GetSumOfWeights()<<"; ";
-    std::cout<<"_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()="<<_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()<<"; ";
-    std::cout<<"_leakFraction[ikin][ieta]="<<_leakFraction[ikin][ieta]<<"; ";
-    std::cout<<"_acceptableFraction[ikin][ieta]="<<_acceptableLeakFraction[ikin][ieta]<<"; ";
-    std::cout<<"return 0;"<<std::endl;
-    return 0;
-  }
+//  if (_pars.isMCclosureMode && _leakFraction[ikin][ieta]>_acceptableLeakFraction[ikin][ieta]){
+//    std::cout<<"_hFake[ikin][ieta]->GetSumOfWeights()="<<_hFake[ikin][ieta]->GetSumOfWeights()<<"; ";
+//    std::cout<<"_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()="<<_hLeakTrueToFake[ikin][ieta]->GetSumOfWeights()<<"; ";
+//    std::cout<<"_leakFraction[ikin][ieta]="<<_leakFraction[ikin][ieta]<<"; ";
+//    std::cout<<"_acceptableFraction[ikin][ieta]="<<_acceptableLeakFraction[ikin][ieta]<<"; ";
+//    std::cout<<"return 0;"<<std::endl;
+//    return 0;
+//  }
   return 1;
 }// end of SetFakeTemplate
 
