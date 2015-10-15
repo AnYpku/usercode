@@ -37,8 +37,9 @@ void TTemplatesSystRandomizeTempl::RandomizeTempl()
 {
 
   for (int ikin=1; ikin<=_pars.nKinBins; ikin++){
-//   for (int ikin=7; ikin<=7; ikin++){
+ //  for (int ikin=3; ikin<=3; ikin++){
     for (int ieta=_BARREL; ieta<=_ENDCAP; ieta++){
+//    for (int ieta=_ENDCAP; ieta<=_ENDCAP; ieta++){
       FitWithRandTemplatesKinEtaBin(ikin, ieta);
     }//end of loop over ieta
   }// end of loop over ikin
@@ -142,6 +143,7 @@ void TTemplatesSystRandomizeTempl::RandomizeTrueTemplates(int ikin, int ieta)
 //    float err2 = 0.2*_hLeakFakeToTrue[ikin][ieta]->GetBinContent(ib);
 //    float sigma = sqrt(err1*err1+err2*err2);
     float newmean=_random.Gaus(mean,err1);
+    if (newmean<0) newmean=0;
     _hTrue[ikin][ieta]->SetBinContent(ib,newmean);
     _hTrue[ikin][ieta]->SetBinError(ib,err1);
     _hFake[ikin][ieta]->SetBinContent(ib,_hFakeReference[ikin][ieta]->GetBinContent(ib));
@@ -168,6 +170,9 @@ void TTemplatesSystRandomizeTempl::RandomizeFakeTemplates(int ikin, int ieta)
 
 void TTemplatesSystRandomizeTempl::FitWithRandTemplatesKinEtaBin(int ikin, int ieta)
 {
+
+  _pars.noRebinTemplates=0;
+
   bool isOk = ComputeBackgroundOne(ikin,ieta,0);
   _nTrueYieldsValRef[ikin][ieta]=_nTrueYieldsVal[ikin][ieta];
   _nFakeYieldsValRef[ikin][ieta]=_nFakeYieldsVal[ikin][ieta];
@@ -182,6 +187,8 @@ void TTemplatesSystRandomizeTempl::FitWithRandTemplatesKinEtaBin(int ikin, int i
   _sumSquaresFake[ikin][ieta]=0;
   _rmsTrue[ikin][ieta]=0;
   _rmsFake[ikin][ieta]=0;
+
+  _pars.noRebinTemplates=1;
 
     // True gamma templates
 

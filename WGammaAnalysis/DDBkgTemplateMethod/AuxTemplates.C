@@ -2,6 +2,7 @@
 #include "TTemplatesSyst.h"
   //due to sideband variation
 #include "TTemplatesSystRandomizeTempl.h"
+#include "TTemplatesSystZgNorm.h"
 #include "../Configuration/TConfiguration.h"
 #include "../Include/TPhotonCuts.h"
 //this package
@@ -27,11 +28,21 @@ void AuxSystRandTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCc
 
   TTemplates::TemplatesPars pars;
   SetParsGeneral(anPars, pars, isMCclosure);
-  pars.noRebinTemplates=1;
   TTemplatesSystRandomizeTempl temp(pars);
   temp.RandomizeTempl();
   
 }// end of AuxSystRandTemplates()
+
+void AuxSystZgNorm(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
+{
+  //this function is called in FullChain
+
+  TTemplates::TemplatesPars pars;
+  SetParsGeneral(anPars, pars, isMCclosure);
+  TTemplatesSystZgNorm temp(pars);
+  temp.SystDueToZgNorm();
+  
+}// end of AuxSystZgNorm()
 
 void AuxTemplates(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {

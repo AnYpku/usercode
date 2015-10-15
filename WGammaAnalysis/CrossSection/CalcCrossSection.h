@@ -19,6 +19,7 @@ class CalcCrossSection
        enum{ERR_STAT,
 
             ERR_SYST_CHISOvsSIHIH,
+            ERR_SYST_ZgMC_Norm,
             ERR_SYST_TemplStat,
             ERR_SYST_etogStat,
             ERR_SYST_accXeff_MCstat,

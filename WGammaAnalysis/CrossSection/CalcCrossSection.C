@@ -219,32 +219,59 @@ void CalcCrossSection::Calc()
   _yCSarray[errT].strUp="syst";
   _yCSarray[errT].strDown="$|N_{Ich}-N_{\\sigma{i\\eta i\\eta}}|$";
   std::cout<<"ERR_SYST_CHISOvsSIHIH "<<_yCSarray[errT].title<<std::endl;
+  TString strCh, strVg;
+  if (_channel==_config.MUON) strCh="MUON";
+  if (_vgamma==_config.W_GAMMA) strVg="WGamma";
+  TString strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
   GetYieldsSyst(_yCSarray[errT], 
-    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
-    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
-    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
+    strF,
+    "yieldsDDTrueONEDICOMMON",
+    "yieldsDDTrueTOTALCOMMON");
+//    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
+//    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
+//    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);  
 
-  errT=ERR_SYST_TemplStat;
+  errT=ERR_SYST_ZgMC_Norm;
   _yCSarray[errT].errType=errT;
-  _yCSarray[errT].title="template statistics";
-  _yCSarray[errT].name="syst_templStat";
-  _yCSarray[errT].strUp="templ";
-  _yCSarray[errT].strDown="stat";
-  std::cout<<"ERR_SYST_TemplStat "<<_yCSarray[errT].title<<std::endl;
-  TString strName=_config.GetDDTemplateFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt");
-  strName.ReplaceAll(".root","_SystRand.root");
+  _yCSarray[errT].name="syst_ZgMC_Norm";
+  _yCSarray[errT].title="Z#gamma MC norm";
+  _yCSarray[errT].strUp="Zg MC";
+  _yCSarray[errT].strDown="norm";
+  std::cout<<"ERR_SYST_ZgMC_Norm "<<_yCSarray[errT].title<<std::endl;
+  strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_"+strVg+"_TEMPL_CHISO_phoEt__SystZgNorm.root";
   GetYieldsSyst(_yCSarray[errT], 
-    strName, 
-    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON), 
-    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON));
+    strF,
+    "yieldsDDTrueONEDICOMMON",
+    "yieldsDDTrueTOTALCOMMON");
+//    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
+//    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
+//    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
-  DivideOverBinWidth(_yCSarray[errT]);  
+  DivideOverBinWidth(_yCSarray[errT]); 
+
+//  errT=ERR_SYST_TemplStat;
+//  _yCSarray[errT].errType=errT;
+//  _yCSarray[errT].title="template statistics";
+//  _yCSarray[errT].name="syst_templStat";
+//  _yCSarray[errT].strUp="templ";
+//  _yCSarray[errT].strDown="stat";
+//  std::cout<<"ERR_SYST_TemplStat "<<_yCSarray[errT].title<<std::endl;
+//  TString strName=_config.GetDDTemplateFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt");
+//  strName.ReplaceAll(".root","_SystRand.root");
+//  GetYieldsSyst(_yCSarray[errT], 
+//    strName, 
+//    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON), 
+//    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON));
+//  ApplyUnfolding(0,_yCSarray[errT]);
+//  ApplyAccXEff(_yCSarray[errT]);
+//  DivideOverLumi(_yCSarray[errT]);
+//  DivideOverBinWidth(_yCSarray[errT]);  
 
   if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
     errT=ERR_SYST_etogStat;
@@ -308,32 +335,32 @@ void CalcCrossSection::Calc()
 
   if (_channel==_config.MUON && _vgamma==_config.W_GAMMA){
 
-    errT=ERR_SYST_WMtCut;
-    _yCSarray[errT].errType=errT;  
-    _yCSarray[errT].title="WMt cut +-5GeV";
-    _yCSarray[errT].name="syst_WMt_cut";
-    _yCSarray[errT].strUp="WMt";
-    _yCSarray[errT].strDown="cut";
-    std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
-    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
+//    errT=ERR_SYST_WMtCut;
+//    _yCSarray[errT].errType=errT;  
+//    _yCSarray[errT].title="WMt cut +-5GeV";
+//    _yCSarray[errT].name="syst_WMt_cut";
+//    _yCSarray[errT].strUp="WMt";
+//    _yCSarray[errT].strDown="cut";
+//    std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
+//    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
 
-    errT=ERR_SYST_PUweight;
-    _yCSarray[errT].errType=errT;  
-    _yCSarray[errT].title="PUweight +-5%";
-    _yCSarray[errT].name="syst_PUweight";
-    _yCSarray[errT].strUp="PU";
-    _yCSarray[errT].strDown="weight";
-    std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
-    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
+//    errT=ERR_SYST_PUweight;
+//    _yCSarray[errT].errType=errT;  
+//    _yCSarray[errT].title="PUweight +-5%";
+//    _yCSarray[errT].name="syst_PUweight";
+//    _yCSarray[errT].strUp="PU";
+//    _yCSarray[errT].strDown="weight";
+//    std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
+//    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
 
-    errT=ERR_SYST_SFs;
-    _yCSarray[errT].errType=errT;  
-    _yCSarray[errT].title="SFs +-1sigma";
-    _yCSarray[errT].name="syst_SFs";
-    _yCSarray[errT].strUp="SFs";
-    _yCSarray[errT].strDown="err";
-    std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
-    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
+//    errT=ERR_SYST_SFs;
+//    _yCSarray[errT].errType=errT;  
+//    _yCSarray[errT].title="SFs +-1sigma";
+//    _yCSarray[errT].name="syst_SFs";
+//    _yCSarray[errT].strUp="SFs";
+//    _yCSarray[errT].strDown="err";
+//    std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
+//    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
 
   }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
 
@@ -451,6 +478,20 @@ void CalcCrossSection::GetSignalYields()
 //    _yCSstat.yields1D_bkgSubtr->SetBinContent(1,cont);
 //    _yCSstat.yields1D_bkgSubtr->SetBinError(1,err);
 //  }
+
+  TString strCh, strVg;
+  if (_channel==_config.MUON) strCh="MUON";
+  if (_vgamma==_config.W_GAMMA) strVg="WGamma";
+  TString strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
+  TFile* fSigMeth2 = new TFile(strF);
+  TH1F* h1D = (TH1F*)fSigMeth2->Get("yieldsDDTrueONEDICOMMON");
+  TH1F* hTot = (TH1F*)fSigMeth2->Get("yieldsDDTrueTOTALCOMMON");
+
+  _yCSarray[errT].yieldTOT_bkgSubtr->SetBinContent(1,hTot->GetBinContent(1));
+  for (int ib=1; ib<=h1D->GetNbinsX(); ib++){
+    _yCSarray[errT].yields1D_bkgSubtr->SetBinContent(ib,h1D->GetBinContent(ib));
+  }//end of loop over ib
+
   _fOut->cd();
   Print("Bkg Subtr Yields:",_yCSarray[errT].yieldTOT_bkgSubtr,_yCSarray[errT].yields1D_bkgSubtr);
 }// end of GetSignalYields()
