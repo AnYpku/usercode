@@ -335,14 +335,14 @@ void CalcCrossSection::Calc()
 
   if (_channel==_config.MUON && _vgamma==_config.W_GAMMA){
 
-//    errT=ERR_SYST_WMtCut;
-//    _yCSarray[errT].errType=errT;  
-//    _yCSarray[errT].title="WMt cut +-5GeV";
-//    _yCSarray[errT].name="syst_WMt_cut";
-//    _yCSarray[errT].strUp="WMt";
-//    _yCSarray[errT].strDown="cut";
-//    std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
-//    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
+    errT=ERR_SYST_WMtCut;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="WMt cut +-5GeV";
+    _yCSarray[errT].name="syst_WMt_cut";
+    _yCSarray[errT].strUp="WMt";
+    _yCSarray[errT].strDown="cut";
+    std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
 
 //    errT=ERR_SYST_PUweight;
 //    _yCSarray[errT].errType=errT;  
@@ -353,14 +353,14 @@ void CalcCrossSection::Calc()
 //    std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
 //    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
 
-//    errT=ERR_SYST_SFs;
-//    _yCSarray[errT].errType=errT;  
-//    _yCSarray[errT].title="SFs +-1sigma";
-//    _yCSarray[errT].name="syst_SFs";
-//    _yCSarray[errT].strUp="SFs";
-//    _yCSarray[errT].strDown="err";
-//    std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
-//    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
+    errT=ERR_SYST_SFs;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="SFs +-1sigma";
+    _yCSarray[errT].name="syst_SFs";
+    _yCSarray[errT].strUp="SFs";
+    _yCSarray[errT].strDown="err";
+    std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
 
   }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
 

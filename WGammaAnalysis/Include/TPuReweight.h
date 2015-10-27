@@ -23,7 +23,7 @@ class TPuReweight
     TFile *fPuMc_;
     TTree *trMC_;
     TH1F *hMCPU_;
-    vector <float> puWeightArray_;
+    float _puWeightArray[101];
 
 };
 #endif
