@@ -29,6 +29,8 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
 {
   TConfiguration config;
   TString fileName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,templFits,anPars.varKin);
+  std::cout<<" AuxSubtractBackgroundOneTempl: fileName="<<fileName<<std::endl;
+
   if (isMCclosure) fileName.ReplaceAll(".root","_MCclosure.root");
   TString fileNameEtoGamma=config.GetDDBkgEtoGammaFileName(anPars.varKin);
   if (isMCclosure) fileNameEtoGamma.ReplaceAll(".root","_MCclosure.root");

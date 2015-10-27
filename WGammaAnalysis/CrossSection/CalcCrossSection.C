@@ -344,14 +344,14 @@ void CalcCrossSection::Calc()
     std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
     ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
 
-//    errT=ERR_SYST_PUweight;
-//    _yCSarray[errT].errType=errT;  
-//    _yCSarray[errT].title="PUweight +-5%";
-//    _yCSarray[errT].name="syst_PUweight";
-//    _yCSarray[errT].strUp="PU";
-//    _yCSarray[errT].strDown="weight";
-//    std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
-//    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
+    errT=ERR_SYST_PUweight;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="PUweight +-5%";
+    _yCSarray[errT].name="syst_PUweight";
+    _yCSarray[errT].strUp="PU";
+    _yCSarray[errT].strDown="weight";
+    std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
 
     errT=ERR_SYST_SFs;
     _yCSarray[errT].errType=errT;  

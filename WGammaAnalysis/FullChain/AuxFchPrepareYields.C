@@ -22,7 +22,7 @@ void AuxFchPrepareYields(TString strChannel, TString strVGamma)
   if (strVGamma=="WGamma") anPars.vgamma=conf.W_GAMMA;
   if (strVGamma=="ZGamma") anPars.vgamma=conf.Z_GAMMA;
 
-        AuxPrepareYields(anPars,0); 
+  AuxPrepareYields(anPars,0); 
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

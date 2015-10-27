@@ -114,7 +114,7 @@ private:
     // for Z-mass window cut for W_GAMMA in ELECTRON channel
 };
 
-  const static float _WMtCut2012[2] = {40.,70.};//MUON, ELECTRON //for 8 TeV
+  const static float _WMtCut2012[2] = {40.,40.};//MUON, ELECTRON //for 8 TeV
 
 #endif 
   //#ifndef TFullCuts_h

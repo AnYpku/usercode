@@ -16,12 +16,12 @@ void AuxFchCrossSection(TString strChannel, TString strVGamma)
   TConfiguration conf;
   int channel;
   int vgamma;
-  if (strChannel=="MUON") channel=conf.MUON;
-  if (strChannel=="ELECTRON") channel=conf.ELECTRON;
-  if (strVGamma=="WGamma") vgamma=conf.W_GAMMA;
-  if (strVGamma=="ZGamma") vgamma=conf.Z_GAMMA;
+  if (strChannel=="MUON") anPars.channel=conf.MUON;
+  if (strChannel=="ELECTRON") anPars.channel=conf.ELECTRON;
+  if (strVGamma=="WGamma") anPars.vgamma=conf.W_GAMMA;
+  if (strVGamma=="ZGamma") anPars.vgamma=conf.Z_GAMMA;
 
-  anPars.noCalcCrossSection[channel][vgamma]=0;
+  anPars.noCalcCrossSection[anPars.channel][anPars.vgamma]=0;
 
   fch.RunAnalysis(anPars);
 
