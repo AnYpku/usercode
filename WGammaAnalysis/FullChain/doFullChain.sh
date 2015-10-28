@@ -63,8 +63,8 @@ DoFullChainPart2(){
 #  root -l   AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l   AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l   AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l   AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l   AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l   AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l   AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchSystRandomizeTempl_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l -b -q  AuxFchSystRandomizeTempl_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
@@ -77,7 +77,7 @@ DoFullChainPart2(){
 #   root -l -b -q  AuxFchCombineCHISOandSIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchCalcAccXEff.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-  root -l -b -q AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
   echo DONE: 'DoFullChainPart2()' $1 $2
 }
 #end of DoFullChainPart2
@@ -96,6 +96,7 @@ DoFullChainPart2(){
 # DD e->gamma bkg estimation for W_GAMMA ELECTRON only: #
 
 #root -l -b -q AuxFchBkgEtoGamma.C+
+#root -l -b -q AuxFchBkgEtoGamma_MCclosure.C+
 
 #MergeChannels
 
@@ -107,9 +108,9 @@ DoFullChainPart2(){
 #MergeMCintoData ChannelsMERGED ZGamma 
 
 #DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
-#DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
+DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
 #DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-DoFullChainPart2 MUON WGamma logs/log20150320/log_
+#DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
 #root -l -b -q runReplotMigrationMatrix.C
 #root -l runCompareCS.C

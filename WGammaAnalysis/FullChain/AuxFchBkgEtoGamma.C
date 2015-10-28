@@ -17,7 +17,7 @@ void AuxFchBkgEtoGamma()
 
   anPars.channel=conf.ELECTRON;
   anPars.vgamma=conf.W_GAMMA;
-  TEtoGamma etg(anPars); 
+  TEtoGamma etg(anPars,0); 
   etg.ComputePlotSave();
 
   time.Stop("time");

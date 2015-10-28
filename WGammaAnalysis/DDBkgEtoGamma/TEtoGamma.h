@@ -18,7 +18,7 @@ class TEtoGamma
 {
   public:
 
-    TEtoGamma(TConfiguration::AnalysisParameters &anPars);
+    TEtoGamma(TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
     virtual ~TEtoGamma();
     void ComputePlotSave();
 
@@ -49,6 +49,8 @@ class TEtoGamma
     TString _varKin;
     int _nKinBins;
     float _kinBinLims[100];
+
+    bool _isMCclosure;
 
     void WriteToFile();
     void ComputeBkg();

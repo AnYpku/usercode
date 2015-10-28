@@ -386,7 +386,7 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
     std::cout<<"%^%  WILL DO e->gamma DD estimation"<<std::endl;
     anPars.channel=conf.ELECTRON;
     anPars.vgamma=conf.W_GAMMA;
-    TEtoGamma etg(anPars); 
+    TEtoGamma etg(anPars,0); 
     etg.ComputePlotSave();
     std::cout<<"%_%  DONE e->gamma DD estimation"<<std::endl;
     std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl; 

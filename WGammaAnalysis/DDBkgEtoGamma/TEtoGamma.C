@@ -21,14 +21,17 @@
 #include "TLine.h"
 #include "TLatex.h"
 
-TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars)
+TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
 
+  _isMCclosure=isMCclosure;
   _cutAdd=anPars.cutAdd;
   _varKin=anPars.varKin;
-  _fOut=new TFile(_conf.GetDDBkgEtoGammaFileName(anPars.varKin),"recreate");
+  TString strFout = _conf.GetDDBkgEtoGammaFileName(anPars.varKin);
+  if (isMCclosure) strFout.ReplaceAll(".root","_MCclosure.root");
+  _fOut=new TFile(strFout,"recreate");
   _nKinBins=anPars.nKinBins;
-  std::cout<<"_fOut="<<_conf.GetDDBkgEtoGammaFileName(anPars.varKin)<<std::endl;
+  std::cout<<"_fOut="<<strFout<<std::endl;
   std::cout<<"_varKin="<<_varKin<<std::endl;
   std::cout<<"_nKinBins="<<_nKinBins<<", _kinBinLims: ";
   for (int ik=0; ik<=_nKinBins; ik++){
@@ -68,18 +71,22 @@ TTree* TEtoGamma::GetTree(TString strFileName){
 
 TString TEtoGamma::FName(int inum)
 {
-  if (inum==_DATA_EtoGAMMA_ENR) 
-    return _conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.DATA);
+  TString str;
+  if (inum==_DATA_EtoGAMMA_ENR) {
+    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.DATA);
+    if (_isMCclosure) str.ReplaceAll(".root","_MCclosure.root");
+  }
   if (inum==_ZJETS_EtoGAMMA_ENR) 
-    return _conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
   if (inum==_ZJETS_NOM_ELE) 
-    return _conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+    str=_conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
   if (inum==_ZJETS_NOM_MUO) 
-    return _conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
   if (inum==_WJETS_NOM_ELE) 
-    return _conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
+    str=_conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
   if (inum==_WJETS_NOM_MUO) 
-    return _conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
+    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
+  return str;
 }//end of TEtoGamma::FName
 
 TString TEtoGamma::HName(int inum, int ieta)
