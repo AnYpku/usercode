@@ -18,12 +18,14 @@ class TPuReweight
     virtual ~TPuReweight();
     float GetPuWeightMc(float puTrue);
   private:
-    TFile *fPuData_;
-    TH1F *hDataPU_;
-    TFile *fPuMc_;
-    TTree *trMC_;
-    TH1F *hMCPU_;
+    TFile *_fPuData;
+    TH1F *_hDataPU;
+    TFile *_fPuMC;
+    TTree *_trMC;
+    TH1F *_hMCPU;
     float _puWeightArray[101];
+    float _npu_probs[101];
+    float _npu_estimated[101];
 
 };
 #endif
