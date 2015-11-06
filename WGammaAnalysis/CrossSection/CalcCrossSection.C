@@ -206,7 +206,7 @@ void CalcCrossSection::Calc()
   _yCSarray[errT].strUp="err";
   _yCSarray[errT].strDown="stat";
   std::cout<<"ERR_STAT "<<_yCSarray[errT].title<<std::endl;
-  GetSignalYields();
+  GetSignalYields(ERR_STAT);
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
@@ -315,6 +315,21 @@ void CalcCrossSection::Calc()
   }//end of loop over ib  
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);  
+
+
+  errT=ERR_SYST_UNF_MCstat;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].name="unf_MC_stat";
+  _yCSarray[errT].title="unf, MC stat";
+  _yCSarray[errT].strUp="unf";
+  _yCSarray[errT].strDown="MC stat";
+  std::cout<<"ERR_SYST_UNF_MCstat "<<_yCSarray[errT].title<<std::endl;
+  GetSignalYields(ERR_SYST_UNF_MCstat);
+  ApplyUnfolding(1,_yCSarray[errT]);
+  ApplyAccXEff(_yCSarray[errT]);
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);
+
 
   errT=ERR_SYST_LUMI;
   _yCSarray[errT].errType=errT;
@@ -459,9 +474,8 @@ void CalcCrossSection::ComputeSystByAnalysisVariation(int errT, TString strDir1,
     Print(_yCSarray[errT].title+TString(", cs: "),_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 }// end of ComputeSystByAnalysisVariation()
 
-void CalcCrossSection::GetSignalYields()
+void CalcCrossSection::GetSignalYields(int errT)
 {
-  int errT=ERR_STAT;
   TFile* fSig = new TFile(_config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_CHISO, "phoEt"));
   std::cout<<"file with signal yields: "<<_config.GetYieldsFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt")<<std::endl;
   std::cout<<"total yields: "<<_config.GetYieldsBkgSubtrDataName(_config.TOTAL)<<std::endl;
@@ -530,10 +544,12 @@ void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
     std::cout<<"ERROR: PrepareMigrationMatrix() for Unfolding failed"<<std::endl;
     return;
   }
-//  TH1D sign1D;
-//  _signalYields1D->Copy(sign1D);
+
   TH1D* signInput1D = (TH1D*)yCS.yields1D_bkgSubtr;
-  TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone("hUnfolded");
+  TString strUnfName = signInput1D->GetName();
+  strUnfName+="_unf";
+  TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone(strUnfName);
+
   isOk = unf.ApplyRooUnfold(doSyst,signInput1D,signUnfolded1D,RooUnfold::kInvert,yCS.name);
   if (!isOk){
     std::cout<<"ERROR: ApplyRooUnfold() for Unfolding failed"<<std::endl;
@@ -545,6 +561,7 @@ void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
   yCS.yieldTOT_unfolded=(TH1F*)yCS.yieldTOT_bkgSubtr->Clone("hBkgSubtrTOT"); // no unfolding for total
   Print("Unfolded Yields: ",yCS.yieldTOT_unfolded,yCS.yields1D_unfolded);
 //  unf.PlotAndStore();
+
 }// end of ApplyUnfolding()
 
 void CalcCrossSection::ApplyAccXEff(FromYieldToCS& yCS)

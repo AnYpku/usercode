@@ -52,19 +52,19 @@ DoFullChainPart1(){
   echo WILL DO: 'DoFullChainPart1()' $1 $2
 # root -l -b -q AuxFchPreliminarySelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PreliminarySelection.log 2>&1&
 # root -l -b -q AuxFchExtraSelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_ExtraSelection.log 2>&1&
-# root -l  AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
+# root -l -b -q AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
   echo DONE: 'DoFullChainPart1()' $1 $2
 }
 #end of DoFullChainPart2
 
 DoFullChainPart2(){
   echo WILL DO: 'DoFullChainPart2()' $1 $2
-#  root -l   AuxFchTemplateFitsData_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l   AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l   AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l   AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-  root -l   AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-  root -l   AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsData_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchSystRandomizeTempl_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l -b -q  AuxFchSystRandomizeTempl_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
@@ -74,10 +74,23 @@ DoFullChainPart2(){
 #  root -l -b -q  AuxFchSystZgNorm_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l -b -q  AuxFchSystZgNorm_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
-#   root -l -b -q  AuxFchCombineCHISOandSIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# Have to do the next 6 steps again because there are 
+# certain files
+# got open and didn't get closed
+# this has to be fixed
+# or have to rerun these steps again
+
+#  root -l -b -q  AuxFchTemplateFitsData_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l   AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q  AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+
+#  root -l -b -q  AuxFchCombineCHISOandSIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchCalcAccXEff.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+  root -l -b -q  AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
   echo DONE: 'DoFullChainPart2()' $1 $2
 }
 #end of DoFullChainPart2
@@ -108,9 +121,9 @@ DoFullChainPart2(){
 #MergeMCintoData ChannelsMERGED ZGamma 
 
 #DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
-DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
+#DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
 #DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-#DoFullChainPart2 MUON WGamma logs/log20150320/log_
+DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
 #root -l -b -q runReplotMigrationMatrix.C
 #root -l runCompareCS.C

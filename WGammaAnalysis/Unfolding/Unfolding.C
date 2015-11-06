@@ -331,8 +331,9 @@ bool Unfolding::ApplyRooUnfold(bool doSyst, TH1D* histInputYields, TH1D* unfolde
   for (int i=1; i<_nBinsGen+1; i++)
     errSyst[i]=0;
 
-  int NSmears=1000;
-//  ComputeSystErrors(histInputYields, errSyst, alg, NSmears);
+  int NSmears=20;
+
+  if (doSyst) ComputeSystErrors(histInputYields, errSyst, alg, NSmears);
 //  ComputeStatErrors(histInputYields, errStat, alg, NSmears);
 //  ComputeStatErrors(histInputYields, errSyst, alg, NSmears);
 

@@ -70,7 +70,7 @@ class CalcCrossSection
        virtual ~CalcCrossSection();
        void    Calc();
 
-       void    GetSignalYields();
+       void    GetSignalYields(int errT);
        void    GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TString str1D, TString strTOT);
 
        void    ComputeSystByAnalysisVariation(int errT, TString strDir1, TString strDir2);
