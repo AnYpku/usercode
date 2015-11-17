@@ -42,6 +42,9 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
     tree->Branch(TString("lepton")+stril+TString("GenParentage"),&_lepGenParentage[il],TString("lepton")+stril+TString("GenParentage/I"));
     tree->Branch(TString("lepton")+stril+TString("GenMomPID"),&_lepGenMomPID[il],TString("lepton")+stril+TString("GenMomPID/I"));
     tree->Branch(TString("lepton")+stril+TString("GenGMomPID"),&_lepGenGMomPID[il],TString("lepton")+stril+TString("GenGMomPID/I"));
+    tree->Branch(TString("lepton")+stril+TString("GenPt"),&_lepGenPt[il],TString("lepton")+stril+TString("GenPt/F"));
+    tree->Branch(TString("lepton")+stril+TString("GenEta"),&_lepGenEta[il],TString("lepton")+stril+TString("GenEta/F"));
+    tree->Branch(TString("lepton")+stril+TString("GenPhi"),&_lepGenPhi[il],TString("lepton")+stril+TString("GenPhi/F"));
     tree->Branch(TString("lepton")+stril+TString("Id2012"),&_lepId2012[il],TString("lepton")+stril+TString("Id2012/O"));
     tree->Branch(TString("lepton")+stril+TString("Id2011"),&_lepId2011[il],TString("lepton")+stril+TString("Id2011/O"));
     tree->Branch(TString("lepton")+stril+TString("Isolation2012"),&_lepIsolation2012[il],TString("lepton")+stril+TString("Isolation2012/F"));
@@ -82,11 +85,15 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("phoGenMomPID",&_phoGenMomPID,"phoGenMomPID/I");
   tree->Branch("phoGenGMomPID",&_phoGenGMomPID,"phoGenGMomPID/I");
   tree->Branch("phoGenEt",&_phoGenEt,"phoGenEt/F");
+  tree->Branch("phoGenEta",&_phoGenEta,"phoGenEta/F");
+  tree->Branch("phoGenPhi",&_phoGenPhi,"phoGenPhi/F");
   tree->Branch("phoHoverE12",&_phoHoverE12,"phoHoverE12/F");
   tree->Branch("phoHoverE",&_phoHoverE,"phoHoverE/F");
   tree->Branch("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,"phoSigmaIEtaIEta/F");
 
   tree->Branch("phoSF",&_phoSF,"phoSF/F");
+
+  tree->Branch("pho_genEle_dRMin",&_pho_genEle_dRMin,"pho_genEle_dRMin/F");
 
   tree->Branch("phoPFChIsoCorr",&_phoPFChIsoCorr,"phoPFChIsoCorr/F");
   tree->Branch("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,"phoPFNeuIsoCorr/F");
@@ -152,6 +159,9 @@ void TSelectedEventsTree::SetAsInputTree(TTree* tree)
     tree->SetBranchAddress(TString("lepton")+stril+TString("GenParentage"),&_lepGenParentage[il],&_b_lepGenParentage[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("GenMomPID"),&_lepGenMomPID[il],&_b_lepGenMomPID[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("GenGMomPID"),&_lepGenGMomPID[il],&_b_lepGenGMomPID[il]);
+    tree->SetBranchAddress(TString("lepton")+stril+TString("GenPt"),&_lepGenPt[il],&_b_lepGenPt[il]);
+    tree->SetBranchAddress(TString("lepton")+stril+TString("GenEta"),&_lepGenEta[il],&_b_lepGenEta[il]);
+    tree->SetBranchAddress(TString("lepton")+stril+TString("GenPhi"),&_lepGenPhi[il],&_b_lepGenPhi[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Id2012"),&_lepId2012[il],&_b_lepId2012[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Id2011"),&_lepId2011[il],&_b_lepId2011[il]);
     tree->SetBranchAddress(TString("lepton")+stril+TString("Isolation2012"),&_lepIsolation2012[il],&_b_lepIsolation2012[il]);
@@ -190,11 +200,15 @@ tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il
   tree->SetBranchAddress("phoGenMomPID",&_phoGenMomPID,&_b_phoGenMomPID);
   tree->SetBranchAddress("phoGenGMomPID",&_phoGenGMomPID,&_b_phoGenGMomPID);
   tree->SetBranchAddress("phoGenEt",&_phoGenEt,&_b_phoGenEt);
+  tree->SetBranchAddress("phoGenEta",&_phoGenEta,&_b_phoGenEta);
+  tree->SetBranchAddress("phoGenPhi",&_phoGenPhi,&_b_phoGenPhi);
   tree->SetBranchAddress("phoHoverE12",&_phoHoverE12,&_b_phoHoverE12);
   tree->SetBranchAddress("phoHoverE",&_phoHoverE,&_b_phoHoverE);
   tree->SetBranchAddress("phoSigmaIEtaIEta",&_phoSigmaIEtaIEta,&_b_phoSigmaIEtaIEta);
 
   tree->SetBranchAddress("phoSF",&_phoSF,&_b_phoSF);
+
+  tree->SetBranchAddress("pho_genEle_dRMin",&_pho_genEle_dRMin,&_b_pho_genEle_dRMin);
 
   tree->SetBranchAddress("phoPFChIsoCorr",&_phoPFChIsoCorr,&_b_phoPFChIsoCorr);
   tree->SetBranchAddress("phoPFNeuIsoCorr",&_phoPFNeuIsoCorr,&_b_phoPFNeuIsoCorr);
@@ -446,6 +460,8 @@ void TSelectedEventsTree::SetPhotonValues(TEventTree::InputTreeLeaves& leaf, TFu
         _phoGenMomPID=leaf.mcMomPID->at(iMC);
         _phoGenGMomPID=leaf.mcGMomPID->at(iMC);
         _phoGenEt=leaf.mcEt->at(iMC);
+        _phoGenEta=leaf.mcEta->at(iMC);
+        _phoGenPhi=leaf.mcPhi->at(iMC);
         _iMCpho=iMC;
       }
       for (int il=0; il<=ilMax; il++){
@@ -460,10 +476,23 @@ void TSelectedEventsTree::SetPhotonValues(TEventTree::InputTreeLeaves& leaf, TFu
           _lepGenParentage[il]=leaf.mcParentage->at(iMC);
           _lepGenMomPID[il]=leaf.mcMomPID->at(iMC);
           _lepGenGMomPID[il]=leaf.mcGMomPID->at(iMC);
+          _lepGenPt[il]=leaf.mcPt->at(iMC);
+          _lepGenEta[il]=leaf.mcEta->at(iMC);
+          _lepGenPhi[il]=leaf.mcPhi->at(iMC);
           _iMClep[il]=iMC;
         }
        }
     }//end of loop over iMC
+
+    float dRMin=1000;
+    for (int iMC=0; iMC<leaf.nMC; iMC++){
+      if (leaf.mcPID->at(iMC)!=11 && leaf.mcPID->at(iMC)!=-11) continue; 
+      if (leaf.mcMomPID->at(iMC)!=23) continue; 
+      float dR = _math.DeltaR(leaf.phoPhi->at(_ipho),leaf.phoEta->at(_ipho),leaf.mcPhi->at(iMC),leaf.mcEta->at(iMC));
+      if (dR<dRMin) dRMin=dR;
+    }//end of loop over iMC
+    _pho_genEle_dRMin=dRMin;
+
   }//end of if (!leaf.isData)
 
   _phoEleVeto=leaf.phoEleVeto->at(cand.ipho);

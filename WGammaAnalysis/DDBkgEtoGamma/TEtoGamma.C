@@ -51,9 +51,12 @@ TEtoGamma::~TEtoGamma()
 
 void TEtoGamma::ComputePlotSave()
 {
-  SetYields(_DATA_EtoGAMMA_ENR); SetYields(_ZJETS_EtoGAMMA_ENR);
-  SetYields(_ZJETS_NOM_ELE);   SetYields(_ZJETS_NOM_MUO);
-  SetYields(_WJETS_NOM_ELE);   SetYields(_WJETS_NOM_MUO);
+  SetYields(_DATA_EtoGAMMA_ENR); 
+  SetYields(_ZJETS_EtoGAMMA_ENR);
+  SetYields(_ZJETS_NOM_ELE);   
+//  SetYields(_ZJETS_NOM_MUO);
+//  SetYields(_WJETS_NOM_ELE);   
+//  SetYields(_WJETS_NOM_MUO);
   for (int ieta=_conf.BARREL; ieta<=_conf.ENDCAP; ieta++){
     // data driven e->gamma estimate as to be used for background subtraction:
     TString strName=_conf.GetYieldsDDBkgEtoGamma(_conf.ONEDI, ieta);
@@ -80,12 +83,12 @@ TString TEtoGamma::FName(int inum)
     str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
   if (inum==_ZJETS_NOM_ELE) 
     str=_conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
-  if (inum==_ZJETS_NOM_MUO) 
-    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
-  if (inum==_WJETS_NOM_ELE) 
-    str=_conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
-  if (inum==_WJETS_NOM_MUO) 
-    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
+//  if (inum==_ZJETS_NOM_MUO) 
+//    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+//  if (inum==_WJETS_NOM_ELE) 
+//    str=_conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
+//  if (inum==_WJETS_NOM_MUO) 
+//    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
   return str;
 }//end of TEtoGamma::FName
 
@@ -95,9 +98,9 @@ TString TEtoGamma::HName(int inum, int ieta)
   if (inum==_DATA_EtoGAMMA_ENR) name="h_Data_EtoGamma_Enr_";
   if (inum==_ZJETS_EtoGAMMA_ENR) name="h_ZJets_EtoGamma_Enr_";
   if (inum==_ZJETS_NOM_ELE)  name="h_ZJets_Nom_Ele_";
-  if (inum==_ZJETS_NOM_MUO)  name="h_ZJets_Nom_Muo_";
-  if (inum==_WJETS_NOM_ELE)  name="h_WJets_Nom_Ele_";
-  if (inum==_WJETS_NOM_MUO)  name="h_WJets_Nom_Muo_";
+//  if (inum==_ZJETS_NOM_MUO)  name="h_ZJets_Nom_Muo_";
+//  if (inum==_WJETS_NOM_ELE)  name="h_WJets_Nom_Ele_";
+//  if (inum==_WJETS_NOM_MUO)  name="h_WJets_Nom_Muo_";
   return name+_conf.StrEtaBin(ieta);
 }//end of TEtoGamma::HName
 
@@ -118,7 +121,9 @@ void TEtoGamma::SetYields(int inum)
     TCut cutEta;
     if (ieta==_conf.BARREL) cutEta=photon.RangeBarrel();
     if (ieta==_conf.ENDCAP) cutEta=photon.RangeEndcap();
-    _yield[inum].tr->Draw(_varKin+TString(">>")+_yield[inum].hist[ieta]->GetName(),(cutEta && _cutAdd && cutWMt)*cutW,"goff");
+    TCut cut = cutEta && _cutAdd && cutWMt;
+    if (inum==_ZJETS_NOM_ELE) {TCut cutMatch("pho_genEle_dRMin<0.4"); cut=cut && cutMatch;}
+    _yield[inum].tr->Draw(_varKin+TString(">>")+_yield[inum].hist[ieta]->GetName(),cut*cutW,"goff");
   }// end of loop over ieta
   
 }// end of TEtoGamma::SetYields
@@ -127,12 +132,12 @@ void TEtoGamma::ComputeBkg()
 {
   _fOut->cd();
   for (int ieta=_conf.BARREL; ieta<=_conf.ENDCAP; ieta++){
-    TH1F* hZj_jg_nom_ele = (TH1F*)_yield[_WJETS_NOM_ELE].hist[ieta]->Clone(TString("hZj_jg_nom_ele")+_conf.StrEtaBin(ieta));
-    hZj_jg_nom_ele->Multiply(_yield[_ZJETS_NOM_MUO].hist[ieta]);
-    hZj_jg_nom_ele->Divide(_yield[_WJETS_NOM_MUO].hist[ieta]);
+//    TH1F* hZj_jg_nom_ele = (TH1F*)_yield[_WJETS_NOM_ELE].hist[ieta]->Clone(TString("hZj_jg_nom_ele")+_conf.StrEtaBin(ieta));
+//    hZj_jg_nom_ele->Multiply(_yield[_ZJETS_NOM_MUO].hist[ieta]);
+//    hZj_jg_nom_ele->Divide(_yield[_WJETS_NOM_MUO].hist[ieta]);
     TString strName=_conf.GetYieldsDDBkgEtoGamma(_conf.ONEDI, ieta);
     _yieldDDEtoGamma[ieta] = (TH1F*)_yield[_ZJETS_NOM_ELE].hist[ieta]->Clone(strName);
-    _yieldDDEtoGamma[ieta]->Add(hZj_jg_nom_ele,-1);
+//    _yieldDDEtoGamma[ieta]->Add(hZj_jg_nom_ele,-1);
     _yieldDDEtoGamma[ieta]->Multiply(_yield[_DATA_EtoGAMMA_ENR].hist[ieta]);
     _yieldDDEtoGamma[ieta]->Divide(_yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]);
     _yieldDDEtoGamma[ieta]->Print();

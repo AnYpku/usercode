@@ -44,6 +44,9 @@ class TSelectedEventsTree
     float _lepSCEta[2];
     float _lepSCPhi[2];
     float _lepPt[2];
+    float _lepGenEta[2];
+    float _lepGenPhi[2];
+    float _lepGenPt[2];
     int _lepGenPID[2];
     int _lepGenParentage[2];
     int _lepGenMomPID[2];
@@ -82,10 +85,14 @@ class TSelectedEventsTree
     int _phoGenParentage;
     int _phoGenMomPID;
     int _phoGenGMomPID;
+    float _phoGenEta;
+    float _phoGenPhi;
     float _phoGenEt;
     float _phoHoverE;//for 2011 cuts
     float _phoHoverE12;
     float _phoSigmaIEtaIEta;
+
+    float _pho_genEle_dRMin;
 
     float _phoSF;
 
@@ -146,6 +153,9 @@ class TSelectedEventsTree
     TBranch* _b_lepGenParentage[2];
     TBranch* _b_lepGenMomPID[2];
     TBranch* _b_lepGenGMomPID[2];
+    TBranch* _b_lepGenPt[2];
+    TBranch* _b_lepGenEta[2];
+    TBranch* _b_lepGenPhi[2];
     TBranch* _b_lepId2012[2];
     TBranch* _b_lepId2011[2];
     TBranch* _b_lepIsolation2012[2];
@@ -181,11 +191,15 @@ class TSelectedEventsTree
     TBranch* _b_phoGenMomPID;
     TBranch* _b_phoGenGMomPID;
     TBranch* _b_phoGenEt;
+    TBranch* _b_phoGenEta;
+    TBranch* _b_phoGenPhi;
     TBranch* _b_phoHoverE;//for 2011 cuts
     TBranch* _b_phoHoverE12;
     TBranch* _b_phoSigmaIEtaIEta;
 
     TBranch* _b_phoSF;
+
+    TBranch* _b_pho_genEle_dRMin;
 
     TBranch* _b_phoPFChIsoCorr;
     TBranch* _b_phoPFNeuIsoCorr;
