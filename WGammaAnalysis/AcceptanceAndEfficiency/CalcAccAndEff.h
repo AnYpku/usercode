@@ -15,6 +15,7 @@
   //from git
 #include "TTree.h" 
 #include "TMath.h" 
+#include "TLorentzVector.h"
   //ROOT package
 
 class CalcAccAndEff
@@ -48,7 +49,10 @@ class CalcAccAndEff
        void    LoopOverTreeEvents(); 
        void    ComputeNumerator();
        void    ComputeDenominator();
-       int     FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPho, int &imcLep1, int &imcLep2);
+       int     FindMCleptons(TEventTree::InputTreeLeaves &leaf, int &imcLep1, int &imcLep2);
+       void    FillLeptonLorentzVectors(TEventTree::InputTreeLeaves &leaf, int &imcLep1, int &imcLep2);
+       int     FindMCphoton(TEventTree::InputTreeLeaves &leaf, int &imcPho, int imcLep1, int imcLep2);
+
        bool    PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int imcPho, int imcLep1, int imcLep2);
        bool    IsFSR(TEventTree::InputTreeLeaves &leaf, int imcPho, int lepID, int bosonID);
        bool    IsTGC(TEventTree::InputTreeLeaves &leaf, int imcPho, int bosonID);
@@ -110,6 +114,11 @@ class CalcAccAndEff
 
        const static int _debugModeNEntries=100000;
        TConfiguration _config;
+
+       TLorentzVector _lorentzPhoton;
+       TLorentzVector _lorentzLepton1;
+       TLorentzVector _lorentzLepton2;
+       bool _arr_imcPhoIsDressing[100];
   };
 
 #endif 

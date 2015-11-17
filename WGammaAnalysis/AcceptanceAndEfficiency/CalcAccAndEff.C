@@ -33,7 +33,6 @@ CalcAccAndEff::CalcAccAndEff(int channel, int vgamma, bool isDebugMode, string c
   std::cout<<_config.StrChannel(channel)<<", "<<_config.StrVgType(vgamma)<<std::endl;
 //  _INPUT->Print();
 
-
 }
 
 CalcAccAndEff::~CalcAccAndEff()
@@ -149,11 +148,10 @@ void CalcAccAndEff::ComputeAccTimesEff()
   std::cout<<"den, denNoWeight, csTheory 1D"<<std::endl;
   for (int ib=1; ib<=nHbins; ib++){
     std::cout<<std::setprecision(3)<<_Hdenominator1D->GetBinContent(ib)<<", ";
-    std::cout<<std::setprecision(0)<<_HdenominatorNoWeight1D->GetBinContent(ib)<<", ";
-    std::cout<<std::setprecision(0)<<_HcsTheory1D->GetBinContent(ib);
+    std::cout<<std::setprecision(3)<<_HdenominatorNoWeight1D->GetBinContent(ib)<<", ";
+    std::cout<<std::setprecision(3)<<_HcsTheory1D->GetBinContent(ib);
     std::cout<<std::endl;
   }// end of loop over ib
-
 
   PlotAndSaveOutput();
   
@@ -191,36 +189,64 @@ void CalcAccAndEff::LoopOverTreeEvents()
    
    for (Long64_t entry=0; entry<nentries; entry++) {
 
-      //loop over events in the tree{
-     //_eventTree.GetEntryNeededBranchesOnly(_channel,TConfiguration::SIGMC,entry);
-          //method of TEventTree class
-
      _eventTree.GetEntryMCSpecific(entry);
           //method of TEventTree class
      float dR=-1;
      float phoPt=-1;
      int mcPattern=-1;
      int imcPho, imcLep1, imcLep2;
-     mcPattern=FindMCparticles(_eventTree.treeLeaf, imcPho, imcLep1, imcLep2);
-     //mcPattern=FindDeltaRandPhoPt(_eventTree.treeLeaf, dR, phoPt);
+
+     mcPattern=FindMCleptons(_eventTree.treeLeaf, imcLep1, imcLep2);
      if (mcPattern==-1) _mcPatternNeg++;
      if (mcPattern>=0) _mcPatternPos[mcPattern]++;
+
+     if (imcLep1>=0 && (imcLep2>=0 || _vgamma==_config.W_GAMMA)) 
+       FillLeptonLorentzVectors(_eventTree.treeLeaf, imcLep1, imcLep2);
+
+     mcPattern=FindMCphoton(_eventTree.treeLeaf, imcPho, imcLep1, imcLep2);
      
      if (PassedPhaseSpaceCut(_eventTree.treeLeaf, imcPho, imcLep1, imcLep2)){
        _Hdenominator1D->Fill(_eventTree.treeLeaf.mcEt->at(imcPho),_lumiWeight);
        _HdenominatorNoWeight1D->Fill(_eventTree.treeLeaf.mcEt->at(imcPho));
-
-//       // if phoEt>15
-//       if ()
-//       _denTot+=_lumiWeight;
-//       _denNoWeightTot+=1;
      } 
 
   } //end of loop over events in the tree
  
 }// end of LoopOverTreeEvents
 
-int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPho, int &imcLep1, int &imcLep2)
+int CalcAccAndEff::FindMCleptons(TEventTree::InputTreeLeaves &leaf, int &imcLep1, int &imcLep2)
+{
+  int photonID=22;
+  int bosonID;
+  if (_vgamma==_config.Z_GAMMA) bosonID=23;
+  if (_vgamma==_config.W_GAMMA) bosonID=24;
+  int lepID;
+  if (_channel==_config.MUON) lepID=13;
+  if (_channel==_config.ELECTRON) lepID=11;
+
+  vector <int> vec_imc_lep;
+  for (int imc=0; imc<leaf.nMC; imc++){
+    if (fabs(leaf.mcPID->at(imc))==lepID && fabs(leaf.mcMomPID->at(imc))==bosonID) vec_imc_lep.push_back(imc);
+  }// end of loop over imc
+
+  imcLep1=-1;
+  imcLep2=-1;// ZGamma only
+  int patt=-1;
+
+  if (vec_imc_lep.size()==0) {patt=0; _strPattern[0]="0 leptons";}
+  if (vec_imc_lep.size()==1) {patt=1; _strPattern[1]="1 lepton";}
+  if (vec_imc_lep.size()==2) {patt=2; _strPattern[2]="2 leptons";}
+  if (vec_imc_lep.size()>=3) {patt=3; _strPattern[3]=">2 leptons";}
+
+  if (vec_imc_lep.size()==0 || (_vgamma==_config.Z_GAMMA && vec_imc_lep.size()==1)){ return patt; }
+
+  imcLep1=vec_imc_lep[0];
+  if (_vgamma==_config.Z_GAMMA) imcLep2=vec_imc_lep[1];
+
+  return patt;
+}// end of FindMCleptons
+
+int CalcAccAndEff::FindMCphoton(TEventTree::InputTreeLeaves &leaf, int &imcPho, int imcLep1, int imcLep2)
 {
   int photonID=22;
   int bosonID;
@@ -231,37 +257,23 @@ int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPh
   if (_channel==_config.ELECTRON) lepID=11;
 
   vector <int> vec_imc_pho;
-  vector <int> vec_imc_lep;
   for (int imc=0; imc<leaf.nMC; imc++){
+    if (_arr_imcPhoIsDressing[imc]==1) continue;
     if (leaf.mcPID->at(imc)==photonID &&
          (IsFSR(leaf,imc,lepID,bosonID) || IsTGC(leaf,imc,bosonID) || IsISR(leaf,imc,bosonID)) 
        ) vec_imc_pho.push_back(imc);
-    if (fabs(leaf.mcPID->at(imc))==lepID && fabs(leaf.mcMomPID->at(imc))==bosonID) vec_imc_lep.push_back(imc);
   }// end of loop over imc
 
   imcPho=-1;
-  imcLep1=-1;
-  imcLep2=-1;// ZGamma only
   int patt=-1;
 
-  if (vec_imc_pho.size()==0 && vec_imc_lep.size()==0) {patt=0; _strPattern[0]="0 photons, 0 leptons";}
-  if (vec_imc_pho.size()==0 && vec_imc_lep.size()!=0) {patt=1; _strPattern[1]="0 photons, >0 leptons";}
-  if (vec_imc_pho.size()!=0 && vec_imc_lep.size()==0) {patt=2; _strPattern[2]="0 leptons, >0 photons";}
-  if (vec_imc_pho.size()==1 && vec_imc_lep.size()==1) {patt=3; _strPattern[3]="1 lepton, 1 photon";}
-  if (vec_imc_pho.size()==2 && vec_imc_lep.size()==1) {patt=4; _strPattern[4]="1 lepton, 2 photons";}
-  if (vec_imc_pho.size()==1 && vec_imc_lep.size()==2) {patt=5; _strPattern[5]="2 leptons, 1 photon";}
-  if (vec_imc_pho.size()==2 && vec_imc_lep.size()==2) {patt=6; _strPattern[6]="2 photons, 2 leptons";}
-  if (vec_imc_pho.size()<=2 && vec_imc_lep.size()>=3) {patt=7; _strPattern[7]="1-2 photons, >2 leptons";}
-  if (vec_imc_pho.size()>=3 && vec_imc_lep.size()==1) {patt=8; _strPattern[8]="1 lepton, >2 photons";}
-  if (vec_imc_pho.size()>=3 && vec_imc_lep.size()==2) {patt=9; _strPattern[9]="2 leptons, >2 photons";}
+  if (vec_imc_pho.size()==0) {patt=4; _strPattern[4]="0 photons";}
+  if (vec_imc_pho.size()==1) {patt=5; _strPattern[5]="1 photon";}
+  if (vec_imc_pho.size()==2) {patt=6; _strPattern[6]="2 photons";}
+  if (vec_imc_pho.size()>=3) {patt=7; _strPattern[7]=">2 photons";}
 
-   if (vec_imc_pho.size()==0 || vec_imc_lep.size()==0 ||
-       (_vgamma==_config.Z_GAMMA && vec_imc_lep.size()==1)){
-    return patt;
-  }
 
-  imcLep1=vec_imc_lep[0];
-  if (_vgamma==_config.Z_GAMMA) imcLep2=vec_imc_lep[1];
+  if (vec_imc_pho.size()==0 ){ return patt; }
 
   if (vec_imc_pho.size()==1) {imcPho=vec_imc_pho[0]; }
   else{
@@ -273,28 +285,50 @@ int CalcAccAndEff::FindMCparticles(TEventTree::InputTreeLeaves &leaf, int &imcPh
     }// end of loop over iv
   }// end of else
 
-  if (IsFSR(leaf,imcPho,lepID,bosonID)){
-    for (int imc=0; imc<leaf.nMC; imc++){
-      if (_vgamma==_config.W_GAMMA &&
-          fabs(leaf.mcPID->at(imc))==lepID && 
-          fabs(leaf.mcGMomPID->at(imc))==bosonID &&
-          fabs(leaf.mcMomPID->at(imc))==lepID) 
-      imcLep1=imc;
-    }// end of loop over imc
-  }//end of IsFSR()
-
-  //  if (imcPho==-1 || imcLep1==-1){return patt;}
-  //  if (_vgamma==_config.Z_GAMMA && imcLep1==-1){return patt;}
-
-  //  TMathTools math;
-  //  dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
-  // if (_vgamma==_config.Z_GAMMA){
-  //   float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
-  //   if (dR2<dR) dR=dR2;
-  // }
+  _lorentzPhoton.SetPtEtaPhiM(leaf.mcEt->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcPho), 0);
 
   return patt;
-}// end of FindMCparticles
+}// end of FindMCphoton
+
+void CalcAccAndEff::FillLeptonLorentzVectors(TEventTree::InputTreeLeaves &leaf, int &imcLep1, int &imcLep2)
+{
+
+  _lorentzLepton1.SetPtEtaPhiM(leaf.mcPt->at(imcLep1), leaf.mcEta->at(imcLep1), leaf.mcPhi->at(imcLep1), 0);
+  TMathTools math;
+
+  if (_vgamma==_config.Z_GAMMA)
+    _lorentzLepton2.SetPtEtaPhiM(leaf.mcPt->at(imcLep2), leaf.mcEta->at(imcLep2), leaf.mcPhi->at(imcLep2), 0);
+
+  for (int imc=0; imc<leaf.nMC; imc++){
+
+    _arr_imcPhoIsDressing[imc]=0;
+
+    if (leaf.mcPID->at(imc)!=22) continue;
+    if (leaf.mcEt->at(imc)<0.5) continue;
+
+    float dR1 = math.DeltaR(leaf.mcPhi->at(imc), leaf.mcEta->at(imc), _lorentzLepton1.Phi(), _lorentzLepton1.Eta());
+    if (dR1<0.1){
+      TLorentzVector vecDressing;
+      vecDressing.SetPtEtaPhiM(leaf.mcEt->at(imc), leaf.mcEta->at(imc), leaf.mcPhi->at(imc), 0);
+      TLorentzVector sum=_lorentzLepton1+vecDressing;
+      _lorentzLepton1=sum;
+      _arr_imcPhoIsDressing[imc]=1;
+    }//end of if (dR1<0.1)
+
+    if (_vgamma!=_config.Z_GAMMA) continue;
+    float dR2 = math.DeltaR(leaf.mcPhi->at(imc), leaf.mcEta->at(imc), _lorentzLepton2.Phi(), _lorentzLepton2.Eta());
+    if (dR2<0.1){
+      TLorentzVector vecDressing;
+      vecDressing.SetPtEtaPhiM(leaf.mcEt->at(imc), leaf.mcEta->at(imc), leaf.mcPhi->at(imc), 0);
+      TLorentzVector sum=_lorentzLepton2+vecDressing;
+      _lorentzLepton2=sum;
+      _arr_imcPhoIsDressing[imc]=1;
+    }//end of if (dR2<0.1)
+
+  }// end of loop over imc
+
+  return;
+}// end of FillLeptonLorentzVectors
 
 bool CalcAccAndEff::PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int imcPho, int imcLep1, int imcLep2)
 {
@@ -303,28 +337,25 @@ bool CalcAccAndEff::PassedPhaseSpaceCut(TEventTree::InputTreeLeaves &leaf, int i
   if (_vgamma==_config.Z_GAMMA && imcLep2==-1) return 0; _passed.imcLep2++;
 
   TMathTools math;
-  float dR=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep1), leaf.mcEta->at(imcLep1));
+  float dR=math.DeltaR(_lorentzPhoton.Phi(), _lorentzPhoton.Eta(), _lorentzLepton1.Phi(), _lorentzLepton1.Eta());
   if (!(dR>0.7)) return 0; _passed.dR++;
-  if (!(fabs(leaf.mcEta->at(imcPho))<2.5)) return 0; _passed.phoEta++;
-  if (!(fabs(leaf.mcEta->at(imcLep1))<2.5)) return 0; _passed.lep1Eta++;
-  if (!(leaf.mcPt->at(imcLep1)>20)) return 0; _passed.lep2Eta++;
+  if (!(fabs(_lorentzPhoton.Eta())<2.5)) return 0; _passed.phoEta++;
+  if (!(fabs(_lorentzLepton1.Eta())<2.5)) return 0; _passed.lep1Eta++;
+  if (!(_lorentzLepton1.Pt()>20)) return 0; _passed.lep2Eta++;
 
   if (_vgamma==_config.Z_GAMMA){
-     float dR2=math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imcLep2), leaf.mcEta->at(imcLep2));
+     float dR2=math.DeltaR(_lorentzPhoton.Phi(), _lorentzPhoton.Eta(), _lorentzLepton2.Phi(), _lorentzLepton2.Eta());
      if (!(dR2>0.7)) return 0; _passed.dR2++;
-     if (!(fabs(leaf.mcEta->at(imcLep2))<2.5)) return 0; _passed.lep2Eta++;
-     if (!(leaf.mcPt->at(imcLep2)>20)) return 0; _passed.lep2Pt++;
-     TLorentzVector vlep1, vlep2;
-     vlep1.SetPtEtaPhiM(leaf.mcPt->at(imcLep1),leaf.mcEta->at(imcLep1),leaf.mcPhi->at(imcLep1),0);
-     vlep2.SetPtEtaPhiM(leaf.mcPt->at(imcLep2),leaf.mcEta->at(imcLep2),leaf.mcPhi->at(imcLep2),0);
-     if(!((vlep1 + vlep2).M() > 50)) return 0; _passed.Mll++;
+     if (!(fabs(_lorentzLepton2.Eta())<2.5)) return 0; _passed.lep2Eta++;
+     if (!(_lorentzLepton2.Pt()>20)) return 0; _passed.lep2Pt++;
+     if(!((_lorentzLepton1 + _lorentzLepton2).M() > 50)) return 0; _passed.Mll++;
   }// end of if (_vgamma==_config.Z_GAMMA)
 
   //I_gen03 < 5 GeV for photon
   float Igen=0;
   for (int imc=0; imc<leaf.nMC; imc++){
     if (imc==imcPho) continue;
-    float dRIgen = math.DeltaR(leaf.mcPhi->at(imcPho), leaf.mcEta->at(imcPho), leaf.mcPhi->at(imc), leaf.mcEta->at(imc));
+    float dRIgen = math.DeltaR(_lorentzPhoton.Phi(), _lorentzPhoton.Eta(), leaf.mcPhi->at(imc), leaf.mcEta->at(imc));
     if (dRIgen<0.3) Igen+=leaf.mcPt->at(imc);
   }// end of imc  
   if (!(Igen<5)) return 0; _passed.phoIgen++;
