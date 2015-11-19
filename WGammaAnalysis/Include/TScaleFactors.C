@@ -64,6 +64,24 @@ float TScaleFactors::SF_TightEleID(float pt, float eta) {
 }// end of SF_TightEleID
 
 float TScaleFactors::SF_Err_TightEleID(float pt, float eta) {
+  if ( pt <= 40){
+    if (fabs(eta) <= 0.8)                       { return 0.001;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442)  { return 0.002;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0)  { return 0.003;}
+    if (fabs(eta) > 2.0 )    { return 0.004;}
+  }
+  if ( pt > 40 && pt <= 50){
+    if (fabs(eta) <= 0.8)                       { return 0.001;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442)  { return 0.001;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0)  { return 0.002;}
+    if (fabs(eta) > 2.0 )    { return 0.003;}
+  }
+  if ( pt > 50 ) {
+    if (fabs(eta) <= 0.8)                       { return 0.002;}
+    if (fabs(eta) > 0.8 && fabs(eta) <= 1.4442)  { return 0.002;}
+    if (fabs(eta) > 1.566 && fabs(eta) <= 2.0)  { return 0.004;}
+    if (fabs(eta) > 2.0 )    { return 0.005;}
+  }
   return 0.0;
 }// end of SF_Err_TightEleID
 
@@ -89,6 +107,23 @@ float TScaleFactors::SF_PixelSeedVeto(float pt, float eta){
 }// end of SF_PixelSeedVeto(float pt, float eta)
 
 float TScaleFactors::SF_Err_PixelSeedVeto(float pt, float eta){
+  if(fabs(eta) <= 1.4442){
+    if(pt > 15 && pt <= 20) {return 0.020;}
+    if(pt > 20 && pt <= 25) {return 0.024;}
+    if(pt > 25 && pt <= 30) {return 0.030;}
+    if(pt > 30 && pt <= 40) {return 0.033;}
+    if(pt > 40 && pt <= 50) {return 0.073;}
+    if(pt > 50 && pt <= 70) {return 0.128;}
+    if(pt > 70 )            {return 0.111;}
+  } else if(fabs(eta) > 1.566 && fabs(eta) <= 2.5){
+    if(pt > 15 && pt <= 20) {return 0.041;}
+    if(pt > 20 && pt <= 25) {return 0.051;}
+    if(pt > 25 && pt <= 30) {return 0.062;}
+    if(pt > 30 && pt <= 40) {return 0.081;}
+    if(pt > 40 && pt <= 50) {return 0.150;}
+    if(pt > 50 && pt <= 70) {return 0.294;}
+    if(pt > 70 )           {return 0.371;}
+  } 
   return 0.0;
 }// end of SF_Err_PixelSeedVeto(float pt, float eta)
 
