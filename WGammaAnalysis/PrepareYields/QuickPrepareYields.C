@@ -41,7 +41,7 @@ void QuickPrepareYields_FSRandISR(){
 
   TConfiguration conf;
   TPhotonCuts photon;
-  TCut cut = photon.RangePhoton(_config.MUON, _config.Z_GAMMA, 2012, photon.WP_MEDIUM, 1, 0, 1, 1, 1, 1);
+  TCut cut = photon.RangePhoton(conf.MUON, conf.Z_GAMMA, 2012, photon.WP_MEDIUM, 1, 0, 1, 1, 1, 1);
   anPars.cutAdd=cut;//"phoEt<40";
 //  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
 
