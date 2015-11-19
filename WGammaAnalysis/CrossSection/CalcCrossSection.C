@@ -221,7 +221,9 @@ void CalcCrossSection::Calc()
   std::cout<<"ERR_SYST_CHISOvsSIHIH "<<_yCSarray[errT].title<<std::endl;
   TString strCh, strVg;
   if (_channel==_config.MUON) strCh="MUON";
+  if (_channel==_config.ELECTRON) strCh="ELECTRON";
   if (_vgamma==_config.W_GAMMA) strVg="WGamma";
+  if (_vgamma==_config.Z_GAMMA) strVg="ZGamma";
   TString strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
   GetYieldsSyst(_yCSarray[errT], 
     strF,
@@ -348,7 +350,7 @@ void CalcCrossSection::Calc()
   }//end of loop over ib  
   Print("Lumi syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 
-  if (_channel==_config.MUON && _vgamma==_config.W_GAMMA){
+  if (_vgamma==_config.W_GAMMA){
 
     errT=ERR_SYST_WMtCut;
     _yCSarray[errT].errType=errT;  
@@ -368,14 +370,16 @@ void CalcCrossSection::Calc()
     std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
     ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
 
-    errT=ERR_SYST_SFs;
-    _yCSarray[errT].errType=errT;  
-    _yCSarray[errT].title="SFs +-1sigma";
-    _yCSarray[errT].name="syst_SFs";
-    _yCSarray[errT].strUp="SFs";
-    _yCSarray[errT].strDown="err";
-    std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
-    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
+    if (_channel==_config.MUON){
+      errT=ERR_SYST_SFs;
+      _yCSarray[errT].errType=errT;  
+      _yCSarray[errT].title="SFs +-1sigma";
+      _yCSarray[errT].name="syst_SFs";
+      _yCSarray[errT].strUp="SFs";
+      _yCSarray[errT].strDown="err";
+      std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
+      ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
+    }
 
   }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
 
@@ -495,7 +499,9 @@ void CalcCrossSection::GetSignalYields(int errT)
 
   TString strCh, strVg;
   if (_channel==_config.MUON) strCh="MUON";
+  if (_channel==_config.ELECTRON) strCh="ELECTRON";
   if (_vgamma==_config.W_GAMMA) strVg="WGamma";
+  if (_vgamma==_config.Z_GAMMA) strVg="ZGamma";
   TString strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
   TFile* fSigMeth2 = new TFile(strF);
   TH1F* h1D = (TH1F*)fSigMeth2->Get("yieldsDDTrueONEDICOMMON");

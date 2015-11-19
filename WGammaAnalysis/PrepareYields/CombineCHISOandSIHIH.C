@@ -165,11 +165,14 @@ void ComputeSystHists(TString strKin, TString strEta)
 
   h_Yield_Meth2[ieta]->SetTitle("yieldsDDTrueONEDI"+strEta);
   h_Yield_Meth2[ieta]->Write("yieldsDDTrueONEDI"+strEta);
+  
+//  if (channel==conf.MUON) strCh="MUON";
+//  if (channel==conf.ELECTRON) strCh="ELECTRON";
 
   std::cout<<"\\begin{table}[h]"<<std::endl;
   std::cout<<"  \\scriptsize"<<std::endl;
   std::cout<<"  \\begin{center}"<<std::endl;
-  std::cout<<"  \\caption{Syst. due to different ways to fit. Muon "<<strKin<<" "<<strEta<<"}"<<std::endl;
+  std::cout<<"  \\caption{Syst. due to different ways to fit. "<<strKin<<" "<<strEta<<"}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
   std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|c|}"<<std::endl;
   std::cout<<"    bin &  MC   & data  & data  & MC cl. & MC cl. & yield & yield\\\\ "<<std::endl;
@@ -195,7 +198,7 @@ void ComputeSystHists(TString strKin, TString strEta)
   }//end of loop over ib
 
   std::cout<<"  \\end{tabular}"<<std::endl;
-  std::cout<<"  \\label{tab:diff_ways_to_fit_muon_";
+  std::cout<<"  \\label{tab:diff_ways_to_fit_";
   std::cout<<strKin<<"_"<<strEta;
   std::cout<<"}"<<std::endl;
   std::cout<<"  \\end{center}"<<std::endl;
@@ -232,7 +235,9 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
   TString strCh, strVg;
   TConfiguration conf;
   if (channel==conf.MUON) strCh="MUON";
+  if (channel==conf.ELECTRON) strCh="ELECTRON";
   if (vgamma==conf.W_GAMMA) strVg="WGamma";
+  if (vgamma==conf.Z_GAMMA) strVg="ZGamma";
 
   f_data_chiso="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/yields_"+strVg+"_TEMPL_CHISO_phoEt_.root";
   f_data_sihih="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/yields_"+strVg+"_TEMPL_SIHIH_phoEt_.root";
