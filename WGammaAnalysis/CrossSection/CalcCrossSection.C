@@ -370,7 +370,7 @@ void CalcCrossSection::Calc()
     std::cout<<"ERR_SYST_PUweight "<<_yCSarray[errT].title<<std::endl;
     ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux23_PUreweight_minus5pc", "WGammaAnalysisAux24_PUreweight_plus5pc");
 
-    if (_channel==_config.MUON){
+
       errT=ERR_SYST_SFs;
       _yCSarray[errT].errType=errT;  
       _yCSarray[errT].title="SFs +-1sigma";
@@ -379,7 +379,7 @@ void CalcCrossSection::Calc()
       _yCSarray[errT].strDown="err";
       std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
       ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
-    }
+
 
   }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
 
