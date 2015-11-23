@@ -464,6 +464,7 @@ TString TPrepareYields::PlotTitleReplaceAll(TString strTitle){
   plotTitle.ReplaceAll("TotalDATAvsMC","DATA vs MC.");
   plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(DATA - BKG) vs SIGMC.");
   plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","DATA vs (BKG + SIGMC).");
+  plotTitle.ReplaceAll("DATAvsDDsum","DATA vs DD fits ");
 
   plotTitle.ReplaceAll("CHISO Endcap MUON WGamma","Endcap");
   plotTitle.ReplaceAll("CHISO Barrel MUON WGamma","Barrel");

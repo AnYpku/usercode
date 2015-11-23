@@ -121,6 +121,7 @@ class TTemplates
     void PrintOneHistogramBinByBin(TH1D* hist[nKinBinsMax][3], int ikin, int ieta);
     void ComputeYieldOneKinBin(int ikin, int ieta, bool noPrint=0);
     void ComputeTrueYield(int ikin, int ieta, bool noPrint, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
+    void ComputeFakeYield(int ikin, int ieta, bool noPrint, TH1D* hist[2], double*  nYieldsVal,double* nYieldsErr,double* nFromFitVal, double* nFromFitErr);
  //   void ComputeYieldOne(TH1D* hFake, double nFakeVal, double nFakeErr, double& nFakeYieldVal, double& nFakeYieldErr,int ieta, int ikin, bool isTrue, bool noPrint=0);
 
     void SetTemplate(int ikin, int ieta, bool isTrueGamma, TH1D* hTemplate, TCut cutExceptKin, bool noPrint, bool noLeak, TH1D* hLeak);
@@ -143,7 +144,8 @@ class TTemplates
     TCut FitVarFitRangeCut(int ikin, int ieta);
     TCut CutKinBin(int kinBin);
     TCut CutEtaBin(int etaBin);
-    float EffFromTree(int ikin, int ieta, bool noPrint);
+    float EffTrueFromTree(int ikin, int ieta, bool noPrint);
+    float EffFakeFromTree(int ikin, int ieta, bool noPrint);
 
     TRandom _random;
 
