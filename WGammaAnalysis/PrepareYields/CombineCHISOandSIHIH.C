@@ -1,7 +1,7 @@
 #include "../Configuration/TConfiguration.h"
 
-#include "iostream.h"
-#include "iomanip.h"
+#include <iostream>
+#include <iomanip>
 #include "TFile.h"
 #include "TMath.h"
 #include "TH1F.h"
@@ -275,10 +275,12 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
     for (int ib=2; ib<=h_Yield_Meth2[ieta]->GetNbinsX(); ib++){
       cont+=h_Yield_Meth2[ieta]->GetBinContent(ib);
       err+=h_Yield_Meth2[ieta]->GetBinError(ib)*h_Yield_Meth2[ieta]->GetBinError(ib);
+      std::cout<<"ib="<<ib<<", cont+-err="<<h_Yield_Meth2[ieta]->GetBinContent(ib)<<"+-"<<h_Yield_Meth2[ieta]->GetBinError(ib)<<std::endl;
     }//end of loop over ib
     err = sqrt(err);
     hYieldTOTAL[ieta]->SetBinContent(1,cont);
     hYieldTOTAL[ieta]->SetBinError(1,err);
+      std::cout<<"total: cont+-err="<<cont<<"+-"<<err<<std::endl;
     hYieldTOTAL[ieta]->Write();
   }//end of loop over ieta
 

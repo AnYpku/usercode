@@ -134,7 +134,7 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
     std::cout<<"  \\caption{Cross section and errors}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
     std::cout<<"  \\begin{tabular}{|c|c|c|}"<<std::endl;
-    std::cout<<"    bin & d\\sigma/dP_{T} &d\\sigma/dP_{T} \\\\ "<<std::endl;
+    std::cout<<"    bin & $d\\sigma/dP_{T}$ &$d\\sigma/dP_{T}$ \\\\ "<<std::endl;
     std::cout<<"    lims & MC based &    meas.       \\\\ \\hline"<<std::endl;
 
 
@@ -142,13 +142,13 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
       std::cout<<"    ";
       std::cout<<std::setprecision(0)<<"total & ";
 
-      std::cout<<std::setprecision(0)<<1000*hTheoryTot->GetBinContent(1)<<" & ";
+      std::cout<<std::setprecision(0)<<1000*hTheoryTot->GetBinContent(1)<<" & $";
 
       std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1)<<" \\pm ";
 
       std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinError(1)<<" \\pm ";
 
-      std::cout<<std::setprecision(0)<<_yCSarray[ERR_SYST_SUM].crossSectionTOT->GetBinError(1);
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_SYST_SUM].crossSectionTOT->GetBinError(1)<<"$";
 
       std::cout<<" \\\\ \\hline"<<std::endl;
     //loop over pt bins
@@ -165,13 +165,13 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
       if (cont<1)  pres=2;
       if (cont<0.1) pres=3;
 
-      std::cout<<std::setprecision(pres)<<1000*hTheory1D->GetBinContent(ib)<<" & ";
+      std::cout<<std::setprecision(pres)<<1000*hTheory1D->GetBinContent(ib)<<" & $";
    
       std::cout<<std::setprecision(pres)<<cont<<" \\pm ";
 
       std::cout<<std::setprecision(pres)<<_yCSarray[ERR_STAT].crossSection1D->GetBinError(ib)<<" \\pm ";
 
-      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_SYST_SUM].crossSection1D->GetBinError(ib);
+      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_SYST_SUM].crossSection1D->GetBinError(ib)<<"$";
 
 
 
