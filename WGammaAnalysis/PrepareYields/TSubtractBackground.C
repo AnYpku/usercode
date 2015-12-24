@@ -484,5 +484,45 @@ void TSubtractBackground::PlotPrintSave()
     hSystCHISOvsSIHIHTot->Write();
     delete hSystCHISOvsSIHIHTot;
   }//end of loop over ieta
+
+  //Write syst error due to Zg and Wg->taunu stat and normalization
+  int isZg=-1; int isWgtaunu=-1;
+  for (int is=0; is<_sources.size(); is++){
+    if(_sources[is].name=="Zg") isZg=is;
+    if(_sources[is].name=="Wg_to_taunu") isWgtaunu=is;
+  }//end of loop over is
+
+  for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+    TString strSyst=conf.GetSystBkgSubtrZgWgtaunu(conf.ONEDI, ieta);
+
+    TH1F* hSystBkgSubtr1D = (TH1F*)_sourceBkgSubtrData[0].hist[ieta]->Clone(strSyst);
+    hSystBkgSubtr1D->SetTitle(strSyst);
+
+    TString strSystTot=conf.GetSystBkgSubtrZgWgtaunu(conf.TOTAL, ieta);
+    TH1F* hSystBkgSubtrTot = new TH1F(strSystTot,strSystTot,1,15.0,500.0);
+    float errTot=0;
+    std::cout<<"hSyst BkgSubtr Zg and Wgtaunu; ieta="<<StrLabelEta(ieta)<<std::endl;
+    for (int ib=1; ib<=hSystBkgSubtr1D->GetNbinsX(); ib++){
+      float Err1 = 0;
+      if (isZg>-1) Err1=2*0.046*_sources[isZg].hist[ieta]->GetBinContent(ib);
+      float Err2 = 0;
+      if (isWgtaunu>-1) Err2=2*0.2*_sources[isWgtaunu].hist[ieta]->GetBinContent(ib);     
+      float Err3 = 0;
+      if (isZg>-1) Err3=_sources[isZg].hist[ieta]->GetBinError(ib); 
+      float Err4 = 0;
+      if (isWgtaunu>-1) Err4=_sources[isWgtaunu].hist[ieta]->GetBinError(ib);
+      float Err=sqrt(Err1*Err1+Err2*Err2+Err3*Err3+Err4*Err4);
+      std::cout<<"ieta="<<ieta<<", ib="<<ib<<", Err1="<<Err1<<", Err2="<<Err2<<", Err3="<<Err3<<", Err4="<<Err4<<", Err="<<Err<<std::endl;
+      hSystBkgSubtr1D->SetBinError(ib,Err);
+      errTot+=Err*Err;
+    }//end of loop over ib
+    errTot=sqrt(errTot);
+    hSystBkgSubtr1D->Write();
+    hSystBkgSubtrTot->SetBinContent(1,0);
+    hSystBkgSubtrTot->SetBinError(1,errTot);
+    hSystBkgSubtrTot->Write();
+    delete hSystBkgSubtrTot;
+  }//end of loop over ieta
+
   std::cout<<"everything written to "<<_pyPars.fOut->GetName()<<std::endl;
 }// end of PlotPrintSave()

@@ -117,6 +117,7 @@ class TConfiguration
     TString GetCSname(int channel, int csMode);
 
     TString GetSystCHISOvsSIHIHname(int csMode, int etaBin);
+    TString GetSystBkgSubtrZgWgtaunu(int csMode, int etaBin);
 
 //    TString GetUnfoldingFileName(int channel);
 //    TString GetMatrUnfo1DName();

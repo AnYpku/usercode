@@ -293,6 +293,26 @@ void CalcCrossSection::Calc()
     DivideOverBinWidth(_yCSarray[errT]);  
   }// end of if (_channel==_config.ELECTRON && _channel==_config.W_GAMMA)
 
+  errT=ERR_SYST_BkgSubtrZgWgtaunu;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].name="syst_real_g_bkg_subtr";
+  _yCSarray[errT].title="real #gamma bkg subtr";
+  _yCSarray[errT].strUp="real \\gamma";
+  _yCSarray[errT].strDown="bkg";
+  std::cout<<"ERR_SYST_BkgSubtrZgWgtaunu "<<_yCSarray[errT].title<<std::endl;
+  strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/yields_"+strVg+"__phoEt_.root";
+  GetYieldsSyst(_yCSarray[errT], 
+    strF,
+    "systBkgSubtrZgWgtaunu_ONEDI_COMMON",
+    "systBkgSubtrZgWgtaunu_TOTAL_COMMON");
+//    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
+//    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
+//    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
+  ApplyUnfolding(0,_yCSarray[errT]);
+  ApplyAccXEff(_yCSarray[errT]);
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);
+
   errT=ERR_SYST_accXeff_MCstat;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].title="accXeff, MC stat";

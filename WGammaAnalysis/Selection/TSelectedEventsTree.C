@@ -127,6 +127,8 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("pfMETPhi",&_pfMETPhi,"pfMETPhi/F");
   tree->Branch("pfMET_notSmeared",&_pfMET_notSmeared,"pfMET_notSmeared/F");
   tree->Branch("pfMETPhi_notSmeared",&_pfMETPhi_notSmeared,"pfMETPhi_notSmeared/F");
+  tree->Branch("totEt",&_totEt,"totEt/F");
+  tree->Branch("totEtPhi",&_totEtPhi,"totEtPhi/F");
   tree->Branch("rho2012",&_rho2012,"rho2012/F");
   tree->Branch("rho2011",&_rho2011,"rho2011/F");
   tree->Branch("run",&_run,"run/I");
@@ -241,6 +243,8 @@ tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il
   tree->SetBranchAddress("pfMETPhi",&_pfMETPhi,&_b_pfMETPhi);
   tree->SetBranchAddress("pfMET_notSmeared",&_pfMET_notSmeared,&_b_pfMET_notSmeared);
   tree->SetBranchAddress("pfMETPhi_notSmeared",&_pfMETPhi_notSmeared,&_b_pfMETPhi_notSmeared);
+  tree->SetBranchAddress("totEt",&_totEt,&_b_totEt);
+  tree->SetBranchAddress("totEtPhi",&_totEtPhi,&_b_totEtPhi);
   tree->SetBranchAddress("rho2012",&_rho2012,&_b_rho2012);
   tree->SetBranchAddress("rho2011",&_rho2011,&_b_rho2011);
   tree->SetBranchAddress("run",&_run,&_b_run);
@@ -291,27 +295,57 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
    //pfMET smearing
    _pfMET_notSmeared=leaf.pfMET;
    _pfMETPhi_notSmeared=leaf.pfMETPhi;
-   if (!leaf.isData) {
-     TMetTools met(leaf.event, leaf.pfMET, leaf.pfMETPhi,
-              //leaf.nLowPtJet, leaf.jetLowPtRawPt,
-              //leaf.jetLowPtRawEn, leaf.jetLowPtPt,  
-              //leaf.jetLowPtEta, leaf.jetLowPtPhi,
-              //leaf.jetLowPtGenJetPt, leaf.jetLowPtGenJetEta, 
-              //leaf.jetLowPtGenJetPhi, 
-              leaf.nJet, 
-              leaf.jetRawPt, leaf.jetRawEn, 
-              leaf.jetPt, leaf.jetEta, 
-              leaf.jetPhi, leaf.jetGenJetPt, 
-              leaf.jetGenJetEta, leaf.jetGenJetPhi);
-     met.METSmearCorrection();
-     _pfMET = met.GetRecoPfMET();
-     _pfMETPhi = met.GetRecoPfMETPhi();
- 
-   }//end of "if (!leaf.isData)"
-   else{
-     _pfMET=leaf.pfMET;
-     _pfMETPhi=leaf.pfMETPhi;
+   _pfMET=leaf.pfMET;
+   _pfMETPhi=leaf.pfMETPhi;
+
+   
+   _totEt=0; _totEtPhi=0;
+   TLorentzVector vTot, vAdd, vSum;
+   vTot.SetPtEtaPhiM(0,0,0,0);
+   
+   if (channel==_config.ELECTRON){
+     for (int i=0; i<leaf.nEle; i++){
+       vAdd.SetPtEtaPhiM(leaf.elePt->at(i),leaf.eleEta->at(i),leaf.elePhi->at(i),0);
+       vSum=vTot+vAdd; vTot=vSum;
+     }
    }
+   
+   if (channel==_config.MUON){   
+     for (int i=0; i<leaf.nMu; i++){
+       vAdd.SetPtEtaPhiM(leaf.muPt->at(i),leaf.muEta->at(i),leaf.muPhi->at(i),0);
+       TLorentzVector vSum=vTot+vAdd; vTot=vSum;
+     }
+   }
+   
+   for (int i=0; i<leaf.nPho; i++){
+     vAdd.SetPtEtaPhiM(leaf.phoEt->at(i),leaf.phoEta->at(i),leaf.phoPhi->at(i),0);
+     TLorentzVector vSum=vTot+vAdd; vTot=vSum;
+   }
+   
+   for (int i=0; i<leaf.nJet; i++){
+     vAdd.SetPtEtaPhiM(leaf.jetPt->at(i),leaf.jetEta->at(i),leaf.jetPhi->at(i),0);
+     TLorentzVector vSum=vTot+vAdd; vTot=vSum;
+   }
+   _totEt=vTot.Pt();
+   _totEtPhi=vTot.Phi();
+   
+   //   if (!leaf.isData) {
+   //     TMetTools met(leaf.event, leaf.pfMET, leaf.pfMETPhi,
+   //              //leaf.nLowPtJet, leaf.jetLowPtRawPt,
+   //              //leaf.jetLowPtRawEn, leaf.jetLowPtPt,  
+   //              //leaf.jetLowPtEta, leaf.jetLowPtPhi,
+   //              //leaf.jetLowPtGenJetPt, leaf.jetLowPtGenJetEta, 
+   //              //leaf.jetLowPtGenJetPhi, 
+   //              leaf.nJet, 
+   //              leaf.jetRawPt, leaf.jetRawEn, 
+   //              leaf.jetPt, leaf.jetEta, 
+   //              leaf.jetPhi, leaf.jetGenJetPt, 
+   //              leaf.jetGenJetEta, leaf.jetGenJetPhi);
+   //     met.METSmearCorrection();
+   //     _pfMET = met.GetRecoPfMET();
+   //     _pfMETPhi = met.GetRecoPfMETPhi();
+   //   }//end of "if (!leaf.isData)"
+   
 
   _WMt = sqrt(2*_lepPt[0]*_pfMET*(1-cos(_lepPhi[0]-_pfMETPhi))); //makes sense for W_GAMMA only
   

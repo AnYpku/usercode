@@ -129,6 +129,10 @@ class TSelectedEventsTree
     float _pfMETPhi;
     float _pfMET_notSmeared;
     float _pfMETPhi_notSmeared;
+
+    float _totEt;
+    float _totEtPhi;
+
     float _rho2011;//for 2011 cuts
     float _rho2012;
     int _run;
@@ -234,6 +238,8 @@ class TSelectedEventsTree
     TBranch* _b_pfMETPhi;
     TBranch* _b_pfMET_notSmeared;
     TBranch* _b_pfMETPhi_notSmeared;
+    TBranch* _b_totEt;
+    TBranch* _b_totEtPhi;
     TBranch* _b_rho2011;//for 2011 cuts
     TBranch* _b_rho2012;
     TBranch* _b_run;

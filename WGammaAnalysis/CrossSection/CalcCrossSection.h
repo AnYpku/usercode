@@ -22,6 +22,7 @@ class CalcCrossSection
             ERR_SYST_ZgMC_Norm,
             ERR_SYST_TemplStat,
             ERR_SYST_etogStat,
+            ERR_SYST_BkgSubtrZgWgtaunu,
             ERR_SYST_accXeff_MCstat,
             ERR_SYST_LUMI,
             ERR_SYST_WMtCut,
