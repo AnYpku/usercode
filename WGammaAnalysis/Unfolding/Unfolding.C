@@ -73,75 +73,59 @@ Unfolding::~Unfolding()
 bool Unfolding::TestDifferentMethods()
 {
 
-  TH1D* dataSignYields = new TH1D("data","data yields  for test",_nBinsGen,_phoPtLimitsGen);
-
-  dataSignYields->SetBinContent(0,_histYieldsRecSmeared->GetBinContent(0));
-  dataSignYields->SetBinError(0,_histYieldsRecSmeared->GetBinError(0));
-  
   bool doSyst=0;
 
   TH1D* unfYieldsRooUnfInv = new TH1D("unfYieldsInv","unfolded yields Inversion",_nBinsGen,_phoPtLimitsGen);
-  TMatrixD errCovStatInv(_nBinsGen,_nBinsGen);
-  TVectorD errStatInv(_nBinsGen);
-  TVectorD errSystInv(_nBinsGen);
-  TVectorD errCovStatVInv(_nBinsGen);
-  ApplyRooUnfold(doSyst, _histYieldsRec,unfYieldsRooUnfInv,RooUnfold::kInvert,errCovStatInv, errStatInv, errSystInv,errCovStatVInv,"testInvert");
+  ApplyRooUnfold(doSyst, _histYieldsRecSmeared,unfYieldsRooUnfInv,RooUnfold::kInvert,"testInvert");
 
   TH1D* unfYieldsRooUnfDAg = new TH1D("unfYieldsDAg","unfolded yields D'Agostini",_nBinsGen,_phoPtLimitsGen);
-  TMatrixD errCovStatDAg(_nBinsGen,_nBinsGen);
-  TVectorD errStatDAg(_nBinsGen);
-  TVectorD errSystDAg(_nBinsGen);
-  TVectorD errCovStatVDAg(_nBinsGen);
-//  ApplyRooUnfold(_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes);
-  ApplyRooUnfold(doSyst,_histYieldsRec,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg,"testBayes");
-//  ApplyRooUnfold(_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,errCovStatDAg, errStatDAg, errSystDAg, errCovStatVDAg);
+  ApplyRooUnfold(doSyst,_histYieldsRecSmeared,unfYieldsRooUnfDAg,RooUnfold::kBayes,"testBayes");
+
+
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{Unfolding, MC closure test. ";
+    std::cout<<_config.StrChannel(_channel)<<" "<<_config.StrVgType(_vgamma)<<"}"<<std::endl;
+                                  // bin | val | stat err | syst Ich vs sihih
+    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|}"<<std::endl;
+
 
   std::cout<<std::endl;
-  std::cout<<"   limits;      RooUnf inv;       RooUnf D'Ag;      histYieldsGen;        Input Yields"<<std::endl;  
+  std::cout<<"  bin &  yields &   yields &  unfolded &  unfolded \\\\ \\hline"<<std::endl;  
+  std::cout<<"   limits &  gen-level & rec &  inversion &  D'Agostini \\\\ \\hline"<<std::endl;  
 
   std::cout<<std::endl;
   
   for (int i=1; i<=_nBinsGen; i++){
-    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" GeV: ";
+    std::cout<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i-1]<<" - "<<std::setw(3)<<std::setprecision(0)<<_phoPtLimitsGen[i]<<" & ";
       //limits
 
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatInv(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystInv(i-1)<<"=";
-   std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfInv->GetBinContent(i)<<"+-"<<unfYieldsRooUnfInv->GetBinError(i)<<";     ";
-      //inversion
-
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errStatDAg(i-1)<<"+-"<<std::setw(4)<<std::setprecision(0)<<errSystDAg(i-1)<<"=";
-    std::cout<<std::setw(5)<<std::setprecision(0)<<unfYieldsRooUnfDAg->GetBinContent(i)<<"+-"<<unfYieldsRooUnfDAg->GetBinError(i)<<";     ";
-      //D'Agostini
-
-    std::cout<<std::setw(5)<<std::setprecision(0)<<_histYieldsGen->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<_histYieldsGen->GetBinError(i)<<";    ";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<_histYieldsGen->GetBinContent(i)<<"\\pm"<<std::setw(4)<<std::setprecision(0)<<_histYieldsGen->GetBinError(i)<<"$ & ";
       //gen yields
 
-    std::cout<<std::setw(5)<<std::setprecision(0)<<_histYieldsRec->GetBinContent(i)<<"+-"<<std::setw(4)<<std::setprecision(0)<<_histYieldsRec->GetBinError(i)<<";    ";
-      //gen yields->GetBinError(i)<<";    ";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<_histYieldsRec->GetBinContent(i)<<"\\pm"<<std::setw(4)<<std::setprecision(0)<<_histYieldsRec->GetBinError(i)<<"$ & ";
       //rec yields
 
-    std::cout<<std::endl;
-  }
+   std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<unfYieldsRooUnfInv->GetBinContent(i)<<"\\pm"<<unfYieldsRooUnfInv->GetBinError(i)<<"$ & ";
+      //inversion
 
-  std::cout<<std::endl;
-  std::cout<<"Covariance Matrix, RooUnf inversion"<<std::endl;  
-  for (int i=0; i<_nBinsGen; i++){
-    for (int j=0; j<_nBinsGen; j++){
-//      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatInv(i,j)<<" ";
-    }
-//    std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVInv(i);
-    std::cout<<std::endl;
-  }
+    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<unfYieldsRooUnfDAg->GetBinContent(i)<<"\\pm"<<unfYieldsRooUnfDAg->GetBinError(i)<<"$ ";
+      //D'Agostini
 
-  std::cout<<std::endl;
-  std::cout<<"Covariance Matrix, RooUnf D'Agostini"<<std::endl;  
-  for (int i=0; i<_nBinsGen; i++){
-    for (int j=0; j<_nBinsGen; j++){
-//      std::cout<<std::setw(5)<<std::setprecision(0)<<errCovStatDAg(i,j)<<" ";
-    }
-//    std::cout<<"; diag: "<<std::setw(4)<<std::setprecision(0)<<errCovStatVDAg(i);
+    std::cout<<"\\\\ \\hline";
+
     std::cout<<std::endl;
-  }
+  }// end of loop over i
+
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:unf_mc_closure_";
+    std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+    std::cout<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
+
+
 
   delete unfYieldsRooUnfInv;
   delete unfYieldsRooUnfDAg;
@@ -375,24 +359,35 @@ bool Unfolding::ApplyRooUnfold(bool doSyst, TH1D* histInputYields, TH1D* unfolde
 
   PlotMatrixAsTH2D(matrCorrelation, "matrCorrelation",TString("Correlation Matrix")+strAffix, strAnnex);
 
-  std::cout<<"Yields: (MC-gen), (MC-rec), (data-input), (data-unfolded)"<<std::endl;
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{Unfolding on data. ";
+    std::cout<<_config.StrChannel(_channel)<<" "<<_config.StrVgType(_vgamma)<<"}"<<std::endl;
+                                  // bin | val | stat err | syst Ich vs sihih
+    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|}"<<std::endl;
+
+  std::cout<<"Yields & sign. MC & sign. MC & data & data \\\\"<<std::endl;
+  std::cout<<"       & gen-level & rec.    & input & unfolded \\\\ \\hline"<<std::endl;
   for (int i=1; i<=_nBinsRec; i++){
     std::cout<<std::setprecision(0);
-    std::cout<<_histYieldsGen->GetBinLowEdge(i)<<"-"<<_histYieldsGen->GetBinLowEdge(i)+_histYieldsGen->GetBinWidth(i)<<" ";
-    std::cout<<_histYieldsGen->GetBinContent(i)<<"+-"<<_histYieldsGen->GetBinError(i)<<" ";
-    std::cout<<_histYieldsRec->GetBinLowEdge(i)<<"-"<<_histYieldsRec->GetBinLowEdge(i)+_histYieldsRec->GetBinWidth(i)<<" ";
-    std::cout<<_histYieldsRec->GetBinContent(i)<<"+-"<<_histYieldsRec->GetBinError(i)<<" ";
-    std::cout<<histInputYields->GetBinLowEdge(i)<<"-"<<histInputYields->GetBinLowEdge(i)+histInputYields->GetBinWidth(i)<<" ";
-    std::cout<<histInputYields->GetBinContent(i)<<"+-"<<histInputYields->GetBinError(i)<<" ";
-    std::cout<<unfoldedYields->GetBinLowEdge(i)<<"-"<<unfoldedYields->GetBinLowEdge(i)+unfoldedYields->GetBinWidth(i)<<" ";
-    std::cout<<unfoldedYields->GetBinContent(i)<<"+-"<<unfoldedYields->GetBinError(i)<<" ";
+    std::cout<<_histYieldsGen->GetBinLowEdge(i)<<"-"<<_histYieldsGen->GetBinLowEdge(i)+_histYieldsGen->GetBinWidth(i)<<" & ";
+    std::cout<<"$"<<_histYieldsGen->GetBinContent(i)<<"\\pm"<<_histYieldsGen->GetBinError(i)<<"$ & ";
+    //    std::cout<<_histYieldsRec->GetBinLowEdge(i)<<"-"<<_histYieldsRec->GetBinLowEdge(i)+_histYieldsRec->GetBinWidth(i)<<" ";
+    std::cout<<"$"<<_histYieldsRec->GetBinContent(i)<<"\\pm"<<_histYieldsRec->GetBinError(i)<<"$ & ";
+    //    std::cout<<histInputYields->GetBinLowEdge(i)<<"-"<<histInputYields->GetBinLowEdge(i)+histInputYields->GetBinWidth(i)<<" ";
+    std::cout<<"$"<<histInputYields->GetBinContent(i)<<"\\pm"<<histInputYields->GetBinError(i)<<"$ & ";
+    //    std::cout<<unfoldedYields->GetBinLowEdge(i)<<"-"<<unfoldedYields->GetBinLowEdge(i)+unfoldedYields->GetBinWidth(i)<<" ";
+    std::cout<<"$"<<unfoldedYields->GetBinContent(i)<<"\\pm"<<unfoldedYields->GetBinError(i)<<"$ \\\\ \\hline ";
     std::cout<<std::endl;
   }
-//  std::cout<<"Unfolded yields:"<<std::endl;
-//  for (int i=1; i<=_nBinsGen; i++){
-//    std::cout<<std::setprecision(0)<<histUnfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<histUnfoldedYields->GetBinError(i)<<"+-"<<std::setprecision(0)<<errSyst[i];
-//    std::cout<<" = "<<std::setprecision(0)<<unfoldedYields->GetBinContent(i)<<"+-"<<std::setprecision(0)<<unfoldedYields->GetBinError(i)<<std::endl;
-//  }
+
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:unf_data_";
+    std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+    std::cout<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
 
   std::cout<<std::endl<<"DoRooUnfold() ends here"<<std::endl;
   std::cout<<"#######################"<<std::endl;

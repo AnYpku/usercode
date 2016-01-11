@@ -576,7 +576,7 @@ void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
   strUnfName+="_unf";
   TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone(strUnfName);
 
-  isOk = unf.ApplyRooUnfold(doSyst,signInput1D,signUnfolded1D,RooUnfold::kInvert,yCS.name);
+  isOk = unf.ApplyRooUnfold(doSyst,signInput1D,signUnfolded1D,RooUnfold::kBayes,yCS.name);
   if (!isOk){
     std::cout<<"ERROR: ApplyRooUnfold() for Unfolding failed"<<std::endl;
     return;

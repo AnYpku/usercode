@@ -280,18 +280,18 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
   for (int ich=0; ich<=1; ich++){
     for (int ivg=0; ivg<=1; ivg++){
       if (anPars.noPreSelection[ich][ivg]) continue;
-      TString strAffix=TString("Preliminary Selection ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
-      std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
-      std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
-      anPars.channel=ich;
-      anPars.vgamma=ivg;
-      Selection selection(anPars);
-      selection.LoopOverInputFiles();
-      std::cout<<"%_%  DONE "<<strAffix<<std::endl;
-      std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
+        TString strAffix=TString("Preliminary Selection ")+conf.StrChannel(ich)+TString(" ")+conf.StrVgType(ivg);
+        std::cout<<"%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%"<<std::endl;
+        std::cout<<"%^%  WILL DO "<<strAffix<<std::endl;
+        anPars.channel=ich;
+        anPars.vgamma=ivg;
+        Selection selection(anPars);
+        selection.LoopOverInputFiles();
+        std::cout<<"%_%  DONE "<<strAffix<<std::endl;
+        std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
     }
   }
-
+  
   //extra selection
   for (int ich=0; ich<=1; ich++){
     for (int ivg=0; ivg<=1; ivg++){
@@ -440,6 +440,5 @@ void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)
       std::cout<<"%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%_%"<<std::endl;
     }// end of loop over ivg
   }// end of loop over ich
-
+  
 }
-
