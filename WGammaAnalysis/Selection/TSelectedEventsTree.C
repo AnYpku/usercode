@@ -121,9 +121,13 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("phoTrkIsoHollowDR04Corr",&_phoTrkIsoHollowDR04Corr,"phoTrkIsoHollowCorr/F");
   tree->Branch("phohasPixelSeed",&_phohasPixelSeed,"phohasPixelSeed/I");
   tree->Branch("WMt",&_WMt,"WMt/F");
+  tree->Branch("WMtLow",&_WMtLow,"WMtLow/F");
+  tree->Branch("WMtUp",&_WMtUp,"WMtUp/F");
   tree->Branch("Mleplep",&_Mleplep,"Mleplep/F");
   tree->Branch("Mpholeplep",&_Mpholeplep,"Mpholeplep/F");
   tree->Branch("pfMET",&_pfMET,"pfMET/F");
+  tree->Branch("pfMETlow",&_pfMETlow,"pfMETlow/F");
+  tree->Branch("pfMETup",&_pfMETup,"pfMETup/F");
   tree->Branch("pfMETPhi",&_pfMETPhi,"pfMETPhi/F");
   tree->Branch("pfMET_notSmeared",&_pfMET_notSmeared,"pfMET_notSmeared/F");
   tree->Branch("pfMETPhi_notSmeared",&_pfMETPhi_notSmeared,"pfMETPhi_notSmeared/F");
@@ -136,6 +140,7 @@ void TSelectedEventsTree::SetAsOutputTree(TTree* tree)
   tree->Branch("weight",&_weight,"weight/F");
   tree->Branch("PUweight",&_PUweight,"PUweight/F");
   tree->Branch("PU",&_PU,"PU/F");
+ tree->Branch("nPU",&_nPU,"nPU/I");
   tree->Branch("nMC",&_nMC,"nMC/I");
   tree->Branch("mcPID","vector<int>", &_mcPID);
   tree->Branch("mcMomPID","vector<int>", &_mcMomPID);
@@ -237,9 +242,13 @@ tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il
   tree->SetBranchAddress("phoTrkIsoHollowDR04Corr",&_phoTrkIsoHollowDR04Corr,&_b_phoTrkIsoHollowDR04Corr);
   tree->SetBranchAddress("phohasPixelSeed",&_phohasPixelSeed,&_b_phohasPixelSeed);
   tree->SetBranchAddress("WMt",&_WMt,&_b_WMt);
+  tree->SetBranchAddress("WMtLow",&_WMtLow,&_b_WMtLow);
+  tree->SetBranchAddress("WMtUp",&_WMtUp,&_b_WMtUp);
   tree->SetBranchAddress("Mleplep",&_Mleplep,&_b_Mleplep);
   tree->SetBranchAddress("Mpholeplep",&_Mpholeplep,&_b_Mpholeplep);
   tree->SetBranchAddress("pfMET",&_pfMET,&_b_pfMET);
+  tree->SetBranchAddress("pfMETlow",&_pfMETlow,&_b_pfMETlow);
+  tree->SetBranchAddress("pfMETup",&_pfMETup,&_b_pfMETup);
   tree->SetBranchAddress("pfMETPhi",&_pfMETPhi,&_b_pfMETPhi);
   tree->SetBranchAddress("pfMET_notSmeared",&_pfMET_notSmeared,&_b_pfMET_notSmeared);
   tree->SetBranchAddress("pfMETPhi_notSmeared",&_pfMETPhi_notSmeared,&_b_pfMETPhi_notSmeared);
@@ -252,6 +261,7 @@ tree->SetBranchAddress(TString("lep")+stril+TString("TrgMatch"),&_lepTrgMatch[il
   tree->SetBranchAddress("weight",&_weight,&_b_weight);
   tree->SetBranchAddress("PUweight",&_PUweight,&_b_PUweight);
   tree->SetBranchAddress("PU",&_PU,&_b_PU);
+  tree->SetBranchAddress("nPU",&_nPU,&_b_nPU);
   tree->SetBranchAddress("nMC",&_nMC,&_b_nMC);
 
   _mcPID=0;
@@ -300,34 +310,66 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
 
    
    _totEt=0; _totEtPhi=0;
-   TLorentzVector vTot, vAdd, vSum;
+   TLorentzVector vTot, vAdd, vAddUp, vAddLow, vSum, vSumUp, vSumLow, vMET, vMETlow, vMETup;
    vTot.SetPtEtaPhiM(0,0,0,0);
+   vMET.SetPtEtaPhiM(_pfMET,0,_pfMETPhi,0);
+   vMETup=vMET; vMETlow=vMET;
    
    if (channel==_config.ELECTRON){
      for (int i=0; i<leaf.nEle; i++){
        vAdd.SetPtEtaPhiM(leaf.elePt->at(i),leaf.eleEta->at(i),leaf.elePhi->at(i),0);
        vSum=vTot+vAdd; vTot=vSum;
+       if (fabs(leaf.eleEta->at(i))<1.4442){// barrel
+         vAddUp.SetPtEtaPhiM(1.006*leaf.elePt->at(i),leaf.eleEta->at(i),leaf.elePhi->at(i),0);
+         vAddLow.SetPtEtaPhiM(0.994*leaf.elePt->at(i),leaf.eleEta->at(i),leaf.elePhi->at(i),0);
+       }
+       if (fabs(leaf.eleEta->at(i))>1.56 && fabs(leaf.eleEta->at(i))<2.5){// endcap
+         vAddUp.SetPtEtaPhiM(1.015*leaf.elePt->at(i),leaf.eleEta->at(i),leaf.elePhi->at(i),0);
+         vAddLow.SetPtEtaPhiM(0.985*leaf.elePt->at(i),leaf.eleEta->at(i),leaf.elePhi->at(i),0);
+       }
+       vSumUp=vMETup-vAdd+vAddUp; vMETup=vSumUp;
+       vSumLow=vMETlow-vAdd+vAddLow; vMETlow=vSumLow;
      }
-   }
+   }// end of if (channel==_config.ELECTRON)
    
    if (channel==_config.MUON){   
      for (int i=0; i<leaf.nMu; i++){
        vAdd.SetPtEtaPhiM(leaf.muPt->at(i),leaf.muEta->at(i),leaf.muPhi->at(i),0);
-       TLorentzVector vSum=vTot+vAdd; vTot=vSum;
+       vSum=vTot+vAdd; vTot=vSum;
      }
-   }
+   }// end of if (channel==_config.MUON)
    
    for (int i=0; i<leaf.nPho; i++){
      vAdd.SetPtEtaPhiM(leaf.phoEt->at(i),leaf.phoEta->at(i),leaf.phoPhi->at(i),0);
-     TLorentzVector vSum=vTot+vAdd; vTot=vSum;
-   }
+     vSum=vTot+vAdd; vTot=vSum;
+       if (fabs(leaf.phoEta->at(i))<1.4442){// barrel
+         vAddUp.SetPtEtaPhiM(1.006*leaf.phoEt->at(i),leaf.phoEta->at(i),leaf.phoPhi->at(i),0);
+         vAddLow.SetPtEtaPhiM(0.994*leaf.phoEt->at(i),leaf.phoEta->at(i),leaf.phoPhi->at(i),0);
+       }
+       if (fabs(leaf.phoEta->at(i))>1.56 && fabs(leaf.phoEta->at(i))<2.5){// endcap
+         vAddUp.SetPtEtaPhiM(1.015*leaf.phoEt->at(i),leaf.phoEta->at(i),leaf.phoPhi->at(i),0);
+         vAddLow.SetPtEtaPhiM(0.985*leaf.phoEt->at(i),leaf.phoEta->at(i),leaf.phoPhi->at(i),0);
+       }
+       vSumUp=vMETup-vAdd+vAddUp; vMETup=vSumUp;
+       vSumLow=vMETlow-vAdd+vAddLow; vMETlow=vSumLow;     
+   }// end of for (int i=0; i<leaf.nPho; i++)
    
    for (int i=0; i<leaf.nJet; i++){
      vAdd.SetPtEtaPhiM(leaf.jetPt->at(i),leaf.jetEta->at(i),leaf.jetPhi->at(i),0);
-     TLorentzVector vSum=vTot+vAdd; vTot=vSum;
-   }
+     vSum=vTot+vAdd; vTot=vSum;
+     float cUp = Scale_jet_up(leaf.jetEta->at(i))*(1+leaf.jetJECUnc->at(i));
+     float cLow = Scale_jet_down(leaf.jetEta->at(i))*(1-leaf.jetJECUnc->at(i));
+     vAddUp.SetPtEtaPhiM(cUp*leaf.jetPt->at(i),leaf.jetEta->at(i),leaf.jetPhi->at(i),0);
+     vAddLow.SetPtEtaPhiM(cLow*leaf.jetPt->at(i),leaf.jetEta->at(i),leaf.jetPhi->at(i),0);
+     vSumUp=vMETup-vAdd+vAddUp; vMETup=vSumUp;
+     vSumLow=vMETlow-vAdd+vAddLow; vMETlow=vSumLow;  
+   }// end of for (int i=0; i<leaf.nJet; i++)
+
    _totEt=vTot.Pt();
    _totEtPhi=vTot.Phi();
+
+   _pfMETup=vMETup.Pt();
+   _pfMETlow=vMETlow.Pt();
    
    //   if (!leaf.isData) {
    //     TMetTools met(leaf.event, leaf.pfMET, leaf.pfMETPhi,
@@ -348,6 +390,8 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
    
 
   _WMt = sqrt(2*_lepPt[0]*_pfMET*(1-cos(_lepPhi[0]-_pfMETPhi))); //makes sense for W_GAMMA only
+  _WMtUp = sqrt(2*_lepPt[0]*_pfMETup*(1-cos(_lepPhi[0]-_pfMETPhi))); //makes sense for W_GAMMA only
+  _WMtLow = sqrt(2*_lepPt[0]*_pfMETlow*(1-cos(_lepPhi[0]-_pfMETPhi))); //makes sense for W_GAMMA only
   
   TLorentzVector vlep1, vlep2, vpho;
   vlep1.SetPtEtaPhiM(_lepPt[0],_lepEta[0],_lepPhi[0],0);
@@ -381,12 +425,35 @@ void TSelectedEventsTree::SetValues(int channel, int sample, TEventTree::InputTr
   _weight=weight*_phoSF*_lepSF[0]*_lepSF[1];
   _PUweight=PUweight;
   _PU=PU;
+  _nPU=leaf.nPU->at(1);
   _nMC=leaf.nMC;
   _mcPID=leaf.mcPID;
   _mcMomPID=leaf.mcMomPID;
   _mcGMomPID=leaf.mcGMomPID;
 
 }//end of SetValues
+
+float TSelectedEventsTree::Scale_jet_down(float eta){
+  if (fabs(eta)<0.5) return (1.053/1.079);
+  if (fabs(eta)<1.1) return (1.071/1.099);
+  if (fabs(eta)<1.7) return (1.092/1.121);
+  if (fabs(eta)<2.3) return (1.162/1.208);
+  if (fabs(eta)<2.8) return (1.192/1.254);
+  if (fabs(eta)<3.2) return (1.332/1.395);
+  if (fabs(eta)<5.0) return (0.865/1.056);
+  return 1.0;
+}// end of Scale_jet_down
+
+float TSelectedEventsTree::Scale_jet_up(float eta){
+  if (fabs(eta)<0.5) return (1.105/1.079);
+  if (fabs(eta)<1.1) return (1.127/1.099);
+  if (fabs(eta)<1.7) return (1.150/1.121);
+  if (fabs(eta)<2.3) return (1.254/1.208);
+  if (fabs(eta)<2.8) return (1.316/1.254);
+  if (fabs(eta)<3.2) return (1.458/1.395);
+  if (fabs(eta)<5.0) return (0.247/1.056);
+  return 1.0;
+}// end of Scale_jet_up
 
 void TSelectedEventsTree::SetMuonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int ilMax)
 {

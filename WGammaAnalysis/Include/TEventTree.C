@@ -21,6 +21,7 @@ void TEventTree::GetEntryNeededBranchesOnly(int channel, int sample, Long64_t en
   if (channel==config.ELECTRON || channel==config.BOTH_CHANNELS) GetEntryEleSpecific(entry);
   GetEntryRandCone(entry);
   if (sample!=config.DATA) GetEntryMCSpecific(entry);
+  if (sample==config.SIGMC) GetEntrySIGMCSpecific(entry);
 }
 
 void TEventTree::GetEntryCommon(Long64_t entry)
@@ -161,6 +162,7 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
    b_mcDecayType->GetEntry(entry);
    b_mcParentage->GetEntry(entry);
 
+
    b_nPUInfo->GetEntry(entry);
    b_puTrue->GetEntry(entry);
 
@@ -174,6 +176,13 @@ void TEventTree::GetEntryMCSpecific(Long64_t entry)
    b_muGenIndex->GetEntry(entry);
    b_eleGenIndex->GetEntry(entry);
 }
+
+void TEventTree::GetEntrySIGMCSpecific(Long64_t entry)
+{
+   b_mcStatus->GetEntry(entry);
+   b_jetJECUnc->GetEntry(entry);
+   b_nPU->GetEntry(entry);
+}// end of GetEntrySIGMCSpecifi
 
 void TEventTree::Init(TTree *tree)
 {
@@ -211,8 +220,8 @@ void TEventTree::Init(TTree *tree)
    treeLeaf.mcIndex = 0;
    treeLeaf.mcDecayType = 0;
    treeLeaf.mcParentage = 0;
-//   treeLeaf.mcStatus = 0;
-//   treeLeaf.nPU = 0;
+   treeLeaf.mcStatus = 0;
+   treeLeaf.nPU = 0;
 //   treeLeaf.puBX = 0;
    treeLeaf.puTrue = 0;
 //   treeLeaf.trkMETx = 0;
@@ -650,7 +659,7 @@ void TEventTree::Init(TTree *tree)
 //   treeLeaf.jetMVAsExt_philv1 = 0;
 //   treeLeaf.jetWPLevelsExt_philv1 = 0;
 //   treeLeaf.jetMt = 0;
-//   treeLeaf.jetJECUnc = 0;
+     treeLeaf.jetJECUnc = 0;
 //   treeLeaf.jetLeadTrackPt = 0;
 //   treeLeaf.jetVtxPt = 0;
 //   treeLeaf.jetVtxMass = 0;
@@ -772,11 +781,11 @@ void TEventTree::Init(TTree *tree)
    fChain->SetBranchAddress("mcIndex", &treeLeaf.mcIndex, &b_mcIndex);
    fChain->SetBranchAddress("mcDecayType", &treeLeaf.mcDecayType, &b_mcDecayType);
    fChain->SetBranchAddress("mcParentage", &treeLeaf.mcParentage, &b_mcParentage);
-//   fChain->SetBranchAddress("mcStatus", &treeLeaf.mcStatus, &b_mcStatus);
+   fChain->SetBranchAddress("mcStatus", &treeLeaf.mcStatus, &b_mcStatus);
 //   fChain->SetBranchAddress("genMET", &treeLeaf.genMET, &b_genMET);
 //   fChain->SetBranchAddress("genMETPhi", &treeLeaf.genMETPhi, &b_genMETPhi);
    fChain->SetBranchAddress("nPUInfo", &treeLeaf.nPUInfo, &b_nPUInfo);
-//   fChain->SetBranchAddress("nPU", &treeLeaf.nPU, &b_nPU);
+   fChain->SetBranchAddress("nPU", &treeLeaf.nPU, &b_nPU);
 //   fChain->SetBranchAddress("puBX", &treeLeaf.puBX, &b_puBX);
    fChain->SetBranchAddress("puTrue", &treeLeaf.puTrue, &b_puTrue);
    fChain->SetBranchAddress("pfMET", &treeLeaf.pfMET, &b_pfMET);
@@ -1248,7 +1257,7 @@ void TEventTree::Init(TTree *tree)
 //   fChain->SetBranchAddress("jetMVAsExt_philv1", &treeLeaf.jetMVAsExt_philv1, &b_jetMVAsExt_philv1);
 //   fChain->SetBranchAddress("jetWPLevelsExt_philv1", &treeLeaf.jetWPLevelsExt_philv1, &b_jetWPLevelsExt_philv1);
 //   fChain->SetBranchAddress("jetMt", &treeLeaf.jetMt, &b_jetMt);
-//   fChain->SetBranchAddress("jetJECUnc", &treeLeaf.jetJECUnc, &b_jetJECUnc);
+   fChain->SetBranchAddress("jetJECUnc", &treeLeaf.jetJECUnc, &b_jetJECUnc);
 //   fChain->SetBranchAddress("jetLeadTrackPt", &treeLeaf.jetLeadTrackPt, &b_jetLeadTrackPt);
 //   fChain->SetBranchAddress("jetVtxPt", &treeLeaf.jetVtxPt, &b_jetVtxPt);
 //   fChain->SetBranchAddress("jetVtxMass", &treeLeaf.jetVtxMass, &b_jetVtxMass);

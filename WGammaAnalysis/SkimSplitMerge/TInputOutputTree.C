@@ -57,11 +57,11 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
    outputTree->Branch("mcIndex","vector<int>", &treeLeaf.mcIndex);
    outputTree->Branch("mcDecayType", "vector<int>",&treeLeaf.mcDecayType);
    outputTree->Branch("mcParentage", "vector<int>",&treeLeaf.mcParentage);
-//   outputTree->Branch("mcStatus", "vector<int>",&treeLeaf.mcStatus);
+   outputTree->Branch("mcStatus", "vector<int>",&treeLeaf.mcStatus);
 //   outputTree->Branch("genMET", &treeLeaf.genMET, "genMET/F");
 //   outputTree->Branch("genMETPhi", &treeLeaf.genMETPhi, "genMETPhi/F");
    outputTree->Branch("nPUInfo", &treeLeaf.nPUInfo, "nPUInfo/I");
-//   outputTree->Branch("nPU", "vector<int>",&treeLeaf.nPU);
+   outputTree->Branch("nPU", "vector<int>",&treeLeaf.nPU);
 //   outputTree->Branch("puBX", "vector<int>",&treeLeaf.puBX);
    outputTree->Branch("puTrue", "vector<float>",&treeLeaf.puTrue);
    outputTree->Branch("pfMET", &treeLeaf.pfMET, "pfMET/F");
@@ -507,7 +507,7 @@ void TInputOutputTree::InitOutputTree(TTree* outputTree)
  //  outputTree->Branch("jetMVAsExt_philv1", "vector<vector<float>>",&treeLeaf.jetMVAsExt_philv1);
  //  outputTree->Branch("jetWPLevelsExt_philv1","vector<vector<int>>", &treeLeaf.jetWPLevelsExt_philv1);
  //  outputTree->Branch("jetMt", "vector<float>", &treeLeaf.jetMt);
- //  outputTree->Branch("jetJECUnc", "vector<float>", &treeLeaf.jetJECUnc);
+   outputTree->Branch("jetJECUnc", "vector<float>", &treeLeaf.jetJECUnc);
  //  outputTree->Branch("jetLeadTrackPt", "vector<float>", &treeLeaf.jetLeadTrackPt);
  //  outputTree->Branch("jetVtxPt", "vector<float>", &treeLeaf.jetVtxPt);
  //  outputTree->Branch("jetVtxMass", "vector<float>", &treeLeaf.jetVtxMass);

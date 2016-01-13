@@ -22,6 +22,8 @@ class TSelectedEventsTree
     void SetAsOutputTree(TTree* tree);
     void SetAsInputTree(TTree* tree);
     void SetValues(int channel, int sample, TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int inputFileN, float weight, float PUweight, float PU,zgamma::PhosphorCorrectionFunctor* photonCorrector);
+    float Scale_jet_down(float eta);
+    float Scale_jet_up(float eta);
     void SetMuonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand,int ilMax); 
     void SetElectronValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int ilMax); 
     void SetPhotonValues(TEventTree::InputTreeLeaves& leaf, TFullCuts::Candidate cand, int channel, int ilMax); 
@@ -122,10 +124,14 @@ class TSelectedEventsTree
     int _phohasPixelSeed;//for 2011 cuts
     float _lepPhoDeltaR[2];
     float _WMt;
+    float _WMtLow;
+    float _WMtUp;
     float _Mpholep[2];
     float _Mleplep;//relevant for Z_GAMMA only
     float _Mpholeplep;//relevant for Z_GAMMA only
     float _pfMET;
+    float _pfMETlow;
+    float _pfMETup;
     float _pfMETPhi;
     float _pfMET_notSmeared;
     float _pfMETPhi_notSmeared;
@@ -140,6 +146,7 @@ class TSelectedEventsTree
     float _weight; 
     float _PUweight;
     float _PU;
+    int _nPU;
     int _nMC;
     vector <int>* _mcPID;
     vector <int>* _mcMomPID;
@@ -231,10 +238,14 @@ class TSelectedEventsTree
     TBranch* _b_phohasPixelSeed;//for 2011 cuts
     TBranch* _b_lepPhoDeltaR[2];
     TBranch* _b_WMt;
+    TBranch* _b_WMtLow;
+    TBranch* _b_WMtUp;
     TBranch* _b_Mpholep[2];
     TBranch* _b_Mleplep;
     TBranch* _b_Mpholeplep;
     TBranch* _b_pfMET;
+    TBranch* _b_pfMETlow;
+    TBranch* _b_pfMETup;
     TBranch* _b_pfMETPhi;
     TBranch* _b_pfMET_notSmeared;
     TBranch* _b_pfMETPhi_notSmeared;
@@ -247,6 +258,7 @@ class TSelectedEventsTree
     TBranch* _b_weight; 
     TBranch* _b_PUweight;
     TBranch* _b_PU;
+    TBranch* _b_nPU;
     TBranch* _b_nMC;
     TBranch* _b_mcPID;
     TBranch* _b_mcMomPID;

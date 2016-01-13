@@ -379,7 +379,7 @@ void CalcCrossSection::Calc()
     _yCSarray[errT].strUp="WMt";
     _yCSarray[errT].strDown="cut";
     std::cout<<"ERR_SYST_WMtCut "<<_yCSarray[errT].title<<std::endl;
-    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtminus5GeV", "WGammaAnalysisAux22_WMtplus5GeV");
+    ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux21_WMtLow", "WGammaAnalysisAux22_WMtUp");
 
     errT=ERR_SYST_PUweight;
     _yCSarray[errT].errType=errT;  

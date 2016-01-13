@@ -84,11 +84,11 @@ public:
      vector<int>     *mcIndex;
      vector<int>     *mcDecayType;
      vector<int>     *mcParentage;
-//   vector<int>     *mcStatus;
+     vector<int>     *mcStatus;
 //   Float_t         genMET;
 //   Float_t         genMETPhi;
      Int_t           nPUInfo;
-//   vector<int>     *nPU;
+     vector<int>     *nPU;
 //   vector<int>     *puBX;
      vector<float>   *puTrue;
      Float_t         pfMET;
@@ -560,7 +560,7 @@ public:
 //   vector<vector<float> > *jetMVAsExt_philv1;
 //   vector<vector<int> > *jetWPLevelsExt_philv1;
 //   vector<float>   *jetMt;
-//   vector<float>   *jetJECUnc;
+   vector<float>   *jetJECUnc;
 //   vector<float>   *jetLeadTrackPt;
 //   vector<float>   *jetVtxPt;
 //   vector<float>   *jetVtxMass;
@@ -1241,6 +1241,7 @@ public:
    void GetEntryMuoSpecific(Long64_t entry);
    void GetEntryEleSpecific(Long64_t entry);
    void GetEntryMCSpecific(Long64_t entry);
+   void GetEntrySIGMCSpecific(Long64_t entry);
    void GetEntryRandCone(Long64_t entry);
    virtual void     Init(TTree *tree);
 //   void SetMCSpecificAddresses();
