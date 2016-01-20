@@ -269,6 +269,14 @@ void FullChain::SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters
     for (int ib=0; ib<anPars.nKinBins+1; ib++)
       anPars.kinBinLims[ib]=0+1*ib;
   }
+
+  if (varKin=="phoSigmaIEtaIEta"){
+    anPars.varKin=varKin;
+    anPars.nKinBins=32;
+    anPars.kinBinLims=new float[anPars.nKinBins+1];
+    for (int ib=0; ib<anPars.nKinBins+1; ib++)
+      anPars.kinBinLims[ib]=0.005+0.002*ib;
+  }
 }// end of SetDefaultFullChainParameters
 
 void FullChain::RunAnalysis(TConfiguration::AnalysisParameters &anPars)

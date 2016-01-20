@@ -6,9 +6,9 @@
 #include "TPrepareYields.h"
 #include "TSubtractBackground.h"
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage);
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage, TString strNameAdd="");
 
-void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=TConfiguration::FULLY)
+void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=TConfiguration::FULLY, TString strNameAdd="")
 {
   TConfiguration conf;
   TPrepareYields prep;
@@ -18,7 +18,7 @@ void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosu
   if (isMCclosure) pars.strFileOut.ReplaceAll(".root","_MCclosure.root");
 
   std::cout<<"AuxPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
-  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, selStage);
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, selStage, strNameAdd);
 
 
   prep.PlotPrintSave();
@@ -86,7 +86,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
 
 }// end of AuxSubtractBackground
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage)
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage, TString strNameAdd)
 {
   TConfiguration config;
   TPhotonCuts photon;
@@ -114,11 +114,12 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   pars.isMCclosure=isMCclosure;
 
   pars.strPlotsDir=config.GetPlotsDirName(anPars.channel, anPars.vgamma, config.PLOTS_PREPARE_YIELDS);
-  pars.strPlotsBaseName=TString("c_")+config.StrChannel(anPars.channel)+TString("_")+config.StrVgType(anPars.vgamma)+TString("_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_");
+  pars.strPlotsBaseName=TString("c_")+config.StrChannel(anPars.channel)+TString("_")+config.StrVgType(anPars.vgamma)+TString("_")+config.StrTempl(anPars.templFits)+TString("_")+config.StrBlindType(anPars.blind[anPars.channel][anPars.vgamma])+TString("_")+strNameAdd;
   if (isMCclosure ) pars.strPlotsBaseName+="MCclosure_";
   std::cout<<"AuxPrepareYieldsCommon: selStage="<<config.StrSelectionStage(selStage)<<std::endl;
   pars.strSelStage="";
   if (selStage!=config.FULLY) pars.strSelStage=config.StrSelectionStage(selStage);
+  pars.strSelStage+=strNameAdd;
   std::cout<<"pars.strSelStage="<<pars.strSelStage<<std::endl;
 
   for (int ieta=config.BARREL; ieta<=config.COMMON; ieta++){
