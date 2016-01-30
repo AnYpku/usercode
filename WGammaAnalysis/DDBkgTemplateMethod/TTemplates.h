@@ -36,6 +36,7 @@ class TTemplates
       TFile* fTrueToFake; TTree* treeTrueToFake; //leak of real-gamma to fake template
       TFile* fFakeToTrue; TTree* treeFakeToTrue; //leak of fake-gamma to real template
       TFile* fFakeRef; TTree* treeFakeRef; // MC-truth fake distribution (for MC-closure test)
+      TFile* fTrueRef; TTree* treeTrueRef; // MC-truth true distribution (for MC-closure test)
 
       int nKinBins;
       float kinBinLims[nKinBinsMax];
@@ -152,6 +153,7 @@ class TTemplates
     TH1D* _hTrue[nKinBinsMax][3];
     TH1D* _hFake[nKinBinsMax][3];
     TH1D* _hFakeMCtruth[nKinBinsMax][3];
+    TH1D* _hTrueMCtruth[nKinBinsMax][3];
     TH1D* _hLeakTrueToFake[nKinBinsMax][3];
     TH1D* _hLeakFakeToTrue[nKinBinsMax][3];
     TH1D* _hSign[nKinBinsMax][3];

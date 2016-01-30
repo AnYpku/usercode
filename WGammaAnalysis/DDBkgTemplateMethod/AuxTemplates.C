@@ -177,6 +177,10 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
 
+  TString strTrueRef=config.GetSelectedName(config.FSR,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.SIGMC);
+  pars.treeTrueRef=LoadOneTree("true-pho ref", strTrueRef, pars.fTrueRef);
+  if (!pars.treeTrueRef) return;
+
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_CHISO,anPars.varKin);
     //the histograms with extracted yields will be saved here
   if (isMCclosure) pars.strFileOutName.ReplaceAll(".root","_MCclosure.root");
@@ -269,6 +273,9 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
 //  TString strFake=config.GetSelectedName(config.PRELIMINARY_FOR_TEMPLATE_METHOD,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.DATA);
   pars.treeFakeRef=LoadOneTree("fake-pho ref", strFakeRef, pars.fFakeRef);
   if (!pars.treeFakeRef) return;
+ TString strTrueRef=config.GetSelectedName(config.FSR,anPars.channel,config.Z_GAMMA,config.UNBLIND,config.SIGMC);
+  pars.treeTrueRef=LoadOneTree("true-pho ref", strTrueRef, pars.fTrueRef);
+  if (!pars.treeTrueRef) return;
 
   pars.strFileOutName=config.GetDDTemplateFileName(anPars.channel,anPars.vgamma,config.TEMPL_SIHIH,anPars.varKin);
     //the histograms with extracted yields will be saved here

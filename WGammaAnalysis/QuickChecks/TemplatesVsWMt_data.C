@@ -130,7 +130,7 @@ void DrawTemplates(TString strCanvBase, TTree* tr[2], TString varTemp, TCut cutE
       hists[1][ipt][0]->SetTitle(strTitle);
 
       TString strSave="../WGammaOutput";
-      strSave+="/ChannelsMERGED_WGamma/Plots/QuickChecks/";
+      strSave+="/ChannelsMERGED_ZGamma/Plots/QuickChecks/";
       strSave+=canv->GetName();
 
       canv->SaveAs(strSave+TString(".png"));

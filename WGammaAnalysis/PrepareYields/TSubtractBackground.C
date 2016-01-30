@@ -393,7 +393,9 @@ void TSubtractBackground::PlotPrintSave()
     }
   }
 
-  //Print Yields
+ _pyPars.fOut->cd();
+
+  //Print Yields and Write to output file
   std::cout<<std::endl;
   std::cout<<"Print Yields:"<<std::endl;
   std::cout<<std::endl;
@@ -402,11 +404,17 @@ void TSubtractBackground::PlotPrintSave()
     std::cout<<StrLabelEta(ieta)<<std::endl;
     for (int is=0; is<_sources.size(); is++){
       PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].hist[ieta]);
+      _sources[is].hist[ieta]->Write();
     }//end of loop over is
     for (int is=0; is<_nDDsources; is++){
       PrintYieldsOne(_sourceDDFake[is].name+TString(": "), _sourceDDFake[is].yieldTotVal[ieta], _sourceDDFake[is].yieldTotErr[ieta], _sourceDDFake[is].hist[ieta]);
       PrintYieldsOne(_sourceDDTrue[is].name+TString(": "), _sourceDDTrue[is].yieldTotVal[ieta], _sourceDDTrue[is].yieldTotErr[ieta], _sourceDDTrue[is].hist[ieta]);
-      if (_pyPars.doEtoGammaSubtr) PrintYieldsOne(_sourceDDEtoGamma.name+TString(": "), _sourceDDEtoGamma.yieldTotVal[ieta], _sourceDDEtoGamma.yieldTotErr[ieta], _sourceDDEtoGamma.hist[ieta]);
+      _sourceDDFake[is].hist[ieta]->Write();
+      _sourceDDTrue[is].hist[ieta]->Write();
+      if (_pyPars.doEtoGammaSubtr) {
+        PrintYieldsOne(_sourceDDEtoGamma.name+TString(": "), _sourceDDEtoGamma.yieldTotVal[ieta], _sourceDDEtoGamma.yieldTotErr[ieta], _sourceDDEtoGamma.hist[ieta]);
+	_sourceDDEtoGamma.hist[ieta]->Write();
+      }
       PrintYieldsOne(_sourceBkgSubtrData[is].name+TString(": "), _sourceBkgSubtrData[is].yieldTotVal[ieta], _sourceBkgSubtrData[is].yieldTotErr[ieta], _sourceBkgSubtrData[is].hist[ieta]);
     }//end of loop over is   
     std::cout<<std::endl; 
@@ -418,9 +426,8 @@ void TSubtractBackground::PlotPrintSave()
     if (_sources[is].sourceType==SIGMC) isSign=is;
   }
 
-  // Write to output file
 
-  _pyPars.fOut->cd(); 
+
   TH1F* hBkgSubtrDataTot[3];
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     _sourceBkgSubtrData[0].hist[ieta]->Write();

@@ -141,6 +141,42 @@ void TEtoGamma::ComputeBkg()
     _yieldDDEtoGamma[ieta]->Multiply(_yield[_DATA_EtoGAMMA_ENR].hist[ieta]);
     _yieldDDEtoGamma[ieta]->Divide(_yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]);
     _yieldDDEtoGamma[ieta]->Print();
+   
+  std::cout<<"==============================="<<std::endl;
+  std::cout<<"||||========== Print Latex"<<std::endl;
+
+  std::cout<<"||||========== Table with err in %"<<std::endl;
+
+
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{$e\\rightarrow\\gamma$ background }";
+    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|}"<<std::endl;
+    std::cout<<" bin  & DYjets    & Data                      & DYjets & scale & $e\\rightarrow\\gamma$ \\\\ "<<std::endl;
+    std::cout<<" lims & nom. sel. & $e\\rightarrow\\gamma$ enr. & $e\\rightarrow\\gamma$ enr. & & yield     \\\\ \\hline"<<std::endl;
+
+    for (int ib=1; ib<=_yield[_ZJETS_NOM_ELE].hist[ieta]->GetNbinsX(); ib++){
+      std::cout<<_yield[_ZJETS_NOM_ELE].hist[ieta]->GetBinLowEdge(ib)<<"-"<<_yield[_ZJETS_NOM_ELE].hist[ieta]->GetBinLowEdge(ib)+_yield[_ZJETS_NOM_ELE].hist[ieta]->GetBinWidth(ib)<<" & ";
+      std::cout<<(int)_yield[_ZJETS_NOM_ELE].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)_yield[_ZJETS_NOM_ELE].hist[ieta]->GetBinError(ib)<<" & ";
+      std::cout<<(int)_yield[_DATA_EtoGAMMA_ENR].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)_yield[_DATA_EtoGAMMA_ENR].hist[ieta]->GetBinError(ib)<<" & ";
+      std::cout<<(int)_yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)_yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]->GetBinError(ib)<<" & ";
+      float scale = _yield[_DATA_EtoGAMMA_ENR].hist[ieta]->GetBinContent(ib)/_yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]->GetBinContent(ib);
+      TMathTools math;
+      float scaleErr = math.ErrOfTwoIndependent("x1/x2", _yield[_DATA_EtoGAMMA_ENR].hist[ieta]->GetBinContent(ib), _yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]->GetBinContent(ib),_yield[_DATA_EtoGAMMA_ENR].hist[ieta]->GetBinError(ib), _yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]->GetBinError(ib) );
+      std::cout<<std::setprecision(3)<<scale<<"$\\pm$"<<scaleErr<<"& ";
+      std::cout<<(int)_yieldDDEtoGamma[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)_yieldDDEtoGamma[ieta]->GetBinError(ib);
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    }//end of loop over ib
+
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:EtoGAMMA_"<<ieta<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
+
+  std::cout<<"|||| end of Print Latex"<<std::endl;
+  std::cout<<"==============================="<<std::endl;
+
   }// end of loop over ieta
 
 }// end of TEtoGamma::ComputeBkg()
@@ -162,7 +198,7 @@ void TEtoGamma::WriteToFile()
         err+=_yieldDDEtoGamma[ieta]->GetBinError(ib)*_yieldDDEtoGamma[ieta]->GetBinError(ib);
       }
       err = sqrt(err);
-      std::cout<<"ieta="<<ieta<<", total = "<<cont<<"+-"<<err<<std::endl;
+      std::cout<<"ieta="<<ieta<<", total = "<<(int)cont<<"+-"<<(int)err<<std::endl;
       histTot[ieta]->SetBinContent(1,cont); histTot[ieta]->SetBinError(1,err);
       histTot[ieta]->Write();
     }//end of loop over ieta

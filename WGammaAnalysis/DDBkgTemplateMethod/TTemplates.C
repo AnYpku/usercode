@@ -58,16 +58,20 @@ void TTemplates::SetPars(TemplatesPars pars)
 
 void TTemplates::ComputeBackground(bool noPrint, bool noPlot)
 {
+  
   if (!noPrint) PrintPars();
+  
   for (int ikin=0; ikin<=_pars.nKinBins; ikin++){
   //for (int ikin=0; ikin<=1; ikin++){
     bool ok = ComputeBackgroundOne(ikin,_COMMON,noPrint);
     if (!ok) return;
   }
+  
   if (!noPlot) PlotTemplates();
   PrintYieldsAndChi2();
   PrintLatex();
   SaveYields();
+  
 }// end of ComputeBackground()
 
 void TTemplates::PrintPars()
@@ -154,6 +158,7 @@ void TTemplates::PrintLatex()
 
 bool TTemplates::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
 {
+  
   // if ieta == _COMMON - compute BARREL, ENDCAP and SUM
   // otherwise compute just for ieta
   if (!noPrint){
@@ -161,25 +166,26 @@ bool TTemplates::ComputeBackgroundOne(int ikin, int ieta, bool noPrint)
     std::cout<<"==============================="<<std::endl;
     std::cout<<"||||========== ComputeBackgroundOne - "<<StrLabelKin(ikin)<<" starts"<<std::endl;
   }
-
+  
   for (int ieta1=_BARREL; ieta1<=_ENDCAP; ieta1++){
     if ((ieta!=_COMMON) && (ieta!=ieta1)) continue;
     bool ok = SetHists(ikin, ieta1, noPrint);
-    if (!noPrint) std::cout<<"SetHists is done; ok="<<ok<<std::endl;
-    if (!ok) return 0;
-    if (!noPrint) std::cout<<"Will do FitOne; ieta="<<StrLabelEta(ieta)<<", ieta1="<<StrLabelEta(ieta1)<<std::endl;
-    if (_pars.isRooFit) FitOneRooFit(ikin, ieta1, noPrint);
-    else FitOneROOT(ikin, ieta1, noPrint);
+        if (!noPrint) std::cout<<"SetHists is done; ok="<<ok<<std::endl;
+        if (!ok) return 0;
+        if (!noPrint) std::cout<<"Will do FitOne; ieta="<<StrLabelEta(ieta)<<", ieta1="<<StrLabelEta(ieta1)<<std::endl;
+        if (_pars.isRooFit) FitOneRooFit(ikin, ieta1, noPrint);
+        else FitOneROOT(ikin, ieta1, noPrint);
   }//end of loop over ieta
-
+  
   ComputeYieldOneKinBin(ikin,ieta,noPrint);
-
+  
 
   if (!noPrint){
     std::cout<<"||||========== ComputeBackgroundOne - "<<StrLabelKin(ikin)<<" ends"<<std::endl;
     std::cout<<"==============================="<<std::endl;
     std::cout<<std::endl;
   }
+  
   return 1;
 }// end of ComputeBackgroundOne
 
@@ -189,13 +195,14 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
     std::cout<<std::endl;
     std::cout<<"SetHists for: "<<StrLabelKin(ikin)<<", "<<StrLabelEta(ieta)<<std::endl;
   }
-
+  
   _pars.unitOrigFit[ikin][ieta] = (_pars.maxVarFit[ikin][ieta]-_pars.minVarFit[ikin][ieta])/_pars.nFitBins[ikin][ieta];
   NewHistograms(ikin, ieta, noPrint);
   bool isOk = SetFakeTemplate(ikin, ieta, noPrint);
   if (!isOk) return 0;
   SetTrueTemplate(ikin, ieta, noPrint);
   SetDataAndSignHists(ikin, ieta, noPrint);
+  
   bool badBins[150];
   bool hasBadBins=CheckTemplates(ikin, ieta, badBins, noPrint);
   if (!noPrint)     std::cout<<"CheckTemplates done; hasBadBins="<<hasBadBins<<std::endl;
@@ -225,6 +232,7 @@ bool TTemplates::SetHists(int ikin, int ieta, bool noPrint){
   if (!noPrint)     std::cout<<"copied templates to reference hists"<<std::endl;
 
   if (!noPrint)     std::cout<<std::endl;
+  
   return 1;
 }//end of SetHists()
 
@@ -397,7 +405,7 @@ void TTemplates::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
     std::cout<<"_pars.treeData->GetEntries(cut)="<<_pars.treeData->GetEntries(cut)<<std::endl;
   }
 
-	
+  	
 //  TH1D* histTemp = (TH1D*)_hData[ikin][ieta]->Clone(); 
 //  histTemp->SetName(TString("histTemp")+StrLabelKin(ikin)+StrLabelEta(ieta));
   TString varDraw=_pars.varFit+TString(">>")+_hData[ikin][ieta]->GetName();
@@ -437,6 +445,8 @@ void TTemplates::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
   
   varDraw=_pars.varFit+TString(">>")+_hFakeMCtruth[ikin][ieta]->GetName();
   _pars.treeFakeRef->Draw(varDraw,cut*_pars.cutWeight,"goff");
+    varDraw=_pars.varFit+TString(">>")+_hTrueMCtruth[ikin][ieta]->GetName();
+   _pars.treeTrueRef->Draw(varDraw,cut*_pars.cutWeight,"goff");
 
   _testMCtruthKolmogorov[ikin][ieta]=_hFakeMCtruth[ikin][ieta]->KolmogorovTest(_hFake[ikin][ieta]);
   _testMCtruthChi2[ikin][ieta]=_hFakeMCtruth[ikin][ieta]->Chi2Test(_hFake[ikin][ieta],"WW");
@@ -455,7 +465,7 @@ void TTemplates::SetDataAndSignHists(int ikin, int ieta, bool noPrint){
   std::cout<<std::endl;
   std::cout<<std::endl;
   delete histTemp; 
-
+  
 }//end of SetDataAndSignHists
 
 bool TTemplates::CheckTemplates(int ikin, int ieta, bool badBins[150], bool noPrint){
@@ -634,6 +644,9 @@ void TTemplates::NewHistograms(int ikin, int ieta, bool noPrint){
   name.ReplaceAll("_True","_FakeMCtruth");
   _hFakeMCtruth[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
   _hFakeMCtruth[ikin][ieta]->Sumw2();
+  name.ReplaceAll("_FakeMCtruth","_TrueMCtruth");
+  _hTrueMCtruth[ikin][ieta] = new TH1D(name,name,nFitBins,fitBinLims);
+  _hTrueMCtruth[ikin][ieta]->Sumw2();
 }// end of NewHistograms
 
 void TTemplates::DeleteHistograms(int ikin, int ieta){
@@ -649,6 +662,7 @@ void TTemplates::DeleteHistograms(int ikin, int ieta){
   delete  _hSign[ikin][ieta]; 
   delete  _hTrue[ikin][ieta]; 
   delete  _hFakeMCtruth[ikin][ieta];
+  delete  _hTrueMCtruth[ikin][ieta];
 }// end of DeleteHistograms
 
 TString TTemplates::StrLabelEta(int ieta){
@@ -1061,10 +1075,12 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
   float areaHistTrue=0;
   float areaHistFake=0;
   float areaHistFakeMCtruth=0;
+  float areaHistTrueMCtruth=0;
   for (int ib=1; ib<=_hTrue[ikin][ieta]->GetNbinsX(); ib++){
     areaHistTrue+=_hTrue[ikin][ieta]->GetBinContent(ib);
     areaHistFake+=_hFake[ikin][ieta]->GetBinContent(ib);
     areaHistFakeMCtruth+=_hFakeMCtruth[ikin][ieta]->GetBinContent(ib);
+    areaHistTrueMCtruth+=_hTrueMCtruth[ikin][ieta]->GetBinContent(ib);
   }
 
   for (int ib=1; ib<=_hSumm[ikin][ieta]->GetNbinsX(); ib++){
@@ -1108,6 +1124,14 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
       err2F = (_hFakeMCtruth[ikin][ieta]->GetBinContent(ib)*_nFakeFromFitErr[ikin][ieta])/areaHistFakeMCtruth;
       _hFakeMCtruth[ikin][ieta]->SetBinContent(ib,contF);
       _hFakeMCtruth[ikin][ieta]->SetBinError(ib,sqrt(err1F*err1F+err2F*err2F));
+    }
+    if (areaHistTrueMCtruth==0);
+    else {
+      contT = _hTrueMCtruth[ikin][ieta]->GetBinContent(ib)*_nTrueFromFitVal[ikin][ieta]/areaHistTrueMCtruth;
+      err1T = (_hTrueMCtruth[ikin][ieta]->GetBinError(ib)*_nTrueFromFitVal[ikin][ieta])/areaHistTrueMCtruth;
+      err2T = (_hTrueMCtruth[ikin][ieta]->GetBinContent(ib)*_nTrueFromFitErr[ikin][ieta])/areaHistTrueMCtruth;
+      _hTrueMCtruth[ikin][ieta]->SetBinContent(ib,contT);
+      _hTrueMCtruth[ikin][ieta]->SetBinError(ib,sqrt(err1T*err1T+err2T*err2T));
     }
 
   }  
@@ -1162,6 +1186,12 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
       _hFakeMCtruth[ikin][ieta]->SetFillStyle(3004);
       _hFakeMCtruth[ikin][ieta]->Draw("HIST same");
       _hFakeMCtruth[ikin][ieta]->Draw("EP same");
+      _hTrueMCtruth[ikin][ieta]->SetLineWidth(2);
+      _hTrueMCtruth[ikin][ieta]->SetLineColor(32);
+      _hTrueMCtruth[ikin][ieta]->SetFillColor(32);
+      _hTrueMCtruth[ikin][ieta]->SetFillStyle(3004);
+      _hTrueMCtruth[ikin][ieta]->Draw("HIST same");
+      _hTrueMCtruth[ikin][ieta]->Draw("EP same");
     }
 
     textBin->Draw("same");

@@ -173,7 +173,7 @@ void QuickPrepareYields_FSRandISR(){
 
   TConfiguration conf;
   TPhotonCuts photon;
-  TCut cut = photon.RangePhoton(conf.MUON, conf.Z_GAMMA, 2012, photon.WP_MEDIUM, 1, 0, 1, 1, 1, 1);
+  TCut cut = photon.RangePhoton(conf.MUON, conf.Z_GAMMA, 2012, photon.WP_TIGHT, 1, 1, 1, 1, 1, 1);
   anPars.cutAdd=cut;//"phoEt<40";
 //  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
 
@@ -189,39 +189,39 @@ void QuickPrepareYields_FSRandISR(){
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage); 
+  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_"); 
 
   fch.SetDefaultFullChainParameters(anPars,"Mleplep");
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage); 
+  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_"); 
 
   fch.SetDefaultFullChainParameters(anPars,"lep1PhoDeltaR");
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
 
   fch.SetDefaultFullChainParameters(anPars,"lep2PhoDeltaR");
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
 
   selStage=conf.FSR;
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd="1";
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
 
   selStage=conf.FSR_EXCLUDED;
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
   anPars.channel=conf.BOTH_CHANNELS;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd="1";
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
 
 }//end of QuickPrepareYields_FSRandISR
 
