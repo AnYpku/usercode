@@ -191,6 +191,7 @@ void TTemplatesSystZgNorm::ChangeTemplatesDiffNorm(TH1D* hTemp, TH1D* hLeak, int
   hTemp->Print();
   for (int ib=1; ib<=nBins; ib++){
     float frac = 0.046*k*hLeak->GetBinContent(ib);
+    //float frac = 0.2*k*hLeak->GetBinContent(ib);
     float cont = hTemp->GetBinContent(ib);
     hTemp->SetBinContent(ib,cont-frac);
     std::cout<<"ib="<<ib<<", cont="<<cont<<", frac="<<frac<<", leak="<<hLeak->GetBinContent(ib)<<"="<<int(100*hLeak->GetBinContent(ib)/(cont+hLeak->GetBinContent(ib)))<<"%"<<std::endl;

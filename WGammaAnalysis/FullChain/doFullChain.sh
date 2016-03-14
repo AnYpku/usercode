@@ -7,7 +7,7 @@ MergeMUONandELECTRON(){
   # $1 WGamma/ZGamma
   # $2 PreliminaryFroTemplateMethodSelected/FsrSelected etc
   # $3 name
-  hadd -f ../WGammaOutput/ChannelsMERGED_$1/$2/$3 ../WGammaOutput/MUON_$1/$2/$3 ../WGammaOutput/ELECTRON_$1/$2/$3
+  hadd -f ../WGammaOutput/ChannelsMERGED_$1/$2/$3 ../WGammaOutput/ELECTRON_$1/$2/$3 ../WGammaOutput/MUON_$1/$2/$3
 }
 
 MergeChannels(){
@@ -36,6 +36,7 @@ MergeChannels(){
   MergeMUONandELECTRON ZGamma PreliminaryForTemplateMethodSelected selected_ZGamma_UNblind_DATA.root
   MergeMUONandELECTRON WGamma PreliminaryForTemplateMethodSelected selected_WGamma_UNblind_DATA.root
   MergeMUONandELECTRON ZGamma PreliminaryForTemplateMethodSelected selected_ZGammaSIGMC.root
+  MergeMUONandELECTRON ZGamma PreliminaryForTemplateMethodSelected selected_ZGammaBKGMC_DYjets_to_ll.root
   MergeMUONandELECTRON WGamma PreliminaryForTemplateMethodSelected selected_WGammaSIGMC.root
 }
 
@@ -51,7 +52,7 @@ DoFullChainPart1(){
 #  root -l -b -q runApplySF.C
   echo WILL DO: 'DoFullChainPart1()' $1 $2
 # root -l -b -q AuxFchPreliminarySelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PreliminarySelection.log 2>&1&
-# root -l -b -q AuxFchExtraSelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_ExtraSelection.log 2>&1&
+ root -l -b -q AuxFchExtraSelection.C+\(\"$1\",\"$2\"\) #> $3$1_$2_ExtraSelection.log 2>&1&
 # root -l -b -q AuxFchPrepareYields.C+\(\"$1\",\"$2\"\) #> $3$1_$2_PrepareYiedls.log 2>&1&
   echo DONE: 'DoFullChainPart1()' $1 $2
 }
@@ -59,20 +60,20 @@ DoFullChainPart1(){
 
 DoFullChainPart2(){
   echo WILL DO: 'DoFullChainPart2()' $1 $2
-#  root -l -b -q  AuxFchTemplateFitsData_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchTemplateFitsData_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchSystRandomizeTempl_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSystRandomizeTempl_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSystRandomizeTempl_CHISO_MCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSystRandomizeTempl_SIHIH_MCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # [DO NOT NEED] root -l -b -q  AuxFchSystRandomizeTempl_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # [DO NOT NEED] root -l -b -q  AuxFchSystRandomizeTempl_CHISO_MCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # [DO NOT NEED] root -l -b -q  AuxFchSystRandomizeTempl_SIHIH_MCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchSystZgNorm_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSystZgNorm_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # [DO NOT NEED]  root -l -b -q  AuxFchSystZgNorm_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 # Have to do the next 6 steps again because there are 
 # certain files
@@ -81,16 +82,16 @@ DoFullChainPart2(){
 # or have to rerun these steps again
 
 #  root -l -b -q  AuxFchTemplateFitsData_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # root -l -b -q  AuxFchTemplateFitsMCclosure_CHISO.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l -b -q  AuxFchTemplateFitsData_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # root -l -b -q  AuxFchTemplateFitsMCclosure_SIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 #  root -l   AuxFchSubtractBackgroundData.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-#  root -l -b -q  AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+# # # root -l -b -q  AuxFchSubtractBackgroundMCclosure.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
 #  root -l -b -q  AuxFchCombineCHISOandSIHIH.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
 
-#  root -l -b -q  AuxFchCalcAccXEff.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
-  root -l -b -q  AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l  AuxFchCalcAccXEff.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
+#  root -l -b -q AuxFchCrossSection.C+\(\"$1\",\"$2\"\) #> $3$1_$2MCclosure.log 2>&1&
   echo DONE: 'DoFullChainPart2()' $1 $2
 }
 #end of DoFullChainPart2
@@ -106,24 +107,21 @@ DoFullChainPart2(){
 #DoFullChainPart1 MUON ZGamma logs/log20150320/log_
 #DoFullChainPart1 MUON WGamma logs/log20150320/log_
 
+#MergeChannels
+
+#MergeMCintoData MUON 
+#MergeMCintoData ELECTRON
+#MergeMCintoData ChannelsMERGED 
+
 # DD e->gamma bkg estimation for W_GAMMA ELECTRON only: #
 
 #root -l -b -q AuxFchBkgEtoGamma.C+
 #root -l -b -q AuxFchBkgEtoGamma_MCclosure.C+
 
-#MergeChannels
-
-#MergeMCintoData MUON WGamma
-#MergeMCintoData ELECTRON WGamma
-#MergeMCintoData ChannelsMERGED WGamma 
-#MergeMCintoData MUON ZGamma
-#MergeMCintoData ELECTRON ZGamma
-#MergeMCintoData ChannelsMERGED ZGamma 
-
 #DoFullChainPart2 ELECTRON ZGamma logs/log20150320/log_
 #DoFullChainPart2 ELECTRON WGamma logs/log20150320/log_
 #DoFullChainPart2 MUON ZGamma logs/log20150320/log_
-DoFullChainPart2 MUON WGamma logs/log20150320/log_
+#DoFullChainPart2 MUON WGamma logs/log20150320/log_
 
 #root -l -b -q runReplotMigrationMatrix.C
 #root -l runCompareCS.C

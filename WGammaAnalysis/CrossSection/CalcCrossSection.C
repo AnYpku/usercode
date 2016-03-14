@@ -371,7 +371,7 @@ void CalcCrossSection::Calc()
   Print("Lumi syst, cs: ",_yCSarray[errT].crossSectionTOT,_yCSarray[errT].crossSection1D);
 
   if (_vgamma==_config.W_GAMMA){
-
+    /*
     errT=ERR_SYST_WMtCut;
     _yCSarray[errT].errType=errT;  
     _yCSarray[errT].title="WMt cut +-5GeV";
@@ -399,7 +399,7 @@ void CalcCrossSection::Calc()
       _yCSarray[errT].strDown="err";
       std::cout<<"ERR_SYST_SFs "<<_yCSarray[errT].title<<std::endl;
       ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
-
+    */
 
   }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
 

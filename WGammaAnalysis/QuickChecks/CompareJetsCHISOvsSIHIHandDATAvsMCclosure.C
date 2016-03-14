@@ -59,11 +59,11 @@ void CompareJets()
   
     for (int ib=1; ib<=hDataCHISO[0]->GetNbinsX(); ib++){
       std::cout<<hDataCHISO[ieta]->GetBinLowEdge(ib)<<"-"<<hDataCHISO[0]->GetBinLowEdge(ib)+hDataCHISO[0]->GetBinWidth(ib)<<" & ";
-      std::cout<<hMCsumJets[ieta]->GetBinContent(ib)<<"$\\pm$"<<hMCsumJets[ieta]->GetBinError(ib)<<" & ";
-      std::cout<<hDataCHISO[ieta]->GetBinContent(ib)<<"$\\pm$"<<hDataCHISO[ieta]->GetBinError(ib)<<" & ";
-      std::cout<<hDataSIHIH[ieta]->GetBinContent(ib)<<"$\\pm$"<<hDataSIHIH[ieta]->GetBinError(ib)<<" & ";
-      std::cout<<hMCclCHISO[ieta]->GetBinContent(ib)<<"$\\pm$"<<hMCclCHISO[ieta]->GetBinError(ib)<<" & ";
-      std::cout<<hMCclSIHIH[ieta]->GetBinContent(ib)<<"$\\pm$"<<hMCclSIHIH[ieta]->GetBinError(ib)<<"  ";
+      std::cout<<(int)hMCsumJets[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)hMCsumJets[ieta]->GetBinError(ib)<<" & ";
+      std::cout<<(int)hDataCHISO[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)hDataCHISO[ieta]->GetBinError(ib)<<" & ";
+      std::cout<<(int)hDataSIHIH[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)hDataSIHIH[ieta]->GetBinError(ib)<<" & ";
+      std::cout<<(int)hMCclCHISO[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)hMCclCHISO[ieta]->GetBinError(ib)<<" & ";
+      std::cout<<(int)hMCclSIHIH[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)hMCclSIHIH[ieta]->GetBinError(ib)<<"  ";
       std::cout<<" \\\\ \\hline"<<std::endl;
     }//end of ib
 

@@ -117,7 +117,7 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   TConfiguration config;
   TPhotonCuts photon;
 
-  pars.thresholdCombineTrueTemplates=0;//combine all
+  pars.thresholdCombineTrueTemplates=14.9;//14.9;//combine all except underflow bin
   pars.thresholdCombineFakeTemplates=10000;//never combine
   for (int ikb=0; ikb<=anPars.nKinBins; ikb++){
     pars.kinBinLims[ikb]=anPars.kinBinLims[ikb];// binning 15-20-25-30-35-45-55-65-75-85-95-120-500
@@ -151,21 +151,21 @@ void SetParsChIsoTempl(TTemplates::TemplatesPars &pars, TConfiguration::Analysis
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign);
   if (!pars.treeSign) return;
 
-  TString strTrueToFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
+  TString strTrueToFake="../WGammaOutput/MUON_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
   pars.treeTrueToFake=LoadOneTree("leak_TrueToFake", strTrueToFake, pars.fTrueToFake); 
   if (!pars.treeTrueToFake) return;
 
-  TString strFakeToTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
+  TString strFakeToTrue="../WGammaOutput/MUON_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
   pars.treeFakeToTrue=LoadOneTree("leak_FakeToTrue", strFakeToTrue, pars.fFakeToTrue); 
   if (!pars.treeFakeToTrue) return;
 
-  TString strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
-  if (isMCclosure) strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";
+  TString strTrue="../WGammaOutput/MUON_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strTrue="../WGammaOutput/MUON_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
-  if (isMCclosure) strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";
+  TString strFake="../WGammaOutput/MUON_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
+  if (isMCclosure) strFake="../WGammaOutput/MUON_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA_MCclosure.root";
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;
 
@@ -248,20 +248,20 @@ void SetParsSigmaIEtaIEtaTempl(TTemplates::TemplatesPars &pars, TConfiguration::
   pars.treeSign=LoadOneTree("signalMC", strSign, pars.fSign);
   if (!pars.treeSign) return;
 
-  TString strTrueToFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
+  TString strTrueToFake="../WGammaOutput/MUON_ZGamma/FsrExcludedSelected/selected_ZGammaSIGMC.root";
   pars.treeTrueToFake=LoadOneTree("leak_TrueToFake", strTrueToFake, pars.fTrueToFake); 
   if (!pars.treeTrueToFake) return;
 
-  TString strFakeToTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
+  TString strFakeToTrue="../WGammaOutput/MUON_ZGamma/FsrSelected/selected_ZGammaBKGMC_DYjets_to_ll.root";
   pars.treeFakeToTrue=LoadOneTree("leak_FakeToTrue", strFakeToTrue, pars.fFakeToTrue); 
   if (!pars.treeFakeToTrue) return;
 
-  TString strTrue="../WGammaOutput/ChannelsMERGED_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
+  TString strTrue="../WGammaOutput/MUON_ZGamma/FsrSelected/selected_ZGamma_UNblind_DATA.root";
   if (isMCclosure) strTrue.ReplaceAll(".root","_MCclosure.root"); 
   pars.treeTrue=LoadOneTree("true-pho template", strTrue, pars.fTrue);
   if (!pars.treeTrue) return;
 
-  TString strFake="../WGammaOutput/ChannelsMERGED_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
+  TString strFake="../WGammaOutput/MUON_ZGamma/FsrExcludedSelected/selected_ZGamma_UNblind_DATA.root";
   if (isMCclosure) strFake.ReplaceAll(".root","_MCclosure.root"); 
   pars.treeFake=LoadOneTree("fake-pho template", strFake, pars.fFake);
   if (!pars.treeFake) return;

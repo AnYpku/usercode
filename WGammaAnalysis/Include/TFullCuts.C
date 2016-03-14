@@ -486,7 +486,7 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
   return cut;
 }// end of RangeForTemplateMethodCut
 
-TCut TFullCuts::RangeForEtoGamma(int phoWP){
+TCut TFullCuts::RangeForEtoGamma(int phoWP, bool doPSVcut){
   // for WGamma ELECTRON only
 
   //TCut RangePhoton(int year, int wp, 
@@ -494,8 +494,9 @@ TCut TFullCuts::RangeForEtoGamma(int phoWP){
   //         bool doNeuOrHcalIsoCut=1, bool doPhoOrEcalIsoCut=1, 
   //         bool doHoverECut=1, bool doElectronVetoCut=1);
 
-  TCut cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 0);
-  // doElectronVetoCut is not applied to enrich the sample with e->gamma events
+  TCut cutPhoton;
+  if (!doPSVcut) cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 0) && !_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 1);
+  if (doPSVcut) cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 1);
 
   TCut cut = cutPhoton && RangeDeltaR(_config.W_GAMMA) && RangeMetRelatedCut(2012,_config.ELECTRON); 
   cut = cut && (!RangeZmassWindowCut());// to enrich sample with e->gamma events
@@ -521,7 +522,7 @@ TCut TFullCuts::RangeFsrCut()
 {
   TCut cut;
 //  cut = "Mpholeplep<101 && Mpholeplep>81 && (lep1PhoDeltaR<0.8 || lep2PhoDeltaR<0.8)";
-  cut = "Mpholeplep<101 && Mpholeplep>81 && lep1PhoDeltaR>0.4 && Mleplep<80 && lep1PhoDeltaR<1.0";
+  cut = "Mpholeplep<101 && lep1PhoDeltaR>0.4";
   cut = cut && _photon.RangePhoton(_config.MUON, _config.Z_GAMMA, 2012, _photon.WP_MEDIUM, 0, 0, 1, 1, 1, 1);
   // 0 - no sigmaIEtaIEta and chiso cuts
   // for ZGamma: the same RangePhoton for muon and electron channels
@@ -532,7 +533,7 @@ TCut TFullCuts::RangeFsrCut()
 TCut TFullCuts::RangeFsrExcludedCut()
 {
   TCut cut;
-  cut = "Mleplep>80 && Mleplep<110 && lep1PhoDeltaR>1.0 && lep2PhoDeltaR>1.0";
+  cut = "Mpholeplep>101 && lep1PhoDeltaR>1.0";
   cut = cut && _photon.RangePhoton(_config.MUON, _config.Z_GAMMA, 2012, _photon.WP_MEDIUM, 0, 0, 1, 1, 1, 1);
   // 0 - no sigmaIEtaIEta and chiso cuts
   // for ZGamma: the same RangePhoton for muon and electron channels

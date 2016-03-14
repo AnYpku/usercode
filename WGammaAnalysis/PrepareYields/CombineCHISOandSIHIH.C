@@ -21,7 +21,7 @@
   TH1F* h_M_chiso_templStat;
   TH1F* h_M_sihih_templStat;
 
-  TH1F* h_Yield_Meth1;
+  TH1F* h_Yield_Meth1[3];
   TH1F* h_Yield_Meth2[3];
 
   TFile* fOut;
@@ -142,7 +142,7 @@ void ComputeSystHists(TString strKin, TString strEta)
   if (strEta=="BARREL") ieta=0;
   if (strEta=="ENDCAP") ieta=1;
 
-  h_Yield_Meth1 = (TH1F*)h_d_chiso->Clone(TString("h_Syst_Meth1")+strEta);
+  h_Yield_Meth1[ieta] = (TH1F*)h_d_chiso->Clone(TString("h_Syst_Meth1")+strEta);
   h_Yield_Meth2[ieta] = (TH1F*)h_d_chiso->Clone(TString("h_Syst_Meth2")+strEta);
 
   for (int ib=1; ib<=h_d_chiso->GetNbinsX(); ib++){
@@ -150,7 +150,8 @@ void ComputeSystHists(TString strKin, TString strEta)
     float errMeth1_1 = fabs(h_d_chiso->GetBinContent(ib) - h_d_sihih->GetBinContent(ib));
     float errMeth1_2 = h_d_chiso_templStat->GetBinError(ib);
     float errMeth1 = sqrt(errMeth1_1*errMeth1_1+errMeth1_2*errMeth1_2);
-    h_Yield_Meth1->SetBinError(ib,errMeth1);
+    h_Yield_Meth1[ieta]->SetBinError(ib,errMeth1);
+    h_Yield_Meth1[ieta]->SetBinContent(ib,h_d_chiso->GetBinContent(ib));
 
     float w1, x1, w2, x2;
     x1 = h_d_chiso->GetBinContent(ib);
@@ -163,8 +164,8 @@ void ComputeSystHists(TString strKin, TString strEta)
     h_Yield_Meth2[ieta]->SetBinError(ib,errMeth2);
   }//end of loop over ib
 
-  h_Yield_Meth2[ieta]->SetTitle("yieldsDDTrueONEDI"+strEta);
-  h_Yield_Meth2[ieta]->Write("yieldsDDTrueONEDI"+strEta);
+  h_Yield_Meth1[ieta]->SetTitle("yieldsDDTrueONEDI"+strEta);
+  h_Yield_Meth1[ieta]->Write("yieldsDDTrueONEDI"+strEta);
   
 //  if (channel==conf.MUON) strCh="MUON";
 //  if (channel==conf.ELECTRON) strCh="ELECTRON";
@@ -174,9 +175,9 @@ void ComputeSystHists(TString strKin, TString strEta)
   std::cout<<"  \\begin{center}"<<std::endl;
   std::cout<<"  \\caption{Syst. due to different ways to fit. "<<strKin<<" "<<strEta<<"}"<<std::endl;
                                   // bin | val | stat err | syst Ich vs sihih
-  std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|c|}"<<std::endl;
-  std::cout<<"    bin &  MC   & data  & data  & MC cl. & MC cl. & yield & yield\\\\ "<<std::endl;
-  std::cout<<"    lims & pred & chiso & sihih & chiso  & sihih  & meth1 & meth2 \\\\ \\hline"<<std::endl;
+  std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
+  std::cout<<"    bin &  MC   & data  & data  & MC cl. & MC cl. & yield \\\\ "<<std::endl;
+  std::cout<<"    lims & pred & chiso & sihih & chiso  & sihih  & average  \\\\ \\hline"<<std::endl;
   for (int ib=1; ib<=h_d_chisoMCsig->GetNbinsX(); ib++){
 
 //      if (ib==1) std::cout<<"%";
@@ -191,7 +192,6 @@ void ComputeSystHists(TString strKin, TString strEta)
       std::cout<<"$"<<(int)h_M_chiso->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_chiso->GetBinError(ib)*h_M_chiso->GetBinError(ib)+h_M_chiso_templStat->GetBinError(ib)*h_M_chiso_templStat->GetBinError(ib))<<"$ & ";
       std::cout<<"$"<<(int)h_M_sihih->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_sihih->GetBinError(ib)*h_M_sihih->GetBinError(ib)+h_M_sihih_templStat->GetBinError(ib)*h_M_sihih_templStat->GetBinError(ib))<<"$ &";
 
-      std::cout<<"$"<<(int)h_Yield_Meth1->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth1->GetBinError(ib)<<"$ &";
       std::cout<<"$"<<(int)h_Yield_Meth2[ieta]->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth2[ieta]->GetBinError(ib)<<"$ ";
 
       std::cout<<" \\\\ \\hline"<<std::endl;
@@ -256,13 +256,13 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
   bool isOk2 = GetAndCheckHists(f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, f_data_chiso_templStat, f_data_sihih_templStat, f_MCcl_chiso_templStat, f_MCcl_sihih_templStat,"ENDCAP");
   if (isOk2) {ComputeSystHists("phoEt", "ENDCAP"); PrintTableOne("phoEt", "ENDCAP");}
 
-  h_Yield_Meth2[0]->Print();
-  h_Yield_Meth2[1]->Print();
-  h_Yield_Meth2[2]=(TH1F*)h_Yield_Meth2[0]->Clone("yieldsDDTrueONEDICOMMON");
-  h_Yield_Meth2[2]->Add(h_Yield_Meth2[1]);
-  h_Yield_Meth2[2]->SetTitle("yieldsDDTrueONEDICOMMON");
-  h_Yield_Meth2[2]->Write();
-  h_Yield_Meth2[2]->Print();
+  h_Yield_Meth1[0]->Print();
+  h_Yield_Meth1[1]->Print();
+  h_Yield_Meth1[2]=(TH1F*)h_Yield_Meth1[0]->Clone("yieldsDDTrueONEDICOMMON");
+  h_Yield_Meth1[2]->Add(h_Yield_Meth1[1]);
+  h_Yield_Meth1[2]->SetTitle("yieldsDDTrueONEDICOMMON");
+  h_Yield_Meth1[2]->Write();
+  h_Yield_Meth1[2]->Print();
 
   TH1F* hYieldTOTAL[3];
   for (int ieta=0; ieta<=2; ieta++){
@@ -272,10 +272,10 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
     if (ieta==2) str="COMMON";
     hYieldTOTAL[ieta]=new TH1F("yieldsDDTrueTOTAL"+str,"yieldsDDTrueTOTAL"+str,1,15,500);
     float cont=0; float err=0;
-    for (int ib=2; ib<=h_Yield_Meth2[ieta]->GetNbinsX(); ib++){
-      cont+=h_Yield_Meth2[ieta]->GetBinContent(ib);
-      err+=h_Yield_Meth2[ieta]->GetBinError(ib)*h_Yield_Meth2[ieta]->GetBinError(ib);
-      std::cout<<"ib="<<ib<<", cont+-err="<<h_Yield_Meth2[ieta]->GetBinContent(ib)<<"+-"<<h_Yield_Meth2[ieta]->GetBinError(ib)<<std::endl;
+    for (int ib=2; ib<=h_Yield_Meth1[ieta]->GetNbinsX(); ib++){
+      cont+=h_Yield_Meth1[ieta]->GetBinContent(ib);
+      err+=h_Yield_Meth1[ieta]->GetBinError(ib)*h_Yield_Meth1[ieta]->GetBinError(ib);
+      std::cout<<"ib="<<ib<<", cont+-err="<<h_Yield_Meth1[ieta]->GetBinContent(ib)<<"+-"<<h_Yield_Meth1[ieta]->GetBinError(ib)<<std::endl;
     }//end of loop over ib
     err = sqrt(err);
     hYieldTOTAL[ieta]->SetBinContent(1,cont);

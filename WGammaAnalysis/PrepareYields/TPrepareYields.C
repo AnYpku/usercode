@@ -465,7 +465,7 @@ TString TPrepareYields::PlotTitleReplaceAll(TString strTitle){
   plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(DATA - BKG) vs SIGMC.");
   plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","DATA vs (BKG + SIGMC).");
   plotTitle.ReplaceAll("DATAvsDDsum","DATA vs DD fits ");
-
+  /*
   plotTitle.ReplaceAll("CHISO Endcap MUON WGamma","Endcap");
   plotTitle.ReplaceAll("CHISO Barrel MUON WGamma","Barrel");
   plotTitle.ReplaceAll("CHISO Endcap MUON ZGamma","Endcap");
@@ -478,6 +478,33 @@ TString TPrepareYields::PlotTitleReplaceAll(TString strTitle){
   plotTitle.ReplaceAll("CHISO EtaCommon MUON ZGamma","EB+EE");
   plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON WGamma","EB+EE");
   plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON ZGamma","EB+EE");
+
+  plotTitle.ReplaceAll("SIHIH Endcap MUON WGamma","Endcap");
+  plotTitle.ReplaceAll("SIHIH Barrel MUON WGamma","Barrel");
+  plotTitle.ReplaceAll("SIHIH Endcap MUON ZGamma","Endcap");
+  plotTitle.ReplaceAll("SIHIH Barrel MUON ZGamma","Barrel");
+  plotTitle.ReplaceAll("SIHIH Endcap ELECTRON WGamma","Endcap");
+  plotTitle.ReplaceAll("SIHIH Barrel ELECTRON WGamma","Barrel");
+  plotTitle.ReplaceAll("SIHIH Endcap ELECTRON ZGamma","Endcap");
+  plotTitle.ReplaceAll("SIHIH Barrel ELECTRON ZGamma","Barrel");
+  plotTitle.ReplaceAll("SIHIH EtaCommon MUON WGamma","EB+EE");
+  plotTitle.ReplaceAll("SIHIH EtaCommon MUON ZGamma","EB+EE");
+  plotTitle.ReplaceAll("SIHIH EtaCommon ELECTRON WGamma","EB+EE");
+  plotTitle.ReplaceAll("SIHIH EtaCommon ELECTRON ZGamma","EB+EE");
+  */
+  plotTitle.ReplaceAll("Endcap MUON WGamma","Endcap");
+  plotTitle.ReplaceAll("Barrel MUON WGamma","Barrel");
+  plotTitle.ReplaceAll("Endcap MUON ZGamma","Endcap");
+  plotTitle.ReplaceAll("Barrel MUON ZGamma","Barrel");
+  plotTitle.ReplaceAll("Endcap ELECTRON WGamma","Endcap");
+  plotTitle.ReplaceAll("Barrel ELECTRON WGamma","Barrel");
+  plotTitle.ReplaceAll("Endcap ELECTRON ZGamma","Endcap");
+  plotTitle.ReplaceAll("Barrel ELECTRON ZGamma","Barrel");
+  plotTitle.ReplaceAll("EtaCommon MUON WGamma","EB+EE");
+  plotTitle.ReplaceAll("EtaCommon MUON ZGamma","EB+EE");
+  plotTitle.ReplaceAll("EtaCommon ELECTRON WGamma","EB+EE");
+  plotTitle.ReplaceAll("EtaCommon ELECTRON ZGamma","EB+EE");
+
   plotTitle.ReplaceAll("EtaCommon","EB+EE");
   plotTitle.ReplaceAll("ChannelsMERGED","#mu+e");
   plotTitle.ReplaceAll("CHISO","");

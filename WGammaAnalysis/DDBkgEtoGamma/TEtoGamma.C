@@ -76,13 +76,18 @@ TString TEtoGamma::FName(int inum)
 {
   TString str;
   if (inum==_DATA_EtoGAMMA_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.DATA);
-    if (_isMCclosure) str.ReplaceAll(".root","_MCclosure.root");
+        str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.DATA);
+        if (_isMCclosure) str.ReplaceAll(".root","_MCclosure.root");
+    std::cout<<"file _DATA_EtoGAMMA_ENR: "<<str<<std::endl;
   }
-  if (inum==_ZJETS_EtoGAMMA_ENR) 
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
-  if (inum==_ZJETS_NOM_ELE) 
+  if (inum==_ZJETS_EtoGAMMA_ENR) {
+    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+    std::cout<<"file _ZJETS_EtoGAMMA_ENR: "<<str<<std::endl;
+  }
+  if (inum==_ZJETS_NOM_ELE) {
     str=_conf.GetSelectedName(_conf.FULLY,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+    std::cout<<"file _ZJETS_NOM_ELE: "<<str<<std::endl;
+  }
 //  if (inum==_ZJETS_NOM_MUO) 
 //    str=_conf.GetSelectedName(_conf.FULLY,_conf.MUON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
 //  if (inum==_WJETS_NOM_ELE) 

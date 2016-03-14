@@ -22,7 +22,8 @@ class TConfiguration
     enum {TOTAL, ONEDI, TWODI};//csMode
     enum {VERY_PRELIMINARY,
           PRELIMINARY_FOR_TEMPLATE_METHOD,
-          PRELIMINARY_FOR_E_TO_GAMMA,
+          PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,
+          PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT,
           PRELIMINARY_FOR_UNFOLDING,
           FSR,
           FSR_EXCLUDED,
@@ -177,7 +178,7 @@ static const TString _outputDir="../WGammaOutput/";
 //selected files, directory and file names
 //(these files will be output of the script Selection)
 //names are listed in the constructor for now
-TString _selectedNameBase[7];
+TString _selectedNameBase[8];
 
 //////////////////////////////////////////
 //yields

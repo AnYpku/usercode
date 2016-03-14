@@ -13,7 +13,8 @@ TConfiguration::TConfiguration()
 {
   _selectedNameBase[VERY_PRELIMINARY]="VeryPreliminarySelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_TEMPLATE_METHOD]="PreliminaryForTemplateMethodSelected/selected";
-  _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA]="PreliminaryForEtoGammaSelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT]="PreliminaryForEtoGammaWithPSVcutSelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT]="PreliminaryForEtoGammaNoPSVcutSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_UNFOLDING]="PreliminaryForUnfoldingSelected/selected";
   _selectedNameBase[FSR]="FsrSelected/selected";
   _selectedNameBase[FSR_EXCLUDED]="FsrExcludedSelected/selected";
@@ -70,7 +71,8 @@ TString TConfiguration::StrCsMode(int csMode){
 TString TConfiguration::StrSelectionStage(int sel){
   if (sel==VERY_PRELIMINARY) return "VERY_PRELIMINARY"; 
   if (sel==PRELIMINARY_FOR_TEMPLATE_METHOD) return "PRELIMINARY_FOR_TEMPLATE_METHOD"; 
-  if (sel==PRELIMINARY_FOR_E_TO_GAMMA) return "PRELIMINARY_FOR_E_TO_GAMMA";
+  if (sel==PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT) return "PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT";
+  if (sel==PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT) return "PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT";
   if (sel==PRELIMINARY_FOR_UNFOLDING) return "PRELIMINARY_FOR_UNFOLDING"; 
   if (sel==FSR_EXCLUDED) return "FSR_EXCLUDED";
   if (sel==FSR) return "FSR";

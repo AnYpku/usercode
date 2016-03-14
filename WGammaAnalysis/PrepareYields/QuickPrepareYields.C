@@ -14,9 +14,9 @@ void QuickPrepareYields_FSRandISR_Ich(){
   TConfiguration conf;
 
   fch.SetDefaultFullChainParameters(anPars,"phoPFChIsoCorr");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.blind[conf.BOTH_CHANNELS][conf.Z_GAMMA]=conf.UNBLIND;
+  anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
 
   anPars.cutAdd="1";
   int selStage=conf.FSR_EXCLUDED;
@@ -42,16 +42,17 @@ void QuickPrepareYields_FSRandISR_TemplatesIch(){
   TConfiguration conf;
 
   fch.SetDefaultFullChainParameters(anPars,"phoPFChIsoCorr");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.blind[conf.BOTH_CHANNELS][conf.Z_GAMMA]=conf.UNBLIND;
+  anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
 
   TCut cutSihihNomB="phoSigmaIEtaIEta<0.011 && phoSCEta>-1.4442 && phoSCEta<1.4442";
   TCut cutSihihNomE="phoSigmaIEtaIEta<0.033 && ((phoSCEta>-2.5 && phoSCEta<-1.566)||(phoSCEta<2.5 && phoSCEta>1.566))";
   TCut cutSihihNom = cutSihihNomB || cutSihihNomE;
-
+  
   anPars.cutAdd=cutSihihNom && TCut("phoEt>10 && phoEt<15");
   int selStage=conf.FSR_EXCLUDED;
+  /*
   AuxPrepareYields(anPars,0,selStage,"_pt10to15_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>15 && phoEt<20");
@@ -89,14 +90,18 @@ void QuickPrepareYields_FSRandISR_TemplatesIch(){
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>120 && phoEt<500");
   AuxPrepareYields(anPars,0,selStage,"_pt120to500_");
-
-  anPars.cutAdd=cutSihihNom && TCut("phoEt>10 && phoEt<500");
+  */
+  anPars.cutAdd=cutSihihNom && TCut("phoEt>15 && phoEt<500");
   anPars.nKinBins=6;
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   for (int ib=0; ib<anPars.nKinBins+1; ib++)
   anPars.kinBinLims[ib]=0+1*ib;
   selStage=conf.FSR;
-  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR");
+  selStage=conf.FSR_EXCLUDED;
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ ISR");
+  selStage=conf.PRELIMINARY_FOR_TEMPLATE_METHOD;
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR+ISR");
 
 }//end of QuickPrepareYields_FSRandISR_TemplatesIch
 
@@ -114,12 +119,13 @@ void QuickPrepareYields_FSRandISR_TemplatesSihih(){
   TCut cutIsoNom = cutIsoNomB || cutIsoNomE;
 
   fch.SetDefaultFullChainParameters(anPars,"phoSigmaIEtaIEta");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.blind[conf.BOTH_CHANNELS][conf.Z_GAMMA]=conf.UNBLIND;
+  anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>10 && phoEt<15");
   int selStage=conf.FSR_EXCLUDED;
+  
   AuxPrepareYields(anPars,0,selStage,"_pt10to15_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>15 && phoEt<20");
@@ -160,6 +166,14 @@ void QuickPrepareYields_FSRandISR_TemplatesSihih(){
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>30 && phoEt<500");
   AuxPrepareYields(anPars,0,selStage,"_pt30to500_");
+  
+  anPars.cutAdd=cutIsoNom && TCut("phoEt>15 && phoEt<500");
+  selStage=conf.FSR;
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR");
+  selStage=conf.FSR_EXCLUDED;
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ ISR");
+  selStage=conf.PRELIMINARY_FOR_TEMPLATE_METHOD;
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR+ISR");
 
 
 }//end of QuickPrepareYields_FSRandISR_TemplatesSihih
@@ -173,56 +187,68 @@ void QuickPrepareYields_FSRandISR(){
 
   TConfiguration conf;
   TPhotonCuts photon;
-  TCut cut = photon.RangePhoton(conf.MUON, conf.Z_GAMMA, 2012, photon.WP_TIGHT, 1, 1, 1, 1, 1, 1);
+  TCut cut = photon.RangePhoton(conf.MUON, conf.Z_GAMMA, 2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1) ;
   anPars.cutAdd=cut;//"phoEt<40";
 //  anPars.cutAdd=photon.RangeSigmaIEtaIEta(2012,photon.WP_MEDIUM,conf.COMMON);
 
-  anPars.blind[conf.BOTH_CHANNELS][conf.Z_GAMMA]=conf.UNBLIND;
+  anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
 
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
 
-
+  
   int selStage=conf.VERY_PRELIMINARY;
-
+  
   fch.SetDefaultFullChainParameters(anPars,"Mpholeplep");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_"); 
-
+  anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+   
+  
   fch.SetDefaultFullChainParameters(anPars,"Mleplep");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_"); 
-
+  anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+  
   fch.SetDefaultFullChainParameters(anPars,"lep1PhoDeltaR");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
+  anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+
 
   fch.SetDefaultFullChainParameters(anPars,"lep2PhoDeltaR");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
-  anPars.cutAdd=cut;
-  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
+  anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+  
 
+  
   selStage=conf.FSR;
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd="1";
-  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
+  AuxPrepareYields(anPars,0,selStage);
 
   selStage=conf.FSR_EXCLUDED;
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
-  anPars.channel=conf.BOTH_CHANNELS;
+  anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd="1";
-  AuxPrepareYields(anPars,0,selStage,"_wpTIGHT_");
-
+  AuxPrepareYields(anPars,0,selStage);
+  
 }//end of QuickPrepareYields_FSRandISR
 
 void QuickPrepareYields_WMt(int channel){
@@ -269,7 +295,7 @@ void QuickPrepareYields_EtoGammaEnriched(){
 
   TConfiguration conf;
   fch.SetDefaultFullChainParameters(anPars,"Mpholep1");
-  anPars.cutAdd="phoEt>15 && phoEt<45";//"phoEt<40";
+  //anPars.cutAdd="phoEt>15 && phoEt<15";//"phoEt<40";
 
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.channel=conf.ELECTRON;
@@ -281,9 +307,32 @@ void QuickPrepareYields_EtoGammaEnriched(){
     anPars.kinBinLims[ib]=70+2*ib;//70-110 GeV
 
 
-    int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA;
-  //  AuxPrepareYields(anPars,0,selStage); 
+    int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT;
+    AuxPrepareYields(anPars,0,selStage); 
 
+    selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT;
+    AuxPrepareYields(anPars,0,selStage); 
+
+    /*
+  anPars.nKinBins=8;
+  anPars.kinBinLims=new float[anPars.nKinBins+1];
+  for (int ib=0; ib<anPars.nKinBins+1; ib++)
+    anPars.kinBinLims[ib]=70+5*ib;//70-110 GeV
+  TPhotonCuts photon;
+  TFullCuts fullcut;
+  //  TCut cut = photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
+  //  anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
+  //  selStage=conf.VERY_PRELIMINARY;
+  //  AuxPrepareYields(anPars,0,selStage,"_full_MediumID_");
+  TCut cut = photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 0);
+  anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
+  selStage=conf.VERY_PRELIMINARY;
+  AuxPrepareYields(anPars,0,selStage,"_noPXVcut_MediumID_");
+  anPars.cutAdd = anPars.cutAdd && !photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 0, 0, 0, 0, 0, 1);
+  selStage=conf.VERY_PRELIMINARY;
+  AuxPrepareYields(anPars,0,selStage,"_invPXVcut_MediumID_");
+    */
+  /*    
   anPars.nKinBins=75;
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   for (int ib=0; ib<anPars.nKinBins+1; ib++)
@@ -294,7 +343,7 @@ void QuickPrepareYields_EtoGammaEnriched(){
   anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
   selStage=conf.VERY_PRELIMINARY;
   AuxPrepareYields(anPars,0,selStage);
-
+  */
   //  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.UNBLIND;
   //  anPars.channel=conf.MUON;
   //    TCut cut = photon.RangePhoton(conf.MUON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
