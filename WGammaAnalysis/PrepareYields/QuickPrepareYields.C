@@ -295,7 +295,6 @@ void QuickPrepareYields_EtoGammaEnriched(){
 
   TConfiguration conf;
   fch.SetDefaultFullChainParameters(anPars,"Mpholep1");
-  //anPars.cutAdd="phoEt>15 && phoEt<15";//"phoEt<40";
 
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.channel=conf.ELECTRON;
@@ -307,48 +306,37 @@ void QuickPrepareYields_EtoGammaEnriched(){
     anPars.kinBinLims[ib]=70+2*ib;//70-110 GeV
 
 
-    int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT;
-    AuxPrepareYields(anPars,0,selStage); 
+  int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT;
+  anPars.cutAdd="phoEt>10 && phoEt<15";
+  AuxPrepareYields(anPars,0,selStage,"_pt10to15_"); 
+  anPars.cutAdd="phoEt>15 && phoEt<20";
+  AuxPrepareYields(anPars,0,selStage,"_pt15to20_"); 
+  anPars.cutAdd="phoEt>20 && phoEt<25";
+  AuxPrepareYields(anPars,0,selStage,"_pt20to25_"); 
+  anPars.cutAdd="phoEt>25 && phoEt<30";
+  AuxPrepareYields(anPars,0,selStage,"_pt25to30_"); 
+  anPars.cutAdd="phoEt>30 && phoEt<35";
+  AuxPrepareYields(anPars,0,selStage,"_pt30to35_"); 
+  anPars.cutAdd="phoEt>35 && phoEt<45";
+  AuxPrepareYields(anPars,0,selStage,"_pt35to45_"); 
+  anPars.cutAdd="phoEt>45 && phoEt<55";
+  AuxPrepareYields(anPars,0,selStage,"_pt45to55_"); 
+  anPars.cutAdd="phoEt>55 && phoEt<65";
+  AuxPrepareYields(anPars,0,selStage,"_pt55to65_"); 
+  anPars.cutAdd="phoEt>65 && phoEt<75";
+  AuxPrepareYields(anPars,0,selStage,"_pt65to75_");
+  anPars.cutAdd="phoEt>75 && phoEt<85";
+  AuxPrepareYields(anPars,0,selStage,"_pt75to85_"); 
+  anPars.cutAdd="phoEt>85 && phoEt<95";
+  AuxPrepareYields(anPars,0,selStage,"_pt85to95_");
+  anPars.cutAdd="phoEt>95 && phoEt<120";
+  AuxPrepareYields(anPars,0,selStage,"_pt95to120_");
+  anPars.cutAdd="phoEt>120 && phoEt<500";
+  AuxPrepareYields(anPars,0,selStage,"_pt120to500_"); 
 
-    selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT;
-    AuxPrepareYields(anPars,0,selStage); 
+    //selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT;
+    //AuxPrepareYields(anPars,0,selStage); 
 
-    /*
-  anPars.nKinBins=8;
-  anPars.kinBinLims=new float[anPars.nKinBins+1];
-  for (int ib=0; ib<anPars.nKinBins+1; ib++)
-    anPars.kinBinLims[ib]=70+5*ib;//70-110 GeV
-  TPhotonCuts photon;
-  TFullCuts fullcut;
-  //  TCut cut = photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
-  //  anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
-  //  selStage=conf.VERY_PRELIMINARY;
-  //  AuxPrepareYields(anPars,0,selStage,"_full_MediumID_");
-  TCut cut = photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 0);
-  anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
-  selStage=conf.VERY_PRELIMINARY;
-  AuxPrepareYields(anPars,0,selStage,"_noPXVcut_MediumID_");
-  anPars.cutAdd = anPars.cutAdd && !photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 0, 0, 0, 0, 0, 1);
-  selStage=conf.VERY_PRELIMINARY;
-  AuxPrepareYields(anPars,0,selStage,"_invPXVcut_MediumID_");
-    */
-  /*    
-  anPars.nKinBins=75;
-  anPars.kinBinLims=new float[anPars.nKinBins+1];
-  for (int ib=0; ib<anPars.nKinBins+1; ib++)
-    anPars.kinBinLims[ib]=0+2*ib;//0-150 GeV
-  TPhotonCuts photon;
-  TFullCuts fullcut;
-  TCut cut = photon.RangePhoton(conf.ELECTRON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
-  anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.ELECTRON);
-  selStage=conf.VERY_PRELIMINARY;
-  AuxPrepareYields(anPars,0,selStage);
-  */
-  //  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.UNBLIND;
-  //  anPars.channel=conf.MUON;
-  //    TCut cut = photon.RangePhoton(conf.MUON, conf.W_GAMMA,2012, photon.WP_MEDIUM, 1, 1, 1, 1, 1, 1);
-  //    anPars.cutAdd = anPars.cutAdd && cut && fullcut.RangeDeltaR(conf.W_GAMMA) && fullcut.RangeMetRelatedCut(2012,conf.MUON);
-  //    selStage=conf.VERY_PRELIMINARY;
-  //    AuxPrepareYields(anPars,0,selStage);
+
 
 }//end of QuickPrepareYields_Mass_FSRandISR

@@ -499,7 +499,7 @@ TCut TFullCuts::RangeForEtoGamma(int phoWP, bool doPSVcut){
   if (doPSVcut) cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 1);
 
   TCut cut = cutPhoton && RangeDeltaR(_config.W_GAMMA) && RangeMetRelatedCut(2012,_config.ELECTRON); 
-  cut = cut && (!RangeZmassWindowCut());// to enrich sample with e->gamma events
+  //  cut = cut && (!RangeZmassWindowCut());// to enrich sample with e->gamma events
   return cut;
 }// end of RangeForEtoGamma(int phoWP)
 

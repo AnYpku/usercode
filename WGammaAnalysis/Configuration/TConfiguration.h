@@ -31,7 +31,7 @@ class TConfiguration
     enum {TEMPL_CHISO=0, TEMPL_SIHIH=1, TEMPL_OVERLAY=2};
       // template fits: from I_ch (with random cone isolation method)
       // or with sigmaIEtaIEta
-    enum {PLOTS_TEMPL_FITS, PLOTS_PREPARE_YIELDS, PLOTS_CONSTANTS, 
+    enum {PLOTS_TEMPL_FITS, PLOTS_ETOGAMMA_FITS, PLOTS_PREPARE_YIELDS, PLOTS_CONSTANTS, 
           PLOTS_CROSS_SECTION, PLOTS_QUICK_CHECKS, PLOTS_TEMPL_FITS_SYST};
 
     struct AnalysisParameters{

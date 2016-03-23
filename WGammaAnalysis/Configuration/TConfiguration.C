@@ -89,6 +89,7 @@ TString TConfiguration::StrTempl(int templ){
 TString TConfiguration::StrPlotsType(int plotsType)
 {
   if (plotsType==PLOTS_TEMPL_FITS) return "TemplateFits";
+  if (plotsType==PLOTS_ETOGAMMA_FITS) return "EtoGammaFits";
   if (plotsType==PLOTS_PREPARE_YIELDS) return "PrepareYields";
   if (plotsType==PLOTS_CONSTANTS) return "Constants";
   if (plotsType==PLOTS_CROSS_SECTION) return "CrossSection";

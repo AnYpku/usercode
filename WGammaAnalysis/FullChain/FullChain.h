@@ -17,7 +17,7 @@ class FullChain
 
     void SetDiffKinFullChainParameters(TConfiguration::AnalysisParameters& anPars, TString varKin);
 
-    void RunAnalysis(TConfiguration::AnalysisParameters& anPars);
+    //    void RunAnalysis(TConfiguration::AnalysisParameters& anPars);
 
   private:
     TConfiguration _config;

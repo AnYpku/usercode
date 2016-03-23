@@ -1,5 +1,7 @@
 #include "../Configuration/TConfiguration.h"
 #include "../FullChain/FullChain.h"
+#include "../CrossSection/CalcCrossSection.h"
+#include "../CrossSection/AuxCrossSection.C"
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
@@ -21,9 +23,9 @@ void AuxFchCrossSection(TString strChannel, TString strVGamma)
   if (strVGamma=="WGamma") anPars.vgamma=conf.W_GAMMA;
   if (strVGamma=="ZGamma") anPars.vgamma=conf.Z_GAMMA;
 
-  anPars.noCalcCrossSection[anPars.channel][anPars.vgamma]=0;
+  AuxCrossSection(anPars,anPars.channel,anPars.vgamma);
 
-  fch.RunAnalysis(anPars);
+
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

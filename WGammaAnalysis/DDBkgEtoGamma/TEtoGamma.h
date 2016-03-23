@@ -25,7 +25,7 @@ class TEtoGamma
   private:
     TFile* _fOut;
 
-    enum {_DATA_EtoGAMMA_ENR, _ZJETS_EtoGAMMA_ENR, _ZJETS_NOM_ELE, _ZJETS_NOM_MUO, _WJETS_NOM_ELE, _WJETS_NOM_MUO};
+    enum {_DATA_EtoGAMMA_ENR, _ZJETS_EtoGAMMA_ENR, _ZJETS_NOM, _SIGMC_NOM, _SIGMC_ENR,_WGAMMATAUNU_ENR, _ZGAMMA_ENR, _TTJETS_ENR, _WJETS_ENR};
 
     struct Yield{
       int num;
@@ -35,7 +35,7 @@ class TEtoGamma
 //      float cont;
 //      float err;
     };
-    Yield _yield[6];
+    Yield _yield[10];
 
     TString FName(int inum);
     TString HName(int inum, int ieta);
@@ -43,6 +43,9 @@ class TEtoGamma
 
     // etaBin: BARREL, ENDCAP
     TH1F* _yieldDDEtoGamma[3];// data driven estimate
+    TH1F* _hZmassData[2][4][50];// BARREL or ENDCAP, ietaFine, ikin
+    float _NsigVal[4];//ietaFine
+    float _NsigErr[4];//ietaFine
 
     TConfiguration _conf;
     TCut _cutAdd;
@@ -55,8 +58,12 @@ class TEtoGamma
     void WriteToFile();
     void ComputeBkg();
     TTree* GetTree(TString strFileName);
-
+    void FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass,TString saveas);
+    TCut CutEtaFine(int ieta, int ietaFine);
 };
 
+const float _ZmassMin = 60;
+const float _ZmassMax=200;
+const int _ZmassNbins[5]={28,20,14,10,7};
 
 #endif //TEtoGamma_h
