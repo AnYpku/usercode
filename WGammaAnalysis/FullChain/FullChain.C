@@ -45,9 +45,11 @@ void FullChain::SetDefaultFullChainParameters(TConfiguration::AnalysisParameters
   anPars.phoWP=TPhotonCuts::WP_MEDIUM;//WP_LOOSE,WP_MEDIUM,WP_TIGHT
   anPars.cutAdd="1";
 
-  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.BLIND_COMBINED;
+  // anPars.blind[conf.MUON][conf.W_GAMMA]=conf.BLIND_COMBINED;
+  anPars.blind[conf.MUON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.blind[conf.MUON][conf.Z_GAMMA]=conf.UNBLIND;
-  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_COMBINED;
+  //  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.BLIND_COMBINED;
+  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.blind[conf.ELECTRON][conf.Z_GAMMA]=conf.UNBLIND;
 
   anPars.noDDBkgEtoGamma=1;

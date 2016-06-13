@@ -8,4 +8,3 @@ Library.RooUnfoldParms:                     libRooUnfold.so libCore.so libHist.s
 Library.RooUnfoldInvert:                    libRooUnfold.so libCore.so libHist.so libGraf.so libTree.so libMatrix.so libMathCore.so
 Library.RooUnfoldBasisSplines:              libRooUnfold.so libCore.so libHist.so libGraf.so libTree.so libMatrix.so libMathCore.so
 Library.RooUnfoldTUnfold:                   libRooUnfold.so libCore.so libHist.so libGraf.so libTree.so libMatrix.so libMathCore.so
-Library.TSVDUnfold_529:                     libRooUnfold.so libCore.so libHist.so libGraf.so libTree.so libMatrix.so libMathCore.so

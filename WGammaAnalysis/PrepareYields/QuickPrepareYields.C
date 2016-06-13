@@ -295,20 +295,35 @@ void QuickPrepareYields_EtoGammaEnriched(){
 
   TConfiguration conf;
   fch.SetDefaultFullChainParameters(anPars,"Mpholep1");
-
+  /*
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.channel=conf.ELECTRON;
   anPars.vgamma=conf.W_GAMMA;
   anPars.varKin="Mpholep1";
-  anPars.nKinBins=20;
+  anPars.nKinBins=40;
   anPars.kinBinLims=new float[anPars.nKinBins+1];
   for (int ib=0; ib<anPars.nKinBins+1; ib++)
-    anPars.kinBinLims[ib]=70+2*ib;//70-110 GeV
+    anPars.kinBinLims[ib]=0+5*ib;//0-200 GeV
 
 
   int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT;
-  anPars.cutAdd="phoEt>10 && phoEt<15";
-  AuxPrepareYields(anPars,0,selStage,"_pt10to15_"); 
+  anPars.cutAdd="phoEt>15";
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_"); 
+  */
+  anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
+  anPars.channel=conf.ELECTRON;
+  anPars.vgamma=conf.W_GAMMA;
+  anPars.varKin="Mpholep1";
+  anPars.nKinBins=40;
+  anPars.kinBinLims=new float[anPars.nKinBins+1];
+  for (int ib=0; ib<anPars.nKinBins+1; ib++)
+    anPars.kinBinLims[ib]=0+5*ib;//0-200 GeV
+
+
+  int selStage=conf.FULLY;
+  anPars.cutAdd="phoEt>15";
+  AuxPrepareYields(anPars,0,selStage,"_pt15to500_"); 
+  /*
   anPars.cutAdd="phoEt>15 && phoEt<20";
   AuxPrepareYields(anPars,0,selStage,"_pt15to20_"); 
   anPars.cutAdd="phoEt>20 && phoEt<25";
@@ -333,7 +348,7 @@ void QuickPrepareYields_EtoGammaEnriched(){
   AuxPrepareYields(anPars,0,selStage,"_pt95to120_");
   anPars.cutAdd="phoEt>120 && phoEt<500";
   AuxPrepareYields(anPars,0,selStage,"_pt120to500_"); 
-
+  */
     //selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT;
     //AuxPrepareYields(anPars,0,selStage); 
 

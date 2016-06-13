@@ -25,7 +25,7 @@ class TEtoGamma
   private:
     TFile* _fOut;
 
-    enum {_DATA_EtoGAMMA_ENR, _ZJETS_EtoGAMMA_ENR, _ZJETS_NOM, _SIGMC_NOM, _SIGMC_ENR,_WGAMMATAUNU_ENR, _ZGAMMA_ENR, _TTJETS_ENR, _WJETS_ENR};
+    enum {_DATA_EtoGAMMA_ENR, _ZJETS_EtoGAMMA_ENR, _ZJETS_NOM, _SIGMC_NOM, _SIGMC_ENR, _WGAMMATAUNU_ENR, _ZGAMMA_ENR, _TTJETS_ENR, _WJETS_ENR};
 
     struct Yield{
       int num;
@@ -53,17 +53,29 @@ class TEtoGamma
     int _nKinBins;
     float _kinBinLims[100];
 
+    int _nFineEtaBins;
+
     bool _isMCclosure;
 
     void WriteToFile();
     void ComputeBkg();
     TTree* GetTree(TString strFileName);
-    void FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass,TString saveas);
+    void FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TCut cutEtoGenr, TString saveas);
     TCut CutEtaFine(int ieta, int ietaFine);
+    float EtaMin(int ieta, int ietaFine);
+    float EtaMax(int ieta, int ietaFine);
+    TString StrEtaFine(int ieta, int ietaFine);
+
+    float _start_CMS_alpha;
+    float _start_CMS_beta;
+    float _start_CMS_gamma;
+    float _start_CMS_peak;
+    float _start_mean_gau;
+    float _start_sigma_gau;
 };
 
-const float _ZmassMin = 60;
+const float _ZmassMin = 40;
 const float _ZmassMax=200;
-const int _ZmassNbins[5]={28,20,14,10,7};
+const int _ZmassNbins[5]={40,32,20,16,10};
 
 #endif //TEtoGamma_h

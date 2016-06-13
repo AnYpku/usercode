@@ -1204,6 +1204,7 @@ void TTemplates::PlotOneTemplate(int ikin, int ieta)
     _hRatio[ikin][ieta]->GetXaxis()->SetLabelSize(0.1);
     _hRatio[ikin][ieta]->GetXaxis()->SetTitleOffset(1.0);
     _hRatio[ikin][ieta]->GetXaxis()->SetTitleSize(0.12);
+    _hRatio[ikin][ieta]->GetYaxis()->SetRangeUser(0.6,1.8);
     _hRatio[ikin][ieta]->SetTitle(TString("; ")+_pars.varFit+TString(" ;"));
     _hRatio[ikin][ieta]->Draw();
     int nBins = _hRatio[ikin][ieta]->GetNbinsX();

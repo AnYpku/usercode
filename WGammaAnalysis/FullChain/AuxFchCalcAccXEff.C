@@ -1,5 +1,6 @@
 #include "../Configuration/TConfiguration.h"
 #include "../FullChain/FullChain.h"
+#include "../AcceptanceAndEfficiency/CalcAccAndEff.h"
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
@@ -21,9 +22,10 @@ void AuxFchCalcAccXEff(TString strChannel, TString strVGamma)
   if (strVGamma=="WGamma") anPars.vgamma=conf.W_GAMMA;
   if (strVGamma=="ZGamma") anPars.vgamma=conf.Z_GAMMA;
 
-  anPars.noCalcAccAndEff[anPars.channel][anPars.vgamma]=0;
-
-  fch.RunAnalysis(anPars);
+  //anPars.noCalcAccAndEff[anPars.channel][anPars.vgamma]=0;
+  CalcAccAndEff accAndEff(anPars.channel, anPars.vgamma, anPars.isDebugMode, anPars.configfile);
+  accAndEff.ComputeAccTimesEff();
+ 
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

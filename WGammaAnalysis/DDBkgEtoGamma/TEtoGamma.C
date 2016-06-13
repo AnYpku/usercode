@@ -5,6 +5,7 @@
 #include "../Include/TPhotonCuts.h"
 #include "../Include/TFullCuts.h"
 #include "../Include/TMathTools.h"
+#include "../Include/RooCMSShape.h"
 
 #include <string>
 #include <vector>
@@ -32,14 +33,17 @@
 #include "RooCBShape.h"
 #include "RooFFTConvPdf.h"
 #include "RooExponential.h"
+#include "RooNDKeysPdf.h"
+#include "RooGaussian.h"
 #include "RooPlot.h"
 using namespace RooFit;
 
 TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
 {
-
+  
   _isMCclosure=isMCclosure;
   _cutAdd=anPars.cutAdd;
+  
   _varKin=anPars.varKin;
   TString strFout = _conf.GetDDBkgEtoGammaFileName(anPars.varKin);
   if (isMCclosure) strFout.ReplaceAll(".root","_MCclosure.root");
@@ -54,7 +58,7 @@ TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars, bool isMCclosur
     if (ik<_nKinBins) std::cout<<", ";
   }// end of loop over ik
   std::cout<<std::endl;
-
+  
 
 
 }// end of   TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars) 
@@ -65,7 +69,7 @@ TEtoGamma::~TEtoGamma()
 
 void TEtoGamma::ComputePlotSave()
 {
-
+  
   SetYields(_ZJETS_EtoGAMMA_ENR);
   SetYields(_ZJETS_NOM);   
   SetYields(_SIGMC_NOM);  
@@ -86,6 +90,7 @@ void TEtoGamma::ComputePlotSave()
   }//end of loop over ieta
   ComputeBkg();
   WriteToFile();
+  
 }// end of TEtoGamma::EstimateBkg()
 
 TTree* TEtoGamma::GetTree(TString strFileName){
@@ -169,12 +174,16 @@ void TEtoGamma::SetYields(int inum)
     if (ieta==_conf.BARREL) cutEta=photon.RangeBarrel();
     if (ieta==_conf.ENDCAP) cutEta=photon.RangeEndcap();
     TCut cut = cutEta && _cutAdd;// && cutWMt;
-    if (inum==_ZJETS_NOM || inum==_ZJETS_EtoGAMMA_ENR) {TCut cutMatch("pho_genEle_dRMin<0.4"); cut=cut && cutMatch;}
+    TCut cutMatch("pho_genEle_dRMin<0.4");
+    if (inum==_ZJETS_NOM || inum==_ZJETS_EtoGAMMA_ENR) { cut=cut && cutMatch;}
     _yield[inum].tr->Draw(_varKin+TString(">>")+_yield[inum].hist[ieta]->GetName(),cut*cutW,"goff");
 
     if (inum!=_DATA_EtoGAMMA_ENR) continue;
     for (int ikin=0; ikin<_nKinBins; ikin++){
-      for (int ietaFine=0; ietaFine<4; ietaFine++){
+      if (_kinBinLims[ikin]<=55) _nFineEtaBins=4;
+      else if (_kinBinLims[ikin]<=85) _nFineEtaBins=2;
+      else _nFineEtaBins=1;      
+      for (int ietaFine=0; ietaFine<_nFineEtaBins; ietaFine++){
         TString strCutKin;
         strCutKin=_varKin+">";
         strCutKin+=_kinBinLims[ikin];
@@ -191,16 +200,21 @@ void TEtoGamma::SetYields(int inum)
         hNameZmass+="_ieta";  
         hNameZmass+=ietaFine;      
         int nB = _ZmassNbins[0];
+        // 0: 10-15, 1: 15-20, 2: 20-25, 3: 25-30, 4: 30-35, 5: 35-45, 6: 45-55
+        // 7: 55-65, 8: 65-75, 9: 75-85, 10: 85-95, 11: 95-120, 12: 120-500
+        if (ikin>=5) nB=_ZmassNbins[1];
+        if (ikin>=7) nB=_ZmassNbins[2];
+        if (ikin>=9) nB=_ZmassNbins[3];
+        if (ikin>=11) nB=_ZmassNbins[4];
         _hZmassData[ieta][ietaFine][ikin] = new TH1F(hNameZmass,hNameZmass,nB,_ZmassMin,_ZmassMax);    
         _yield[inum].tr->Draw("Mpholep1>>"+hNameZmass,cutWithKin*cutW,"goff");
 
-	        FitMeg(ikin, ieta, ietaFine, _hZmassData[ieta][ietaFine][ikin],"sa_"+hNameZmass);
-
+	FitMeg(ikin, ieta, ietaFine, _hZmassData[ieta][ietaFine][ikin],(cutEta && cutEtaFine && _cutAdd && cutKin && cutMatch)*cutW,"sa_"+hNameZmass);
 
       }//end of loop over ietaFine
 
       float val=0; float err=0;
-      for (int ietaFine=0; ietaFine<4; ietaFine++){
+      for (int ietaFine=0; ietaFine<_nFineEtaBins; ietaFine++){
         val += _NsigVal[ietaFine];
         err += _NsigErr[ietaFine]*_NsigErr[ietaFine];
       }//end of ietaFine 
@@ -212,20 +226,113 @@ void TEtoGamma::SetYields(int inum)
     
 }// end of TEtoGamma::SetYields
 
+float TEtoGamma::EtaMin(int ieta, int ietaFine){
+  if (_nFineEtaBins==4){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return 0.00;}
+      if (ietaFine==1) {return 0.10;}
+      if (ietaFine==2) {return 0.50;}
+      if (ietaFine==3) {return 1.00;} 
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return 1.56;}
+      if (ietaFine==1) {return 2.10;}
+      if (ietaFine==2) {return 2.20;}
+      if (ietaFine==3) {return 2.40;} 
+    }//end of  if (ieta==1)
+  }//end of _nFineEtaBins==4
+  if (_nFineEtaBins==2){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return 0.00;}
+      if (ietaFine==1) {return 0.50;}
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return 1.56;}
+      if (ietaFine==1) {return 2.20;}
+    }//end of  if (ieta==1)
+  }//end of _nFineEtaBins==2
+  if (_nFineEtaBins==1){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return 0.00;}
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return 1.56;}
+    }//end of  if (ieta==1)
+  }//end of _nFineEtaBins==1
+}//end of EtaMin
+
+float TEtoGamma::EtaMax(int ieta, int ietaFine){
+  if (_nFineEtaBins==4){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return 0.10;}
+      if (ietaFine==1) {return 0.50;}
+      if (ietaFine==2) {return 1.00;}
+      if (ietaFine==3) {return 1.45;} 
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return 2.10;}
+      if (ietaFine==1) {return 2.20;}
+      if (ietaFine==2) {return 2.40;}
+      if (ietaFine==3) {return 2.51;} 
+    }//end of  if (ieta==1)
+  }//end of _nFineEtaBins==4
+  if (_nFineEtaBins==2){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return 0.50;}
+      if (ietaFine==1) {return 1.45;} 
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return 2.20;}
+      if (ietaFine==1) {return 2.51;} 
+    }//end of  if (ieta==1)
+  }//end of _nFineEtaBins==2
+  if (_nFineEtaBins==1){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return 1.45;} 
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return 2.51;} 
+    }//end of  if (ieta==1)
+  }//end of _nFineEtaBins==1
+}//end of EtaMax
+
+TString TEtoGamma::StrEtaFine(int ieta, int ietaFine){
+  if (_nFineEtaBins==4){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return "0.00-0.10";}
+      if (ietaFine==1) {return "0.10-0.50";}
+      if (ietaFine==2) {return "0.50-1.00";}
+      if (ietaFine==3) {return "1.00-1.44";} 
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return "1.56-2.10";}
+      if (ietaFine==1) {return "2.10-2.20";}
+      if (ietaFine==2) {return "2.20-2.40";}
+      if (ietaFine==3) {return "2.40-2.50";} 
+    }//end of  if (ieta==1)
+  }//end of _nEtaBins==4
+  if (_nFineEtaBins==2){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return "0.00-0.50";}
+      if (ietaFine==1) {return "0.50-1.44";}
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return "1.56-2.20";}
+      if (ietaFine==1) {return "2.20-2.50";}
+    }//end of  if (ieta==1)
+  }//end of _nEtaBins==2
+  if (_nFineEtaBins==1){
+    if (ieta==0){//BARREL
+      if (ietaFine==0) {return "0.00-1.44";}
+    }//end of  if (ieta==0)
+    if (ieta==1){//ENDCAP
+      if (ietaFine==0) {return "1.56-2.50";}
+    }//end of  if (ieta==1)
+  }//end of _nEtaBins==1
+}//end of EtaMin
+
 TCut TEtoGamma::CutEtaFine(int ieta, int ietaFine){
-  float etaMin=0.0; float etaMax=2.5;
-  if (ieta==0){//BARREL
-    if (ietaFine==0) {etaMin=0.00; etaMax=0.10;}
-    if (ietaFine==1) {etaMin=0.10; etaMax=0.50;}
-    if (ietaFine==2) {etaMin=0.50; etaMax=1.00;}
-    if (ietaFine==3) {etaMin=1.00; etaMax=1.45;} 
-  }//end of  if (ieta==0)
-  if (ieta==1){//ENDCAP
-    if (ietaFine==0) {etaMin=1.56; etaMax=2.10;}
-    if (ietaFine==1) {etaMin=2.10; etaMax=2.20;}
-    if (ietaFine==2) {etaMin=2.20; etaMax=2.40;}
-    if (ietaFine==3) {etaMin=2.40; etaMax=2.51;} 
-  }//end of  if (ieta==1)
+  float etaMin=EtaMin(ieta, ietaFine); float etaMax=EtaMax(ieta, ietaFine);
   TString strCut;
   strCut="(phoSCEta>=";
   strCut+=etaMin;
@@ -240,6 +347,8 @@ TCut TEtoGamma::CutEtaFine(int ieta, int ietaFine){
   strCut+=")";
   TCut cut(strCut);
   std::cout<<"ieta="<<ieta<<", ietaFine="<<ietaFine<<", cut="<<cut.GetTitle()<<std::endl;
+  std::cout<<"etaMin="<<etaMin<<", etaMax="<<etaMax<<std::endl;
+  std::cout<<"nFineEtaBins="<<_nFineEtaBins<<", EtaMin("<<ieta<<", "<<ietaFine<<")="<<EtaMin(ieta, ietaFine)<<", EtaMax("<<ieta<<", "<<ietaFine<<")="<<EtaMax(ieta, ietaFine)<<std::endl;
   return cut;
 }//end of  CutEtaFine
 
@@ -332,7 +441,7 @@ void TEtoGamma::WriteToFile()
     _yieldDDEtoGamma[_conf.COMMON]->Write(str);
 }// end of WriteToFile()
 
-void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TString saveas)
+void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TCut cut, TString saveas)
 {
   
   double hmin = _ZmassMin;//Z_mass->GetXaxis()->GetXmin();
@@ -341,48 +450,137 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TString 
   
   // Declare observable x
   RooRealVar xtmp("xtmp","xtmp",_ZmassMin,_ZmassMax) ;
-  RooRealVar x("x","x",hmin,hmax) ;
+  RooRealVar x("Mpholep1", "Mpholep1 from tree", _ZmassMin,_ZmassMax);//("x","x",hmin,hmax) ;
   RooDataHist dh("dh","dh",x,Import(*Z_mass)) ;
   RooDataHist x1("x1","x1",xtmp,Import(*Z_mass)) ;
+
   //Construct the signal P.D.F., a gaussian function
-  RooRealVar mean_bw("mean_bw","mean of bw",92,75.,100.);
-  //  RooRealVar mean_bw("mean_bw","mean of bw",91.2);
-  //  mean_bw.setConstant(kTRUE);
-  RooRealVar mean_cb("mean_cb","mean of cb",0,-5.0,10);
-  RooRealVar sigma_bw("sigma_bw","width of bw",2.5,0,5.);
-  //  RooRealVar sigma_bw("sigma_bw","width of bw",2.5);
-  //  sigma_bw.setConstant(kTRUE);
-  RooRealVar sigma_cb("sigma_cb","width of cb",2.0, 0.00001, 8.0);//this range worked for overall pt range
-  RooRealVar n("n","", 6.7489,1.0,20.0);
-  RooRealVar alpha("alpha","", 1.0,-50.,50);
-  RooBreitWigner bwPDF("BreitWigner","BreitWigner",x,mean_bw,sigma_bw);
-  RooCBShape cbPDF("cball", "crystal ball", x, mean_cb, sigma_cb, alpha, n);
-  std::cout<<"I will declare RooFFTConvPdf"<<std::endl;
-  RooFFTConvPdf SigPDF("bwxCryBall", "FFT Conv CryBall and BW", x, bwPDF, cbPDF);
-  std::cout<<"I declared RooFFTConvPdf"<<std::endl;  
-  //Now define the background P.D.F, a simple exponential
-  RooRealVar tau("tau","exponential function parameter",0,-10.,10.);//this range worked for overall pt range
-  RooExponential exp("exponential","Background PDF",x,tau);
-  RooFormulaVar eff("eff","0.5*(TMath::Erf((x-1)/0.5)+1)",x) ;
-  RooAddPdf BkgPDF("BkgPDF","exp. * Err.fn",exp,eff) ;
-  //RooRealVar a0("a0","a0",0.,-5.,5.);
-  //RooRealVar a1("a1","a1",0.,-1.,1.);
-  //RooRealVar a2("a2","a2",0.,-1.,1.);
+
+  // BW x CB
+  
+  //  RooRealVar mean_bw("mean_bw","mean of bw",92,75.,100.);
+  //  RooRealVar mean_cb("mean_cb","mean of cb",0,-5.0,10);
+  //  RooRealVar sigma_bw("sigma_bw","width of bw",2.5,0,5.);
+  //  RooRealVar sigma_cb("sigma_cb","width of cb",2.0, 0.00001, 8.0);//this range worked for overall pt range
+  //  RooRealVar n("n","", 6.7489,1.0,20.0);
+  //  RooRealVar alpha("alpha","", 1.0,-50.,50);
+  //  RooBreitWigner bwPDF("BreitWigner","BreitWigner",x,mean_bw,sigma_bw);
+  //  RooCBShape cbPDF("cball", "crystal ball", x, mean_cb, sigma_cb, alpha, n);
+  //  RooFFTConvPdf SigPDF("bwxCryBall", "FFT Conv CryBall and BW", x, bwPDF, cbPDF);
+   
+ 
+
+    _start_CMS_alpha=60;
+    _start_CMS_beta=0.050;
+    _start_CMS_gamma=0.020;
+    _start_CMS_peak=80;
+    _start_mean_gau=0;
+    _start_sigma_gau=1.0;
+
+    if (ikin==0 && ieta==0){//10-15 GeV, barrel
+      _start_CMS_alpha=20;
+      _start_CMS_beta=0.005;
+      _start_CMS_gamma=0.055;
+      _start_CMS_peak=75;
+      _start_mean_gau=0.9;
+      _start_sigma_gau=1.34;
+    }
+
+    if (ikin==0 && ieta==1){//10-15 GeV, endcap
+      _start_CMS_alpha=20;
+      _start_CMS_beta=0.005;
+      _start_CMS_gamma=0.020;
+      _start_CMS_peak=80;
+      _start_mean_gau=-1.97;
+      _start_sigma_gau=0.1;
+    }
+
+    if (ikin==1 && ieta==0){//15-20 GeV, barrel
+      _start_CMS_alpha=41;
+      _start_CMS_beta=0.2;
+      _start_CMS_gamma=0.047;
+      _start_CMS_peak=80;
+      _start_mean_gau=1.3;
+      _start_sigma_gau=5.0;
+    }
+
+    if (ikin==1 && ieta==1){//15-20 GeV, endcap
+      _start_CMS_alpha=43;
+      _start_CMS_beta=0.09;
+      _start_CMS_gamma=0.018;
+      _start_CMS_peak=80;
+      _start_mean_gau=0.6;
+      _start_sigma_gau=1.7;
+    }
+
+    if (ikin==2 && ieta==1){//20-25 GeV, endcap
+      _start_CMS_alpha=50;
+      _start_CMS_beta=0.06;
+      _start_CMS_gamma=0.023;
+      _start_CMS_peak=90;
+      _start_mean_gau=2.4;
+      _start_sigma_gau=0.1;
+    }
+
+
+  // RooNDKeysPdf x Gaussian
+  
+    RooRealVar mean_gau("mean_gau", "Gaussian Z mass, mean", _start_mean_gau, -5, 5);
+    RooRealVar sigma_gau("sigma_gau", "Gaussian Z mass, sigma", _start_sigma_gau, 0.05, 6.00);
+    RooGaussian gauPDF("gauPDF","Signal shape gaussian",x, mean_gau, sigma_gau);
+    TFile* fTemp = new TFile("fTemp.toor","RECREATE");
+    TTree* tr = (TTree*)_yield[_ZJETS_EtoGAMMA_ENR].tr->CopyTree(cut);
+    std::cout<<"tr entries = "<<_yield[_ZJETS_EtoGAMMA_ENR].tr->GetEntries()<<std::endl;
+    std::cout<<"after  cut = "<<tr->GetEntries()<<std::endl;
+    RooDataSet sig_data("sig_data", "e->g data, DYjets", tr, x);
+    RooNDKeysPdf sig_templ( "sig_templ", "sig_template", x, sig_data);
+    RooFFTConvPdf SigPDF("SigPDF", "FFT Conv sig templ x Gau", x, sig_templ, gauPDF);
+  
+  
+
+  //Now define the background P.D.F
+
+  //Exponential
+    //    RooRealVar tau("tau","exponential function parameter",0,-10.,10.);//this range worked for overall pt range
+    //    RooExponential exp("exponential","Background PDF",x,tau);
+    //    RooFormulaVar eff("eff","0.5*(TMath::Erf((Mpholep1-1)/0.5)+1)",x) ;
+    //    RooAddPdf BkgPDF("BkgPDF","exp. * Err.fn",exp,eff) ;
+
+    //RooCMSShape
+     RooRealVar CMS_alpha("CMS_alpha","CMS_alpha",_start_CMS_alpha,20,120);
+     RooRealVar CMS_beta("CMS_beta","CMS_beta",_start_CMS_beta,0.005,0.300);
+     RooRealVar CMS_gamma("CMS_gamma","CMS_gamma",_start_CMS_gamma,0.005,0.070);
+     RooRealVar CMS_peak("CMS_peak","CMS_peak",_start_CMS_peak,70,90);
+     RooCMSShape BkgPDF("BkgPDF","RooCMSShape",x,CMS_alpha,CMS_beta, CMS_gamma,CMS_peak);
+    
+       	
+
   //Now construct the total PDF. We need to define the number of signal and background events in the model
   RooRealVar Nsig("Nsig","Number of signal events",0.5*nMax,0.,nMax);
   RooRealVar Nbkg("Nbkg","Number of background events",0.2*nMax,0.,nMax);
   RooAddPdf PDFtot("PDFtot","PDFtot",RooArgList(SigPDF,BkgPDF),RooArgList(Nsig,Nbkg));
   //RooAddPdf PDFtot("PDFtot","PDFtot",RooArgList(bwPDF,BkgPDF),RooArgList(Nsig,Nbkg));
   std::cout<<"I will fit PDFtot  "<<std::endl;  
-    PDFtot.fitTo(dh);//ML fit is default
+  PDFtot.fitTo(dh);//ML fit is default
   std::cout<<"I fitted PDFtot  "<<std::endl; 
   
   // Print values of mean and sigma (that now reflect fitted values and errors, unless you fixed them)
-  mean_bw.Print();
+  // mean_bw.Print();
   // sigma.Print();
   //Now plot the data and the fitted PDF
   
   RooPlot* frame = x.frame() ;
+
+  TString strKin="Pt: ";
+  strKin+=(int)_yield[_DATA_EtoGAMMA_ENR].hist[0]->GetBinLowEdge(ikin+1);
+  strKin+="-";
+  strKin+=(int)_yield[_DATA_EtoGAMMA_ENR].hist[0]->GetBinLowEdge(ikin+1)+(int)_yield[_DATA_EtoGAMMA_ENR].hist[0]->GetBinWidth(ikin+1);
+  strKin+=" GeV, ";
+  TString strEta="eta: "+StrEtaFine(ieta, ietaFine);
+  TString strTitle=strKin+strEta;
+  
+  frame->SetTitle(strTitle);
+  
   //  x1.plotOn(frame);//MarkerColor(2),MarkerSize(0.9),MarkerStyle(21)); //this will show histogram data points on canvas
   dh.plotOn(frame);//MarkerColor(2),MarkerSize(0.9),MarkerStyle(21)); //this will show histogram data points on canvas
   //dh.statOn(frame); //this will display hist stat on canvas
@@ -391,11 +589,12 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TString 
   //One can also plot the single components of the total PDF, like the background component
   PDFtot.plotOn(frame,Components(BkgPDF),LineStyle(kDashed),LineColor(kRed));
   //Actually plot the result
+  
   TCanvas* c1 = new TCanvas(saveas,saveas);
   c1->cd();
   //c1->SetLogy();
+  
   frame->Draw();
-
   // Prepare and plot THStack
   
   THStack* mcHists = new THStack("mcHistsTot","DATA vs MC and FIT");
@@ -413,8 +612,8 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TString 
   _yield[_WJETS_ENR].hist[ieta]->SetFillColor(433);_yield[_WJETS_ENR].hist[ieta]->SetLineColor(433);
   mcHists->Add(_yield[_WJETS_ENR].hist[ieta]);
 
-  //  mcHists->Draw("same");
-  //  frame->Draw("same");
+  //  mcHists->Draw("HIST same");
+  frame->Draw("same");
   
   c1->Draw();
   //double chi2 = RooChi2Var("chi2","chi2",PDFtot,dh);
@@ -422,6 +621,7 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TString 
   cout<<"chi2="<<chi2<<endl;
   if (_isMCclosure) saveas+="_MCclosure";
   c1->SaveAs("../WGammaOutput/ELECTRON_WGamma/Plots/EtoGammaFits/"+saveas+".png");
+  c1->SaveAs("../WGammaOutput/ELECTRON_WGamma/Plots/EtoGammaFits/"+saveas+".pdf");
   cout<<"Nsig.getVal()="<<Nsig.getVal()<<endl;
   _NsigVal[ietaFine]=Nsig.getVal();
   _NsigErr[ietaFine]=Nsig.getError();

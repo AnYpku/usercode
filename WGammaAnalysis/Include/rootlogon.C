@@ -10,6 +10,7 @@
 
   gROOT->ProcessLine(".L ../PHOSPHOR_CORRECTION/PhosphorCorrectorFunctor.cc+");
 
+  gROOT->ProcessLine(".L ../Include/RooCMSShape.cc+");
   gROOT->ProcessLine(".L ../Include/TScaleFactors.C+");
   gROOT->ProcessLine(".L ../Include/TMathTools.C+");
   gROOT->ProcessLine(".L ../Include/TEventTree.C+");

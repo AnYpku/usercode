@@ -166,7 +166,7 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   _pyPars.fOut->cd();
   TString canvName="TotalDATAvsMC";
   canvName+=StrLabelEta(ieta);
-  _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,800);
+  _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,1200,800);
   TLegend* legend;
   if (_pyPars.varKin=="Mleplep" || _pyPars.varKin=="lep2PhoDeltaR")
     legend = new TLegend(0.25,0.50,0.50,0.90);
@@ -238,11 +238,11 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   TPad* pad2 = (TPad*)canv->GetPad(2);
   pad1->SetPad(0,0.3,1.0,1.0);
   pad2->SetPad(0,0,  1.0,0.28);
-  pad1->SetLeftMargin(0.18);
+  pad1->SetLeftMargin(0.10);
   pad1->SetTopMargin(0.08);
   pad1->SetRightMargin(0.07);
   pad1->SetBottomMargin(0.01); // All X axis labels and titles are thus cut off
-  pad2->SetLeftMargin(0.18);
+  pad2->SetLeftMargin(0.10);
   pad2->SetTopMargin(0.01);
   pad2->SetRightMargin(0.07);
   pad2->SetBottomMargin(0.45);
@@ -299,7 +299,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   if (isStack) hist2->SetFillStyle(0);
   hist1[0]->GetYaxis()->SetRangeUser(min,max);
   hist1[0]->GetYaxis()->SetTitle("N_{events}/(bin width)");
-  hist1[0]->GetYaxis()->SetTitleOffset(1.4);
+  hist1[0]->GetYaxis()->SetTitleOffset(1.0);
   hist1[0]->SetStats(0);
   if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(0); hist1[0]->GetYaxis()->SetNoExponent(); }
   hist1[0]->Draw("P");
@@ -324,7 +324,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
 //    boxBlind1->SetFillColor(13);
 //    boxBlind1->SetFillStyle(3004);
 //    boxBlind1->Draw("same");
-    TText* textUnderflow = new TText(0.23,0.20,"underflow bin");
+    TText* textUnderflow = new TText(0.15,0.20,"underflow bin");
     textUnderflow->SetNDC();
     textUnderflow->SetTextAngle(90);//vertical
     textUnderflow->Draw("same");
