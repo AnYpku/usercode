@@ -482,10 +482,22 @@ void CalcAccAndEff::PlotAndSaveOutput()
   _HaccXeff1D->SetLineWidth(2);
   _HaccXeff1D->GetXaxis()->SetMoreLogLabels(); 
   _HaccXeff1D->GetXaxis()->SetNoExponent();
+  _HaccXeff1D->GetXaxis()->SetTitle("photon Pt, GeV");
+  _HaccXeff1D->SetStats(0);
+
+  TString hTitle=_HaccXeff1D->GetTitle();
+  hTitle.ReplaceAll("ONEDI"," ");
+  hTitle.ReplaceAll("_"," ");
+  _HaccXeff1D->SetTitle(hTitle);
   _HaccXeff1D->Draw();
 
   _HaccXeff1D->Write();
   _HcsTheory1D->Write();
+  TString nameSave=_config.GetPlotsDirName(_channel,_vgamma,_config.PLOTS_CONSTANTS);
+  nameSave+=cName;
+  canv->SaveAs(nameSave+".png");
+  canv->SaveAs(nameSave+".pdf");
+  canv->SaveAs(nameSave+".root");
 
   TMathTools math;
   TH1F* HaccXeffTot = math.ComputeHistTotal(_config.GetAccXEffName(_config.TOTAL), _HaccXeff1D);
