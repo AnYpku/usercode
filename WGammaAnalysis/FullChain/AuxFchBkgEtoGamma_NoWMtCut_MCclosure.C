@@ -4,7 +4,7 @@
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
-void AuxFchBkgEtoGamma_MCclosure()
+void AuxFchBkgEtoGamma_NoWMtCut_MCclosure()
 {
   TBenchmark time;
   time.Start("time");
@@ -17,7 +17,7 @@ void AuxFchBkgEtoGamma_MCclosure()
 
   anPars.channel=conf.ELECTRON;
   anPars.vgamma=conf.W_GAMMA;
-  TEtoGamma etg(anPars,conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,1); 
+  TEtoGamma etg(anPars,conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_NO_WMT_CUT,1); 
   etg.ComputePlotSave();
 
   time.Stop("time");

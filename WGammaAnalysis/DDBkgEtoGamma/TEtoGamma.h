@@ -18,7 +18,7 @@ class TEtoGamma
 {
   public:
 
-    TEtoGamma(TConfiguration::AnalysisParameters &anPars, bool isMCclosure);
+  TEtoGamma(TConfiguration::AnalysisParameters &anPars, int selStage, bool isMCclosure);
     virtual ~TEtoGamma();
     void ComputePlotSave();
 
@@ -54,6 +54,8 @@ class TEtoGamma
     float _kinBinLims[100];
 
     int _nFineEtaBins;
+
+    int _selStage;
 
     bool _isMCclosure;
 

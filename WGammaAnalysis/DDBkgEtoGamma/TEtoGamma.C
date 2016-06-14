@@ -38,14 +38,17 @@
 #include "RooPlot.h"
 using namespace RooFit;
 
-TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars, bool isMCclosure)
+TEtoGamma::TEtoGamma(TConfiguration::AnalysisParameters &anPars, int selStage, bool isMCclosure)
 {
   
   _isMCclosure=isMCclosure;
   _cutAdd=anPars.cutAdd;
+  _selStage=selStage;
   
   _varKin=anPars.varKin;
   TString strFout = _conf.GetDDBkgEtoGammaFileName(anPars.varKin);
+  if (selStage==_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_NO_WMT_CUT) 
+    strFout.ReplaceAll(".root","_noWMTcut.root");
   if (isMCclosure) strFout.ReplaceAll(".root","_MCclosure.root");
   _fOut=new TFile(strFout,"recreate");
   _nKinBins=anPars.nKinBins;
@@ -100,34 +103,37 @@ TTree* TEtoGamma::GetTree(TString strFileName){
 
 TString TEtoGamma::FName(int inum)
 {
+
+  //selStage = _conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT
+  //selStage = _conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_NO_WMT_CUT
   TString str;
   if (inum==_DATA_EtoGAMMA_ENR) {
-        str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.DATA);
+        str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.DATA);
         if (_isMCclosure) str.ReplaceAll(".root","_MCclosure.root");
     std::cout<<"file _DATA_EtoGAMMA_ENR: "<<str<<std::endl;
   }
   if (inum==_ZJETS_EtoGAMMA_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
+    str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"DYjets_to_ll");
     std::cout<<"file _ZJETS_EtoGAMMA_ENR: "<<str<<std::endl;
   }
   if (inum==_SIGMC_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.SIGMC);
+    str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.SIGMC);
     std::cout<<"file _SIGMC_ENR: "<<str<<std::endl;
   }
   if (inum==_WGAMMATAUNU_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wg_to_taunu");
+    str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wg_to_taunu");
     std::cout<<"file __WGAMMATAUNU_ENR: "<<str<<std::endl;
   }
   if (inum==_ZGAMMA_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Zg");
+    str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Zg");
     std::cout<<"file _ZGAMMA_ENR: "<<str<<std::endl;
   }
   if (inum==_TTJETS_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"ttbarjets");
+    str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"ttbarjets");
     std::cout<<"file _TTJETS_ENR: "<<str<<std::endl;
   }
   if (inum==_WJETS_ENR) {
-    str=_conf.GetSelectedName(_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
+    str=_conf.GetSelectedName(_selStage,_conf.ELECTRON,_conf.W_GAMMA,_conf.UNBLIND,_conf.BKGMC,"Wjets_to_lnu");
     std::cout<<"file _WJETS_ENR: "<<str<<std::endl;
   }
   if (inum==_ZJETS_NOM) {
@@ -163,10 +169,13 @@ void TEtoGamma::SetYields(int inum)
   TFullCuts fullcut;
   _yield[inum].num=inum;
   TString fName=FName(inum);
+  std::cout<<"fName="<<fName<<std::endl;
   _yield[inum].tr = GetTree(fName);
   TCut cutW="weight";
   //  TCut cutWMt=fullcut.RangeMetRelatedCut(2012,_conf.ELECTRON);
+  
   for (int ieta=_conf.BARREL; ieta<=_conf.ENDCAP; ieta++){
+    
     TString hName=HName(inum,ieta);
     _yield[inum].hist[ieta] = new TH1F(hName,hName,_nKinBins,_kinBinLims);
     _yield[inum].hist[ieta]->Sumw2();
@@ -175,14 +184,20 @@ void TEtoGamma::SetYields(int inum)
     if (ieta==_conf.ENDCAP) cutEta=photon.RangeEndcap();
     TCut cut = cutEta && _cutAdd;// && cutWMt;
     TCut cutMatch("pho_genEle_dRMin<0.4");
+    
+    std::cout<<"cut="<<cut.GetTitle()<<std::endl;
     if (inum==_ZJETS_NOM || inum==_ZJETS_EtoGAMMA_ENR) { cut=cut && cutMatch;}
+    _yield[inum].hist[ieta]->Print();
+    std::cout<<"trEntries="<<_yield[inum].tr->GetEntries(cut*cutW)<<std::endl;
     _yield[inum].tr->Draw(_varKin+TString(">>")+_yield[inum].hist[ieta]->GetName(),cut*cutW,"goff");
-
+    
     if (inum!=_DATA_EtoGAMMA_ENR) continue;
     for (int ikin=0; ikin<_nKinBins; ikin++){
+      
       if (_kinBinLims[ikin]<=55) _nFineEtaBins=4;
       else if (_kinBinLims[ikin]<=85) _nFineEtaBins=2;
-      else _nFineEtaBins=1;      
+      else _nFineEtaBins=1;  
+        
       for (int ietaFine=0; ietaFine<_nFineEtaBins; ietaFine++){
         TString strCutKin;
         strCutKin=_varKin+">";
@@ -221,9 +236,11 @@ void TEtoGamma::SetYields(int inum)
       err=sqrt(err);
       _yield[_DATA_EtoGAMMA_ENR].hist[ieta]->SetBinContent(ikin+1,val);
       _yield[_DATA_EtoGAMMA_ENR].hist[ieta]->SetBinError(ikin+1,err);
+      
     }//end of loop over ikin
-  }// end of loop over ieta
     
+  }// end of loop over ieta
+  
 }// end of TEtoGamma::SetYields
 
 float TEtoGamma::EtaMin(int ieta, int ietaFine){
