@@ -14,6 +14,7 @@ TConfiguration::TConfiguration()
   _selectedNameBase[VERY_PRELIMINARY]="VeryPreliminarySelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_TEMPLATE_METHOD]="PreliminaryForTemplateMethodSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT]="PreliminaryForEtoGammaWithPSVcutSelected/selected";
+  _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_NO_WMT_CUT]="PreliminaryForEtoGammaWithPSVNoWMtcutSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT]="PreliminaryForEtoGammaNoPSVcutSelected/selected";
   _selectedNameBase[PRELIMINARY_FOR_UNFOLDING]="PreliminaryForUnfoldingSelected/selected";
   _selectedNameBase[FSR]="FsrSelected/selected";

@@ -486,7 +486,7 @@ TCut TFullCuts::RangeForTemplateMethodCut(int year, int channel, int vgamma, int
   return cut;
 }// end of RangeForTemplateMethodCut
 
-TCut TFullCuts::RangeForEtoGamma(int phoWP, bool doPSVcut){
+TCut TFullCuts::RangeForEtoGamma(int phoWP, bool doPSVcut, bool doWMtcut){
   // for WGamma ELECTRON only
 
   //TCut RangePhoton(int year, int wp, 
@@ -498,7 +498,8 @@ TCut TFullCuts::RangeForEtoGamma(int phoWP, bool doPSVcut){
   if (!doPSVcut) cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 0) && !_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 1);
   if (doPSVcut) cutPhoton=_photon.RangePhoton(_config.ELECTRON, _config.W_GAMMA, 2012, phoWP, 1, 1, 1, 1, 1, 1);
 
-  TCut cut = cutPhoton && RangeDeltaR(_config.W_GAMMA) && RangeMetRelatedCut(2012,_config.ELECTRON); 
+  TCut cut = cutPhoton && RangeDeltaR(_config.W_GAMMA);
+  if (doWMtcut) cut = cut && RangeMetRelatedCut(2012,_config.ELECTRON); 
   //  cut = cut && (!RangeZmassWindowCut());// to enrich sample with e->gamma events
   return cut;
 }// end of RangeForEtoGamma(int phoWP)

@@ -361,7 +361,7 @@ void Selection::ExtraSelection(TConfiguration::AnalysisParameters &anPars)
     }
   }//end of loop over i (for (int i=0; i<INPUT.nSources_; i++))
 
-}
+}// end of ExtraSelection
 
 void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfiguration& config, TFullCuts &fullCut, int year, int channel, int vgamma, int wp, int blind)
 {
@@ -395,25 +395,30 @@ void Selection::ExtraSelectionOne(TAllInputSamples &INPUT, int iSource, TConfigu
     // Preliminary for e->gamma selected
     if (channel==config.ELECTRON && vgamma==config.W_GAMMA && blind==config.UNBLIND){
       
+      TString fOutName2_1=config.GetSelectedName(config.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_NO_WMT_CUT,config.ELECTRON,config.W_GAMMA,config.UNBLIND,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
+      TFile fOut2_1(fOutName2_1,"recreate");
+      std::cout<<"For EtoGamma with PSV Selection cut:      "<<fullCut.RangeForEtoGamma(wp,1,0).GetTitle()<<std::endl;
+      _tr2_1 = new TTree("selectedEvents","selected events, one candidate per event");
+      _trReduced = _tr->CopyTree(fullCut.RangeForEtoGamma(wp,1,0));
+      PickHardestPhotonInEvent(_tr2_1, _trReduced, blind);
+      _tr2_1->Write();
+      std::cout<<"Will be saved to file:      "<<fOutName2_1<<std::endl;
+
       TString fOutName2_2=config.GetSelectedName(config.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT,config.ELECTRON,config.W_GAMMA,config.UNBLIND,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
       TFile fOut2_2(fOutName2_2,"recreate");
-      std::cout<<"For EtoGamma with PSV Selection cut:      "<<fullCut.RangeForEtoGamma(wp,1).GetTitle()<<std::endl;
+      std::cout<<"For EtoGamma with PSV Selection cut:      "<<fullCut.RangeForEtoGamma(wp,1,0).GetTitle()<<std::endl;
       _tr2_2 = new TTree("selectedEvents","selected events, one candidate per event");
-      _trReduced = _tr->CopyTree(fullCut.RangeForEtoGamma(wp,1));
-
+      _trReduced = _tr->CopyTree(fullCut.RangeForEtoGamma(wp,1,1));
       PickHardestPhotonInEvent(_tr2_2, _trReduced, blind);
-
       _tr2_2->Write();
       std::cout<<"Will be saved to file:      "<<fOutName2_2<<std::endl;
 
       TString fOutName2_3=config.GetSelectedName(config.PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT,config.ELECTRON,config.W_GAMMA,config.UNBLIND,INPUT.allInputs_[iSource].sample_,INPUT.allInputs_[iSource].sourceName_);
       TFile fOut2_3(fOutName2_3,"recreate");
-      std::cout<<"For EtoGamma inversted PSV Selection cut:      "<<fullCut.RangeForEtoGamma(wp,0).GetTitle()<<std::endl;
+      std::cout<<"For EtoGamma inversted PSV Selection cut:      "<<fullCut.RangeForEtoGamma(wp,0,0).GetTitle()<<std::endl;
       _tr2_3 = new TTree("selectedEvents","selected events, one candidate per event");
-      _trReduced = _tr->CopyTree(fullCut.RangeForEtoGamma(wp,0));
-
+      _trReduced = _tr->CopyTree(fullCut.RangeForEtoGamma(wp,0,1));
       PickHardestPhotonInEvent(_tr2_3, _trReduced, blind);
-
       _tr2_3->Write();
       std::cout<<"Will be saved to file:      "<<fOutName2_3<<std::endl;
       
