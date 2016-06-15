@@ -4,7 +4,7 @@
 #include "TBenchmark.h" // ROOT
 #include <iostream> //C++
 
-void AuxFchBkgEtoGammaNoWMtCut()
+void AuxFchBkgEtoGamma_NoWMtCut()
 {
   TBenchmark time;
   time.Start("time");
