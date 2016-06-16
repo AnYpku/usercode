@@ -21,6 +21,7 @@ class CalcCrossSection
             ERR_SYST_CHISOvsSIHIH,
             ERR_SYST_ZgMC_Norm,
             ERR_SYST_TemplStat,
+            ERR_SYST_etogDiff,
             ERR_SYST_etogStat,
             ERR_SYST_BkgSubtrZgWgtaunu,
             ERR_SYST_accXeff_MCstat,
@@ -97,7 +98,7 @@ class CalcCrossSection
        TConfiguration _config;
        TFile* _fOut;
 
-       static const int Nerrs=15;
+       static const int Nerrs=25;
        FromYieldToCS _yCSarray[Nerrs];
 //       FromYieldToCS _yCSallSyst;
 

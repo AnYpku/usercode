@@ -276,6 +276,22 @@ void CalcCrossSection::Calc()
 //  DivideOverBinWidth(_yCSarray[errT]);  
 
   if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
+    errT=ERR_SYST_etogDiff;
+    _yCSarray[errT].errType=errT;  
+    _yCSarray[errT].title="e#rightarrow#gamma, with or without WMt";
+    _yCSarray[errT].name="syst_etog_diff";
+    _yCSarray[errT].strUp="e\\rightarrow\\gamma ";
+    _yCSarray[errT].strDown="y/n WMt";
+    std::cout<<"ERR_SYST_etogDiff "<<_yCSarray[errT].title<<std::endl;
+    GetYieldsSyst(_yCSarray[errT], 
+      "../WGammaOutput/ELECTRON_WGamma/YieldsAndBackground/DDetog_Syst_phoEt.root", 
+      "yieldsBkgSubtrData_ONEDI_COMMON", 
+      "yieldsBkgSubtrData_TOTAL_COMMON");
+    ApplyUnfolding(0,_yCSarray[errT]);
+    ApplyAccXEff(_yCSarray[errT]);
+    DivideOverLumi(_yCSarray[errT]);
+    DivideOverBinWidth(_yCSarray[errT]);  
+
     errT=ERR_SYST_etogStat;
     _yCSarray[errT].errType=errT;  
     _yCSarray[errT].title="e#rightarrow#gamma, samples stat";
@@ -284,9 +300,9 @@ void CalcCrossSection::Calc()
     _yCSarray[errT].strDown="stat";
     std::cout<<"ERR_SYST_etogStat "<<_yCSarray[errT].title<<std::endl;
     GetYieldsSyst(_yCSarray[errT], 
-    _config.GetDDBkgEtoGammaFileName("phoEt"), 
-    _config.GetYieldsDDBkgEtoGamma(_config.ONEDI,_config.COMMON), 
-    _config.GetYieldsDDBkgEtoGamma(_config.TOTAL,_config.COMMON));
+      _config.GetDDBkgEtoGammaFileName("phoEt"), 
+      _config.GetYieldsDDBkgEtoGamma(_config.ONEDI,_config.COMMON), 
+      _config.GetYieldsDDBkgEtoGamma(_config.TOTAL,_config.COMMON));
     ApplyUnfolding(0,_yCSarray[errT]);
     ApplyAccXEff(_yCSarray[errT]);
     DivideOverLumi(_yCSarray[errT]);

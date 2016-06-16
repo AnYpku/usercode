@@ -90,7 +90,7 @@ void DDetogSyst()
   }//end of loop over ieta
   hYieldONEDI[2]=(TH1F*)hYieldONEDI[0]->Clone("yieldsBkgSubtrData_ONEDI_COMMON");
   hYieldONEDI[2]->Add(hYieldONEDI[1]);
-  
+  hYieldONEDI[2]->Write();
   for (int ieta=0; ieta<=2; ieta++){
     TString str;
     if (ieta==0) str="BARREL";
