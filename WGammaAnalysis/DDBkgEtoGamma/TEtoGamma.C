@@ -224,7 +224,10 @@ void TEtoGamma::SetYields(int inum)
         _hZmassData[ieta][ietaFine][ikin] = new TH1F(hNameZmass,hNameZmass,nB,_ZmassMin,_ZmassMax);    
         _yield[inum].tr->Draw("Mpholep1>>"+hNameZmass,cutWithKin*cutW,"goff");
 
-	FitMeg(ikin, ieta, ietaFine, _hZmassData[ieta][ietaFine][ikin],(cutEta && cutEtaFine && _cutAdd && cutKin && cutMatch)*cutW,"sa_"+hNameZmass);
+        TString saveas="sa_"+hNameZmass;
+        if (_selStage==_conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_NO_WMT_CUT) saveas+="_noWMtCut";
+
+	FitMeg(ikin, ieta, ietaFine, _hZmassData[ieta][ietaFine][ikin],(cutEta && cutEtaFine && _cutAdd && cutKin && cutMatch)*cutW,saveas);
 
       }//end of loop over ietaFine
 

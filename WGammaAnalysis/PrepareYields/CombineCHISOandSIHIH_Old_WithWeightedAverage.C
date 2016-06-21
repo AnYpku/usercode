@@ -22,6 +22,7 @@
   TH1F* h_M_sihih_templStat;
 
   TH1F* h_Yield_Meth1[3];
+  TH1F* h_Yield_Meth2[3];
 
   TFile* fOut;
 
@@ -78,7 +79,7 @@ bool GetAndCheckHists(TString f_data_chiso, TString f_data_sihih, TString f_MCcl
   TString hNameMCsig=TString("yieldsSelected_SIGMC__ONEDI_")+strEta;
 
 
-  fOut->cd();
+fOut->cd();
 
   h_d_chiso = (TH1F*)f_d_chiso->Get(hName);
   h_d_sihih = (TH1F*)f_d_sihih->Get(hName);
@@ -142,14 +143,25 @@ void ComputeSystHists(TString strKin, TString strEta)
   if (strEta=="ENDCAP") ieta=1;
 
   h_Yield_Meth1[ieta] = (TH1F*)h_d_chiso->Clone(TString("h_Syst_Meth1")+strEta);
+  h_Yield_Meth2[ieta] = (TH1F*)h_d_chiso->Clone(TString("h_Syst_Meth2")+strEta);
 
   for (int ib=1; ib<=h_d_chiso->GetNbinsX(); ib++){
 
     //   float errMeth1_1 = fabs(h_d_chiso->GetBinContent(ib) - h_d_sihih->GetBinContent(ib));
+    //   float errMeth1_2 = h_d_chiso_templStat[ieta]->GetBinError(ib);
     float errMeth1 = fabs(h_d_chiso->GetBinContent(ib) - h_d_sihih->GetBinContent(ib));//sqrt(errMeth1_1*errMeth1_1+errMeth1_2*errMeth1_2);
     h_Yield_Meth1[ieta]->SetBinError(ib,errMeth1);
     h_Yield_Meth1[ieta]->SetBinContent(ib,h_d_chiso->GetBinContent(ib));
 
+    float w1, x1, w2, x2;
+    x1 = h_d_chiso->GetBinContent(ib);
+    x2 = h_d_sihih->GetBinContent(ib);
+    w1 = 1./(TMath::Power(h_M_chiso->GetBinContent(ib)-h_M_chisoMCsig->GetBinContent(ib),2)+TMath::Power(h_d_chiso_templStat[ieta]->GetBinError(ib),2));
+    w2 = 1./(TMath::Power(h_M_sihih->GetBinContent(ib)-h_M_chisoMCsig->GetBinContent(ib),2)+TMath::Power(h_d_sihih_templStat->GetBinError(ib),2));
+    float valMeth2 = (w1*x1+w2*x2)/(w1+w2);
+    float errMeth2 = 1./sqrt(w1+w2);
+    h_Yield_Meth2[ieta]->SetBinContent(ib,valMeth2);
+    h_Yield_Meth2[ieta]->SetBinError(ib,errMeth2);
   }//end of loop over ib
 
   h_Yield_Meth1[ieta]->SetTitle("yieldsDDTrueONEDI_CHISOvsSIHIH_"+strEta);
@@ -183,7 +195,7 @@ void ComputeSystHists(TString strKin, TString strEta)
       std::cout<<"$"<<(int)h_M_chiso->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_chiso->GetBinError(ib)*h_M_chiso->GetBinError(ib)+h_M_chiso_templStat->GetBinError(ib)*h_M_chiso_templStat->GetBinError(ib))<<"$ & ";
       std::cout<<"$"<<(int)h_M_sihih->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_sihih->GetBinError(ib)*h_M_sihih->GetBinError(ib)+h_M_sihih_templStat->GetBinError(ib)*h_M_sihih_templStat->GetBinError(ib))<<"$ &";
 
-      std::cout<<"$"<<(int)h_Yield_Meth1[ieta]->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth1[ieta]->GetBinError(ib)<<"$ ";
+      std::cout<<"$"<<(int)h_Yield_Meth2[ieta]->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth2[ieta]->GetBinError(ib)<<"$ ";
 
       std::cout<<" \\\\ \\hline"<<std::endl;
   }//end of loop over ib
@@ -249,30 +261,19 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
 
   h_Yield_Meth1[0]->Print();
   h_Yield_Meth1[1]->Print();
-  h_Yield_Meth1[2]=(TH1F*)h_Yield_Meth1[0]->Clone("yieldsDDTrueONEDI_CHISOvsSIHIH_COMMON");
+  h_Yield_Meth1[2]=(TH1F*)h_Yield_Meth1[0]->Clone("yieldsDDTrueONEDICOMMON");
   h_Yield_Meth1[2]->Add(h_Yield_Meth1[1]);
-  h_Yield_Meth1[2]->SetTitle("yieldsDDTrueONEDI_CHISOvsSIHIH_COMMON");
+  h_Yield_Meth1[2]->SetTitle("yieldsDDTrueONEDICOMMON");
   h_Yield_Meth1[2]->Write();
   h_Yield_Meth1[2]->Print();
 
-  h_d_chiso_templStat[0]->Print();
-  h_d_chiso_templStat[1]->Print();
-  h_d_chiso_templStat[2]=(TH1F*)h_Yield_Meth1[0]->Clone("yieldsDDTrueONEDI_TemplStat_COMMON");
-  h_d_chiso_templStat[2]->Add(h_Yield_Meth1[1]);
-  h_d_chiso_templStat[2]->SetTitle("yieldsDDTrueONEDI_TemplStat_COMMON");
-  h_d_chiso_templStat[2]->Write();
-  h_d_chiso_templStat[2]->Print();
-
-  TH1F* hYieldTOTAL_CHISOvsSIHIH[3];
-  TH1F* hYieldTOTAL_TemplStat[3];
+  TH1F* hYieldTOTAL[3];
   for (int ieta=0; ieta<=2; ieta++){
     TString str;
     if (ieta==0) str="BARREL";
     if (ieta==1) str="ENDCAP";
     if (ieta==2) str="COMMON";
-    hYieldTOTAL_CHISOvsSIHIH[ieta]=new TH1F("yieldsDDTrueTOTAL_CHISOvsSIHIH_"+str,"yieldsDDTrueTOTAL_CHISOvsSIHIH_"+str,1,15,500);
-    hYieldTOTAL_TemplStat[ieta]=new TH1F("yieldsDDTrueTOTAL_TemplStat_"+str,"yieldsDDTrueTOTAL_TemplStat_"+str,1,15,500);
-
+    hYieldTOTAL[ieta]=new TH1F("yieldsDDTrueTOTAL"+str,"yieldsDDTrueTOTAL"+str,1,15,500);
     float cont=0; float err=0;
     for (int ib=2; ib<=h_Yield_Meth1[ieta]->GetNbinsX(); ib++){
       cont+=h_Yield_Meth1[ieta]->GetBinContent(ib);
@@ -280,24 +281,18 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
       std::cout<<"ib="<<ib<<", cont+-err="<<h_Yield_Meth1[ieta]->GetBinContent(ib)<<"+-"<<h_Yield_Meth1[ieta]->GetBinError(ib)<<std::endl;
     }//end of loop over ib
     err = sqrt(err);
-    hYieldTOTAL_CHISOvsSIHIH[ieta]->SetBinContent(1,cont);
-    hYieldTOTAL_CHISOvsSIHIH[ieta]->SetBinError(1,err);
+    hYieldTOTAL[ieta]->SetBinContent(1,cont);
+    hYieldTOTAL[ieta]->SetBinError(1,err);
       std::cout<<"total: cont+-err="<<cont<<"+-"<<err<<std::endl;
-    hYieldTOTAL_CHISOvsSIHIH[ieta]->Write();
-
-    cont=0; err=0;
-    for (int ib=2; ib<=h_d_chiso_templStat[ieta]->GetNbinsX(); ib++){
-      cont+=h_d_chiso_templStat[ieta]->GetBinContent(ib);
-      err+=h_d_chiso_templStat[ieta]->GetBinError(ib)*h_d_chiso_templStat[ieta]->GetBinError(ib);
-      std::cout<<"ib="<<ib<<", cont+-err="<<h_d_chiso_templStat[ieta]->GetBinContent(ib)<<"+-"<<h_d_chiso_templStat[ieta]->GetBinError(ib)<<std::endl;
-    }//end of loop over ib
-    err = sqrt(err);
-    hYieldTOTAL_TemplStat[ieta]->SetBinContent(1,cont);
-    hYieldTOTAL_TemplStat[ieta]->SetBinError(1,err);
-      std::cout<<"total: cont+-err="<<cont<<"+-"<<err<<std::endl;
-    hYieldTOTAL_TemplStat[ieta]->Write();
-
+    hYieldTOTAL[ieta]->Write();
   }//end of loop over ieta
+
+//  f_data_chiso="../../WGammaAnalysisAux15_Fit_WMt_bins/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_WMt_.root";
+//  f_data_sihih="../../WGammaAnalysisAux15_Fit_WMt_bins/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_WMt_.root";
+//  f_MCcl_chiso="../../WGammaAnalysisAux18_Fit_WMt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_CHISO_WMt_.root";
+//  f_MCcl_sihih="../../WGammaAnalysisAux18_Fit_WMt_bins_MCclosure/WGammaOutput/MUON_WGamma/YieldsAndBackground/yields_WGamma_TEMPL_SIHIH_WMt_.root";
+//  PrintTableOne("WMt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "BARREL");
+//  PrintTableOne("WMt", f_data_chiso, f_data_sihih, f_MCcl_chiso, f_MCcl_sihih, "ENDCAP");
 
 
 }//end of CombineCHISOandSIHIH()

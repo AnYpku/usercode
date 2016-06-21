@@ -67,25 +67,25 @@ void CalcCrossSection::PrintLatexAll_ErrInPercent()
     // print |c|c|c|.....|c|
     std::cout<<"  \\begin{tabular}{|c|";
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE) std::cout<<"c|";
+      if (_yCSarray[errT].errType!=ERR_NONE && _yCSarray[errT].errType!=ERR_SUM) std::cout<<"c|";
     std::cout<<"}"<<std::endl;
 
     // print strUp
     std::cout<<"    bin ";
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE) std::cout<<" & "<<_yCSarray[errT].strUp;
+      if (_yCSarray[errT].errType!=ERR_NONE && _yCSarray[errT].errType!=ERR_SUM) std::cout<<" & "<<_yCSarray[errT].strUp;
     std::cout<<"\\\\"<<std::endl;
     // print strDown
     std::cout<<"    lims ";
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE) std::cout<<" & "<<_yCSarray[errT].strDown;
+      if (_yCSarray[errT].errType!=ERR_NONE && _yCSarray[errT].errType!=ERR_SUM) std::cout<<" & "<<_yCSarray[errT].strDown;
     std::cout<<"\\\\ \\hline"<<std::endl;
 
       std::cout<<"    ";
       std::cout<<std::setprecision(0)<<"total ";
     std::cout<<std::setprecision(0);
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE) 
+      if (_yCSarray[errT].errType!=ERR_NONE  && _yCSarray[errT].errType!=ERR_SUM) 
         std::cout<<" & "<<100*_yCSarray[errT].crossSectionTOT->GetBinError(1)/_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1);
 
       std::cout<<" \\\\ \\hline"<<std::endl;
@@ -99,7 +99,7 @@ void CalcCrossSection::PrintLatexAll_ErrInPercent()
       std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)+_yCSarray[ERR_STAT].crossSection1D->GetBinWidth(ib);
 
       for (int errT=0; errT<Nerrs; errT++) 
-        if (_yCSarray[errT].errType!=ERR_NONE) 
+        if (_yCSarray[errT].errType!=ERR_NONE  && _yCSarray[errT].errType!=ERR_SUM) 
           std::cout<<" & "<<100*_yCSarray[errT].crossSection1D->GetBinError(ib)/_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
 
       std::cout<<" \\\\ \\hline"<<std::endl;
@@ -198,7 +198,7 @@ void CalcCrossSection::Calc()
   for (errT=0; errT<Nerrs; errT++){
     _yCSarray[errT].errType=ERR_NONE;
   }
-
+  
   errT=ERR_STAT;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].name="yield_pm_stat";
@@ -206,12 +206,13 @@ void CalcCrossSection::Calc()
   _yCSarray[errT].strUp="err";
   _yCSarray[errT].strDown="stat";
   std::cout<<"ERR_STAT "<<_yCSarray[errT].title<<std::endl;
-  GetSignalYields(ERR_STAT);
+  GetSignalYields(ERR_STAT);  
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);
-
+  
+  
   errT=ERR_SYST_CHISOvsSIHIH;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].name="syst_CHISOvsSIHIH";
@@ -227,11 +228,8 @@ void CalcCrossSection::Calc()
   TString strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
   GetYieldsSyst(_yCSarray[errT], 
     strF,
-    "yieldsDDTrueONEDICOMMON",
-    "yieldsDDTrueTOTALCOMMON");
-//    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
-//    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
-//    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
+    "yieldsDDTrueONEDI_CHISOvsSIHIH_COMMON",
+    "yieldsDDTrueTOTAL_CHISOvsSIHIH_COMMON");
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
@@ -249,31 +247,27 @@ void CalcCrossSection::Calc()
     strF,
     "yieldsDDTrueONEDICOMMON",
     "yieldsDDTrueTOTALCOMMON");
-//    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
-//    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
-//    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]); 
 
-//  errT=ERR_SYST_TemplStat;
-//  _yCSarray[errT].errType=errT;
-//  _yCSarray[errT].title="template statistics";
-//  _yCSarray[errT].name="syst_templStat";
-//  _yCSarray[errT].strUp="templ";
-//  _yCSarray[errT].strDown="stat";
-//  std::cout<<"ERR_SYST_TemplStat "<<_yCSarray[errT].title<<std::endl;
-//  TString strName=_config.GetDDTemplateFileName(_channel,_vgamma,_config.TEMPL_CHISO,"phoEt");
-//  strName.ReplaceAll(".root","_SystRand.root");
-//  GetYieldsSyst(_yCSarray[errT], 
-//    strName, 
-//    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON), 
-//    _config.GetYieldsDDTemplateTrueName(_config.ONEDI,_config.COMMON));
-//  ApplyUnfolding(0,_yCSarray[errT]);
-//  ApplyAccXEff(_yCSarray[errT]);
-//  DivideOverLumi(_yCSarray[errT]);
-//  DivideOverBinWidth(_yCSarray[errT]);  
+  errT=ERR_SYST_TemplStat;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="template statistics";
+  _yCSarray[errT].name="syst_templStat";
+  _yCSarray[errT].strUp="templ";
+  _yCSarray[errT].strDown="stat";
+  std::cout<<"ERR_SYST_TemplStat "<<_yCSarray[errT].title<<std::endl;
+  strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
+  GetYieldsSyst(_yCSarray[errT], 
+    strF,
+    "yieldsDDTrueONEDI_TemplStat_COMMON",
+    "yieldsDDTrueTOTAL_TemplStat_COMMON");
+  ApplyUnfolding(0,_yCSarray[errT]);
+  ApplyAccXEff(_yCSarray[errT]);
+  DivideOverLumi(_yCSarray[errT]);
+  DivideOverBinWidth(_yCSarray[errT]);  
 
   if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
     errT=ERR_SYST_etogDiff;
@@ -417,8 +411,10 @@ void CalcCrossSection::Calc()
       ComputeSystByAnalysisVariation(errT, "WGammaAnalysisAux25_ApplySF_minusSigma", "WGammaAnalysisAux26_ApplySF_plusSigma");
     
 
-  }// end of if (_channel==_config.MUON && _channel==_config.W_GAMMA)
+  }// end of if (_channel==_config.W_GAMMA)
+  
 
+  
   errT=ERR_SYST_SUM;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].title="sum of syst";
@@ -471,7 +467,7 @@ void CalcCrossSection::Calc()
   // print table of all uncerntainties in Latex format
   PrintLatexAll_ErrInPercent();
   PrintLatexAll_MeasVsMCbased();
-
+  
 }// Calc()
 
 void CalcCrossSection::ComputeSystByAnalysisVariation(int errT, TString strDir1, TString strDir2){
@@ -522,34 +518,26 @@ void CalcCrossSection::GetSignalYields(int errT)
   std::cout<<"1D yields: "<<_config.GetYieldsBkgSubtrDataName(_config.ONEDI)<<std::endl;
   _yCSarray[errT].yieldTOT_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
   _yCSarray[errT].yields1D_bkgSubtr=(TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
+  
   _yCSarray[errT].yields1D_bkgSubtr->Print();
- 
-//  if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
-//    TH1F* hSigMC = (TH1F*)fSig->Get("yieldsSelected_SIGMC__ONEDI_COMMON");
-//    // take underflow bin from signal MC for WGamma electron channel
-//   float cont = hSigMC->GetBinContent(1);
-//    float err = sqrt(hSigMC->GetBinError(1)*hSigMC->GetBinError(1)+0.2*cont*0.2*cont);
-//    _yCSstat.yields1D_bkgSubtr->SetBinContent(1,cont);
-//    _yCSstat.yields1D_bkgSubtr->SetBinError(1,err);
-//  }
-
+  
   TString strCh, strVg;
   if (_channel==_config.MUON) strCh="MUON";
   if (_channel==_config.ELECTRON) strCh="ELECTRON";
   if (_vgamma==_config.W_GAMMA) strVg="WGamma";
   if (_vgamma==_config.Z_GAMMA) strVg="ZGamma";
-  TString strF="../WGammaOutput/"+strCh+"_"+strVg+"/YieldsAndBackground/DDTemplate_SystCHISOvsSIHIH_phoEt.root";
-  TFile* fSigMeth2 = new TFile(strF);
-  TH1F* h1D = (TH1F*)fSigMeth2->Get("yieldsDDTrueONEDICOMMON");
-  TH1F* hTot = (TH1F*)fSigMeth2->Get("yieldsDDTrueTOTALCOMMON");
-
+  
+  TH1F* h1D = (TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.ONEDI));
+  TH1F* hTot = (TH1F*)fSig->Get(_config.GetYieldsBkgSubtrDataName(_config.TOTAL));
+  
   _yCSarray[errT].yieldTOT_bkgSubtr->SetBinContent(1,hTot->GetBinContent(1));
   for (int ib=1; ib<=h1D->GetNbinsX(); ib++){
-    _yCSarray[errT].yields1D_bkgSubtr->SetBinContent(ib,h1D->GetBinContent(ib));
+    //_yCSarray[errT].yields1D_bkgSubtr->SetBinContent(ib,h1D->GetBinContent(ib));
   }//end of loop over ib
-
+  /*
   _fOut->cd();
-  Print("Bkg Subtr Yields:",_yCSarray[errT].yieldTOT_bkgSubtr,_yCSarray[errT].yields1D_bkgSubtr);
+   Print("Bkg Subtr Yields:",_yCSarray[errT].yieldTOT_bkgSubtr,_yCSarray[errT].yields1D_bkgSubtr);
+  */
 }// end of GetSignalYields()
 
 void CalcCrossSection::GetYieldsSyst(FromYieldToCS& yCS, TString strFile, TString str1D, TString strTOT)
