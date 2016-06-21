@@ -168,7 +168,7 @@ void ComputeSystHists(TString strKin, TString strEta)
                                   // bin | val | stat err | syst Ich vs sihih
   std::cout<<"  \\begin{tabular}{|c|c|c|c|c|c|c|}"<<std::endl;
   std::cout<<"    bin &  MC   & data  & data  & MC cl. & MC cl. & yield \\\\ "<<std::endl;
-  std::cout<<"    lims & pred & chiso & sihih & chiso  & sihih  & average  \\\\ \\hline"<<std::endl;
+  std::cout<<"    lims & pred & chiso & sihih & chiso  & sihih  & Diff \\\\ \\hline"<<std::endl;
   for (int ib=1; ib<=h_d_chisoMCsig->GetNbinsX(); ib++){
 
 //      if (ib==1) std::cout<<"%";
@@ -183,7 +183,7 @@ void ComputeSystHists(TString strKin, TString strEta)
       std::cout<<"$"<<(int)h_M_chiso->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_chiso->GetBinError(ib)*h_M_chiso->GetBinError(ib)+h_M_chiso_templStat->GetBinError(ib)*h_M_chiso_templStat->GetBinError(ib))<<"$ & ";
       std::cout<<"$"<<(int)h_M_sihih->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_sihih->GetBinError(ib)*h_M_sihih->GetBinError(ib)+h_M_sihih_templStat->GetBinError(ib)*h_M_sihih_templStat->GetBinError(ib))<<"$ &";
 
-      std::cout<<"$"<<(int)h_Yield_Meth1[ieta]->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth1[ieta]->GetBinError(ib)<<"$ ";
+      std::cout<<"$"<<(int)h_Yield_Meth1[ieta]->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth1[ieta]->GetBinError(ib)<<"\\pm"<<(int)h_d_chiso_templStat[ieta]->GetBinError(ib)<<"$ ";
 
       std::cout<<" \\\\ \\hline"<<std::endl;
   }//end of loop over ib
@@ -257,8 +257,8 @@ void CombineCHISOandSIHIH(int channel, int vgamma)
 
   h_d_chiso_templStat[0]->Print();
   h_d_chiso_templStat[1]->Print();
-  h_d_chiso_templStat[2]=(TH1F*)h_Yield_Meth1[0]->Clone("yieldsDDTrueONEDI_TemplStat_COMMON");
-  h_d_chiso_templStat[2]->Add(h_Yield_Meth1[1]);
+  h_d_chiso_templStat[2]=(TH1F*)h_d_chiso_templStat[0]->Clone("yieldsDDTrueONEDI_TemplStat_COMMON");
+  h_d_chiso_templStat[2]->Add(h_d_chiso_templStat[1]);
   h_d_chiso_templStat[2]->SetTitle("yieldsDDTrueONEDI_TemplStat_COMMON");
   h_d_chiso_templStat[2]->Write();
   h_d_chiso_templStat[2]->Print();
