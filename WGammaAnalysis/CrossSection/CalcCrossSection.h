@@ -93,6 +93,8 @@ class CalcCrossSection
        void    Print(TString strYields, TH1F* hTot, TH1F* h1D);
 
        void    PrintLatexAll_ErrInPercent();
+       void    PrintLatexAll_ErrEtogamma();
+       void    PrintLatexAll_ErrSmallSysts();
        void    PrintLatexAll_MeasVsMCbased();
 
 

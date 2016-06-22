@@ -117,6 +117,155 @@ void CalcCrossSection::PrintLatexAll_ErrInPercent()
 
 }//end of PrintLatexAll_ErrInPercent()
 
+void CalcCrossSection::PrintLatexAll_ErrEtogamma()
+{
+ std::cout<<"==============================="<<std::endl;
+  std::cout<<"||||========== Print Latex"<<std::endl;
+
+  std::cout<<"||||========== Table with err in %"<<std::endl;
+
+
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{Relative errors [\\%]. ";
+    std::cout<<_config.StrChannel(_channel)<<" "<<_config.StrVgType(_vgamma)<<"}"<<std::endl;
+                                  // bin | val | stat err | syst Ich vs sihih
+
+    // print |c|c|c|.....|c|
+    std::cout<<"  \\begin{tabular}{|c|";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_etogDiff || _yCSarray[errT].errType==ERR_SYST_etogStat ||
+           _yCSarray[errT].errType==ERR_SYST_SUM_etog ) std::cout<<"c|";
+    std::cout<<"}"<<std::endl;
+
+    // print strUp
+    std::cout<<"    bin ";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_etogDiff || _yCSarray[errT].errType==ERR_SYST_etogStat ||
+           _yCSarray[errT].errType==ERR_SYST_SUM_etog) std::cout<<" & "<<_yCSarray[errT].strUp;
+    std::cout<<"\\\\"<<std::endl;
+    // print strDown
+    std::cout<<"    lims ";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_etogDiff || _yCSarray[errT].errType==ERR_SYST_etogStat ||
+           _yCSarray[errT].errType==ERR_SYST_SUM_etog) std::cout<<" & "<<_yCSarray[errT].strDown;
+    std::cout<<"\\\\ \\hline"<<std::endl;
+
+      std::cout<<"    ";
+      std::cout<<std::setprecision(0)<<"total ";
+    std::cout<<std::setprecision(0);
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_etogDiff || _yCSarray[errT].errType==ERR_SYST_etogStat ||
+           _yCSarray[errT].errType==ERR_SYST_SUM_etog) 
+        std::cout<<" & "<<100*_yCSarray[errT].crossSectionTOT->GetBinError(1)/_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1);
+
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    //loop over pt bins
+    for (int ib=1; ib<=_yCSarray[ERR_STAT].crossSection1D->GetNbinsX(); ib++){
+
+      if (ib==1) std::cout<<"%";
+
+      std::cout<<"    ";
+      std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)<<"-";
+      std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)+_yCSarray[ERR_STAT].crossSection1D->GetBinWidth(ib);
+
+      for (int errT=0; errT<Nerrs; errT++) 
+        if (_yCSarray[errT].errType==ERR_SYST_etogDiff || _yCSarray[errT].errType==ERR_SYST_etogStat ||
+           _yCSarray[errT].errType==ERR_SYST_SUM_etog) 
+          std::cout<<" & "<<100*_yCSarray[errT].crossSection1D->GetBinError(ib)/_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
+
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    }//end of loop over ib
+
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:systInPercentEtogamma_";
+    std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+    std::cout<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
+
+  std::cout<<"|||| end of Print Latex"<<std::endl;
+  std::cout<<"==============================="<<std::endl;
+}// end of PrintLatexAll_ErrEtogamma()
+
+void CalcCrossSection::PrintLatexAll_ErrSmallSysts()
+{
+ std::cout<<"==============================="<<std::endl;
+  std::cout<<"||||========== Print Latex"<<std::endl;
+
+  std::cout<<"||||========== Table with err in %"<<std::endl;
+
+
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{Relative errors [\\%]. ";
+    std::cout<<_config.StrChannel(_channel)<<" "<<_config.StrVgType(_vgamma)<<"}"<<std::endl;
+                                  // bin | val | stat err | syst Ich vs sihih
+
+    // print |c|c|c|.....|c|
+    std::cout<<"  \\begin{tabular}{|c|";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_SUM_OTHER || 
+            (_yCSarray[errT].errType>=ERR_SYST_BkgSubtrZgWgtaunu && 
+               _yCSarray[errT].errType<ERR_SUM)) std::cout<<"c|";
+    std::cout<<"}"<<std::endl;
+
+    // print strUp
+    std::cout<<"    bin ";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_SUM_OTHER || 
+            (_yCSarray[errT].errType>=ERR_SYST_BkgSubtrZgWgtaunu && 
+               _yCSarray[errT].errType<ERR_SUM)) std::cout<<" & "<<_yCSarray[errT].strUp;
+    std::cout<<"\\\\"<<std::endl;
+    // print strDown
+    std::cout<<"    lims ";
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_SUM_OTHER || 
+            (_yCSarray[errT].errType>=ERR_SYST_BkgSubtrZgWgtaunu && 
+               _yCSarray[errT].errType<ERR_SUM)) std::cout<<" & "<<_yCSarray[errT].strDown;
+    std::cout<<"\\\\ \\hline"<<std::endl;
+
+      std::cout<<"    ";
+      std::cout<<std::setprecision(0)<<"total ";
+    std::cout<<std::setprecision(0);
+    for (int errT=0; errT<Nerrs; errT++) 
+      if (_yCSarray[errT].errType==ERR_SYST_SUM_OTHER || 
+            (_yCSarray[errT].errType>=ERR_SYST_BkgSubtrZgWgtaunu && 
+               _yCSarray[errT].errType<ERR_SUM)) 
+        std::cout<<" & "<<100*_yCSarray[errT].crossSectionTOT->GetBinError(1)/_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1);
+
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    //loop over pt bins
+    for (int ib=1; ib<=_yCSarray[ERR_STAT].crossSection1D->GetNbinsX(); ib++){
+
+      if (ib==1) std::cout<<"%";
+
+      std::cout<<"    ";
+      std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)<<"-";
+      std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)+_yCSarray[ERR_STAT].crossSection1D->GetBinWidth(ib);
+
+      for (int errT=0; errT<Nerrs; errT++) 
+        if (_yCSarray[errT].errType==ERR_SYST_SUM_OTHER || 
+            (_yCSarray[errT].errType>=ERR_SYST_BkgSubtrZgWgtaunu && 
+               _yCSarray[errT].errType<ERR_SUM)) 
+          std::cout<<" & "<<100*_yCSarray[errT].crossSection1D->GetBinError(ib)/_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
+
+      std::cout<<" \\\\ \\hline"<<std::endl;
+    }//end of loop over ib
+
+    std::cout<<"  \\end{tabular}"<<std::endl;
+    std::cout<<"  \\label{tab:systInPercentSmallSysts_";
+    std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+    std::cout<<"}"<<std::endl;
+    std::cout<<"  \\end{center}"<<std::endl;
+    std::cout<<"\\end{table}"<<std::endl;
+
+  std::cout<<"|||| end of Print Latex"<<std::endl;
+  std::cout<<"==============================="<<std::endl;
+}// end of PrintLatexAll_ErrSmallSysts()
+
 void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
 {
   std::cout<<"==============================="<<std::endl;
@@ -515,6 +664,8 @@ void CalcCrossSection::Calc()
   Plot();
 
   // print table of all uncerntainties in Latex format
+  PrintLatexAll_ErrEtogamma();
+  PrintLatexAll_ErrSmallSysts();
   PrintLatexAll_ErrInPercent();
   PrintLatexAll_MeasVsMCbased();
   
