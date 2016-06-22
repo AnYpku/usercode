@@ -21,17 +21,25 @@ class CalcCrossSection
             ERR_SYST_CHISOvsSIHIH,
             ERR_SYST_ZgMC_Norm,
             ERR_SYST_TemplStat,
-            ERR_SYST_etogDiff,
-            ERR_SYST_etogStat,
-            ERR_SYST_BkgSubtrZgWgtaunu,
-            ERR_SYST_accXeff_MCstat,
-            ERR_SYST_LUMI,
-            ERR_SYST_WMtCut,
-            ERR_SYST_PUweight,
             ERR_SYST_SFs,
-            ERR_SYST_UNF_MCstat,
+	    ERR_SYST_LUMI,
+
+            ERR_SYST_SUM_etog,
+            ERR_SYST_SUM_OTHER,
 
             ERR_SYST_SUM,
+
+            // to ERR_SYST_SUM_etog
+            ERR_SYST_etogDiff,
+            ERR_SYST_etogStat,
+
+            // to ERR_SYST_SUM_OTHER
+            ERR_SYST_BkgSubtrZgWgtaunu,
+            ERR_SYST_accXeff_MCstat,
+            ERR_SYST_WMtCut,
+            ERR_SYST_PUweight,
+            ERR_SYST_UNF_MCstat,
+
             ERR_SUM,
             ERR_NONE};
       // FromYieldToCS _yCSsyst_CHISOvsSIHIH;

@@ -42,7 +42,6 @@ extern void G__set_cpp_environmentRooUnfoldDict();
 #include "/home/hep/eavdeeva2/releases-GIT/usercode/WGammaAnalysis/RooUnfold/src/RooUnfoldSvd.h"
 #include "/home/hep/eavdeeva2/releases-GIT/usercode/WGammaAnalysis/RooUnfold/src/RooUnfoldTUnfold.h"
 #include "/home/hep/eavdeeva2/releases-GIT/usercode/WGammaAnalysis/RooUnfold/src/testHelperRooUnfoldBasisSplines.h"
-#include "/home/hep/eavdeeva2/releases-GIT/usercode/WGammaAnalysis/RooUnfold/src/TSVDUnfold_local.h"
 #include <algorithm>
 namespace std { }
 using namespace std;
@@ -103,7 +102,7 @@ extern G__linked_taginfo G__RooUnfoldDictLN_TDecompSVD;
 extern G__linked_taginfo G__RooUnfoldDictLN_RooUnfoldInvert;
 extern G__linked_taginfo G__RooUnfoldDictLN_TProfile;
 extern G__linked_taginfo G__RooUnfoldDictLN_RooUnfoldParms;
-extern G__linked_taginfo G__RooUnfoldDictLN_TSVDUnfold_529;
+extern G__linked_taginfo G__RooUnfoldDictLN_TSVDUnfold;
 extern G__linked_taginfo G__RooUnfoldDictLN_RooUnfoldSvd;
 extern G__linked_taginfo G__RooUnfoldDictLN_TSpline;
 extern G__linked_taginfo G__RooUnfoldDictLN_TGraph;

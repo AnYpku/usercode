@@ -67,25 +67,25 @@ void CalcCrossSection::PrintLatexAll_ErrInPercent()
     // print |c|c|c|.....|c|
     std::cout<<"  \\begin{tabular}{|c|";
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE && _yCSarray[errT].errType!=ERR_SUM) std::cout<<"c|";
+      if (_yCSarray[errT].errType<=ERR_SYST_SUM) std::cout<<"c|";
     std::cout<<"}"<<std::endl;
 
     // print strUp
     std::cout<<"    bin ";
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE && _yCSarray[errT].errType!=ERR_SUM) std::cout<<" & "<<_yCSarray[errT].strUp;
+      if (_yCSarray[errT].errType<=ERR_SYST_SUM) std::cout<<" & "<<_yCSarray[errT].strUp;
     std::cout<<"\\\\"<<std::endl;
     // print strDown
     std::cout<<"    lims ";
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE && _yCSarray[errT].errType!=ERR_SUM) std::cout<<" & "<<_yCSarray[errT].strDown;
+      if (_yCSarray[errT].errType<=ERR_SYST_SUM) std::cout<<" & "<<_yCSarray[errT].strDown;
     std::cout<<"\\\\ \\hline"<<std::endl;
 
       std::cout<<"    ";
       std::cout<<std::setprecision(0)<<"total ";
     std::cout<<std::setprecision(0);
     for (int errT=0; errT<Nerrs; errT++) 
-      if (_yCSarray[errT].errType!=ERR_NONE  && _yCSarray[errT].errType!=ERR_SUM) 
+      if (_yCSarray[errT].errType<=ERR_SYST_SUM) 
         std::cout<<" & "<<100*_yCSarray[errT].crossSectionTOT->GetBinError(1)/_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1);
 
       std::cout<<" \\\\ \\hline"<<std::endl;
@@ -99,7 +99,7 @@ void CalcCrossSection::PrintLatexAll_ErrInPercent()
       std::cout<<_yCSarray[ERR_STAT].crossSection1D->GetBinLowEdge(ib)+_yCSarray[ERR_STAT].crossSection1D->GetBinWidth(ib);
 
       for (int errT=0; errT<Nerrs; errT++) 
-        if (_yCSarray[errT].errType!=ERR_NONE  && _yCSarray[errT].errType!=ERR_SUM) 
+        if (_yCSarray[errT].errType<=ERR_SYST_SUM) 
           std::cout<<" & "<<100*_yCSarray[errT].crossSection1D->GetBinError(ib)/_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib);
 
       std::cout<<" \\\\ \\hline"<<std::endl;
@@ -212,7 +212,8 @@ void CalcCrossSection::Calc()
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);
   
-  
+
+  // ERR_SYST_CHISOvsSIHIH
   errT=ERR_SYST_CHISOvsSIHIH;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].name="syst_CHISOvsSIHIH";
@@ -233,8 +234,10 @@ void CalcCrossSection::Calc()
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
-  DivideOverBinWidth(_yCSarray[errT]);  
+  DivideOverBinWidth(_yCSarray[errT]); 
+  // end of ERR_SYST_CHISOvsSIHIH
 
+  // ERR_SYST_Zg_Norm
   errT=ERR_SYST_ZgMC_Norm;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].name="syst_ZgMC_Norm";
@@ -251,7 +254,9 @@ void CalcCrossSection::Calc()
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]); 
+  // end of ERR_SYST_Zg_Norm
 
+  // ERR_SYST_TemplStat
   errT=ERR_SYST_TemplStat;
   _yCSarray[errT].errType=errT;
   _yCSarray[errT].title="template statistics";
@@ -268,8 +273,10 @@ void CalcCrossSection::Calc()
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
   DivideOverBinWidth(_yCSarray[errT]);  
+  // end of ERR_SYST_TemplStat
 
   if (_channel==_config.ELECTRON && _vgamma==_config.W_GAMMA){
+
     errT=ERR_SYST_etogDiff;
     _yCSarray[errT].errType=errT;  
     _yCSarray[errT].title="e#rightarrow#gamma, with or without WMt";
@@ -285,6 +292,7 @@ void CalcCrossSection::Calc()
     ApplyAccXEff(_yCSarray[errT]);
     DivideOverLumi(_yCSarray[errT]);
     DivideOverBinWidth(_yCSarray[errT]);  
+    // end of ERR_SYST_etogDiff
 
     errT=ERR_SYST_etogStat;
     _yCSarray[errT].errType=errT;  
@@ -300,7 +308,26 @@ void CalcCrossSection::Calc()
     ApplyUnfolding(0,_yCSarray[errT]);
     ApplyAccXEff(_yCSarray[errT]);
     DivideOverLumi(_yCSarray[errT]);
-    DivideOverBinWidth(_yCSarray[errT]);  
+    DivideOverBinWidth(_yCSarray[errT]); 
+    // end of ERR_SYST_etogStat 
+
+    errT=ERR_SYST_SUM_etog;
+    _yCSarray[errT].errType=errT;
+    _yCSarray[errT].title="e to gamma total syst";
+    _yCSarray[errT].name="etog";
+    _yCSarray[errT].strUp="e to";
+    _yCSarray[errT].strDown="gamma";
+    std::cout<<"ERR_SYST_SUM_etog "<<_yCSarray[errT].title<<std::endl;
+    _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ERR_SYST_etogDiff].crossSectionTOT->Clone();
+    _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ERR_SYST_etogDiff].crossSection1D->Clone();
+    _yCSarray[errT].crossSectionTOT->Add(_yCSarray[ERR_SYST_etogStat].crossSectionTOT); 
+    _yCSarray[errT].crossSection1D->Add(_yCSarray[ERR_SYST_etogStat].crossSection1D); 
+    _yCSarray[errT].crossSectionTOT->SetBinContent(1,_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1));
+    for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+      _yCSarray[errT].crossSection1D->SetBinContent(ib,_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib));
+    }//end of loop over ib 
+    // end of ERR_SYST_SUM_etog
+
   }// end of if (_channel==_config.ELECTRON && _channel==_config.W_GAMMA)
 
   errT=ERR_SYST_BkgSubtrZgWgtaunu;
@@ -315,9 +342,6 @@ void CalcCrossSection::Calc()
     strF,
     "systBkgSubtrZgWgtaunu_ONEDI_COMMON",
     "systBkgSubtrZgWgtaunu_TOTAL_COMMON");
-//    _config.GetYieldsFileName(_channel, _vgamma, _config.TEMPL_OVERLAY, "phoEt"), 
-//    _config.GetSystCHISOvsSIHIHname(_config.ONEDI,_config.COMMON), 
-//    _config.GetSystCHISOvsSIHIHname(_config.TOTAL,_config.COMMON));
   ApplyUnfolding(0,_yCSarray[errT]);
   ApplyAccXEff(_yCSarray[errT]);
   DivideOverLumi(_yCSarray[errT]);
@@ -413,28 +437,24 @@ void CalcCrossSection::Calc()
 
   }// end of if (_channel==_config.W_GAMMA)
   
-
-  
-  errT=ERR_SYST_SUM;
+  errT=ERR_SYST_SUM_OTHER;
   _yCSarray[errT].errType=errT;
-  _yCSarray[errT].title="sum of syst";
-  _yCSarray[errT].name="syst_sum";
+  _yCSarray[errT].title="sum of small systs";
+  _yCSarray[errT].name="syst_other";
   _yCSarray[errT].strUp="syst";
-  _yCSarray[errT].strDown="total";
+  _yCSarray[errT].strDown="other";
   std::cout<<"ERR_SYST_SUM "<<_yCSarray[errT].title<<std::endl;
   bool sumStarted=0;
-//  _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ERR_STAT].crossSectionTOT->Clone();
-//  _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ERR_STAT].crossSection1D->Clone();
   float errTot=0;
   for (int ieT=0; ieT<Nerrs; ieT++) {
-    if (_yCSarray[ieT].errType==ERR_STAT || _yCSarray[ieT].errType>=ERR_SYST_SUM) continue;
+    if (_yCSarray[ieT].errType<ERR_SYST_BkgSubtrZgWgtaunu) continue;
+    if ( _yCSarray[ieT].errType>=ERR_SUM) continue;
     if (!sumStarted){
        _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ieT].crossSectionTOT->Clone();
        _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ieT].crossSection1D->Clone();
        sumStarted=1;
     }
     else{
-//      _yCSarray[errT].crossSectionTOT->Add(_yCSarray[ieT].crossSectionTOT); 
       _yCSarray[errT].crossSection1D->Add(_yCSarray[ieT].crossSection1D); 
     }    
     errTot+=_yCSarray[ieT].crossSectionTOT->GetBinError(1)*_yCSarray[ieT].crossSectionTOT->GetBinError(1);
@@ -445,6 +465,36 @@ void CalcCrossSection::Calc()
   for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
     _yCSarray[errT].crossSection1D->SetBinContent(ib,_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib));
   }//end of loop over ib  
+  // end of ERR_SYST_SUM_OTHER
+  
+  errT=ERR_SYST_SUM;
+  _yCSarray[errT].errType=errT;
+  _yCSarray[errT].title="sum of syst";
+  _yCSarray[errT].name="syst_sum";
+  _yCSarray[errT].strUp="syst";
+  _yCSarray[errT].strDown="total";
+  std::cout<<"ERR_SYST_SUM "<<_yCSarray[errT].title<<std::endl;
+  sumStarted=0;
+  errTot=0;
+  for (int ieT=0; ieT<Nerrs; ieT++) {
+    if (_yCSarray[ieT].errType==ERR_STAT || _yCSarray[ieT].errType>=ERR_SYST_SUM_OTHER) continue;
+    if (!sumStarted){
+       _yCSarray[errT].crossSectionTOT=(TH1F*)_yCSarray[ieT].crossSectionTOT->Clone();
+       _yCSarray[errT].crossSection1D=(TH1F*)_yCSarray[ieT].crossSection1D->Clone();
+       sumStarted=1;
+    }
+    else{
+      _yCSarray[errT].crossSection1D->Add(_yCSarray[ieT].crossSection1D); 
+    }    
+    errTot+=_yCSarray[ieT].crossSectionTOT->GetBinError(1)*_yCSarray[ieT].crossSectionTOT->GetBinError(1);
+  }//end of loop over ieT
+  errTot=sqrt(errTot);
+  _yCSarray[errT].crossSectionTOT->SetBinContent(1,_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1));
+  _yCSarray[errT].crossSectionTOT->SetBinError(1,errTot);
+  for (int ib=1; ib<=_yCSarray[errT].crossSection1D->GetNbinsX(); ib++){
+    _yCSarray[errT].crossSection1D->SetBinContent(ib,_yCSarray[ERR_STAT].crossSection1D->GetBinContent(ib));
+  }//end of loop over ib  
+  // end of ERR_SYST_SUM
 
   errT=ERR_SUM;
   _yCSarray[errT].errType=errT;
