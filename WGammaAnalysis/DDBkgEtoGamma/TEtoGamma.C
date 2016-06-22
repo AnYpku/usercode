@@ -385,6 +385,13 @@ void TEtoGamma::ComputeBkg()
     // underflow bin: take MC value
     _yieldDDEtoGamma[ieta]->SetBinContent(1,_yield[_ZJETS_NOM].hist[ieta]->GetBinContent(1));
     _yieldDDEtoGamma[ieta]->SetBinError(1,_yield[_ZJETS_NOM].hist[ieta]->GetBinError(1));
+
+    strName="hScale_ONEDI_";
+    if (ieta==0) strName+="BARREL"; if (ieta==1) strName+="ENDCAP";
+    _hScale[ieta]=(TH1F*)_yield[_DATA_EtoGAMMA_ENR].hist[ieta]->Clone(strName);
+    _hScale[ieta]->SetTitle(strName);
+    _hScale[ieta]->Divide(_yield[_ZJETS_EtoGAMMA_ENR].hist[ieta]);
+    _hScale[ieta]->Write();
    
   std::cout<<"==============================="<<std::endl;
   std::cout<<"||||========== Print Latex"<<std::endl;

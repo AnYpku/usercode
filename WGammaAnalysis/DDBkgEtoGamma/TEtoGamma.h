@@ -43,6 +43,7 @@ class TEtoGamma
 
     // etaBin: BARREL, ENDCAP
     TH1F* _yieldDDEtoGamma[3];// data driven estimate
+    TH1F* _hScale[2]; // nEst/nMC
     TH1F* _hZmassData[2][4][50];// BARREL or ENDCAP, ietaFine, ikin
     float _NsigVal[4];//ietaFine
     float _NsigErr[4];//ietaFine
