@@ -19,10 +19,12 @@ class TPrepareYields
     TPrepareYields();
     virtual ~TPrepareYields();
 
-    enum {DATA, SIGMC, BKGMC, BKGMC_TRUE, BKGMC_FAKE, DATA_DRIVEN};//sourceType
+    enum {DATA, SIGMC, BKGMC, BKGMC_TRUE, BKGMC_ETOG, BKGMC_FAKE, DATA_DRIVEN};//sourceType
 
     struct PrepareYieldsPars{
       bool doEtoGammaSubtr;
+      float etogScaleB;
+      float etogScaleE;
       TString varKin;
       TString varKinGen;
       int nKinBins; 

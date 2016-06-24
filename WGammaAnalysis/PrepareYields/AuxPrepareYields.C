@@ -6,9 +6,9 @@
 #include "TPrepareYields.h"
 #include "TSubtractBackground.h"
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage, TString strNameAdd="");
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage, float etogScaleB, float etogScaleE, TString strNameAdd="");
 
-void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=TConfiguration::FULLY, TString strNameAdd="")
+void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage=TConfiguration::FULLY, float etogScaleB=1, float etogScaleE=1, TString strNameAdd="")
 {
   TConfiguration conf;
   TPrepareYields prep;
@@ -18,7 +18,7 @@ void AuxPrepareYields(TConfiguration::AnalysisParameters &anPars, bool isMCclosu
   if (isMCclosure) pars.strFileOut.ReplaceAll(".root","_MCclosure.root");
 
   std::cout<<"AuxPrepareYields: selStage="<<conf.StrSelectionStage(selStage)<<std::endl;
-  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, selStage, strNameAdd);
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, selStage, etogScaleB, etogScaleE, strNameAdd);
 
 
   prep.PlotPrintSave();
@@ -70,7 +70,8 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
   pars.strFileOut=conf.GetYieldsFileName(anPars.channel, anPars.vgamma, anPars.templFits, anPars.varKin);
   if (isMCclosure) pars.strFileOut.ReplaceAll(".root","_MCclosure.root");
 
-  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, conf.FULLY);
+  AuxPrepareYieldsCommon(prep, pars, anPars, isMCclosure, conf.FULLY, 1, 1);
+  // 1 for etogScaleB and etogScaleE
 
   TConfiguration config;
 
@@ -86,7 +87,7 @@ void AuxSubtractBackground(TConfiguration::AnalysisParameters &anPars, bool isMC
 
 }// end of AuxSubtractBackground
 
-void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage, TString strNameAdd)
+void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsPars& pars, TConfiguration::AnalysisParameters &anPars, bool isMCclosure, int selStage, float etogScaleB, float etogScaleE, TString strNameAdd)
 {
   TConfiguration config;
   TPhotonCuts photon;
@@ -130,9 +131,12 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
   }
 
 
+  pars.etogScaleB=1; pars.etogScaleE=1;
   pars.doEtoGammaSubtr=0;
   if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA) {
     pars.doEtoGammaSubtr=1;
+    pars.etogScaleB=etogScaleB;
+    pars.etogScaleE=etogScaleE;
   }
 
   prep.SetPars(pars);
@@ -177,7 +181,11 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
 
   prep.SetOneYieldSource(prep.BKGMC_FAKE, "ttbarjets", "t#bar{t}+jets", 631, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"ttbarjets") , "selectedEvents");
 
-  prep.SetOneYieldSource(prep.BKGMC_FAKE, "DYjets_to_ll", "DY+jets#rightarrowl#bar{l}", 418, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
+  prep.SetOneYieldSource(prep.BKGMC_FAKE, "DYjets_to_ll_jtog", "DY+jets#rightarrowl#bar{l}, j#rightarrow#gamma", 418, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
+
+  if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA){
+    prep.SetOneYieldSource(prep.BKGMC_ETOG, "DYjets_to_ll_etog", "DY+jets#rightarrowl#bar{l}, e#rightarrow#gamma", 16, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
+  }
 
 
   prep.SetOneYieldSource(prep.BKGMC_FAKE, "Wjets_to_lnu", "W+jets#rightarrowl#nu+jets", 433, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Wjets_to_lnu"), "selectedEvents");

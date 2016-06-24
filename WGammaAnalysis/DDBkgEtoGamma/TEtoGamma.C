@@ -481,22 +481,6 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TCut cut
   RooDataHist dh("dh","dh",x,Import(*Z_mass)) ;
   RooDataHist x1("x1","x1",xtmp,Import(*Z_mass)) ;
 
-  //Construct the signal P.D.F., a gaussian function
-
-  // BW x CB
-  
-  //  RooRealVar mean_bw("mean_bw","mean of bw",92,75.,100.);
-  //  RooRealVar mean_cb("mean_cb","mean of cb",0,-5.0,10);
-  //  RooRealVar sigma_bw("sigma_bw","width of bw",2.5,0,5.);
-  //  RooRealVar sigma_cb("sigma_cb","width of cb",2.0, 0.00001, 8.0);//this range worked for overall pt range
-  //  RooRealVar n("n","", 6.7489,1.0,20.0);
-  //  RooRealVar alpha("alpha","", 1.0,-50.,50);
-  //  RooBreitWigner bwPDF("BreitWigner","BreitWigner",x,mean_bw,sigma_bw);
-  //  RooCBShape cbPDF("cball", "crystal ball", x, mean_cb, sigma_cb, alpha, n);
-  //  RooFFTConvPdf SigPDF("bwxCryBall", "FFT Conv CryBall and BW", x, bwPDF, cbPDF);
-   
- 
-
     _start_CMS_alpha=60;
     _start_CMS_beta=0.050;
     _start_CMS_gamma=0.020;
@@ -567,12 +551,6 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TCut cut
 
   //Now define the background P.D.F
 
-  //Exponential
-    //    RooRealVar tau("tau","exponential function parameter",0,-10.,10.);//this range worked for overall pt range
-    //    RooExponential exp("exponential","Background PDF",x,tau);
-    //    RooFormulaVar eff("eff","0.5*(TMath::Erf((Mpholep1-1)/0.5)+1)",x) ;
-    //    RooAddPdf BkgPDF("BkgPDF","exp. * Err.fn",exp,eff) ;
-
     //RooCMSShape
      RooRealVar CMS_alpha("CMS_alpha","CMS_alpha",_start_CMS_alpha,20,120);
      RooRealVar CMS_beta("CMS_beta","CMS_beta",_start_CMS_beta,0.005,0.300);
@@ -586,14 +564,10 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TCut cut
   RooRealVar Nsig("Nsig","Number of signal events",0.5*nMax,0.,nMax);
   RooRealVar Nbkg("Nbkg","Number of background events",0.2*nMax,0.,nMax);
   RooAddPdf PDFtot("PDFtot","PDFtot",RooArgList(SigPDF,BkgPDF),RooArgList(Nsig,Nbkg));
-  //RooAddPdf PDFtot("PDFtot","PDFtot",RooArgList(bwPDF,BkgPDF),RooArgList(Nsig,Nbkg));
   std::cout<<"I will fit PDFtot  "<<std::endl;  
   PDFtot.fitTo(dh);//ML fit is default
   std::cout<<"I fitted PDFtot  "<<std::endl; 
   
-  // Print values of mean and sigma (that now reflect fitted values and errors, unless you fixed them)
-  // mean_bw.Print();
-  // sigma.Print();
   //Now plot the data and the fitted PDF
   
   RooPlot* frame = x.frame() ;
@@ -652,8 +626,6 @@ void  TEtoGamma::FitMeg(int ikin, int ieta, int ietaFine, TH1F* Z_mass, TCut cut
   cout<<"Nsig.getVal()="<<Nsig.getVal()<<endl;
   _NsigVal[ietaFine]=Nsig.getVal();
   _NsigErr[ietaFine]=Nsig.getError();
-  //  _yield[_DATA_EtoGAMMA_ENR].hist[ieta]->SetBinContent(ikin+1,Nsig.getVal());
-  //  _yield[_DATA_EtoGAMMA_ENR].hist[ieta]->SetBinError(ikin+1,Nsig.getError());
   
   return;
   

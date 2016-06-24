@@ -20,7 +20,7 @@ void QuickPrepareYields_FSRandISR_Ich(){
 
   anPars.cutAdd="1";
   int selStage=conf.FSR_EXCLUDED;
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,1,1);
 
   anPars.cutAdd="1";
   anPars.nKinBins=6;
@@ -28,7 +28,7 @@ void QuickPrepareYields_FSRandISR_Ich(){
   for (int ib=0; ib<anPars.nKinBins+1; ib++)
   anPars.kinBinLims[ib]=0+1*ib;
   selStage=conf.FSR;
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,1,1);
 
 }//end of QuickPrepareYields_FSRandISR_Ich
 
@@ -53,43 +53,43 @@ void QuickPrepareYields_FSRandISR_TemplatesIch(){
   anPars.cutAdd=cutSihihNom && TCut("phoEt>10 && phoEt<15");
   int selStage=conf.FSR_EXCLUDED;
   /*
-  AuxPrepareYields(anPars,0,selStage,"_pt10to15_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to15_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>15 && phoEt<20");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to20_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to20_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>20 && phoEt<25");
-  AuxPrepareYields(anPars,0,selStage,"_pt20to25_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt20to25_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>25 && phoEt<30");
-  AuxPrepareYields(anPars,0,selStage,"_pt25to30_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt25to30_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>30 && phoEt<35");
-  AuxPrepareYields(anPars,0,selStage,"_pt30to35_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt30to35_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>35 && phoEt<45");
-  AuxPrepareYields(anPars,0,selStage,"_pt35to45_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt35to45_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>45 && phoEt<55");
-  AuxPrepareYields(anPars,0,selStage,"_pt45to55_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt45to55_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>55 && phoEt<65");
-  AuxPrepareYields(anPars,0,selStage,"_pt55to65_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt55to65_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>65 && phoEt<75");
-  AuxPrepareYields(anPars,0,selStage,"_pt65to75_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt65to75_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>75 && phoEt<85");
-  AuxPrepareYields(anPars,0,selStage,"_pt75to85_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt75to85_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>85 && phoEt<95");
-  AuxPrepareYields(anPars,0,selStage,"_pt85to95_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt85to95_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>95 && phoEt<120");
-  AuxPrepareYields(anPars,0,selStage,"_pt95to120_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt95to120_");
 
   anPars.cutAdd=cutSihihNom && TCut("phoEt>120 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt120to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt120to500_");
   */
   anPars.cutAdd=cutSihihNom && TCut("phoEt>15 && phoEt<500");
   anPars.nKinBins=6;
@@ -97,11 +97,11 @@ void QuickPrepareYields_FSRandISR_TemplatesIch(){
   for (int ib=0; ib<anPars.nKinBins+1; ib++)
   anPars.kinBinLims[ib]=0+1*ib;
   selStage=conf.FSR;
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_ FSR");
   selStage=conf.FSR_EXCLUDED;
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ ISR");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_ ISR");
   selStage=conf.PRELIMINARY_FOR_TEMPLATE_METHOD;
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR+ISR");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_ FSR+ISR");
 
 }//end of QuickPrepareYields_FSRandISR_TemplatesIch
 
@@ -126,54 +126,54 @@ void QuickPrepareYields_FSRandISR_TemplatesSihih(){
   anPars.cutAdd=cutIsoNom && TCut("phoEt>10 && phoEt<15");
   int selStage=conf.FSR_EXCLUDED;
   
-  AuxPrepareYields(anPars,0,selStage,"_pt10to15_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to15_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>15 && phoEt<20");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to20_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to20_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>20 && phoEt<25");
-  AuxPrepareYields(anPars,0,selStage,"_pt20to25_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt20to25_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>25 && phoEt<30");
-  AuxPrepareYields(anPars,0,selStage,"_pt25to30_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt25to30_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>30 && phoEt<35");
-  AuxPrepareYields(anPars,0,selStage,"_pt30to35_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt30to35_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>35 && phoEt<45");
-  AuxPrepareYields(anPars,0,selStage,"_pt35to45_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt35to45_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>45 && phoEt<55");
-  AuxPrepareYields(anPars,0,selStage,"_pt45to55_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt45to55_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>55 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt55to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt55to500_");
 
 
   selStage=conf.FSR;
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>10 && phoEt<15");
-  AuxPrepareYields(anPars,0,selStage,"_pt10to15_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to15_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>15 && phoEt<20");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to20_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to20_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>20 && phoEt<25");
-  AuxPrepareYields(anPars,0,selStage,"_pt20to25_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt20to25_");
 
    anPars.cutAdd=cutIsoNom && TCut("phoEt>25 && phoEt<30");
-   AuxPrepareYields(anPars,0,selStage,"_pt25to30_");
+   AuxPrepareYields(anPars,0,selStage,1,1,"_pt25to30_");
 
   anPars.cutAdd=cutIsoNom && TCut("phoEt>30 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt30to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt30to500_");
   
   anPars.cutAdd=cutIsoNom && TCut("phoEt>15 && phoEt<500");
   selStage=conf.FSR;
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_ FSR");
   selStage=conf.FSR_EXCLUDED;
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ ISR");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_ ISR");
   selStage=conf.PRELIMINARY_FOR_TEMPLATE_METHOD;
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_ FSR+ISR");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_ FSR+ISR");
 
 
 }//end of QuickPrepareYields_FSRandISR_TemplatesSihih
@@ -203,35 +203,35 @@ void QuickPrepareYields_FSRandISR(){
   anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to500_");
   anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_");
    
   
   fch.SetDefaultFullChainParameters(anPars,"Mleplep");
   anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to500_");
   anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_");
   
   fch.SetDefaultFullChainParameters(anPars,"lep1PhoDeltaR");
   anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to500_");
   anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_");
 
 
   fch.SetDefaultFullChainParameters(anPars,"lep2PhoDeltaR");
   anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd=cut && TCut("phoEt>10 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt10to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt10to500_");
   anPars.cutAdd=cut && TCut("phoEt>15 && phoEt<500");
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_");
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_");
   
 
   
@@ -240,14 +240,14 @@ void QuickPrepareYields_FSRandISR(){
   anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd="1";
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,1,1);
 
   selStage=conf.FSR_EXCLUDED;
   fch.SetDefaultFullChainParameters(anPars,"phoEt");
   anPars.channel=conf.MUON;
   anPars.vgamma=conf.Z_GAMMA;
   anPars.cutAdd="1";
-  AuxPrepareYields(anPars,0,selStage);
+  AuxPrepareYields(anPars,0,selStage,1,1);
   
 }//end of QuickPrepareYields_FSRandISR
 
@@ -282,7 +282,7 @@ void QuickPrepareYields_WMt(int channel){
 
   anPars.channel=channel;
   anPars.vgamma=conf.W_GAMMA;
-  AuxPrepareYields(anPars,0,selStage); 
+  AuxPrepareYields(anPars,0,selStage,1,1); 
 
 }//end of QuickPrepareYields_WMt
 
@@ -295,7 +295,7 @@ void QuickPrepareYields_EtoGammaEnriched(){
 
   TConfiguration conf;
   fch.SetDefaultFullChainParameters(anPars,"Mpholep1");
-  /*
+  
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.channel=conf.ELECTRON;
   anPars.vgamma=conf.W_GAMMA;
@@ -307,9 +307,11 @@ void QuickPrepareYields_EtoGammaEnriched(){
 
 
   int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT;
-  anPars.cutAdd="phoEt>15";
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_"); 
-  */
+
+  // anPars.cutAdd="phoEt>15";
+  //AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_"); 
+  
+  /*
   anPars.blind[conf.ELECTRON][conf.W_GAMMA]=conf.UNBLIND;
   anPars.channel=conf.ELECTRON;
   anPars.vgamma=conf.W_GAMMA;
@@ -322,36 +324,35 @@ void QuickPrepareYields_EtoGammaEnriched(){
 
   int selStage=conf.FULLY;
   anPars.cutAdd="phoEt>15";
-  AuxPrepareYields(anPars,0,selStage,"_pt15to500_"); 
-  /*
-  anPars.cutAdd="phoEt>15 && phoEt<20";
-  AuxPrepareYields(anPars,0,selStage,"_pt15to20_"); 
-  anPars.cutAdd="phoEt>20 && phoEt<25";
-  AuxPrepareYields(anPars,0,selStage,"_pt20to25_"); 
-  anPars.cutAdd="phoEt>25 && phoEt<30";
-  AuxPrepareYields(anPars,0,selStage,"_pt25to30_"); 
-  anPars.cutAdd="phoEt>30 && phoEt<35";
-  AuxPrepareYields(anPars,0,selStage,"_pt30to35_"); 
-  anPars.cutAdd="phoEt>35 && phoEt<45";
-  AuxPrepareYields(anPars,0,selStage,"_pt35to45_"); 
-  anPars.cutAdd="phoEt>45 && phoEt<55";
-  AuxPrepareYields(anPars,0,selStage,"_pt45to55_"); 
-  anPars.cutAdd="phoEt>55 && phoEt<65";
-  AuxPrepareYields(anPars,0,selStage,"_pt55to65_"); 
-  anPars.cutAdd="phoEt>65 && phoEt<75";
-  AuxPrepareYields(anPars,0,selStage,"_pt65to75_");
-  anPars.cutAdd="phoEt>75 && phoEt<85";
-  AuxPrepareYields(anPars,0,selStage,"_pt75to85_"); 
-  anPars.cutAdd="phoEt>85 && phoEt<95";
-  AuxPrepareYields(anPars,0,selStage,"_pt85to95_");
-  anPars.cutAdd="phoEt>95 && phoEt<120";
-  AuxPrepareYields(anPars,0,selStage,"_pt95to120_");
-  anPars.cutAdd="phoEt>120 && phoEt<500";
-  AuxPrepareYields(anPars,0,selStage,"_pt120to500_"); 
+  AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_"); 
   */
-    //selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_NO_PSV_CUT;
-    //AuxPrepareYields(anPars,0,selStage); 
+  
+  TCut cAdd[13];
+  TString strAdd[13];
+  float etogScaleB[13];
+  float etogScaleE[13];
 
+  cAdd[1]="phoEt>15 && phoEt<20"; strAdd[1]="_pt15to20_";
+  cAdd[2]="phoEt>20 && phoEt<25"; strAdd[2]="_pt20to25_";
+  cAdd[3]="phoEt>25 && phoEt<30"; strAdd[3]="_pt25to30_";
+  cAdd[4]="phoEt>30 && phoEt<35"; strAdd[4]="_pt30to35_";
+  cAdd[5]="phoEt>35 && phoEt<45"; strAdd[5]="_pt35to45_";
+  cAdd[6]="phoEt>45 && phoEt<55"; strAdd[6]="_pt45to55_";
+  cAdd[7]="phoEt>55 && phoEt<65"; strAdd[7]="_pt55to65_";
+  cAdd[8]="phoEt>65 && phoEt<75"; strAdd[8]="_pt65to75_";
+  cAdd[9]="phoEt>75 && phoEt<85"; strAdd[9]="_pt75to85_";
+  cAdd[10]="phoEt>85 && phoEt<95"; strAdd[10]="_pt85to95_";
+  cAdd[11]="phoEt>95 && phoEt<120"; strAdd[11]="_pt95to120_";
+  cAdd[12]="phoEt>120 && phoEt<500"; strAdd[12]="_pt120to500_";
 
+  TFile* f = new TFile("../WGammaOutput/ELECTRON_WGamma/YieldsAndBackground/DDEtoGamma_WGamma_phoEt_.root");
+  TH1F* hScaleB = (TH1F*)f->Get("hScale_ONEDI_BARREL");
+  TH1F* hScaleE = (TH1F*)f->Get("hScale_ONEDI_ENDCAP");
+
+  for (int ib=1; ib<=12; ib++){
+    anPars.cutAdd=cAdd[ib];
+    //AuxPrepareYields(anPars,0,selStage,1,1,strAdd[ib]);
+    AuxPrepareYields(anPars,0,selStage,hScaleB->GetBinContent(ib+1),hScaleE->GetBinContent(ib+1),strAdd[ib]);
+  }
 
 }//end of QuickPrepareYields_Mass_FSRandISR

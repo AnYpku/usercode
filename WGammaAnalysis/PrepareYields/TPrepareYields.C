@@ -92,16 +92,20 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
 
   _pyPars.fOut->cd();
 
+  TCut cutEtog="1";
+  if (source.name=="DYjets_to_ll_etog") cutEtog="pho_genEle_dRMin<0.4";
+  if (source.name=="DYjets_to_ll_jtog") cutEtog="!(pho_genEle_dRMin<0.4)";
+
   for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
     //Set 1D yields
     source.hist[ieta] = new TH1F(source.strYieldsName1D[ieta],source.strYieldsName1D[ieta],_pyPars.nKinBins,_pyPars.kinBinLims);
     source.hist[ieta]->Sumw2();
-    source.tr->Draw(_pyPars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta) && _pyPars.cutAdd)*cutW,"goff");
+    source.tr->Draw(_pyPars.varKin+TString(">>")+source.strYieldsName1D[ieta],(CutEta(ieta) && _pyPars.cutAdd && cutEtog)*cutW,"goff");
 
     TString blindName=source.strYieldsName1D[ieta]+TString("_blind");
     source.histBlind[ieta] = new TH1F(blindName,blindName,_pyPars.nKinBins,_pyPars.kinBinLims);
     source.histBlind[ieta]->Sumw2();
-    source.tr->Draw(_pyPars.varKin+TString(">>")+blindName,(CutEta(ieta) && _pyPars.cutAdd)*cutWblind,"goff");
+    source.tr->Draw(_pyPars.varKin+TString(">>")+blindName,(CutEta(ieta) && _pyPars.cutAdd && cutEtog)*cutWblind,"goff");
 
     source.hist[ieta]->SetLineColor(source.color);
     source.hist[ieta]->SetFillColor(source.color);
@@ -118,8 +122,16 @@ bool TPrepareYields::SetOneYieldSource(int sourceType, TString name, TString lab
     if (source.sourceType==SIGMC){
       _sigMCGenYields[ieta]=new TH1F(_pyPars.strYieldsName1D_SignalMCGenBins[ieta],_pyPars.strYieldsName1D_SignalMCGenBins[ieta],_pyPars.nKinBins,_pyPars.kinBinLims);
       _sigMCGenYields[ieta]->Sumw2();
-      source.tr->Draw(_pyPars.varKinGen+TString(">>")+_pyPars.strYieldsName1D_SignalMCGenBins[ieta],(CutEta(ieta) && _pyPars.cutAdd)*cutW,"goff");
-    }
+      source.tr->Draw(_pyPars.varKinGen+TString(">>")+_pyPars.strYieldsName1D_SignalMCGenBins[ieta],(CutEta(ieta) && _pyPars.cutAdd && cutEtog)*cutW,"goff");
+    }// end of if (source.sourceType==SIGMC)
+
+    if (source.sourceType==BKGMC_ETOG){
+      float scale=1;
+      if (ieta==0) scale=_pyPars.etogScaleB;
+      if (ieta==1) scale=_pyPars.etogScaleE;
+      source.hist[ieta]->Scale(scale);
+      source.histBlind[ieta]->Scale(scale);
+    }// end of if (source.sourceType==ETOG)
 
     //Set total yield
     TH1F* floatingHist = new TH1F("floatingHist","hist for temprorary storage of total yields",1,source.tr->GetMinimum(_pyPars.varKin)-1,source.tr->GetMaximum(_pyPars.varKin)+1);//inputFileNumber
@@ -153,12 +165,12 @@ void TPrepareYields::PlotPrintSave()
   //Print Yields
   for (int is=0; is<_sources.size(); is++){
     for (int ieta=_BARREL; ieta<=_COMMON; ieta++){
+      
       PrintYieldsOne(_sources[is].name+TString(", ")+StrLabelEta(ieta), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].hist[ieta]);
-//      PrintYieldsOne(_sources[is].name+TString(": "), _sources[is].yieldTotVal[ieta], _sources[is].yieldTotErr[ieta], _sources[is].histBlind[ieta]);
     }
   }//end of loop over is
 
-}
+}// end of PlotPrintSave()
 
 
 void TPrepareYields::CompareTotalDATAvsMC(int ieta)
@@ -166,7 +178,7 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   _pyPars.fOut->cd();
   TString canvName="TotalDATAvsMC";
   canvName+=StrLabelEta(ieta);
-  _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,1200,800);
+  _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,650);
   TLegend* legend;
   if (_pyPars.varKin=="Mleplep" || _pyPars.varKin=="lep2PhoDeltaR")
     legend = new TLegend(0.25,0.50,0.50,0.90);
@@ -410,6 +422,11 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   nameForSave+="_";
   nameForSave+=_pyPars.varKin;
   nameForSave+=_pyPars.strSelStage;
+
+  if (_pyPars.etogScaleB<0.999 || _pyPars.etogScaleB>1.001 || 
+      _pyPars.etogScaleE<0.999 || _pyPars.etogScaleE>1.001)
+    nameForSave+="_etogScale";
+
   nameForSave.ReplaceAll(" ","");
   if (_pyPars.isMCclosure) nameForSave+="_MCclosure";
   std::cout<<"nameForSave="<<nameForSave<<std::endl;
