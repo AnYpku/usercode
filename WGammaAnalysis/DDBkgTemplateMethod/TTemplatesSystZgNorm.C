@@ -63,7 +63,6 @@ void TTemplatesSystZgNorm::SystDueToZgNorm()
     TString strTot=_pars.strTrueYieldsTot[ieta];
 
     TString str1D=_pars.strTrueYields1D[ieta];
-
     
     if (ieta==_COMMON){
       h1DTrueYield[_COMMON] = (TH1F*)h1DTrueYield[_BARREL]->Clone(str1D); h1DTrueYield[_COMMON]->SetTitle(str1D);
@@ -77,8 +76,12 @@ void TTemplatesSystZgNorm::SystDueToZgNorm()
 
    hTotTrueYield[ieta] = new TH1F(strTot,strTot,1,_pars.kinBinLims[0],_pars.kinBinLims[_pars.nKinBins]);
    h1DTrueYield[ieta] = new TH1F(str1D,str1D,_pars.nKinBins,_pars.kinBinLims);
+
    float contTot=0;
    float errTot=0;
+
+    
+ 
    for (int ib=1; ib<_pars.nKinBins+1; ib++){  
       float cont = _nTrueYieldsValRef[ib][ieta];
       h1DTrueYield[ieta]->SetBinContent(ib,cont);
@@ -100,12 +103,29 @@ void TTemplatesSystZgNorm::SystDueToZgNorm()
       h1DTrueYield[ieta]->SetBinError(ib,err);
       if (ib==1) continue;
       contTot+=cont;
-      errTot+=err*err;
+      //errTot+=err*err;
    }//end of loop over ib
-   errTot=sqrt(errTot);
+   //errTot=sqrt(errTot);
+   //hTotTrueYield[ieta]->SetBinContent(1,contTot);
+   //hTotTrueYield[ieta]->SetBinError(1,errTot);
+   h1DTrueYield[ieta]->Write(str1D);
+   //hTotTrueYield[ieta]->Write(strTot);
+
+
+   float nTot[5];
+   for (int i=0; i<5; i++){
+     for (int ib=1; ib<_pars.nKinBins+1; ib++){ 
+       nTot[i]+=_nTrueYieldsValDiff[ib][ieta][i];
+     }//end of for (int ib=1; ib<_pars.nKinBins+1; ib++)
+     for (int j=0; j<i; j++){ 
+       float diff = fabs(nTot[i]-nTot[j]);
+       if (errTot<diff) errTot=diff;
+     }//(int j=0; j<5; j++)
+   }//end of for (int i=0; i<5; i++)
+     std::cout<<StrLabelEta(ieta)<<" TOTAL PT"<<std::endl;
+    
    hTotTrueYield[ieta]->SetBinContent(1,contTot);
    hTotTrueYield[ieta]->SetBinError(1,errTot);
-   h1DTrueYield[ieta]->Write(str1D);
    hTotTrueYield[ieta]->Write(strTot);
 
   }//end of loop over ieta
