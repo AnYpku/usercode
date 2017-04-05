@@ -75,10 +75,10 @@ void DrawTemplates(TString strCanvBase, TTree* tr[2], TString varTemp, TCut cutE
         if (strCanvBase.Contains("ENDCAP")){nBins=25; low=0.019; up=0.069;}
       }
 
-      TCanvas* canv = new TCanvas(strCanvBase+strAffix,strCanvBase+strAffix, 600, 600);
+      TCanvas* canv = new TCanvas(strCanvBase+strAffix,strCanvBase+strAffix, 800, 600);
       
       TLegend* leg;
-      leg = new TLegend(0.50,0.70,0.90,0.90);
+      leg = new TLegend(0.50,0.75,0.90,0.90);
       float max = 0;
       
         TString hName="h"+strCanvBase+strAffix;
@@ -96,7 +96,8 @@ void DrawTemplates(TString strCanvBase, TTree* tr[2], TString varTemp, TCut cutE
         hists[1][ipt][0]->SetLineWidth(2);
         hists[1][ipt][0]->SetLineColor(1);
 	NormalizeHist(hists[1][ipt][0]);
-        leg->AddEntry(hists[1][ipt][0],"no MET cut","l");
+        leg->SetFillColor(0);
+        leg->AddEntry(hists[1][ipt][0],"no E_{T}^{miss} cut","l");
 
         hName="h1"+strCanvBase+strAffix;
         hists[0][ipt][1] = new TH1F(hName+"_Zg",hName,nBins,low,up);
@@ -113,11 +114,11 @@ void DrawTemplates(TString strCanvBase, TTree* tr[2], TString varTemp, TCut cutE
         hists[1][ipt][1]->SetLineWidth(2);
         hists[1][ipt][1]->SetLineColor(2);
 	NormalizeHist(hists[1][ipt][1]);
-        leg->AddEntry(hists[1][ipt][1],"MET>10, #Delta #phi(MET,#gamma)<0.5","l");
+        leg->AddEntry(hists[1][ipt][1],"E_{T}^{miss}>10 GeV, #Delta #phi(E_{T}^{miss},#gamma)<0.5","l");
 
       hists[1][ipt][0]->SetStats(0);
-      if (varTemp=="phoPFChIsoCorr") hists[1][ipt][0]->GetXaxis()->SetTitle("I_{ch}, GeV");
-      if (varTemp=="phoSigmaIEtaIEta") hists[1][ipt][0]->GetXaxis()->SetTitle("#sigma_{i #etai #eta}");
+      if (varTemp=="phoPFChIsoCorr") hists[1][ipt][0]->GetXaxis()->SetTitle("I_{ch}^{#gamma}, GeV");
+      if (varTemp=="phoSigmaIEtaIEta") hists[1][ipt][0]->GetXaxis()->SetTitle("#sigma_{i #etai #eta}^{#gamma}");
       hists[1][ipt][0]->Draw("EP");
       hists[1][ipt][1]->Draw("EP same");
       
@@ -127,6 +128,13 @@ void DrawTemplates(TString strCanvBase, TTree* tr[2], TString varTemp, TCut cutE
       strTitle.ReplaceAll("cTemplatesVsWMt","");
       strTitle.ReplaceAll("phoSigmaIEtaIEta","");
       strTitle.ReplaceAll("phoPFChIsoCorr","");
+      strTitle.ReplaceAll("_"," ");
+      strTitle.ReplaceAll("ZjetsISR","DY+jets, ISR,");
+     strTitle.ReplaceAll("pt","P_{T}^{#gamma}: ");
+     strTitle.ReplaceAll("to","-");
+     strTitle.ReplaceAll("500","500 GeV");
+     strTitle.ReplaceAll("ENDCAP","endcap, ");
+     strTitle.ReplaceAll("BARREL","barrel, ");
       hists[1][ipt][0]->SetTitle(strTitle);
 
       TString strSave="../WGammaOutput";

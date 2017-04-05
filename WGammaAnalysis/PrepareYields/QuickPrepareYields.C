@@ -355,4 +355,33 @@ void QuickPrepareYields_EtoGammaEnriched(){
     AuxPrepareYields(anPars,0,selStage,hScaleB->GetBinContent(ib+1),hScaleE->GetBinContent(ib+1),strAdd[ib]);
   }
 
-}//end of QuickPrepareYields_Mass_FSRandISR
+}//end of QuickPrepareYields_EtoGammaEnriched
+
+void QuickPrepareYields_EtoGammaEnriched(int channel){
+
+  FullChain fch;
+  TConfiguration::AnalysisParameters anPars;
+
+  std::cout<<"configfile="<<anPars.configfile<<std::endl;
+
+  TConfiguration conf;
+  fch.SetDefaultFullChainParameters(anPars,"Mpholep1");
+  
+  anPars.blind[channel][conf.W_GAMMA]=conf.UNBLIND;
+  anPars.channel=channel;
+  anPars.vgamma=conf.W_GAMMA;
+  anPars.varKin="Mpholep1";
+  anPars.nKinBins=40;
+  anPars.kinBinLims=new float[anPars.nKinBins+1];
+  for (int ib=0; ib<anPars.nKinBins+1; ib++)
+    anPars.kinBinLims[ib]=0+5*ib;//0-200 GeV
+
+
+  int selStage=conf.PRELIMINARY_FOR_E_TO_GAMMA_WITH_PSV_CUT;
+
+   anPars.cutAdd="phoEt>15 && phoEt<45";
+   AuxPrepareYields(anPars,0,selStage,1,1,"_pt15to500_"); 
+  
+
+
+}//end of QuickPrepareYields_EtoGammaEnriched(int channel)

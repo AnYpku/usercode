@@ -75,10 +75,10 @@ void DrawTemplates(TString strCanvBase, TTree* tr, TString varTemp, TCut cutEta)
         if (strCanvBase.Contains("ENDCAP")){nBins=25; low=0.019; up=0.069;}
       }
 
-      TCanvas* canv = new TCanvas(strCanvBase+strAffix,strCanvBase+strAffix, 600, 600);
+      TCanvas* canv = new TCanvas(strCanvBase+strAffix,strCanvBase+strAffix, 800, 600);
       
       TLegend* leg;
-      leg = new TLegend(0.50,0.70,0.90,0.90);
+      leg = new TLegend(0.60,0.75,0.90,0.90);
       float max = 0;
       
         TString hName="h"+strCanvBase+strAffix;
@@ -91,7 +91,8 @@ void DrawTemplates(TString strCanvBase, TTree* tr, TString varTemp, TCut cutEta)
         hists[ipt][0]->SetLineWidth(2);
         hists[ipt][0]->SetLineColor(1);
 	NormalizeHist(hists[ipt][0]);
-        leg->AddEntry(hists[ipt][0],"40<WMt<70 GeV","l");
+        leg->AddEntry(hists[ipt][0],"40<M_{T}^{W}<70 GeV","l");
+        leg->SetFillColor(0);
 
         hName="h1"+strCanvBase+strAffix;
         hists[ipt][1] = new TH1F(hName,hName,nBins,low,up);
@@ -103,11 +104,11 @@ void DrawTemplates(TString strCanvBase, TTree* tr, TString varTemp, TCut cutEta)
         hists[ipt][1]->SetLineWidth(2);
         hists[ipt][1]->SetLineColor(2);
 	NormalizeHist(hists[ipt][1]);
-        leg->AddEntry(hists[ipt][1],"WMt>70 GeV","l");
+        leg->AddEntry(hists[ipt][1],"M_{T}^{W}>70 GeV","l");
 
       hists[ipt][0]->SetStats(0);
-      if (varTemp=="phoPFChIsoCorr") hists[ipt][0]->GetXaxis()->SetTitle("I_{ch}, GeV");
-      if (varTemp=="phoSigmaIEtaIEta") hists[ipt][0]->GetXaxis()->SetTitle("#sigma_{i #etai #eta}");
+      if (varTemp=="phoPFChIsoCorr") hists[ipt][0]->GetXaxis()->SetTitle("I_{ch}^{#gamma}, GeV");
+      if (varTemp=="phoSigmaIEtaIEta") hists[ipt][0]->GetXaxis()->SetTitle("#sigma_{i #etai #eta}^{#gamma}");
       hists[ipt][0]->Draw("EP");
       hists[ipt][1]->Draw("EP same");
       
@@ -117,10 +118,20 @@ void DrawTemplates(TString strCanvBase, TTree* tr, TString varTemp, TCut cutEta)
       strTitle.ReplaceAll("cTemplatesVsWMt","");
       strTitle.ReplaceAll("phoSigmaIEtaIEta","");
       strTitle.ReplaceAll("phoPFChIsoCorr","");
+      strTitle.ReplaceAll("_"," ");
+      strTitle.ReplaceAll("Wjets","W+jets,");
+      strTitle.ReplaceAll("Wg","W#gamma,");
+      strTitle.ReplaceAll("pt","P_{T}^{#gamma}: ");
+      strTitle.ReplaceAll("to","-");
+      strTitle.ReplaceAll("500","500 GeV");
+      strTitle.ReplaceAll("20","20 GeV");
+      strTitle.ReplaceAll("35","35 GeV");
+      strTitle.ReplaceAll("ENDCAP","endcap, ");
+      strTitle.ReplaceAll("BARREL","barrel, "); 
       hists[ipt][0]->SetTitle(strTitle);
 
       TString strSave="../WGammaOutput";
-      strSave+="/ChannelsMERGED_WGamma/Plots/QuickChecks/";
+      strSave+="/MUON_WGamma/Plots/QuickChecks/";
       strSave+=canv->GetName();
 
       canv->SaveAs(strSave+TString(".png"));

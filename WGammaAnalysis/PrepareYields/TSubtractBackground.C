@@ -450,32 +450,40 @@ void TSubtractBackground::PlotPrintSave()
     std::cout<<"  \\begin{center}"<<std::endl;
     std::cout<<"  \\caption{Data, signal and background yields. ";
     std::cout<<_sources[isSign].name<<" "<<StrLabelEta(ieta)<<"}"<<std::endl;
-    std::cout<<"  \\begin{tabular}{|c|c|c|c|";
-    if (_nDDsources>1) std::cout<<"c|c|";
+    std::cout<<"  \\begin{tabular}{|c|c|c|c|c|";
+    if (_nDDsources>1) std::cout<<"c|";
     if (_pyPars.doEtoGammaSubtr) std::cout<<"c|";
     if (isRealStarted) std::cout<<"c|";
     std::cout<<"}"<<std::endl;
-    std::cout<<"    bin & DD fake &";
-    if (_nDDsources>1) std::cout<<" DD fake &"; // DD fake SIHIH
-    if (_pyPars.doEtoGammaSubtr) std::cout<<" DD &"; // DD e->gamma
-    if (isRealStarted) std::cout<<" MC real-\\gamma & ";// MC real-gamma bkg
-    std::cout<<" SIGMC & bkg+sig & ";
-    if (_nDDsources>1) std::cout<<" bkg+sig &";// bkg+sig SIHIH  
-    std::cout<<" data \\\\ "<<std::endl;
+    std::cout<<"    bin & data & jets$\\rightarrow\\gamma$ &";
+    if (_nDDsources>1) std::cout<<" jets$\\rightarrow\\gamma$ &"; // DD fake SIHIH
+    if (_pyPars.doEtoGammaSubtr) std::cout<<"  &"; // DD e->gamma
+    if (isRealStarted) std::cout<<" MC real-$\\gamma$ & ";// MC real-gamma bkg
+    std::cout<<" data-bkg & signal \\\\ "<<std::endl;
 
-    std::cout<<"    lims & CHISO &"; 
-    if (_nDDsources>1) std::cout<<" SIHIH &";// DD fake SIHIH  
-    if (_pyPars.doEtoGammaSubtr) std::cout<<"e\\rightarrow\\gamma &"; // DD e->gamma
-    if (isRealStarted) std::cout<<" bkg & ";// MC real-gamma bkg  
-    std::cout<<"("<<_sources[isSign].name<<") & CHISO & ";
-    if (_nDDsources>1) std::cout<<" SIHIH &";// bkg+sig SIHIH  
-    std::cout<<"\\\\ \\hline"<<std::endl;
+    std::cout<<"    lims & & $I_{ch}^{\\gamma}$ &"; 
+    if (_nDDsources>1) std::cout<<" $\\sigma_{i\\eta i\\eta}^{\\gamma}$ &";// DD fake SIHIH  
+    if (_pyPars.doEtoGammaSubtr) std::cout<<"$e\\rightarrow\\gamma$ &"; // DD e->gamma
+    if (isRealStarted) std::cout<<" bkg & & MC ";// MC real-gamma bkg  
+    //   std::cout<<"("<<_sources[isSign].name<<") & CHISO & ";
+    //    if (_nDDsources>1) std::cout<<" SIHIH ";// bkg+sig SIHIH  
+    std::cout<<" \\\\ \\hline"<<std::endl;
+
     for (int ib=1; ib<= _sourceDDFake[0].hist[ieta]->GetNbinsX(); ib++){
+
       // bin
       std::cout<<_sourceDDFake[0].hist[ieta]->GetBinLowEdge(ib)<<"-"<<_sourceDDFake[0].hist[ieta]->GetBinLowEdge(ib)+_sourceDDFake[0].hist[ieta]->GetBinWidth(ib)<<" & ";
       // DD-fake-CHISO _sourceDDFake[is].yieldTotVal[ieta], _sourceDDFake[is].yieldTotErr[ieta], _sourceDDFake[is].hist[ieta]
+
+      // data _sources[is].
+      for (int is=0; is<_sources.size(); is++){
+        if (_sources[is].sourceType!=DATA) continue;
+        {std::cout<<_sources[is].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sources[is].hist[ieta]->GetBinError(ib)<<" & ";}
+      }// end of loop over is
+
       std::cout<<_sourceDDFake[0].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sourceDDFake[0].hist[ieta]->GetBinError(ib)<<" & ";
       // DD-fake-SIHIH _sourceDDFake[is].yieldTotVal[ieta], _sourceDDFake[is].yieldTotErr[ieta], _sourceDDFake[is].hist[ieta]
+
       if (_nDDsources>1)
         {std::cout<<_sourceDDFake[1].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sourceDDFake[1].hist[ieta]->GetBinError(ib)<<" & ";}
       // e->g ( if (_pyPars.doEtoGammaSubtr) ) _sourceDDEtoGamma.
@@ -485,21 +493,20 @@ void TSubtractBackground::PlotPrintSave()
       //      std::cout<<"isRealStarted="<<isRealStarted<<std::endl;
       if (isRealStarted)
         {std::cout<<hRealGammaBkg->GetBinContent(ib)<<"$\\pm$"<<hRealGammaBkg->GetBinError(ib)<<" & ";}
+
+      std::cout<<_sourceBkgSubtrData[0].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sourceBkgSubtrData[0].hist[ieta]->GetBinError(ib)<<" & ";
+
       // signal MC _sources[is].
       if (isSign!=-1)
-        {std::cout<<_sources[isSign].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sources[isSign].hist[ieta]->GetBinError(ib)<<" & ";}
+        {std::cout<<_sources[isSign].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sources[isSign].hist[ieta]->GetBinError(ib);}
       // sum CHISO SUM
-      {std::cout<<hTotalCHISO->GetBinContent(ib)<<"$\\pm$"<<hTotalCHISO->GetBinError(ib)<<" & ";}
+      //      {std::cout<<hTotalCHISO->GetBinContent(ib)<<"$\\pm$"<<hTotalCHISO->GetBinError(ib)<<" & ";}
       // sum SIHIH SUM
-      if (_nDDsources>1)
-        {std::cout<<hTotalSIHIH->GetBinContent(ib)<<"$\\pm$"<<hTotalSIHIH->GetBinError(ib)<<" & ";}
-      // data _sources[is].
-      for (int is=0; is<_sources.size(); is++){
-        if (_sources[is].sourceType!=DATA) continue;
-        {std::cout<<_sources[is].hist[ieta]->GetBinContent(ib)<<"$\\pm$"<<_sources[is].hist[ieta]->GetBinError(ib)<<" \\\\ \\hline ";}
-      }// end of loop over is
-      std::cout<<std::endl;
+      //     if (_nDDsources>1)
+      //       {std::cout<<hTotalSIHIH->GetBinContent(ib)<<"$\\pm$"<<hTotalSIHIH->GetBinError(ib);}
+      std::cout<<" \\\\ \\hline "<<std::endl;
     }// end of loop over ib
+
     std::cout<<"  \\end{tabular}"<<std::endl;
     std::cout<<"  \\label{tab:systInPercentyields_";
     std::cout<<_sources[isSign].name<<"_"<<StrLabelEta(ieta);

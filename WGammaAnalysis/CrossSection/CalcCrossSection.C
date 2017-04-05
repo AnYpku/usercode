@@ -782,6 +782,7 @@ void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
   TH1D* signUnfolded1D = (TH1D*)signInput1D->Clone(strUnfName);
 
   isOk = unf.ApplyRooUnfold(doSyst,signInput1D,signUnfolded1D,RooUnfold::kBayes,yCS.name);
+  //isOk = unf.ApplyRooUnfold(doSyst,signInput1D,signUnfolded1D,RooUnfold::kInvert,yCS.name);
   if (!isOk){
     std::cout<<"ERROR: ApplyRooUnfold() for Unfolding failed"<<std::endl;
     return;
@@ -932,7 +933,9 @@ void CalcCrossSection::Plot()
   leg->AddEntry(hTheory,"MC-based","l");
   leg->Draw("same");
 
-  TString txt_CMS_Preliminary = "#scale[1.4]{#font[61]{CMS}} #font[52]{Preliminary}";
+ TString txt_CMS_Preliminary = "#font[52]{Work in progress}"; 
+  //"#scale[1.4]{#font[61]{CMS}} #font[52]{Preliminary}";
+
   TString strHeader=txt_CMS_Preliminary;
   TLatex* text = new TLatex(0.15,0.93,strHeader);
   text->SetNDC();

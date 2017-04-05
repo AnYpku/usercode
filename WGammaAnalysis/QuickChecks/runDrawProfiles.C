@@ -4,8 +4,8 @@
   gStyle->SetPalette(1);
   gStyle->SetCanvasColor(kWhite); 
 
-  TFile fData("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGamma_UNblind_DATA.root");
-  TFile fSign("../WGammaOutput/MUON/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
+  TFile fData("../WGammaOutput/MUON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGamma_UNblind_DATA.root");
+  TFile fSign("../WGammaOutput/MUON_WGamma/PreliminaryForTemplateMethodSelected/selected_WGammaSIGMC.root");
   TTree* trData = (TTree*)fData.Get("selectedEvents");
   TTree* trSign = (TTree*)fSign.Get("selectedEvents");
 

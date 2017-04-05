@@ -1,4 +1,4 @@
 {
-  gROOT->ProcessLine(".L TemplatesVsWMt.C+");
+  gROOT->ProcessLine(".L TemplatesVsWMt_MC.C+");
   TemplatesVsWMt_MC();
 }

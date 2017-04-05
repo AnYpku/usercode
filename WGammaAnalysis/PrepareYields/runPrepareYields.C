@@ -17,7 +17,8 @@
   //  QuickPrepareYields_WMt(conf.MUON);
   //  QuickPrepareYields_WMt(conf.ELECTRON);
   //  QuickPrepareYields_FSRandISR();
-    QuickPrepareYields_EtoGammaEnriched();
+  //  QuickPrepareYields_EtoGammaEnriched();
+ QuickPrepareYields_EtoGammaEnriched(conf.MUON);
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  

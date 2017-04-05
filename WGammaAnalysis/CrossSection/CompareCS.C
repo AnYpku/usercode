@@ -61,13 +61,14 @@ void CompareCS(int vgamma)
     leg->AddEntry(hTheory1D[ich],config.StrChannel(ich)+TString(", MC-based"),"l");
   if (vgamma==config.Z_GAMMA){
     for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
-      leg->AddEntry(hOtto1D[ich],config.StrChannel(ich)+TString(", Otto"),"l");
+      leg->AddEntry(hOtto1D[ich],config.StrChannel(ich)+TString(", CMS published"),"l");
   }
 
   leg->SetFillColor(0);
 
 
-  TString txt_CMS_Preliminary = "#scale[1.4]{#font[61]{CMS}} #font[52]{Preliminary}";
+  TString txt_CMS_Preliminary = "#font[52]{Work in progress}"; 
+  //"#scale[1.4]{#font[61]{CMS}} #font[52]{Preliminary}";
   TString strHeader=txt_CMS_Preliminary;
 
   // differential cross section

@@ -482,12 +482,16 @@ void CalcAccAndEff::PlotAndSaveOutput()
   _HaccXeff1D->SetLineWidth(2);
   _HaccXeff1D->GetXaxis()->SetMoreLogLabels(); 
   _HaccXeff1D->GetXaxis()->SetNoExponent();
-  _HaccXeff1D->GetXaxis()->SetTitle("photon Pt, GeV");
+  _HaccXeff1D->GetXaxis()->SetTitle("P_{T}^{#gamma}, GeV");
   _HaccXeff1D->SetStats(0);
 
   TString hTitle=_HaccXeff1D->GetTitle();
   hTitle.ReplaceAll("ONEDI"," ");
   hTitle.ReplaceAll("_"," ");
+  hTitle.ReplaceAll("accXeff","A#times#epsilon,");
+  hTitle.ReplaceAll("MUON","muon channel,");
+  hTitle.ReplaceAll("ELECTRON","electron channel,");
+  hTitle.ReplaceAll("WGamma","W#gamma");
   _HaccXeff1D->SetTitle(hTitle);
   _HaccXeff1D->Draw();
 
