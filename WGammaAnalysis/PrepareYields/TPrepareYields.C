@@ -178,11 +178,11 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   _pyPars.fOut->cd();
   TString canvName="TotalDATAvsMC";
   canvName+=StrLabelEta(ieta);
-  _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,650);
+  _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,750);
   TLegend* legend;
   if (_pyPars.varKin=="Mleplep" || _pyPars.varKin=="lep2PhoDeltaR")
     legend = new TLegend(0.25,0.50,0.50,0.90);
-  else legend = new TLegend(0.65,0.50,0.90,0.90);
+  else legend = new TLegend(0.65,0.45,0.90,0.75);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot","DATA vs MC");
 
@@ -222,7 +222,8 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
     return;
   }
 
-  legend->AddEntry(_sources[isData].hist[ieta],"data");
+  if (!_pyPars.isMCclosure) legend->AddEntry(_sources[isData].hist[ieta],"data");
+  if (_pyPars.isMCclosure) legend->AddEntry(_sources[isData].hist[ieta],"pseudodata");
 
   _sources[isData].hist[ieta]->SetTitle("");
   CompareStackVsHist("Total DATA vs total MC", _sources[isData].hist[ieta], hSum, legend, _canvTotalDATAvsMC[ieta], 1, mcHists);
@@ -251,7 +252,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   pad1->SetPad(0,0.3,1.0,1.0);
   pad2->SetPad(0,0,  1.0,0.28);
   pad1->SetLeftMargin(0.10);
-  pad1->SetTopMargin(0.08);
+  pad1->SetTopMargin(0.20);
   pad1->SetRightMargin(0.07);
   pad1->SetBottomMargin(0.01); // All X axis labels and titles are thus cut off
   pad2->SetLeftMargin(0.10);
@@ -344,16 +345,20 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   legend->Draw("same");
   pad1->RedrawAxis();
 
-
-
   plotTitle=canv->GetTitle();
   plotTitle+=TString(" ")+_pyPars.strPlotsBaseName;
   plotTitle=PlotTitleReplaceAll(plotTitle);
 
+  TString txt_CMS;
+  if (!_pyPars.isMCclosure) txt_CMS="#font[52]{Work in progress, CMS 2012, #sqrt{s}=8 TeV, L=19.6 fb^{-1}}";
+  if (_pyPars.isMCclosure) txt_CMS="#font[52]{CMS simulation 2012, #sqrt{s}=8 TeV}. MC closure check.";
+  TLatex* latexTitleUp = new TLatex(0.10,0.93,txt_CMS);
+  latexTitleUp->SetNDC();
+  latexTitleUp->Draw("same");
 
-  TLatex* latexTitle = new TLatex(0.15,0.95,plotTitle);
-  latexTitle->SetNDC();
-  latexTitle->Draw("same");
+  TLatex* latexTitleDown = new TLatex(0.10,0.85,plotTitle);
+  latexTitleDown->SetNDC();
+  latexTitleDown->Draw("same");
 
   pad2->cd();
   if (_pyPars.doLogX) pad2->SetLogx();
@@ -475,60 +480,73 @@ TString TPrepareYields::PlotTitleReplaceAll(TString strTitle){
   plotTitle.ReplaceAll("blindPRESCALE_","");
   plotTitle.ReplaceAll("blindCOMBINED_","");
   plotTitle.ReplaceAll("_"," ");
-  plotTitle.ReplaceAll("  "," ");
-  plotTitle.ReplaceAll("TrueDDvsMC","Real #gamma DD-fits vs MC.");
-  plotTitle.ReplaceAll("FakeDDvsMC","Fake #gamma DD-fits vs MC.");
-  plotTitle.ReplaceAll("TotalDATAvsMC","DATA vs MC.");
-  plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(DATA - BKG) vs SIGMC.");
-  plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","DATA vs (BKG + SIGMC).");
-  plotTitle.ReplaceAll("DATAvsDDsum","DATA vs DD fits ");
-  /*
-  plotTitle.ReplaceAll("CHISO Endcap MUON WGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel MUON WGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO Endcap MUON ZGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel MUON ZGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO Endcap ELECTRON WGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel ELECTRON WGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO Endcap ELECTRON ZGamma","Endcap");
-  plotTitle.ReplaceAll("CHISO Barrel ELECTRON ZGamma","Barrel");
-  plotTitle.ReplaceAll("CHISO EtaCommon MUON WGamma","EB+EE");
-  plotTitle.ReplaceAll("CHISO EtaCommon MUON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON WGamma","EB+EE");
-  plotTitle.ReplaceAll("CHISO EtaCommon ELECTRON ZGamma","EB+EE");
 
-  plotTitle.ReplaceAll("SIHIH Endcap MUON WGamma","Endcap");
-  plotTitle.ReplaceAll("SIHIH Barrel MUON WGamma","Barrel");
-  plotTitle.ReplaceAll("SIHIH Endcap MUON ZGamma","Endcap");
-  plotTitle.ReplaceAll("SIHIH Barrel MUON ZGamma","Barrel");
-  plotTitle.ReplaceAll("SIHIH Endcap ELECTRON WGamma","Endcap");
-  plotTitle.ReplaceAll("SIHIH Barrel ELECTRON WGamma","Barrel");
-  plotTitle.ReplaceAll("SIHIH Endcap ELECTRON ZGamma","Endcap");
-  plotTitle.ReplaceAll("SIHIH Barrel ELECTRON ZGamma","Barrel");
-  plotTitle.ReplaceAll("SIHIH EtaCommon MUON WGamma","EB+EE");
-  plotTitle.ReplaceAll("SIHIH EtaCommon MUON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("SIHIH EtaCommon ELECTRON WGamma","EB+EE");
-  plotTitle.ReplaceAll("SIHIH EtaCommon ELECTRON ZGamma","EB+EE");
-  */
-  plotTitle.ReplaceAll("Endcap MUON WGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel MUON WGamma","Barrel");
-  plotTitle.ReplaceAll("Endcap MUON ZGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel MUON ZGamma","Barrel");
-  plotTitle.ReplaceAll("Endcap ELECTRON WGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel ELECTRON WGamma","Barrel");
-  plotTitle.ReplaceAll("Endcap ELECTRON ZGamma","Endcap");
-  plotTitle.ReplaceAll("Barrel ELECTRON ZGamma","Barrel");
-  plotTitle.ReplaceAll("EtaCommon MUON WGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon MUON ZGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon ELECTRON WGamma","EB+EE");
-  plotTitle.ReplaceAll("EtaCommon ELECTRON ZGamma","EB+EE");
+  TString strTitProcess;
+  TString strTitEta;
+  if (strTitle.Contains("ELECTRON") && strTitle.Contains("WGamma")){
+    strTitProcess=" W#gamma#rightarrow e#nu#gamma, ";
+  }
+  if (strTitle.Contains("MUON") && strTitle.Contains("WGamma")){
+    strTitProcess=" W#gamma#rightarrow #mu#nu#gamma, ";
+  }
+  if (strTitle.Contains("ELECTRON") && strTitle.Contains("ZGamma")){
+    strTitProcess=" Z#gamma#rightarrow ee#gamma, ";
+  }
+  if (strTitle.Contains("MUON") && strTitle.Contains("ZGamma")){
+    strTitProcess=" Z#gamma#rightarrow #mu#mu#gamma, ";
+  }
+  if (strTitle.Contains("ChannelsMERGED") && strTitle.Contains("WGamma")){
+    strTitProcess=" W#gamma, #mu+e, ";
+  }
+  if (strTitle.Contains("ChannelsMERGED") && strTitle.Contains("ZGamma")){
+    strTitProcess=" Z#gamma, #mu+e, ";
+  }
+  if (strTitle.Contains("Barrel")) strTitEta="barrel.";
+  if (strTitle.Contains("Endcap")) strTitEta="endcap.";
+  if (strTitle.Contains("EtaCommon")) strTitEta="EB+EE.";
 
-  plotTitle.ReplaceAll("EtaCommon","EB+EE");
-  plotTitle.ReplaceAll("ChannelsMERGED","#mu+e");
+  plotTitle.ReplaceAll("ELECTRON","");
+  plotTitle.ReplaceAll("MUON","");
+  plotTitle.ReplaceAll("WGamma","");
+  plotTitle.ReplaceAll("ZGamma","");
+  plotTitle.ReplaceAll("ChannelsMERGED","");
+  plotTitle.ReplaceAll("Barrel","");
+  plotTitle.ReplaceAll("Endcap","");
+  plotTitle.ReplaceAll("EtaCommon","");
   plotTitle.ReplaceAll("CHISO","");
   plotTitle.ReplaceAll("SIHIH","");
 
-  plotTitle.ReplaceAll("WGamma","W#gamma");
-  plotTitle.ReplaceAll("ZGamma","Z#gamma");
+  if (strTitle.Contains("TotalDATAvsMC")){
+    plotTitle.ReplaceAll("TotalDATAvsMC","Data vs MC.");
+  }//end of if (strTitle.Contains("FakeDDvsMC"))
+
+  if (strTitle.Contains("BkgSubtrDATAvsSIGMC")){
+    plotTitle.ReplaceAll("BkgSubtrDATAvsSIGMC","(Data-bkg.) vs signal MC.");
+  }//end of if (strTitle.Contains("TotalDATAvsMC"))
+
+  if (strTitle.Contains("DATAvsBkgPlusSigMC")){
+    plotTitle.ReplaceAll("DATAvsBkgPlusSigMC","Data vs (bkg.+signal MC).");
+  }//end of if (strTitle.Contains("BkgSubtrDATAvsSIGMC"))
+
+  if (strTitle.Contains("DATAvsDDsum")){
+    plotTitle.ReplaceAll("DATAvsDDsum","Data vs fits results.");
+  }//end of if (strTitle.Contains("DATAvsDDsum"))
+
+  if (strTitle.Contains("TrueDDvsMC")){
+    plotTitle.ReplaceAll("TrueDDvsMC","Real-#gamma, fit results vs MC.");
+  }//end of if (strTitle.Contains("TrueDDvsMC"))
+
+  if (strTitle.Contains("FakeDDvsMC")){
+    plotTitle.ReplaceAll("FakeDDvsMC","Jets#rightarrow#gamma, fit results vs MC.");
+  }//end of if (strTitle.Contains("FakeDDvsMC"))
+
+ if (strTitle.Contains("MCclosure")){
+    plotTitle.ReplaceAll("Data","Pseudodata");
+    plotTitle.ReplaceAll("MCclosure","");
+  }//end of if (strTitle.Contains("MCclosure"))
+
+  plotTitle=plotTitle+strTitProcess+strTitEta;
+  plotTitle.ReplaceAll("  "," ");
 
   return plotTitle;
 

@@ -140,8 +140,8 @@ void TSubtractBackground::CompareDDvsMC(int ieta, TString strDD, int bkgType, Yi
   _pyPars.fOut->cd(); 
   TString canvName=strDD+TString("DDvsMC_")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
-  canv= new TCanvas(canvName,canvName,800,650);
-  TLegend* legend = new TLegend(0.65,0.60,0.90,0.90);
+  canv= new TCanvas(canvName,canvName,800,750);
+  TLegend* legend = new TLegend(0.65,0.45,0.90,0.75);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",strDD+TString(" DD vs MC"));
 
@@ -192,8 +192,8 @@ void TSubtractBackground::CompareDATAvsDDsum(int ieta)
   _pyPars.fOut->cd(); 
   TString canvName=TString("DATAvsDDsum")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
-  _canvDATAvsDDsum[ieta]= new TCanvas(canvName,canvName,800,650);
-  TLegend* legend = new TLegend(0.60,0.65,0.90,0.90);
+  _canvDATAvsDDsum[ieta]= new TCanvas(canvName,canvName,800,750);
+  TLegend* legend = new TLegend(0.65,0.45,0.90,0.75);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",TString("DATAvsDDsum"));
   TH1F* hSum;
@@ -230,8 +230,8 @@ void TSubtractBackground::CompareDATAvsBKGplusSIGMC(int ieta)
   _pyPars.fOut->cd(); 
   TString canvName=TString("DATAvsBkgPlusSigMC")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
-  _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,650);
-  TLegend* legend = new TLegend(0.60,0.65,0.90,0.90);
+  _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,750);
+  TLegend* legend = new TLegend(0.65,0.45,0.90,0.75);
   legend->SetFillColor(0);
   // prepare sum of real-photon bkg MC
   TH1F* hSumBkgMC;
@@ -326,8 +326,8 @@ void TSubtractBackground::CompareBkgSubtrDATAvsSIGMC(int ieta)
   _pyPars.fOut->cd(); 
   TString canvName=TString("BkgSubtrDATAvsSIGMC_")+_pyPars.strPlotsBaseName;
   canvName+=StrLabelEta(ieta);
-  _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,650);
-  TLegend* legend = new TLegend(0.60,0.75,0.90,0.90);
+  _canvDATAvsBKGplusSIGMC[ieta]= new TCanvas(canvName,canvName,800,750);
+  TLegend* legend = new TLegend(0.65,0.60,0.90,0.75);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot",TString("BkgSubtrDATAvsSIGMC"));
 

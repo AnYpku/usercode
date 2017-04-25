@@ -484,6 +484,9 @@ void CalcAccAndEff::PlotAndSaveOutput()
   _HaccXeff1D->GetXaxis()->SetNoExponent();
   _HaccXeff1D->GetXaxis()->SetTitle("P_{T}^{#gamma}, GeV");
   _HaccXeff1D->SetStats(0);
+  if (_vgamma==_config.W_GAMMA) _HaccXeff1D->GetYaxis()->SetRangeUser(0.0,0.45);
+  if (_vgamma==_config.Z_GAMMA) _HaccXeff1D->GetYaxis()->SetRangeUser(0.0,0.60); 
+  _HaccXeff1D->GetYaxis()->SetTitle("A#times#epsilon");
 
   TString hTitle=_HaccXeff1D->GetTitle();
   hTitle.ReplaceAll("ONEDI"," ");
@@ -493,6 +496,7 @@ void CalcAccAndEff::PlotAndSaveOutput()
   hTitle.ReplaceAll("ELECTRON","electron channel,");
   hTitle.ReplaceAll("WGamma","W#gamma");
   _HaccXeff1D->SetTitle(hTitle);
+  _HaccXeff1D->SetTitle("");
   _HaccXeff1D->Draw();
 
   _HaccXeff1D->Write();
