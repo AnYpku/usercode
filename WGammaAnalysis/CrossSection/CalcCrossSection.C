@@ -792,8 +792,44 @@ void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
   yCS.yields1D_unfolded=(TH1F*)signUnfolded1D->Clone("hUnfolded1D");
   yCS.yieldTOT_unfolded=(TH1F*)yCS.yieldTOT_bkgSubtr->Clone("hBkgSubtrTOT"); // no unfolding for total
   Print("Unfolded Yields: ",yCS.yieldTOT_unfolded,yCS.yields1D_unfolded);
-//  unf.PlotAndStore();
 
+    std::cout<<"\\begin{table}[h]"<<std::endl;
+    std::cout<<"  \\scriptsize"<<std::endl;
+    std::cout<<"  \\begin{center}"<<std::endl;
+    std::cout<<"  \\caption{Unfolding Results. ";
+    std::cout<<_config.StrChannel(_channel)<<" "<<_config.StrVgType(_vgamma)<<"}"<<std::endl;
+                                  // bin | val | stat err | syst Ich vs sihih
+    std::cout<<"  \\begin{tabular}{|c|c|c|}"<<std::endl;
+
+
+  std::cout<<std::endl;
+  std::cout<<"  $P_T^{\gamma}$, &  yields &   yields  \\\\ \\hline"<<std::endl;  
+  std::cout<<"  GeV             &  data-bkg & unfolded  \\\\ \\hline"<<std::endl;  
+
+  std::cout<<std::endl;
+  
+  for (int i=1; i<=yCS.yields1D_bkgSubtr->GetNbinsX(); i++){
+    std::cout<<std::setw(3)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinLowEdge(i)<<" - "<<std::setw(3)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinLowEdge(i)+yCS.yields1D_bkgSubtr->GetBinWidth(i)<<" & ";
+      //limits
+
+    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<yCS.yields1D_bkgSubtr->GetBinContent(i)<<"\\pm"<<std::setw(4)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinError(i)<<"$ & ";
+      //rec yields
+
+    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<yCS.yields1D_unfolded->GetBinContent(i)<<"\\pm"<<std::setw(4)<<std::setprecision(0)<<yCS.yields1D_unfolded->GetBinError(i)<<"$  ";
+      //true yields
+
+    std::cout<<"\\\\ \\hline";
+
+    std::cout<<std::endl;
+  }// end of loop over i
+
+  std::cout<<"  \\end{tabular}"<<std::endl;
+  std::cout<<"  \\label{tab:unf_results_";
+  std::cout<<_config.StrChannel(_channel)<<"_"<<_config.StrVgType(_vgamma);
+  std::cout<<"}"<<std::endl;
+  std::cout<<"  \\end{center}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+//  unf.PlotAndStore();
 }// end of ApplyUnfolding()
 
 void CalcCrossSection::ApplyAccXEff(FromYieldToCS& yCS)
@@ -887,7 +923,7 @@ void CalcCrossSection::Plot()
   pad2->SetTopMargin(0.01);
   pad2->SetRightMargin(0.07);
   pad2->SetBottomMargin(0.45);
-  TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
+  TString fName=_config.GetAccXEffFileName(_config.BOTH_CHANNELS, _vgamma);
   TFile* fTheory = new TFile(fName);
   TH1F* hTheory = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
   // Multiply by 1000, pb -> fb

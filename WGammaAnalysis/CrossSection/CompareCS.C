@@ -17,6 +17,7 @@ void CompareCS(int vgamma)
 {
 
   TFile* fCS[2]; //MUON, ELECTRON
+  TFile* fCStheory; //MUON, ELECTRON
   TH1F* hMeasured1D[2];
   TH1F* hTheory1D[2];
   TH1F* hOtto1D[2];//Z_GAMMA only
@@ -30,11 +31,13 @@ void CompareCS(int vgamma)
   SetOttosHists(fOut,hOtto1D);
 
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++){
+    fCStheory=new TFile(config.GetAccXEffFileName(config.BOTH_CHANNELS, vgamma));
+    std::cout<<"fCS="<<config.GetAccXEffFileName(config.BOTH_CHANNELS, vgamma)<<std::endl;
     fCS[ich]=new TFile(config.GetCrossSectionFileName(ich, vgamma));
     std::cout<<"fCS="<<config.GetCrossSectionFileName(ich, vgamma)<<std::endl;
     hMeasured1D[ich]=(TH1F*)fCS[ich]->Get(config.GetCSname(ich, config.ONEDI));
     hMeasuredTotal[ich]=(TH1F*)fCS[ich]->Get(config.GetCSname(ich, config.TOTAL));
-    hTheory1D[ich]=(TH1F*)fCS[ich]->Get(config.GetTheoryCSname(config.ONEDI));
+    hTheory1D[ich]=(TH1F*)fCStheory->Get(config.GetTheoryCSname(config.ONEDI));
     hTheory1D[ich]->SetLineWidth(2);
     hMeasured1D[ich]->SetLineWidth(2);
     hOtto1D[ich]->SetLineWidth(2);

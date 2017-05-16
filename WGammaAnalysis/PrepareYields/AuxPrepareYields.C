@@ -44,18 +44,19 @@ void AuxSubtractBackgroundOneTempl(TSubtractBackground &prep, TConfiguration::An
    strYieldsTotEtoGamma[ieta]=config.GetYieldsDDBkgEtoGamma(config.TOTAL,ieta);
   }// end of loop over ieta
   if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA) {
-    prep.SetYieldsDataDrivenEtoGamma("DD_EtoGamma", "DD e#rightarrow#gamma", 44, fileNameEtoGamma, strYields1DEtoGamma, strYieldsTotEtoGamma);
+    prep.SetYieldsDataDrivenEtoGamma("DD_EtoGamma", "e#rightarrow#gamma", 44, fileNameEtoGamma, strYields1DEtoGamma, strYieldsTotEtoGamma);
   }
   TString name = TString("DD_true")+config.StrTempl(templFits);
   name.ReplaceAll("TEMPL_","_");
   TString label=name;
+  label.ReplaceAll("DD_true","real-#gamma");
   label.ReplaceAll("_"," ");
   label.ReplaceAll(" SIHIH",", #sigma_{i#etai#eta} fits");
   label.ReplaceAll(" CHISO",", I_{ch} fits");
   prep.SetYieldsDataDrivenTrue(name, label, 3, fileName, strYields1DTrue, strYieldTotTrue);
 
   name.ReplaceAll("true","fake");
-  label.ReplaceAll("true","jets#rightarrow#gamma");
+  label.ReplaceAll("real-#gamma","jets#rightarrow#gamma");
   prep.SetYieldsDataDrivenFake(name, label, 4, fileName, strYields1DFake, strYieldTotFake);
   prep.Increase_nDDsources();
 
@@ -164,31 +165,34 @@ void AuxPrepareYieldsCommon(TPrepareYields& prep, TPrepareYields::PrepareYieldsP
     strYieldsNameTot[ieta]=config.GetYieldsSelectedName(config.TOTAL, ieta, config.SIGMC);
   }
   if (anPars.vgamma==config.W_GAMMA && anPars.channel==config.MUON)
-    prep.SetOneYieldSource(prep.SIGMC, "Wg_to_munu", "W#gamma#rightarrow#mu#nu#gamma", 634, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
+    prep.SetOneYieldSource(prep.SIGMC, "Wg_to_munu", "W#gamma#rightarrow#mu#nu#gamma (sig. MC)", 634, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
 
   if (anPars.vgamma==config.W_GAMMA && anPars.channel==config.ELECTRON)
-    prep.SetOneYieldSource(prep.SIGMC, "Wg_to_enu", "W#gamma#rightarrowe#nu#gamma", 634, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
+    prep.SetOneYieldSource(prep.SIGMC, "Wg_to_enu", "W#gamma#rightarrow e#nu#gamma (sig. MC)", 634, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
 
-  if (anPars.vgamma==config.Z_GAMMA)
-    prep.SetOneYieldSource(prep.SIGMC, "Zg", "Z#gamma", 879, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
+  if (anPars.vgamma==config.Z_GAMMA && anPars.channel==config.ELECTRON)
+    prep.SetOneYieldSource(prep.SIGMC, "Zg", "Z#gamma#rightarrow ee#gamma", 879, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
+
+  if (anPars.vgamma==config.Z_GAMMA && anPars.channel==config.MUON)
+    prep.SetOneYieldSource(prep.SIGMC, "Zg", "Z#gamma#rightarrow #mu#mu#gamma", 879, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.SIGMC), "selectedEvents", strYieldsName1D, strYieldsNameTot);
 
   // bkg MC  
   //  prep.SetOneYieldSource(prep.BKGMC_TRUE, "WWg", " WW#gamma", 884, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"WWg") , "selectedEvents");
 
-  prep.SetOneYieldSource(prep.BKGMC_TRUE, "Wg_to_taunu", " W#gamma#rightarrow#tau#nu#gamma", 401, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Wg_to_taunu") , "selectedEvents");
+  prep.SetOneYieldSource(prep.BKGMC_TRUE, "Wg_to_taunu", "W#gamma#rightarrow#tau#nu#gamma", 401, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Wg_to_taunu") , "selectedEvents");
 
-  prep.SetOneYieldSource(prep.BKGMC_TRUE, "Zg", "Z#gamma#rightarrowl#bar{l}", 879, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Zg"), "selectedEvents");
+  prep.SetOneYieldSource(prep.BKGMC_TRUE, "Zg", "Z#gamma", 879, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Zg"), "selectedEvents");
 
   prep.SetOneYieldSource(prep.BKGMC_FAKE, "ttbarjets", "t#bar{t}+jets", 631, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"ttbarjets") , "selectedEvents");
 
-  prep.SetOneYieldSource(prep.BKGMC_FAKE, "DYjets_to_ll_jtog", "DY+jets#rightarrowl#bar{l}, j#rightarrow#gamma", 418, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
+  prep.SetOneYieldSource(prep.BKGMC_FAKE, "DYjets_to_ll_jtog", "DY+jets, jets#rightarrow#gamma", 418, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
 
   if (anPars.channel==config.ELECTRON && anPars.vgamma==config.W_GAMMA){
-    prep.SetOneYieldSource(prep.BKGMC_ETOG, "DYjets_to_ll_etog", "DY+jets#rightarrowl#bar{l}, e#rightarrow#gamma", 16, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
+    prep.SetOneYieldSource(prep.BKGMC_ETOG, "DYjets_to_ll_etog", "DY+jets, e#rightarrow#gamma", 16, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"DYjets_to_ll"), "selectedEvents");
   }
 
 
-  prep.SetOneYieldSource(prep.BKGMC_FAKE, "Wjets_to_lnu", "W+jets#rightarrowl#nu+jets", 433, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Wjets_to_lnu"), "selectedEvents");
+  prep.SetOneYieldSource(prep.BKGMC_FAKE, "Wjets_to_lnu", "W+jets", 433, config.GetSelectedName(selStage,anPars.channel,anPars.vgamma,anPars.blind[anPars.channel][anPars.vgamma],config.BKGMC,"Wjets_to_lnu"), "selectedEvents");
   
 
 }// end of AuxPrepareYieldsCommon

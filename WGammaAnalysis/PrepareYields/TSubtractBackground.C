@@ -260,7 +260,7 @@ void TSubtractBackground::CompareDATAvsBKGplusSIGMC(int ieta)
     hSumBkgMC->SetLineColor(_sourceDDTrue[0].color);
     hSumBkgMC->SetFillColor(_sourceDDTrue[0].color);
     mcHists->Add(hSumBkgMC);
-    legend->AddEntry(hSumBkgMC,"real #gamma bkg MC","f");
+    legend->AddEntry(hSumBkgMC,"real-#gamma bkg. (MC)","f");
     hSum=(TH1F*)hSumBkgMC->Clone("hSum_WholeBkgPlusMC");  
     hSumStarted=1;  
   }// end of if (hSumStartedMC)
@@ -360,6 +360,7 @@ void TSubtractBackground::CompareBkgSubtrDATAvsSIGMC(int ieta)
   for (int ih=0; ih<_nDDsources; ih++){
     TString label = _sourceDDTrue[ih].label;
     label.ReplaceAll("DD_true","DATA - BKG");
+    label.ReplaceAll("real-#gamma","data-bkg.");
     legend->AddEntry(_sourceBkgSubtrData[ih].hist[ieta],label,"l");
     _sourceBkgSubtrData[ih].hist[ieta]->SetTitle("");
     hists[ih]=_sourceBkgSubtrData[ih].hist[ieta];

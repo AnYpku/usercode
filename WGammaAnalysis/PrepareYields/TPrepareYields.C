@@ -181,7 +181,7 @@ void TPrepareYields::CompareTotalDATAvsMC(int ieta)
   _canvTotalDATAvsMC[ieta]= new TCanvas(canvName,canvName,800,750);
   TLegend* legend;
   if (_pyPars.varKin=="Mleplep" || _pyPars.varKin=="lep2PhoDeltaR")
-    legend = new TLegend(0.25,0.50,0.50,0.90);
+    legend = new TLegend(0.20,0.45,0.45,0.75);
   else legend = new TLegend(0.65,0.45,0.90,0.75);
   legend->SetFillColor(0);
   THStack* mcHists = new THStack("mcHistsTot","DATA vs MC");
@@ -312,7 +312,7 @@ void TPrepareYields::CompareStackVsHist(TString plotTitle, int nHists1, TH1F* hi
   if (isStack) hist2->SetFillStyle(0);
   hist1[0]->GetYaxis()->SetRangeUser(min,max);
   hist1[0]->GetYaxis()->SetTitle("N_{events}/(bin width)");
-  hist1[0]->GetYaxis()->SetTitleOffset(1.0);
+  hist1[0]->GetYaxis()->SetTitleOffset(1.4);
   hist1[0]->SetStats(0);
   if (_pyPars.doLogY) {hist1[0]->GetYaxis()->SetMoreLogLabels(0); hist1[0]->GetYaxis()->SetNoExponent(); }
   hist1[0]->Draw("P");

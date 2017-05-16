@@ -10,15 +10,17 @@
   TConfiguration conf;
 
   // QuickPrepareYields_FSRandISR_Ich();
-  // QuickPrepareYields_FSRandISR_TemplatesIch();
+
+
+  // Run April, 26th, 2017:
+  //    QuickPrepareYields_WMt(conf.MUON);
+  //    QuickPrepareYields_WMt(conf.ELECTRON);
+  //    QuickPrepareYields_EtoGammaEnriched(conf.ELECTRON);
+  //    QuickPrepareYields_EtoGammaEnriched();
+  //    QuickPrepareYields_FSRandISR();
+   QuickPrepareYields_FSRandISR_TemplatesIch();
   // QuickPrepareYields_FSRandISR_TemplatesSihih();
-
-
-  //  QuickPrepareYields_WMt(conf.MUON);
-  //  QuickPrepareYields_WMt(conf.ELECTRON);
-  //  QuickPrepareYields_FSRandISR();
-  //  QuickPrepareYields_EtoGammaEnriched();
- QuickPrepareYields_EtoGammaEnriched(conf.MUON);
+ 
 
   time.Stop("time");
   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;  
