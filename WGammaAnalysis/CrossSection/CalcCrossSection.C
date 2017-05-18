@@ -1030,6 +1030,10 @@ void CalcCrossSection::Plot()
   _fOut->cd();
   _yCSarray[ERR_SUM].crossSectionTOT->Write(_config.GetCSname(_channel,_config.TOTAL)); 
   _yCSarray[ERR_SUM].crossSection1D->Write(_config.GetCSname(_channel,_config.ONEDI));
+  _yCSarray[ERR_STAT].crossSectionTOT->Write(_config.GetCSname(_channel,_config.TOTAL)+TString("_errStat")); 
+  _yCSarray[ERR_STAT].crossSection1D->Write(_config.GetCSname(_channel,_config.ONEDI)+TString("_errStat"));
+  _yCSarray[ERR_SYST_SUM].crossSectionTOT->Write(_config.GetCSname(_channel,_config.TOTAL)+TString("_errSyst")); 
+  _yCSarray[ERR_SYST_SUM].crossSection1D->Write(_config.GetCSname(_channel,_config.ONEDI)+TString("_errSyst"));
   hTheory->Write(_config.GetTheoryCSname(_config.ONEDI));
   
 }// end of Plot()

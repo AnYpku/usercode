@@ -176,14 +176,16 @@ void ComputeSystHists(TString strKin, TString strEta)
       std::cout<<"    ";
       std::cout<<h_d_chisoMCsig->GetBinLowEdge(ib)<<"-"<<h_d_chisoMCsig->GetBinLowEdge(ib)+h_d_chisoMCsig->GetBinWidth(ib)<<" & ";
 
-      std::cout<<"$"<<(int)h_d_chisoMCsig->GetBinContent(ib)<<"\\pm"<<(int)h_d_chisoMCsig->GetBinError(ib)<<"$ & ";
-      std::cout<<"$"<<(int)h_d_chiso->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_d_chiso->GetBinError(ib)*h_d_chiso->GetBinError(ib)+h_d_chiso_templStat[ieta]->GetBinError(ib)*h_d_chiso_templStat[ieta]->GetBinError(ib))<<"$ & ";
-      std::cout<<"$"<<(int)h_d_sihih->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_d_sihih->GetBinError(ib)*h_d_sihih->GetBinError(ib)+h_d_sihih_templStat->GetBinError(ib)*h_d_sihih_templStat->GetBinError(ib))<<"$ & ";
+      std::cout<<""<<(int)h_d_chisoMCsig->GetBinContent(ib)<<"$\\pm$"<<(int)h_d_chisoMCsig->GetBinError(ib)<<" & ";
 
-      std::cout<<"$"<<(int)h_M_chiso->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_chiso->GetBinError(ib)*h_M_chiso->GetBinError(ib)+h_M_chiso_templStat->GetBinError(ib)*h_M_chiso_templStat->GetBinError(ib))<<"$ & ";
-      std::cout<<"$"<<(int)h_M_sihih->GetBinContent(ib)<<"\\pm"<<(int)sqrt(h_M_sihih->GetBinError(ib)*h_M_sihih->GetBinError(ib)+h_M_sihih_templStat->GetBinError(ib)*h_M_sihih_templStat->GetBinError(ib))<<"$ &";
 
-      std::cout<<"$"<<(int)h_Yield_Meth1[ieta]->GetBinContent(ib)<<"\\pm"<<(int)h_Yield_Meth1[ieta]->GetBinError(ib)<<"\\pm"<<(int)h_d_chiso_templStat[ieta]->GetBinError(ib)<<"$ ";
+            std::cout<<""<<(int)h_d_chiso->GetBinContent(ib)<<"$\\pm$"<<(int)sqrt(h_d_chiso->GetBinError(ib)*h_d_chiso->GetBinError(ib)+h_d_chiso_templStat[ieta]->GetBinError(ib)*h_d_chiso_templStat[ieta]->GetBinError(ib))<<" & ";
+            std::cout<<""<<(int)h_d_sihih->GetBinContent(ib)<<"$\\pm$"<<(int)sqrt(h_d_sihih->GetBinError(ib)*h_d_sihih->GetBinError(ib)+h_d_sihih_templStat->GetBinError(ib)*h_d_sihih_templStat->GetBinError(ib))<<" & ";
+
+      std::cout<<""<<(int)h_M_chiso->GetBinContent(ib)<<"$\\pm$"<<(int)sqrt(h_M_chiso->GetBinError(ib)*h_M_chiso->GetBinError(ib)+h_M_chiso_templStat->GetBinError(ib)*h_M_chiso_templStat->GetBinError(ib))<<" & ";
+      std::cout<<""<<(int)h_M_sihih->GetBinContent(ib)<<"$\\pm$"<<(int)sqrt(h_M_sihih->GetBinError(ib)*h_M_sihih->GetBinError(ib)+h_M_sihih_templStat->GetBinError(ib)*h_M_sihih_templStat->GetBinError(ib))<<" &";
+
+      std::cout<<""<<(int)h_Yield_Meth1[ieta]->GetBinContent(ib)<<"$\\pm$"<<(int)h_Yield_Meth1[ieta]->GetBinError(ib)<<"$\\pm$"<<(int)h_d_chiso_templStat[ieta]->GetBinError(ib)<<" ";
 
       std::cout<<" \\\\ \\hline"<<std::endl;
   }//end of loop over ib
