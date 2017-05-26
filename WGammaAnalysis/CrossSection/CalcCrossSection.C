@@ -273,7 +273,7 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
 
   std::cout<<"||||========== Table with meas vs MCbased"<<std::endl;
 
-  TString fName=_config.GetAccXEffFileName(_channel, _vgamma);
+  TString fName=_config.GetAccXEffFileName(_config.BOTH_CHANNELS, _vgamma);
   TFile* fTheory = new TFile(fName);
   TH1F* hTheory1D = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.ONEDI));
   TH1F* hTheoryTot = (TH1F*)fTheory->Get(_config.GetTheoryCSname(_config.TOTAL));
@@ -291,13 +291,13 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
       std::cout<<"    ";
       std::cout<<std::setprecision(0)<<"total & ";
 
-      std::cout<<std::setprecision(0)<<1000*hTheoryTot->GetBinContent(1)<<" & $";
+      std::cout<<std::setprecision(0)<<1000*hTheoryTot->GetBinContent(1)<<" & ";
 
-      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1)<<" \\pm ";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinContent(1)<<" $\\pm$ ";
 
-      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinError(1)<<" \\pm ";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_STAT].crossSectionTOT->GetBinError(1)<<" $\\pm$ ";
 
-      std::cout<<std::setprecision(0)<<_yCSarray[ERR_SYST_SUM].crossSectionTOT->GetBinError(1)<<"$";
+      std::cout<<std::setprecision(0)<<_yCSarray[ERR_SYST_SUM].crossSectionTOT->GetBinError(1)<<"";
 
       std::cout<<" \\\\ \\hline"<<std::endl;
     //loop over pt bins
@@ -314,13 +314,13 @@ void CalcCrossSection::PrintLatexAll_MeasVsMCbased()
       if (cont<1)  pres=2;
       if (cont<0.1) pres=3;
 
-      std::cout<<std::setprecision(pres)<<1000*hTheory1D->GetBinContent(ib)<<" & $";
+      std::cout<<std::setprecision(pres)<<1000*hTheory1D->GetBinContent(ib)<<" & ";
    
-      std::cout<<std::setprecision(pres)<<cont<<" \\pm ";
+      std::cout<<std::setprecision(pres)<<cont<<" $\\pm$ ";
 
-      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_STAT].crossSection1D->GetBinError(ib)<<" \\pm ";
+      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_STAT].crossSection1D->GetBinError(ib)<<" $\\pm$ ";
 
-      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_SYST_SUM].crossSection1D->GetBinError(ib)<<"$";
+      std::cout<<std::setprecision(pres)<<_yCSarray[ERR_SYST_SUM].crossSection1D->GetBinError(ib)<<"";
 
 
 
@@ -812,10 +812,10 @@ void CalcCrossSection::ApplyUnfolding(bool doSyst, FromYieldToCS& yCS)
     std::cout<<std::setw(3)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinLowEdge(i)<<" - "<<std::setw(3)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinLowEdge(i)+yCS.yields1D_bkgSubtr->GetBinWidth(i)<<" & ";
       //limits
 
-    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<yCS.yields1D_bkgSubtr->GetBinContent(i)<<"\\pm"<<std::setw(4)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinError(i)<<"$ & ";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<""<<yCS.yields1D_bkgSubtr->GetBinContent(i)<<"$\\pm$"<<std::setw(4)<<std::setprecision(0)<<yCS.yields1D_bkgSubtr->GetBinError(i)<<" & ";
       //rec yields
 
-    std::cout<<std::setw(5)<<std::setprecision(0)<<"$"<<yCS.yields1D_unfolded->GetBinContent(i)<<"\\pm"<<std::setw(4)<<std::setprecision(0)<<yCS.yields1D_unfolded->GetBinError(i)<<"$  ";
+    std::cout<<std::setw(5)<<std::setprecision(0)<<""<<yCS.yields1D_unfolded->GetBinContent(i)<<"$\\pm$"<<std::setw(4)<<std::setprecision(0)<<yCS.yields1D_unfolded->GetBinError(i)<<"  ";
       //true yields
 
     std::cout<<"\\\\ \\hline";
@@ -965,8 +965,8 @@ void CalcCrossSection::Plot()
   _yCSarray[ERR_STAT].crossSection1D->Draw("E1 same");
   TLegend *leg = new TLegend(0.68,0.65,0.92,0.90, "d#sigma/dP_{T}^{#gamma}, fb/GeV");
   leg->SetFillColor(0);
-  leg->AddEntry(_yCSarray[ERR_SUM].crossSection1D,"measured","l");
-  leg->AddEntry(hTheory,"MC-based","l");
+  leg->AddEntry(_yCSarray[ERR_SUM].crossSection1D,"Data","l");
+  leg->AddEntry(hTheory,"NLO theory","l");
   leg->Draw("same");
 
  TString txt_CMS_Preliminary = "#font[52]{Work in progress}"; 

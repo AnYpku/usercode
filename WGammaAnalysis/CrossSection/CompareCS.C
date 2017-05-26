@@ -15,6 +15,14 @@ void SetOttosHists(TFile* fOut, TH1F* h[2]);
 float DifferenceInOneBin(TH1F* h1, TH1F* h2, int ib);
 void PrintLatexCS(TH1F* hTheory, TH1F* hMuonStat, TH1F* hElectronStat, TH1F* hMuonSyst, TH1F* hElectronSyst);
 
+TString StrProcess(int vg, int ch){
+  TConfiguration c;
+  if (vg==c.W_GAMMA && ch==c.MUON) return "#mu#nu#gamma";
+  if (vg==c.W_GAMMA && ch==c.ELECTRON) return "e#nu#gamma";
+  if (vg==c.Z_GAMMA && ch==c.MUON) return "#mu#mu#gamma";
+  if (vg==c.Z_GAMMA && ch==c.ELECTRON) return "ee#gamma";
+}// end of StrProcess(int vg, int ch)
+
 void CompareCS(int vgamma)
 {
 
@@ -76,18 +84,22 @@ void CompareCS(int vgamma)
   hOtto1D[config.MUON]->SetLineColor(7);
   hOtto1D[config.ELECTRON]->SetLineColor(8);
 
-  TLegend* leg = new TLegend(0.45,0.70,0.80,0.80,config.StrVgType(vgamma));
+  TLegend* leg;
+  if (vgamma==config.Z_GAMMA) leg = new TLegend(0.50,0.60,0.88,0.85);
+  if (vgamma==config.W_GAMMA) leg = new TLegend(0.50,0.70,0.88,0.85);
 
   for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
-    leg->AddEntry(hMeasured1D[ich],config.StrChannel(ich)+TString(", measured"),"l");
+    leg->AddEntry(hMeasured1D[ich],TString("Data ")+StrProcess(vgamma,ich),"l");
   for (int ich=config.MUON; ich<=config.MUON; ich++)
     leg->AddEntry(hTheory1D[ich],("NLO theory"),"l");
   if (vgamma==config.Z_GAMMA){
     for (int ich=config.MUON; ich<=config.ELECTRON; ich++)
-      leg->AddEntry(hOtto1D[ich],config.StrChannel(ich)+TString(", CMS published"),"l");
+      leg->AddEntry(hOtto1D[ich],TString("CMS published ")+StrProcess(vgamma,ich),"l");
   }
 
-  leg->SetFillColor(0);
+  leg->SetFillColor(0);  
+  leg->SetLineColor(0);
+
 
 
   TString txt_CMS_Preliminary = "#font[52]{Work in progress, CMS 2012, #sqrt{s}=8 TeV, L=19.6 fb^{-1}}"; 
@@ -161,10 +173,10 @@ void CompareCS(int vgamma)
   text1->SetNDC();
   text1->SetTextSize(0.04);
   text1->Draw("same");
-  TLatex* textVg = new TLatex(0.70,0.80,config.StrVgType(vgamma));
-  textVg->SetNDC();
-  textVg->SetTextSize(0.04);
-  textVg->Draw("same");
+  //  TLatex* textVg = new TLatex(0.70,0.80,config.StrVgType(vgamma));
+  //  textVg->SetNDC();
+  //  textVg->SetTextSize(0.04);
+  //  textVg->Draw("same");
   canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".png"));
   canv1->SaveAs(TString("compareCSratio")+config.StrVgType(vgamma)+TString(".pdf"));
 
@@ -189,10 +201,11 @@ void CompareCS(int vgamma)
     hRatioEleOtto->SetLineWidth(3);
     hRatioEleOtto->SetLineColor(809); 
     hRatioEleOtto->SetMarkerColor(809); 
-    TLegend* leg2 = new TLegend(0.55,0.70,0.80,0.80);
+    TLegend* leg2 = new TLegend(0.50,0.78,0.70,0.88);
     leg2->SetFillColor(0);
-    leg2->AddEntry(hRatioMuOtto,"muon","l");
-    leg2->AddEntry(hRatioEleOtto,"electron","l");  
+    leg2->SetLineColor(0);
+    leg2->AddEntry(hRatioMuOtto,TString("Data ")+StrProcess(vgamma,config.MUON),"l");
+    leg2->AddEntry(hRatioEleOtto,TString("Data ")+StrProcess(vgamma,config.ELECTRON),"l");  
     hRatioMuOtto->GetXaxis()->SetTitle("p_{T}^{#gamma}, GeV/c");
     hRatioMuOtto->Draw("EP");
     line1->Draw("same");
@@ -231,9 +244,11 @@ void CompareCS(int vgamma)
     hRatioEleTheory->SetLineWidth(3);
 //    hRatioEleTheory->SetLineColor(809); 
 //    hRatioEleTheory->SetMarkerColor(809); 
-    TLegend* leg3 = new TLegend(0.60,0.70,0.80,0.80,config.StrVgType(vgamma));
-    leg3->AddEntry(hRatioMuTheory,"muon","l");
-    leg3->AddEntry(hRatioEleTheory,"electron","l");  
+    TLegend* leg3 = new TLegend(0.50,0.78,0.70,0.88);
+    leg3->SetLineWidth(0);
+    leg3->SetLineColor(0);
+    leg3->AddEntry(hRatioMuTheory,TString("Data ")+StrProcess(vgamma,config.MUON),"l");
+    leg3->AddEntry(hRatioEleTheory,TString("Data ")+StrProcess(vgamma,config.ELECTRON),"l");  
     leg3->SetFillColor(0);
     hRatioMuTheory->GetXaxis()->SetRangeUser(15,500);
     hRatioMuTheory->GetYaxis()->SetRangeUser(0.3,2.7);
@@ -352,7 +367,7 @@ void PrintLatexCS(TH1F* hTheory, TH1F* hMuon_Stat, TH1F* hElectron_Stat,  TH1F* 
 
       std::cout<<hTheory->GetBinContent(ib)<<" & ";     
       std::cout<<hMuon_Stat->GetBinContent(ib)<<" $\\pm$ "<<hMuon_Stat->GetBinError(ib)<<" $\\pm$ "<<hMuon_Syst->GetBinError(ib)<<" & ";
-      std::cout<<hElectron_Stat->GetBinContent(ib)<<" $\\pm$ "<<hElectron_Stat->GetBinError(ib)<<" $\\pm$ "<<hElectron_Syst->GetBinError(ib)<<" & ";
+      std::cout<<hElectron_Stat->GetBinContent(ib)<<" $\\pm$ "<<hElectron_Stat->GetBinError(ib)<<" $\\pm$ "<<hElectron_Syst->GetBinError(ib)<<"  ";
 
       //     std::cout<<std::setprecision(pres)<<_yCSarray[ERR_STAT].crossSection1D->GetBinError(ib)<<" \\pm ";
       //     std::cout<<std::setprecision(pres)<<_yCSarray[ERR_SYST_SUM].crossSection1D->GetBinError(ib)<<"$";
